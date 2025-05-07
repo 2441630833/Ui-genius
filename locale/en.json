@@ -9,6 +9,8 @@
   "index.component": "Component",
   "index.api": "API",
   "index.schema": "Schema",
+  "index.dashboard": "Dashboard",
+  "index.login": "Login",
   "index.demo": "uni-app globalization",
   "index.demo-description": "Include uni-framework, manifest.json, pages.json, tabbar, Page, Component, API, Schema",
   "index.detail": "Detail",

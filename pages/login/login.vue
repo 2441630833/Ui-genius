@@ -1,23 +1,16 @@
 <template>
-  <div class="login-container">
-    <div class="logo-title">
-      <span class="chip-icon">🔴</span>
-      <span class="title">GPU Virtual Rental</span>
-    </div>
-    <div class="login-form">
-      <h2>Welcome Back</h2>
-      <label class="input-label">Username</label>
-      <input type="text" class="input-field" placeholder="" />
-      <label class="input-label">Password</label>
-      <input type="password" class="input-field" placeholder="" />
-      <div class="button-row">
-        <button class="login-btn">Login</button>
-        <button class="signup-btn">Sign Up</button>
-      </div>
+  <div class="login-bg">
+    <div class="login-card">
+      <h2 class="login-title">Login to UiGenius</h2>
+      <input type="text" class="login-input" placeholder="Email" />
+      <input type="password" class="login-input" placeholder="Password" />
+      <button class="main-btn">Login</button>
+      <button class="secondary-btn">Sign Up</button>
       <div class="google-login" @click="auth">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="google-icon" />
         <span>Continue with Google</span>
       </div>
+      <div class="forgot-link">Forgot your password?</div>
     </div>
   </div>
 </template>
@@ -107,102 +100,107 @@ export default {
 </script>
 
 <style scoped>
-.login-container {
+.login-bg {
   min-height: 100vh;
+  background: #fcfbfb;
   display: flex;
-  flex-direction: column;
   align-items: center;
-  justify-content: flex-start;
+  justify-content: center;
+}
+.login-card {
   background: #fff;
-  border-radius: 32px;
-  padding: 32px 0 0 0;
-}
-.logo-title {
-  display: flex;
-  align-items: center;
-  margin-top: 24px;
-  margin-bottom: 80px;
-}
-.chip-icon {
-  font-size: 2.2rem;
-  color: #e53935;
-  margin-right: 10px;
-}
-.title {
-  font-size: 2rem;
-  font-weight: 500;
-}
-.login-form {
+  border-radius: 24px;
+  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  padding: 48px 36px 36px 36px;
   width: 100%;
-  max-width: 420px;
+  max-width: 400px;
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  background: none;
 }
-.login-form h2 {
+.login-title {
   text-align: center;
+  font-size: 2rem;
+  font-weight: 500;
   margin-bottom: 32px;
-  font-size: 2.2rem;
-  font-weight: 400;
+  color: #222;
 }
-.input-label {
-  margin-bottom: 6px;
-  margin-top: 12px;
-  font-size: 1.1rem;
-}
-.input-field {
+.login-input {
   border: none;
   outline: none;
-  border-radius: 32px;
-  padding: 16px 24px;
-  margin-bottom: 8px;
-  background: #fafafa;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
+  border-radius: 18px;
+  padding: 14px 20px;
+  margin-bottom: 18px;
+  background: #f5f5f5;
   font-size: 1.1rem;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   transition: box-shadow 0.2s;
 }
-.input-field:focus {
-  box-shadow: 0 4px 16px rgba(229,57,53,0.12);
+.login-input:focus {
+  box-shadow: 0 2px 8px rgba(229,57,53,0.10);
 }
-.button-row {
-  display: flex;
-  justify-content: space-between;
-  margin: 24px 0 32px 0;
-}
-.login-btn {
-  flex: 1;
-  background: #e53935;
-  color: #fff;
-  border: none;
-  border-radius: 32px;
-  padding: 16px 0;
-  font-size: 1.2rem;
-  font-weight: 500;
-  margin-right: 12px;
+.main-btn {
   cursor: pointer;
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 52px;
+  padding: 0px 8px;
+  border: 0;
+  box-sizing: border-box;
+  border-radius: 22px;
+  background-color: #dd161c;
+  color: #ffffff;
+  font-size: 14px;
+  font-family: 'Roboto Condensed', sans-serif;
+  font-weight: 600;
+  line-height: 20px;
+  outline: none;
+  margin-bottom: 12px;
   transition: background 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
 }
-.login-btn:hover {
+.main-btn:hover {
   background: #b71c1c;
 }
-.signup-btn {
-  flex: 1;
-  background: #fff;
-  color: #757575;
-  border: none;
-  border-radius: 48px;
-  padding: 16px 0;
-  font-size: 1.2rem;
-  font-weight: 500;
-  margin-left: 12px;
+.secondary-btn {
   cursor: pointer;
-  box-shadow: 0 2px 8px rgba(0,0,0,0.07);
-  transition: background 0.2s, color 0.2s;
-}
-.signup-btn:hover {
-  background: #f5f5f5;
+  position: relative;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 52px;
+  padding: 0px 8px;
+  box-sizing: border-box;
+  border-radius: 22px;
+  background: #fff;
   color: #e53935;
+  border: 1px solid #e53935;
+  font-size: 14px;
+  font-family: 'Roboto Condensed', sans-serif;
+  font-weight: 600;
+  line-height: 20px;
+  outline: none;
+  margin-bottom: 18px;
+  transition: background 0.2s, color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+}
+.secondary-btn:hover {
+  background: #fbe9e7;
+}
+.forgot-link {
+  text-align: center;
+  margin-top: 18px;
+  color: #888;
+  font-size: 0.98rem;
+  cursor: pointer;
 }
 .google-login {
   display: flex;

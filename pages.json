@@ -33,6 +33,13 @@
 				"navigationBarTitleText": "%index.schema%",
 				"enablePullDownRefresh": false
 			}
+		},
+		{
+			"path": "pages/dashboard/dashboard",
+			"style": {
+				"navigationBarTitleText": "%index.dashboard%",
+				"enablePullDownRefresh": false
+			}
 		}
 	],
 	"tabBar": {
@@ -54,8 +61,8 @@
 				"text": "%index.component%"
 			},
 			{
-				"pagePath": "pages/api/api",
-				"text": "%index.api%"
+				"pagePath": "pages/dashboard/dashboard",
+				"text": "%index.dashboard%"
 			},
 			{
 				"pagePath": "pages/schema/schema",
