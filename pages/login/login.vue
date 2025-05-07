@@ -14,7 +14,7 @@
         <button class="login-btn">Login</button>
         <button class="signup-btn">Sign Up</button>
       </div>
-      <div class="google-login">
+      <div class="google-login" @click="auth">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="google-icon" />
         <span>Continue with Google</span>
       </div>
@@ -25,6 +25,84 @@
 <script>
 export default {
   name: 'LoginPage',
+  data() {
+    return {
+      title: '',
+      pic: '',
+      email: ''
+    }
+  },
+  // mounted() {
+  //   this.getUserInfo()
+  // },
+  onLoad() {
+    this.getUserInfo()
+  },
+  methods: {
+    auth() {
+      // Google OAuth client ID
+      window.clientId = '137524279748-rg43jumis252rh8odausn13glj64nmit.apps.googleusercontent.com'
+      // Redirect URI
+      window.redirectUri = 'http://localhost:5173'
+      // Requested scopes
+      window.scope = 'email profile'
+      // CSRF protection state
+      window.state = ''
+      // Response type
+      window.responseType = 'code'
+      // Google OAuth client secret
+      window.clientSecret = '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'
+      window.grantType = 'authorization_code'
+
+      window.authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${window.clientId}&redirect_uri=${window.redirectUri}&scope=${window.scope}&state=${window.state}&response_type=${window.responseType}`
+      
+      // Redirect to Google auth page
+      window.location.href = window.authUrl
+    },
+
+    getUserInfo() {
+      const urlParams = new URLSearchParams(window.location.search)
+      const code = urlParams.get('code')
+      if (!code) {
+        return
+      }
+
+      const tokenEndpoint = 'https://oauth2.googleapis.com/token'
+      const requestBody = new URLSearchParams()
+      requestBody.append('code', code)
+      requestBody.append('client_id', '137524279748-rg43jumis252rh8odausn13glj64nmit.apps.googleusercontent.com')
+      requestBody.append('client_secret', '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')
+      requestBody.append('redirect_uri', 'http://localhost:5173')
+      requestBody.append('grant_type', 'authorization_code')
+
+      fetch(tokenEndpoint, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/x-www-form-urlencoded',
+        },
+        body: requestBody
+      })
+        .then(response => response.json())
+        .then(data => {
+          const accessToken = data.access_token
+          return fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
+            headers: {
+              Authorization: `Bearer ${accessToken}`
+            }
+          })
+        })
+        .then(response => response.json())
+        .then(userInfo => {
+          this.title = userInfo.name
+          this.pic = userInfo.picture
+          this.email = userInfo.email
+          console.log('User Info:', userInfo)
+        })
+        .catch(error => {
+          console.error('Error during authentication:', error)
+        })
+    }
+  }
 };
 </script>
 
@@ -113,7 +191,7 @@ export default {
   background: #fff;
   color: #757575;
   border: none;
-  border-radius: 32px;
+  border-radius: 48px;
   padding: 16px 0;
   font-size: 1.2rem;
   font-weight: 500;
@@ -133,7 +211,7 @@ export default {
   gap: 10px;
   background-color: white;
   padding: 12px 24px;
-  border-radius: 8px;
+  border-radius: 18px;
   cursor: pointer;
   border: 1px solid rgba(0, 0, 0, 0.1);
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
