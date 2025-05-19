@@ -2,13 +2,18 @@
   <div class="login-bg">
     <div class="login-card">
       <h2 class="login-title">Login to UiGenius</h2>
-      <input type="text" class="login-input" placeholder="Email" />
-      <input type="password" class="login-input" placeholder="Password" />
-      <button class="main-btn">Login</button>
+      <input type="text" class="login-input" placeholder="Email" v-model="user.email" />
+      <input type="password" class="login-input" placeholder="Password" v-model="user.password" />
+      <button class="main-btn" @click="login">Login</button>
       <button class="secondary-btn">Sign Up</button>
       <div class="google-login" @click="auth">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="google-icon" />
         <span>Continue with Google</span>
+      </div>
+      <div class="remember-link">
+        <checkbox-group>
+          <label><checkbox value="psw" :checked='rememberPsw' @tap="rememberPsw =! rememberPsw" color="#e53935"/>Remember email and password</label>
+        </checkbox-group>
       </div>
       <div class="forgot-link">Forgot your password?</div>
     </div>
@@ -22,16 +27,40 @@ export default {
     return {
       title: '',
       pic: '',
-      email: ''
+      email: '',
+      user: {
+        email: '',
+        password: ''
+      },
+      rememberPsw: true
     }
   },
-  // mounted() {
-  //   this.getUserInfo()
-  // },
-  onLoad() {
+  mounted() {
     this.getUserInfo()
+    // Retrieve stored email and password
+    const userEmail = uni.getStorageSync('userEmail')
+    const userPsw = uni.getStorageSync('userPsw')
+    if (userEmail && userPsw) {
+      this.user.email = userEmail
+      this.user.password = userPsw
+    } else {
+      this.user.email = ''
+      this.user.password = ''
+    }
   },
   methods: {
+    login() {
+      // Save email and password to local storage if rememberPsw is checked
+      if (this.rememberPsw) {
+        uni.setStorageSync('userEmail', this.user.email)
+        uni.setStorageSync('userPsw', this.user.password)
+      } else {
+        uni.removeStorageSync('userEmail')
+        uni.removeStorageSync('userPsw')
+      }
+      
+      // Add your login logic here
+    },
     auth() {
       // Google OAuth client ID
       window.clientId = '137524279748-rg43jumis252rh8odausn13glj64nmit.apps.googleusercontent.com'
@@ -77,10 +106,11 @@ export default {
       })
         .then(response => response.json())
         .then(data => {
-          const accessToken = data.access_token
+          const googleToken = data.access_token
+          uni.setStorageSync('googleToken', googleToken)
           return fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
             headers: {
-              Authorization: `Bearer ${accessToken}`
+              Authorization: `Bearer ${googleToken}`
             }
           })
         })
@@ -231,5 +261,21 @@ export default {
   color: #333;
   font-size: 16px;
   font-weight: 500;
+}
+
+.remember-link {
+  text-align: center;
+  margin-top: 18px;
+  color: #888;
+  font-size: 0.98rem;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.remember-link label {
+  display: flex;
+  align-items: center;
+  cursor: pointer;
 }
 </style>

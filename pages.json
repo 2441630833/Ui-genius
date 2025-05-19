@@ -14,13 +14,6 @@
 			}
 		},
 		{
-			"path": "pages/component/component",
-			"style": {
-				"navigationBarTitleText": "%index.component%",
-				"enablePullDownRefresh": false
-			}
-		},
-		{
 			"path": "pages/api/api",
 			"style": {
 				"navigationBarTitleText": "%index.api%",
@@ -28,7 +21,7 @@
 			}
 		},
 		{
-			"path": "pages/schema/schema",
+			"path": "pages/design/design",
 			"style": {
 				"navigationBarTitleText": "%index.schema%",
 				"enablePullDownRefresh": false
@@ -38,6 +31,13 @@
 			"path": "pages/dashboard/dashboard",
 			"style": {
 				"navigationBarTitleText": "%index.dashboard%",
+				"enablePullDownRefresh": false
+			}
+		},
+		{
+			"path": "pages/grapesEditor/grapesEditor",
+			"style": {
+				"navigationBarTitleText": "GrapesJS Editor",
 				"enablePullDownRefresh": false
 			}
 		}
@@ -57,23 +57,23 @@
 				"text": "%index.home%"
 			},
 			{
-				"pagePath": "pages/component/component",
-				"text": "%index.component%"
-			},
-			{
 				"pagePath": "pages/dashboard/dashboard",
 				"text": "%index.dashboard%"
 			},
 			{
-				"pagePath": "pages/schema/schema",
+				"pagePath": "pages/design/design",
 				"text": "%index.schema%"
+			},
+			{
+				"pagePath": "pages/grapesEditor/grapesEditor",
+				"text": "GrapesJS"
 			}
 		]
 	},
 	"globalStyle": {
 		"navigationBarTextStyle": "black",
-		"navigationBarTitleText": "uni-app",
 		"navigationBarBackgroundColor": "#F8F8F8",
+		"navigationStyle": "custom",
 		"backgroundColor": "#F8F8F8"
 	}
 }

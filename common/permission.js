@@ -15,7 +15,8 @@ export default function initPermission() {
 			invoke(e) { // 调用前拦截
 				console.log('拦截', e)
 				//获取用户的token
-				const token = uni.getStorageSync('token'),
+				const token = uni.getStorageSync('token')
+				const googleToken = uni.getStorageSync('googleToken')
 					//获取要跳转的页面路径（url去掉"?"和"?"后的参数）
 				url = e.url.split('?')[0];
 				let notNeed = whiteList.includes(url)
@@ -23,8 +24,8 @@ export default function initPermission() {
 				if (notNeed) {
 					return e
 				} else {
-					//需要登录
-					if (!token) {
+					//如果token和googleToken都为空，则需要登录
+					if (!token && !googleToken) {
 						uni.showToast({
 							title: '请先登录',
 							icon: 'none'
