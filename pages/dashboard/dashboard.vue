@@ -92,9 +92,9 @@
           <text class="description-label">Describe your project in plain English</text>
           
           <view class="description-container">
-            <view class="try-example-container">
+            <!-- <view class="try-example-container">
               <button class="try-example-btn" @click="tryExample">Try example</button>
-            </view>
+            </view> -->
             <textarea 
               class="project-description-input" 
               placeholder="Enter your project description" 
@@ -448,29 +448,30 @@ export default {
 
 .description-container {
   position: relative;
+  margin-right: 30px;
   margin-bottom: 30px;
 }
 
-.try-example-container {
-  position: absolute;
-  top: 0;
-  right: 0;
-  z-index: 2;
-}
+// .try-example-container {
+//   position: absolute;
+//   top: 0;
+//   right: 0;
+//   z-index: 2;
+//   margin-top: 5px;
+// }
 
-.try-example-btn {
-  background: none;
-  border: none;
-  color: #e53935;
-  padding: 8px 16px;
-  cursor: pointer;
-  font-size: 16px;
-  border-radius: 5px;
+// .try-example-btn {
+//   background: none;
+//   border: 1px solid #e53935;
+//   color: #e53935;
+//   cursor: pointer;
+//   font-size: 16px;
+//   border-radius: 5px;
   
-  &:hover {
-    background-color: rgba(229, 57, 53, 0.1);
-  }
-}
+//   &:hover {
+//     background-color: rgba(253, 215, 215, 0.861);
+//   }
+// }
 
 .project-description-input {
   width: 100%;
