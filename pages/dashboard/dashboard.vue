@@ -4,24 +4,28 @@
     <view class="sidebar">
       <view class="logo-container">
         <view class="logo">
-          <image class="logo-icon" src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Icon paint brush.png"></image>
+          <image class="sidebar-icon" src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Icon paint brush.png"></image>
           <text class="logo-text">UiGenius</text>
         </view>
       </view>
       
       <view class="nav-links">
+        <view class="nav-item" :class="{ active: activeNavItem === 'plus' }" @click="openCreateProjectDialog">
+          <image class="sidebar-icon" :src="activeNavItem === 'plus' ? '../../static/plus_white.png' : '../../static/plus.png'"></image>
+          <text class="nav-text">Create Project</text>
+        </view>
         <view class="nav-item" :class="{ active: activeNavItem === 'dashboard' }" @click="setActiveNavItem('dashboard')">
-          <image class="logo-icon" :src="activeNavItem === 'dashboard' ? '../../static/dashboard_white.png' : '../../static/dashboard.png'"></image>
+          <image class="sidebar-icon" :src="activeNavItem === 'dashboard' ? '../../static/dashboard_white.png' : '../../static/dashboard.png'"></image>
           <text class="nav-text">Dashboard</text>
         </view>
         
         <view class="nav-item" :class="{ active: activeNavItem === 'settings' }" @click="setActiveNavItem('settings')">
-          <image class="logo-icon" :src="activeNavItem === 'settings' ? '../../static/settings_white.png' : '../../static/settings.png'"></image>
+          <image class="sidebar-icon" :src="activeNavItem === 'settings' ? '../../static/settings_white.png' : '../../static/settings.png'"></image>
           <text class="nav-text">Settings</text>
         </view>
         
         <view class="nav-item" :class="{ active: activeNavItem === 'account' }" @click="setActiveNavItem('account')">
-          <image class="logo-icon" :src="activeNavItem === 'account' ? '../../static/account_white.png' : '../../static/account.png'"></image>
+          <image class="sidebar-icon" :src="activeNavItem === 'account' ? '../../static/account_white.png' : '../../static/account.png'"></image>
           <text class="nav-text">Account</text>
         </view>
       </view>
@@ -66,6 +70,44 @@
         </view>
       </view>
     </view>
+    
+    <!-- Create Project Dialog -->
+    <view class="dialog-overlay" v-if="showCreateProjectDialog" @click="closeCreateProjectDialog">
+      <view class="dialog-container" @click.stop>
+        <view class="dialog-content">
+          <text class="dialog-title">Which device are you designing for?</text>
+          
+          <view class="device-options">
+            <view class="device-option" :class="{ 'selected': selectedDevice === 'mobile' }" @click="selectDevice('mobile')">
+              <image class="device-icon" src="../../static/plus.png"></image>
+              <text>Mobile</text>
+            </view>
+            
+            <view class="device-option" :class="{ 'selected': selectedDevice === 'desktop' }" @click="selectDevice('desktop')">
+              <image class="device-icon" src="../../static/plus.png"></image>
+              <text>Desktop</text>
+            </view>
+          </view>
+          
+          <text class="description-label">Describe your project in plain English</text>
+          
+          <view class="description-container">
+            <view class="try-example-container">
+              <button class="try-example-btn" @click="tryExample">Try example</button>
+            </view>
+            <textarea 
+              class="project-description-input" 
+              placeholder="Enter your project description" 
+              v-model="projectDescription"
+              maxlength="300"
+            ></textarea>
+            <text class="char-count">{{ projectDescription.length }}/300</text>
+          </view>
+          
+          <button class="continue-btn" @click="createProject">Continue</button>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -74,12 +116,46 @@ export default {
   name: 'Dashboard',
   data() {
     return {
-      activeNavItem: 'dashboard'
+      activeNavItem: 'dashboard',
+      showCreateProjectDialog: false,
+      selectedDevice: '',
+      projectDescription: '',
+      exampleDescription: 'Dating app for people with magical powers'
     }
   },
   methods: {
     setActiveNavItem(item) {
       this.activeNavItem = item;
+    },
+    openCreateProjectDialog() {
+      this.setActiveNavItem('plus');
+      this.showCreateProjectDialog = true;
+    },
+    closeCreateProjectDialog() {
+      this.showCreateProjectDialog = false;
+    },
+    selectDevice(device) {
+      this.selectedDevice = device;
+    },
+    tryExample() {
+      this.projectDescription = this.exampleDescription;
+    },
+    createProject() {
+      if (!this.selectedDevice) {
+        // Show error or notification that device must be selected
+        return;
+      }
+      if (!this.projectDescription) {
+        // Show error or notification that description is required
+        return;
+      }
+      
+      // Handle project creation logic here
+      console.log('Creating project for', this.selectedDevice);
+      console.log('Description:', this.projectDescription);
+      
+      // Close dialog after creating project
+      this.closeCreateProjectDialog();
     }
   }
 }
@@ -115,7 +191,7 @@ export default {
   gap: 8px;
 }
 
-.logo-icon {
+.sidebar-icon {
   width: 24px;
   height: 24px;
   object-fit: contain;
@@ -156,7 +232,7 @@ export default {
   &.active {
     background-color: #e53935;
     
-    .nav-text, .logo-icon {
+    .nav-text, .sidebar-icon {
       color: white;
     }
   }
@@ -283,6 +359,161 @@ export default {
   
   .projects-grid {
     grid-template-columns: 1fr;
+  }
+}
+
+/* Dialog styles */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 1000;
+}
+
+.dialog-container {
+  width: 80%;
+  max-width: 600px;
+  background-color: #fff;
+  border-radius: 12px;
+  overflow: hidden;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.dialog-content {
+  padding: 30px;
+}
+
+.dialog-title {
+  color: #333;
+  font-size: 24px;
+  font-weight: 600;
+  margin-bottom: 30px;
+  text-align: left;
+  display: block;
+}
+
+.device-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 40px;
+}
+
+.device-option {
+  padding: 15px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: #f8f8f8;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+  
+  &:hover {
+    background-color: #f0f0f0;
+  }
+  
+  &.selected {
+    border-color: #e53935;
+    background-color: rgba(229, 57, 53, 0.1);
+  }
+  
+  text {
+    color: #333;
+    font-size: 16px;
+  }
+}
+
+.device-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+.description-label {
+  color: #333;
+  font-size: 20px;
+  margin-bottom: 20px;
+  display: block;
+}
+
+.description-container {
+  position: relative;
+  margin-bottom: 30px;
+}
+
+.try-example-container {
+  position: absolute;
+  top: 0;
+  right: 0;
+  z-index: 2;
+}
+
+.try-example-btn {
+  background: none;
+  border: none;
+  color: #e53935;
+  padding: 8px 16px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
+  
+  &:hover {
+    background-color: rgba(229, 57, 53, 0.1);
+  }
+}
+
+.project-description-input {
+  width: 100%;
+  height: 120px;
+  padding: 15px;
+  background-color: #f8f8f8;
+  border: 1px solid #eaeaea;
+  border-radius: 10px;
+  color: #333;
+  font-size: 16px;
+  resize: none;
+  
+  &::placeholder {
+    color: #888;
+  }
+}
+
+.char-count {
+  position: absolute;
+  bottom: 10px;
+  right: 10px;
+  color: #888;
+  font-size: 14px;
+}
+
+.continue-btn {
+  background-color: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 20px;
+  font-size: 18px;
+  font-weight: 500;
+  height: 50px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: #d32f2f;
   }
 }
 </style>
