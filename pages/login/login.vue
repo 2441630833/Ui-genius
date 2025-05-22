@@ -21,6 +21,49 @@
 </template>
 
 <script>
+// 添加一个简单的 URLSearchParams polyfill
+// #ifndef H5
+class URLSearchParamsPolyfill {
+  constructor(searchString) {
+    this.params = new Map();
+    
+    if (!searchString || typeof searchString !== 'string') {
+      return;
+    }
+    
+    // 移除开头的 '?' 符号
+    const search = searchString.startsWith('?') ? searchString.substring(1) : searchString;
+    
+    // 解析参数
+    const pairs = search.split('&');
+    for (const pair of pairs) {
+      if (!pair) continue;
+      const parts = pair.split('=');
+      const key = decodeURIComponent(parts[0]);
+      const value = parts.length > 1 ? decodeURIComponent(parts[1]) : '';
+      this.params.set(key, value);
+    }
+  }
+  
+  get(key) {
+    return this.params.get(key) || null;
+  }
+  
+  getAll(key) {
+    return this.params.get(key) ? [this.params.get(key)] : [];
+  }
+  
+  has(key) {
+    return this.params.has(key);
+  }
+}
+
+// 如果平台不支持 URLSearchParams，则使用 polyfill
+if (typeof URLSearchParams === 'undefined') {
+  globalThis.URLSearchParams = URLSearchParamsPolyfill;
+}
+// #endif
+
 export default {
   name: 'LoginPage',
   data() {
@@ -62,6 +105,7 @@ export default {
       // Add your login logic here
     },
     auth() {
+      // #ifdef H5
       // Google OAuth client ID
       window.clientId = '137524279748-rg43jumis252rh8odausn13glj64nmit.apps.googleusercontent.com'
       // Redirect URI
@@ -80,15 +124,47 @@ export default {
       
       // Redirect to Google auth page
       window.location.href = window.authUrl
+      // #endif
+      
+      // #ifndef H5
+      // 非 H5 平台的 Google 登录处理
+      uni.showToast({
+        title: '当前平台暂不支持 Google 登录',
+        icon: 'none'
+      });
+      // #endif
     },
 
     getUserInfo() {
-      const urlParams = new URLSearchParams(window.location.search)
-      const code = urlParams.get('code')
+      let code = null;
+      
+      // #ifdef H5
+      // H5 环境下从 URL 获取 code 参数
+      const urlParams = new URLSearchParams(window.location.search);
+      code = urlParams.get('code');
+      // #endif
+      
+      // #ifdef MP-WEIXIN || MP-ALIPAY || MP-BAIDU || MP-TOUTIAO || MP-QQ || MP-KUAISHOU
+      // 小程序环境从页面参数获取 code
+      if (this.$mp && this.$mp.query && this.$mp.query.code) {
+        code = this.$mp.query.code;
+      }
+      // #endif
+      
+      // #ifdef APP-PLUS
+      // App 环境从页面参数获取 code
+      const pages = getCurrentPages();
+      const currentPage = pages[pages.length - 1];
+      if (currentPage && currentPage.options && currentPage.options.code) {
+        code = currentPage.options.code;
+      }
+      // #endif
+      
       if (!code) {
-        return
+        return;
       }
 
+      // #ifdef H5
       const tokenEndpoint = 'https://oauth2.googleapis.com/token'
       const requestBody = new URLSearchParams()
       requestBody.append('code', code)
@@ -124,6 +200,63 @@ export default {
         .catch(error => {
           console.error('Error during authentication:', error)
         })
+      // #endif
+      
+      // #ifndef H5
+      // 非 H5 环境下，使用 uni.request 代替 fetch
+      // 获取 access_token
+      uni.request({
+        url: 'https://oauth2.googleapis.com/token',
+        method: 'POST',
+        header: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        data: {
+          code: code,
+          client_id: '137524279748-rg43jumis252rh8odausn13glj64nmit.apps.googleusercontent.com',
+          client_secret: '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',
+          redirect_uri: 'http://localhost:5173',
+          grant_type: 'authorization_code'
+        },
+        success: (tokenRes) => {
+          if (tokenRes.statusCode === 200 && tokenRes.data.access_token) {
+            const googleToken = tokenRes.data.access_token;
+            uni.setStorageSync('googleToken', googleToken);
+            
+            // 获取用户信息
+            uni.request({
+              url: 'https://www.googleapis.com/oauth2/v2/userinfo',
+              method: 'GET',
+              header: {
+                'Authorization': `Bearer ${googleToken}`
+              },
+              success: (userRes) => {
+                if (userRes.statusCode === 200) {
+                  this.title = userRes.data.name;
+                  this.pic = userRes.data.picture;
+                  this.email = userRes.data.email;
+                  console.log('User Info:', userRes.data);
+                }
+              },
+              fail: (error) => {
+                console.error('Error getting user info:', error);
+                uni.showToast({ title: '获取用户信息失败', icon: 'none' });
+              }
+            });
+          }
+        },
+        fail: (error) => {
+          console.error('Error during authentication:', error);
+          uni.showToast({ title: '身份验证失败', icon: 'none' });
+        }
+      });
+      // #endif
+    }
+  },
+  // 添加 onLoad 生命周期钩子，确保在小程序环境下也能正确获取参数
+  onLoad(options) {
+    if (options && options.code) {
+      this.getUserInfo();
     }
   }
 };
