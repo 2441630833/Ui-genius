@@ -20,7 +20,11 @@ To get started:
    ```
    python run.py
    ``` 
-
+   
+4、Update the environment:
+   ```
+   conda env update -f environment.yml
+   ``` 
 ## Running the Server
 
 Run the server with:
