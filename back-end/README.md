@@ -21,10 +21,16 @@ To get started:
    python run.py
    ``` 
    
-4、Update the environment:
+4. Update the environment:
    ```
    conda env update -f environment.yml
    ``` 
+5. run on the base environment
+   ```
+   conda activate base
+   pip install -r requirements.txt --user
+   python run.py
+   ```
 ## Running the Server
 
 Run the server with:

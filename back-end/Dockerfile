@@ -18,7 +18,7 @@ EXPOSE 8000
 RUN pip config set global.index-url https://pypi.tuna.tsinghua.edu.cn/simple
 
 # Install dependencies
-RUN pip install --no-cache-dir -r requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt --user
 
 # Create uploads directory
 RUN mkdir -p uploads
