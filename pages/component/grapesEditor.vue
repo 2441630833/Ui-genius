@@ -22,16 +22,18 @@ export default {
   setup() {
     const editorContainer = ref(null)
     let editor = null
-    const projectJSONFromServer = {
+    const projectJSONFromServer = ref({
       "pages": [
         {
           "name": "Bank App",
           "component": "<div class=\"bank-app\" style=\"max-width: 400px; margin: 0 auto; background: white; font-family: Arial, sans-serif; padding: 20px;\">\n  <!-- 顶部导航 -->\n  <div class=\"header\" style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #000; padding-bottom: 10px;\">\n    <h1 style=\"font-size: 24px; margin: 0;\">MinimalBank</h1>\n    <div class=\"user-icon\" style=\"width: 30px; height: 30px; border: 2px solid #000; border-radius: 50%; position: relative;\">\n      <div style=\"position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 15px; height: 15px; border: 2px solid #000; border-radius: 3px;\"></div>\n    </div>\n  </div>\n\n  <!-- 余额显示 -->\n  <div class=\"balance-section\" style=\"margin-bottom: 30px;\">\n    <div style=\"font-size: 14px; margin-bottom: 5px;\">Current Balance</div>\n    <div style=\"font-size: 32px; font-weight: bold;\">$12,345.67</div>\n  </div>\n\n  <!-- 交易记录 -->\n  <div class=\"transactions\">\n    <div class=\"transaction-item\" style=\"margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 15px;\">\n      <div style=\"display: flex; justify-content: space-between;\">\n        <div>\n          <div style=\"font-weight: bold;\">Amazon Purchase</div>\n          <div style=\"font-size: 12px; color: #666;\">March 21, 2023</div>\n        </div>\n        <div style=\"color: #ff4444;\">- $120.00</div>\n      </div>\n    </div>\n\n    <div class=\"transaction-item\" style=\"margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 15px;\">\n      <div style=\"display: flex; justify-content: space-between;\">\n        <div>\n          <div style=\"font-weight: bold;\">Starbucks Coffee</div>\n          <div style=\"font-size: 12px; color: #666;\">March 20, 20,203</div>\n        </div>\n        <div style=\"color: #ff4444;\">- $5.50</div>\n      </div>\n    </div>\n\n    <div class=\"transaction-item\" style=\"margin-bottom: 20px;\">\n      <div style=\"display: flex; justify-content: space-between;\">\n        <div>\n          <div style=\"font-weight: bold;\">Salary Deposit</div>\n          <div style=\"font-size: 12px; color: #666;\">March 15, 20,23</div>\n        </div>\n        <div style=\"color: #00c853;\">+ $5,000.00</div>\n      </div>\n    </div>\n  </div>\n\n  <!-- 底部导航 -->\n  <div class=\"bottom-nav\" style=\"position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 20px; display: flex; justify-content: space-around; border-top: 2px solid #000;\">\n    <svg style=\"width: 24px; height: 24px;\" viewBox=\"0 0 24 24\">\n      <path d=\"M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z\" fill=\"none\" stroke=\"#000\" stroke-width=\"2\"/>\n    </svg>\n    <svg style=\"width: 24px; height: 24px;\" viewBox=\"0 0 24 24\">\n      <path d=\"M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z\" fill=\"none\" stroke=\"#000\" stroke-width=\"2\"/>\n    </svg>\n    <svg style=\"width: 24px; height: 24px;\" viewBox=\"0 0 24 24\">\n      <path d=\"M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z\" fill=\"#000\"/>\n    </svg>\n  </div>\n</div>"
         }
       ]
-    };
+    });
+
+    
     // 初始化编辑器
-    const initEditor = () => {
+    const initEditor = async () => {
       editor = createStudioEditor({
         root: '#studio-editor',
         theme: 'light',
@@ -94,56 +96,66 @@ export default {
         // licenseKey wait to test if necessary
         licenseKey: '9a64fa1035cf4c80b9caeb2bb58d9de2d03fe0ea4d594504a4cdeab362b4b295',
 
-
-        // test
-        // project: {
-        //   type: 'web',
-        //   // The default project to use for new projects
-        //   default: {
-        //     pages: [
-        //       { name: 'Home', component: '<h1>Home page</h1>' },
-        //       { name: 'About', component: '<h1>About page</h1>' },
-        //       { name: 'Contact', component: '<h1>Contact page</h1>' },
-        //     ]
-        //   },
-        // }
-
         storage: {
           type: 'self',
-          autosaveChanges: 5,
-          project: projectJSONFromServer,
-          onSave: async ({ project }) => console.log('Save project', { project }),
+          autosaveChanges: 5, // save after every 5 changes
+          
+          onSave: async ({ project }) => {
+            // await saveToSessionStorage('UIGENIUS_PROJECT_ID', project);
+            // console.log('Project saved', { project });
+          },
+          
+          onLoad: async () => {
+            const latest_generated_page = JSON.parse(uni.getStorageSync('latest_generated_page'));
+            const project = JSON.parse(latest_generated_page);
+            // console.log(project)
+            // console.log('Project loaded', { project });
+            
+            // If the project doesn't exist (eg. first load), use projectJSONFromServer
+            return {
+              project: project || projectJSONFromServer.value
+            };
+          },
         },
-
-        // get project from cloud storage
-        // project: {
-        //   type: 'web',
-        //   id: 'UNIQUE_PROJECT_ID' // 替换为实际项目ID
-        // },
-        // identity: {
-        //   id: 'UNIQUE_END_USER_ID' // 替换为实际用户ID
-        // },
-        // assets: {
-        //   storageType: 'cloud'
-        // },
-        // storage: {
-        //   type: 'cloud',
-        //   autosaveChanges: 100,
-        //   autosaveIntervalMs: 10000
-        // }
       })
     }
+    // Helper functions for session storage
+    const saveToSessionStorage = async (key, data) => {
+      try {
+        if (typeof uni !== 'undefined') {
+          uni.setStorageSync(key, JSON.stringify(data));
+        } else {
+          sessionStorage.setItem(key, JSON.stringify(data));
+        }
+        return true;
+      } catch (error) {
+        console.error('Error saving to storage:', error);
+        return false;
+      }
+    };
+
+    const loadFromSessionStorage = async (key) => {
+      try {
+        let data;
+        if (typeof uni !== 'undefined') {
+          data = uni.getStorageSync(key);
+        } else {
+          data = sessionStorage.getItem(key);
+        }
+        return data ? JSON.parse(data) : null;
+      } catch (error) {
+        console.error('Error loading from storage:', error);
+        return null;
+      }
+    };
 
     // 组件挂载时初始化
-    onMounted(() => {
+    onMounted(async () => {
       initEditor()
     })
 
     // 组件卸载前销毁编辑器
     onBeforeUnmount(() => {
-      if (editor) {
-        editor.destroy()
-      }
     })
 
     return {

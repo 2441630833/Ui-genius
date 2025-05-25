@@ -4,33 +4,41 @@
     <view class="sidebar">
       <view class="logo-container">
         <view class="logo">
-          <image class="sidebar-icon" src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Icon paint brush.png"></image>
+          <image class="sidebar-icon"
+            src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Icon paint brush.png"></image>
           <text class="logo-text">UiGenius</text>
         </view>
       </view>
-      
+
       <view class="nav-links">
         <view class="nav-item" :class="{ active: activeNavItem === 'plus' }" @click="openCreateProjectDialog">
-          <image class="sidebar-icon" :src="activeNavItem === 'plus' ? '../../static/plus_white.png' : '../../static/plus.png'"></image>
+          <image class="sidebar-icon"
+            :src="activeNavItem === 'plus' ? '../../static/plus_white.png' : '../../static/plus.png'"></image>
           <text class="nav-text">Create Project</text>
         </view>
-        <view class="nav-item" :class="{ active: activeNavItem === 'dashboard' }" @click="setActiveNavItem('dashboard')">
-          <image class="sidebar-icon" :src="activeNavItem === 'dashboard' ? '../../static/dashboard_white.png' : '../../static/dashboard.png'"></image>
+        <view class="nav-item" :class="{ active: activeNavItem === 'dashboard' }"
+          @click="setActiveNavItem('dashboard')">
+          <image class="sidebar-icon"
+            :src="activeNavItem === 'dashboard' ? '../../static/dashboard_white.png' : '../../static/dashboard.png'">
+          </image>
           <text class="nav-text">Dashboard</text>
         </view>
-        
+
         <view class="nav-item" :class="{ active: activeNavItem === 'settings' }" @click="setActiveNavItem('settings')">
-          <image class="sidebar-icon" :src="activeNavItem === 'settings' ? '../../static/settings_white.png' : '../../static/settings.png'"></image>
+          <image class="sidebar-icon"
+            :src="activeNavItem === 'settings' ? '../../static/settings_white.png' : '../../static/settings.png'">
+          </image>
           <text class="nav-text">Settings</text>
         </view>
-        
+
         <view class="nav-item" :class="{ active: activeNavItem === 'account' }" @click="setActiveNavItem('account')">
-          <image class="sidebar-icon" :src="activeNavItem === 'account' ? '../../static/account_white.png' : '../../static/account.png'"></image>
+          <image class="sidebar-icon"
+            :src="activeNavItem === 'account' ? '../../static/account_white.png' : '../../static/account.png'"></image>
           <text class="nav-text">Account</text>
         </view>
       </view>
     </view>
-    
+
     <!-- Main Content -->
     <view class="main-content">
       <view class="header">
@@ -40,70 +48,81 @@
           <image class="avatar" src="../../static/avatar1.png"></image>
         </view>
       </view>
-      
+
       <view class="projects-grid">
         <!-- Project Alpha -->
         <view class="project-card">
-          <image class="project-image" src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png" mode="aspectFill"></image>
+          <image class="project-image"
+            src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png" mode="aspectFill">
+          </image>
           <view class="project-content">
             <text class="project-title">Project Alpha</text>
-            <text class="project-description">An innovative project using the latest design tools to create user-friendly interfaces.</text>
+            <text class="project-description">An innovative project using the latest design tools to create
+              user-friendly interfaces.</text>
           </view>
         </view>
-        
+
         <!-- Project Beta -->
         <view class="project-card">
-          <image class="project-image" src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(2).png" mode="aspectFill"></image>
+          <image class="project-image"
+            src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(2).png" mode="aspectFill">
+          </image>
           <view class="project-content">
             <text class="project-title">Project Beta</text>
-            <text class="project-description">Focusing on enhancing user experience through refined design methodologies.</text>
+            <text class="project-description">Focusing on enhancing user experience through refined design
+              methodologies.</text>
           </view>
         </view>
-        
+
         <!-- Project Gamma -->
         <view class="project-card">
-          <image class="project-image" src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(3).png" mode="aspectFill"></image>
+          <image class="project-image"
+            src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(3).png" mode="aspectFill">
+          </image>
           <view class="project-content">
             <text class="project-title">Project Gamma</text>
-            <text class="project-description">Exploring new design paradigms to create futuristic and engaging interfaces.</text>
+            <text class="project-description">Exploring new design paradigms to create futuristic and engaging
+              interfaces.</text>
           </view>
         </view>
       </view>
     </view>
-    
+
     <!-- Create Project Dialog -->
     <view class="dialog-overlay" v-if="showCreateProjectDialog" @click="closeCreateProjectDialog">
       <view class="dialog-container" @click.stop>
         <view class="dialog-content">
           <text class="dialog-title">Which device are you designing for?</text>
-          
+
+          <!-- Error notification -->
+          <view class="error-notification" v-if="errorMessage">
+            <text>{{ errorMessage }}</text>
+          </view>
+
           <view class="device-options">
-            <view class="device-option" :class="{ 'selected': selectedDevice === 'mobile' }" @click="selectDevice('mobile')">
+            <view class="device-option" :class="{ 'selected': selectedDevice === 'mobile' }"
+              @click="selectDevice('mobile')">
               <image class="device-icon" src="../../static/plus.png"></image>
               <text>Mobile</text>
             </view>
-            
-            <view class="device-option" :class="{ 'selected': selectedDevice === 'desktop' }" @click="selectDevice('desktop')">
+
+            <view class="device-option" :class="{ 'selected': selectedDevice === 'desktop' }"
+              @click="selectDevice('desktop')">
               <image class="device-icon" src="../../static/plus.png"></image>
               <text>Desktop</text>
             </view>
           </view>
-          
+
           <text class="description-label">Describe your project in plain English</text>
-          
           <view class="description-container">
             <!-- <view class="try-example-container">
               <button class="try-example-btn" @click="tryExample">Try example</button>
             </view> -->
-            <textarea 
-              class="project-description-input" 
-              placeholder="Enter your project description" 
-              v-model="projectDescription"
-              maxlength="300"
-            ></textarea>
+            <textarea class="project-description-input" placeholder="Enter your project description"
+              v-model="projectDescription" maxlength="300"></textarea>
             <text class="char-count">{{ projectDescription.length }}/300</text>
           </view>
-          
+
           <button class="continue-btn" @click="createProject">Continue</button>
         </view>
       </view>
@@ -120,7 +139,9 @@ export default {
       showCreateProjectDialog: false,
       selectedDevice: '',
       projectDescription: '',
-      exampleDescription: 'Dating app for people with magical powers'
+      exampleDescription: 'Dating app for people with magical powers',
+      errorMessage: '',
+      request_project_id: ''
     }
   },
   methods: {
@@ -130,32 +151,52 @@ export default {
     openCreateProjectDialog() {
       this.setActiveNavItem('plus');
       this.showCreateProjectDialog = true;
+      this.errorMessage = '';
     },
     closeCreateProjectDialog() {
       this.showCreateProjectDialog = false;
+      this.errorMessage = '';
     },
     selectDevice(device) {
       this.selectedDevice = device;
+      this.errorMessage = '';
     },
     tryExample() {
       this.projectDescription = this.exampleDescription;
     },
-    createProject() {
+    async createProject() {
       if (!this.selectedDevice) {
         // Show error or notification that device must be selected
+        this.errorMessage = 'Please select a device type first';
         return;
       }
       if (!this.projectDescription) {
         // Show error or notification that description is required
+        this.errorMessage = 'Please enter a project description';
         return;
       }
-      
-      // Handle project creation logic here
-      console.log('Creating project for', this.selectedDevice);
-      console.log('Description:', this.projectDescription);
-      
-      // Close dialog after creating project
+
+      // Clear error message when validation passes
+      this.errorMessage = '';
+
+      // Show loading indicator
+      uni.showLoading({
+        title: 'Generating your page...'
+      });
+      await uni.removeStorageSync('request_project_id');
+      // 先 removeStorageSync 再 setStorageSync
+      await uni.removeStorageSync('latest_generated_page');
+      // Call the generate-page API
+      // store the projectDescription in the projectDescription variable
+      uni.setStorageSync('projectDescription', this.projectDescription);
+      // Close dialog after successful API response
       this.closeCreateProjectDialog();
+      uni.switchTab({
+        url: '/pages/design/design'
+      });
+
+      // Don't close dialog immediately, wait for API response
+      // this.closeCreateProjectDialog();
     }
   }
 }
@@ -197,12 +238,14 @@ export default {
   object-fit: contain;
   color: #767676;
 }
-.bell-icon{
+
+.bell-icon {
   width: 18px;
   height: 18px;
   object-fit: contain;
   color: #767676;
 }
+
 .logo-text {
   font-size: 20px;
   font-weight: 700;
@@ -224,15 +267,16 @@ export default {
   margin: 0 10px;
   transition: background-color 0.2s;
   gap: 7px;
-  
+
   &:hover {
     background-color: #f0f0f0;
   }
-  
+
   &.active {
     background-color: #e53935;
-    
-    .nav-text, .sidebar-icon {
+
+    .nav-text,
+    .sidebar-icon {
       color: white;
     }
   }
@@ -259,24 +303,24 @@ export default {
   justify-content: space-between;
   align-items: center;
   margin-bottom: 40px;
-  
+
   .title {
     font-size: 24px;
     font-weight: 500;
     color: #333;
   }
-  
+
   .user-actions {
     display: flex;
     align-items: center;
     gap: 20px;
-    
+
     .notification-icon {
       font-size: 20px;
       color: #666;
       cursor: pointer;
     }
-    
+
     .avatar {
       width: 40px;
       height: 40px;
@@ -291,41 +335,41 @@ export default {
   display: grid;
   grid-template-columns: repeat(3, 1fr);
   gap: 30px;
-  
+
   .project-card {
     background-color: #fff;
     border-radius: 12px;
     overflow: hidden;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
     transition: transform 0.3s ease, box-shadow 0.3s ease;
-    
+
     &:hover {
       transform: translateY(-5px);
       box-shadow: 0 8px 16px rgba(0, 0, 0, 0.12);
     }
-    
+
     .project-image {
       width: 100%;
       height: 180px;
       object-fit: cover;
     }
-    
+
     .project-content {
       padding: 20px;
-      
+
       .project-title {
         font-size: 18px;
         font-weight: 600;
         margin-bottom: 12px;
         color: #333;
-        display: block; 
+        display: block;
       }
-      
+
       .project-description {
         font-size: 14px;
         color: #666;
         line-height: 1.5;
-        display: block; 
+        display: block;
       }
     }
   }
@@ -341,22 +385,22 @@ export default {
   .dashboard-container {
     flex-direction: column;
   }
-  
+
   .sidebar {
     width: 100%;
     padding: 15px 0;
   }
-  
+
   .nav-links {
     flex-direction: row;
     justify-content: center;
     flex-wrap: wrap;
   }
-  
+
   .nav-item {
     padding: 10px;
   }
-  
+
   .projects-grid {
     grid-template-columns: 1fr;
   }
@@ -417,16 +461,16 @@ export default {
   cursor: pointer;
   transition: all 0.2s;
   border: 2px solid transparent;
-  
+
   &:hover {
     background-color: #f0f0f0;
   }
-  
+
   &.selected {
     border-color: #e53935;
     background-color: rgba(229, 57, 53, 0.1);
   }
-  
+
   text {
     color: #333;
     font-size: 16px;
@@ -467,7 +511,7 @@ export default {
 //   cursor: pointer;
 //   font-size: 16px;
 //   border-radius: 5px;
-  
+
 //   &:hover {
 //     background-color: rgba(253, 215, 215, 0.861);
 //   }
@@ -483,7 +527,7 @@ export default {
   color: #333;
   font-size: 16px;
   resize: none;
-  
+
   &::placeholder {
     color: #888;
   }
@@ -512,9 +556,21 @@ export default {
   justify-content: center;
   cursor: pointer;
   transition: background-color 0.2s;
-  
+
   &:hover {
     background-color: #d32f2f;
+  }
+}
+
+.error-notification {
+  background-color: #ffd7d7;
+  border-radius: 5px;
+  padding: 10px;
+  margin-bottom: 20px;
+
+  text {
+    color: #e53935;
+    font-size: 14px;
   }
 }
 </style>

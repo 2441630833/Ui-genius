@@ -3,23 +3,27 @@
     <!-- Design Toolbar -->
     <view class="design-toolbar">
       <view class="logo-container">
-        <image class="logo-icon" src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Icon paint brush.png"></image>
+        <image class="logo-icon"
+          src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Icon paint brush.png"></image>
       </view>
-      
+
       <view class="nav-links">
         <view class="nav-item" :class="{ active: activeNavItem === 'plus' }" @click="navigateTo('plus')">
-          <image class="nav-icon" :src="activeNavItem === 'plus' ? '/static/plus_white.png' : '/static/plus.png'"></image>
+          <image class="nav-icon" :src="activeNavItem === 'plus' ? '/static/plus_white.png' : '/static/plus.png'">
+          </image>
         </view>
-        
+
         <view class="nav-item" :class="{ active: activeNavItem === 'magic' }" @click="navigateTo('magic')">
-          <image class="nav-icon" :src="activeNavItem === 'magic' ? '/static/magic_white.png' : '/static/magic.png'"></image>
+          <image class="nav-icon" :src="activeNavItem === 'magic' ? '/static/magic_white.png' : '/static/magic.png'">
+          </image>
         </view>
-        
+
         <view class="nav-item" :class="{ active: activeNavItem === 'color' }" @click="navigateTo('color')">
-          <image class="nav-icon" :src="activeNavItem === 'color' ? '/static/color_white.png' : '/static/color.png'"></image>
+          <image class="nav-icon" :src="activeNavItem === 'color' ? '/static/color_white.png' : '/static/color.png'">
+          </image>
         </view>
-        
-        
+
+
         <!-- <view class="nav-item" :class="{ active: activeNavItem === 'profile' }" @click="navigateTo('profile')">
           <image class="nav-icon" :src="activeNavItem === 'profile' ? '/static/profile_white.png' : '/static/profile.png'"></image>
         </view>
@@ -29,7 +33,7 @@
         </view> -->
       </view>
     </view>
-    
+
     <!-- Main Content -->
     <view class="main-content">
       <view class="header">
@@ -44,13 +48,13 @@
             <image class="icon" src="/static/forward.png"></image>
           </view>
         </view> -->
-        
+
         <view class="zoom-controls">
           <!-- <image class="icon" src="/static/minus.png"></image>
           <text class="zoom-text">15%</text>
           <image class="icon" src="/static/plus.png"></image> -->
         </view>
-        
+
         <view class="right-controls">
           <!-- <view class="action-button play-button">
             <image class="icon" src="/static/play.png"></image>
@@ -58,9 +62,9 @@
           <view class="action-button code-button">
             <image class="icon" src="/static/code.png"></image>
           </view> -->
-          
+
           <view class="separator"></view>
-          
+
           <!-- <view class="tool-button">
             <text class="button-text">Comments</text>
           </view> -->
@@ -70,83 +74,99 @@
           <view class="tool-button">
             <text class="button-text">Export</text>
           </view>
-          
+
           <view class="preview-button">
             <image class="icon" src="/static/play_white.png"></image>
             <text class="preview-text">Preview</text>
           </view>
         </view>
       </view>
-      
+
       <!-- Templates Grid -->
       <view class="section">
         <text class="section-title">Interactive Prototype</text>
         <view class="templates-grid">
           <!-- Signup Template -->
           <view class="template-item" @click="navigateToGrapesEditor()">
-            <image class="template-image" src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png" mode="aspectFill"></image>
+            <image class="template-image"
+              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
+              mode="aspectFill"></image>
             <view class="template-label">
               <text class="template-name">Signup</text>
             </view>
           </view>
-          
+
           <!-- Home Template -->
           <view class="template-item" @click="selectTemplate('home')">
-            <image class="template-image" src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png" mode="aspectFill"></image>
+            <image class="template-image"
+              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
+              mode="aspectFill"></image>
             <view class="template-label">
               <text class="template-name">Home</text>
             </view>
           </view>
-          
+
           <!-- Notifications Template -->
           <view class="template-item" @click="selectTemplate('notifications')">
-            <image class="template-image" src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png" mode="aspectFill"></image>
+            <image class="template-image"
+              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
+              mode="aspectFill"></image>
             <view class="template-label">
               <text class="template-name">Notifications</text>
             </view>
           </view>
-          
+
           <!-- Profile Template -->
           <view class="template-item" @click="selectTemplate('profile')">
-            <image class="template-image" src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png" mode="aspectFill"></image>
+            <image class="template-image"
+              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
+              mode="aspectFill"></image>
             <view class="template-label">
               <text class="template-name">Profile</text>
             </view>
           </view>
-          
+
           <!-- Settings Template -->
           <view class="template-item" @click="selectTemplate('settings')">
-            <image class="template-image" src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png" mode="aspectFill"></image>
+            <image class="template-image"
+              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
+              mode="aspectFill"></image>
             <view class="template-label">
               <text class="template-name">Settings</text>
             </view>
           </view>
         </view>
       </view>
-      
+
       <!-- Additional Design Proposals -->
       <view class="section">
         <text class="section-title">Additional Design Proposals</text>
         <view class="proposals-grid">
           <!-- Login Screen -->
           <view class="proposal-item" @click="selectProposal('login')">
-            <image class="proposal-image" src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png" mode="aspectFill"></image>
+            <image class="proposal-image"
+              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
+              mode="aspectFill"></image>
             <view class="proposal-label">
               <text class="proposal-name">Login Screen</text>
             </view>
           </view>
-          
+
           <!-- Dashboard Screen -->
           <view class="proposal-item" @click="selectProposal('dashboard')">
-            <image class="proposal-image" src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png" mode="aspectFill"></image>
+            <image class="proposal-image"
+              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
+              mode="aspectFill"></image>
             <view class="proposal-label">
               <text class="proposal-name">Dashboard Screen</text>
             </view>
           </view>
-          
+
           <!-- Settings Screen -->
           <view class="proposal-item" @click="selectProposal('settings-alt')">
-            <image class="proposal-image" src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png" mode="aspectFill"></image>
+            <image class="proposal-image"
+              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
+              mode="aspectFill"></image>
             <view class="proposal-label">
               <text class="proposal-name">Settings</text>
             </view>
@@ -164,10 +184,53 @@ export default {
     return {
       activeNavItem: 'home',
       selectedTemplate: null,
-      selectedProposal: null
+      selectedProposal: null,
+      projectDescription: '',
+      project_id: ''
     }
   },
+
   methods: {
+    displayUI() {
+      this.project_id = uni.getStorageSync('request_project_id');
+      if (this.project_id) {
+        console.log(this.project_id);
+      }
+      else {
+        this.projectDescription = uni.getStorageSync('projectDescription');
+        uni.request({
+          url: 'http://localhost:8000/api/generate-ui',
+          method: 'POST',
+          data: {
+            prompt: this.projectDescription
+          },
+          header: {
+            'content-type': 'application/x-www-form-urlencoded'
+          },
+          success: (res) => {
+            // Hide loading indicator
+            uni.hideLoading();
+
+            // Store the response in local storage
+            try {
+              uni.setStorageSync('latest_generated_page', JSON.stringify(res.data));
+              console.log(res.data);
+              console.log('Page generation successful!');
+            } catch (e) {
+              console.error('Error storing generated page data:', e);
+              this.errorMessage = 'Failed to save generated page data';
+            }
+          },
+          fail: (err) => {
+            // Hide loading indicator
+            uni.hideLoading();
+
+            console.error('API call failed:', err);
+            this.errorMessage = 'Failed to generate page. Please try again.';
+          }
+        });
+      }
+    },
     navigateTo(item) {
       this.activeNavItem = item;
     },
@@ -242,11 +305,11 @@ export default {
   transition: background-color 0.2s;
   width: 40px;
   height: 40px;
-  
+
   &:hover {
     background-color: #f0f0f0;
   }
-  
+
   &.active {
     background-color: #e53935;
   }
@@ -269,7 +332,7 @@ export default {
   color: #333;
   margin-top: 4px;
   text-align: center;
-  
+
   .active & {
     color: #fff;
   }
@@ -291,29 +354,31 @@ export default {
   border-bottom: 1px solid #eaeaea;
   background-color: #fff;
   margin-bottom: 20px;
-  
-  .left-controls, .right-controls {
+
+  .left-controls,
+  .right-controls {
     display: flex;
     align-items: center;
     gap: 12px;
   }
-  
-  .device-preview, .navigation-controls {
+
+  .device-preview,
+  .navigation-controls {
     display: flex;
     align-items: center;
     gap: 6px;
     padding: 0 8px;
   }
-  
+
   .navigation-controls {
     margin-left: 12px;
   }
-  
+
   .zoom-controls {
     display: flex;
     align-items: center;
     gap: 8px;
-    
+
     .zoom-text {
       font-size: 14px;
       color: #333;
@@ -321,37 +386,37 @@ export default {
       text-align: center;
     }
   }
-  
+
   .icon {
     width: 20px;
     height: 20px;
     object-fit: contain;
     cursor: pointer;
   }
-  
+
   .separator {
     width: 1px;
     height: 24px;
     background-color: #eaeaea;
     margin: 0 4px;
   }
-  
+
   .tool-button {
     padding: 6px 10px;
     cursor: pointer;
     border-radius: 4px;
     transition: background-color 0.2s;
-    
+
     &:hover {
       background-color: #f5f5f5;
     }
-    
+
     .button-text {
       font-size: 14px;
       color: #333;
     }
   }
-  
+
   .preview-button {
     display: flex;
     align-items: center;
@@ -361,23 +426,23 @@ export default {
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.2s;
-    
+
     &:hover {
       background-color: #c62828;
     }
-    
+
     .icon {
       width: 16px;
       height: 16px;
     }
-    
+
     .preview-text {
       font-size: 14px;
       font-weight: 500;
       color: #fff;
     }
   }
-  
+
   .action-button {
     display: flex;
     align-items: center;
@@ -387,7 +452,7 @@ export default {
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.2s;
-    
+
     &:hover {
       background-color: #f5f5f5;
     }
@@ -421,22 +486,22 @@ export default {
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
-  
+
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
   }
-  
+
   .template-image {
     width: 100%;
     height: 120px;
     object-fit: cover;
     border-bottom: 1px solid #f0f0f0;
   }
-  
+
   .template-label {
     padding: 10px 12px;
-    
+
     .template-name {
       font-size: 14px;
       font-weight: 500;
@@ -459,22 +524,22 @@ export default {
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
-  
+
   &:hover {
     transform: translateY(-3px);
     box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
   }
-  
+
   .proposal-image {
     width: 100%;
     height: 150px;
     object-fit: cover;
     border-bottom: 1px solid #f0f0f0;
   }
-  
+
   .proposal-label {
     padding: 12px 15px;
-    
+
     .proposal-name {
       font-size: 15px;
       font-weight: 500;
@@ -494,31 +559,34 @@ export default {
   .design-container {
     flex-direction: column;
   }
-  
+
   .design-toolbar {
     width: 100%;
     height: 60px;
     flex-direction: row;
     padding: 0 20px;
   }
-  
+
   .logo-container {
     margin-bottom: 0;
     margin-right: 20px;
   }
-  
+
   .nav-links {
     flex-direction: row;
     justify-content: flex-start;
   }
-  
-  .templates-grid, .proposals-grid {
+
+  .templates-grid,
+  .proposals-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 640px) {
-  .templates-grid, .proposals-grid {
+
+  .templates-grid,
+  .proposals-grid {
     grid-template-columns: 1fr;
   }
 }
