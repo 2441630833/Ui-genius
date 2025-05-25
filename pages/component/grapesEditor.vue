@@ -6,9 +6,8 @@
 </template>
 
 <script>
-import { onMounted, onBeforeUnmount, ref, nextTick } from 'vue'
-import createStudioEditor from '@grapesjs/studio-sdk'
 import '@grapesjs/studio-sdk/style'
+import createStudioEditor from '@grapesjs/studio-sdk'
 import { layoutSidebarButtons } from '@grapesjs/studio-sdk-plugins';
 import { iconifyComponent } from "@grapesjs/studio-sdk-plugins";
 import { flexComponent } from "@grapesjs/studio-sdk-plugins";
@@ -19,22 +18,25 @@ import { swiperComponent } from '@grapesjs/studio-sdk-plugins';
 import { dialogComponent } from "@grapesjs/studio-sdk-plugins";
 
 export default {
-  setup() {
-    const editorContainer = ref(null)
-    let editor = null
-    const projectJSONFromServer = ref({
-      "pages": [
-        {
-          "name": "Bank App",
-          "component": "<div class=\"bank-app\" style=\"max-width: 400px; margin: 0 auto; background: white; font-family: Arial, sans-serif; padding: 20px;\">\n  <!-- 顶部导航 -->\n  <div class=\"header\" style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #000; padding-bottom: 10px;\">\n    <h1 style=\"font-size: 24px; margin: 0;\">MinimalBank</h1>\n    <div class=\"user-icon\" style=\"width: 30px; height: 30px; border: 2px solid #000; border-radius: 50%; position: relative;\">\n      <div style=\"position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 15px; height: 15px; border: 2px solid #000; border-radius: 3px;\"></div>\n    </div>\n  </div>\n\n  <!-- 余额显示 -->\n  <div class=\"balance-section\" style=\"margin-bottom: 30px;\">\n    <div style=\"font-size: 14px; margin-bottom: 5px;\">Current Balance</div>\n    <div style=\"font-size: 32px; font-weight: bold;\">$12,345.67</div>\n  </div>\n\n  <!-- 交易记录 -->\n  <div class=\"transactions\">\n    <div class=\"transaction-item\" style=\"margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 15px;\">\n      <div style=\"display: flex; justify-content: space-between;\">\n        <div>\n          <div style=\"font-weight: bold;\">Amazon Purchase</div>\n          <div style=\"font-size: 12px; color: #666;\">March 21, 2023</div>\n        </div>\n        <div style=\"color: #ff4444;\">- $120.00</div>\n      </div>\n    </div>\n\n    <div class=\"transaction-item\" style=\"margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 15px;\">\n      <div style=\"display: flex; justify-content: space-between;\">\n        <div>\n          <div style=\"font-weight: bold;\">Starbucks Coffee</div>\n          <div style=\"font-size: 12px; color: #666;\">March 20, 20,203</div>\n        </div>\n        <div style=\"color: #ff4444;\">- $5.50</div>\n      </div>\n    </div>\n\n    <div class=\"transaction-item\" style=\"margin-bottom: 20px;\">\n      <div style=\"display: flex; justify-content: space-between;\">\n        <div>\n          <div style=\"font-weight: bold;\">Salary Deposit</div>\n          <div style=\"font-size: 12px; color: #666;\">March 15, 20,23</div>\n        </div>\n        <div style=\"color: #00c853;\">+ $5,000.00</div>\n      </div>\n    </div>\n  </div>\n\n  <!-- 底部导航 -->\n  <div class=\"bottom-nav\" style=\"position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 20px; display: flex; justify-content: space-around; border-top: 2px solid #000;\">\n    <svg style=\"width: 24px; height: 24px;\" viewBox=\"0 0 24 24\">\n      <path d=\"M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z\" fill=\"none\" stroke=\"#000\" stroke-width=\"2\"/>\n    </svg>\n    <svg style=\"width: 24px; height: 24px;\" viewBox=\"0 0 24 24\">\n      <path d=\"M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z\" fill=\"none\" stroke=\"#000\" stroke-width=\"2\"/>\n    </svg>\n    <svg style=\"width: 24px; height: 24px;\" viewBox=\"0 0 24 24\">\n      <path d=\"M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z\" fill=\"#000\"/>\n    </svg>\n  </div>\n</div>"
-        }
-      ]
-    });
+  //
+  data() {
+    return {
+      editor: null,
+      projectJSONFromServer: {
+        "pages": [
+          {
+            "name": "Bank App",
+            "component": "<div class=\"bank-app\" style=\"max-width: 400px; margin: 0 auto; background: white; font-family: Arial, sans-serif; padding: 20px;\">\n  <!-- 顶部导航 -->\n  <div class=\"header\" style=\"display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px; border-bottom: 2px solid #000; padding-bottom: 10px;\">\n    <h1 style=\"font-size: 24px; margin: 0;\">MinimalBank</h1>\n    <div class=\"user-icon\" style=\"width: 30px; height: 30px; border: 2px solid #000; border-radius: 50%; position: relative;\">\n      <div style=\"position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 15px; height: 15px; border: 2px solid #000; border-radius: 3px;\"></div>\n    </div>\n  </div>\n\n  <!-- 余额显示 -->\n  <div class=\"balance-section\" style=\"margin-bottom: 30px;\">\n    <div style=\"font-size: 14px; margin-bottom: 5px;\">Current Balance</div>\n    <div style=\"font-size: 32px; font-weight: bold;\">$12,345.67</div>\n  </div>\n\n  <!-- 交易记录 -->\n  <div class=\"transactions\">\n    <div class=\"transaction-item\" style=\"margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 15px;\">\n      <div style=\"display: flex; justify-content: space-between;\">\n        <div>\n          <div style=\"font-weight: bold;\">Amazon Purchase</div>\n          <div style=\"font-size: 12px; color: #666;\">March 21, 2023</div>\n        </div>\n        <div style=\"color: #ff4444;\">- $120.00</div>\n      </div>\n    </div>\n\n    <div class=\"transaction-item\" style=\"margin-bottom: 20px; border-bottom: 1px solid #ddd; padding-bottom: 15px;\">\n      <div style=\"display: flex; justify-content: space-between;\">\n        <div>\n          <div style=\"font-weight: bold;\">Starbucks Coffee</div>\n          <div style=\"font-size: 12px; color: #666;\">March 20, 20,203</div>\n        </div>\n        <div style=\"color: #ff4444;\">- $5.50</div>\n      </div>\n    </div>\n\n    <div class=\"transaction-item\" style=\"margin-bottom: 20px;\">\n      <div style=\"display: flex; justify-content: space-between;\">\n        <div>\n          <div style=\"font-weight: bold;\">Salary Deposit</div>\n          <div style=\"font-size: 12px; color: #666;\">March 15, 20,23</div>\n        </div>\n        <div style=\"color: #00c853;\">+ $5,000.00</div>\n      </div>\n    </div>\n  </div>\n\n  <!-- 底部导航 -->\n  <div class=\"bottom-nav\" style=\"position: fixed; bottom: 0; left: 0; right: 0; background: white; padding: 15px 20px; display: flex; justify-content: space-around; border-top: 2px solid #000;\">\n    <svg style=\"width: 24px; height: 24px;\" viewBox=\"0 0 24 24\">\n      <path d=\"M12 2L2 12h3v8h6v-6h2v6h6v-8h3L12 2z\" fill=\"none\" stroke=\"#000\" stroke-width=\"2\"/>\n    </svg>\n    <svg style=\"width: 24px; height: 24px;\" viewBox=\"0 0 24 24\">\n      <path d=\"M4 8h4V4H4v4zm6 12h4v-4h-4v4zm-6 0h4v-4H4v4zm0-6h4v-4H4v4zm6 0h4v-4h-4v4zm6-10v4h4V4h-4zm-6 4h4V4h-4v4zm6 6h4v-4h-4v4zm0 6h4v-4h-4v4z\" fill=\"none\" stroke=\"#000\" stroke-width=\"2\"/>\n    </svg>\n    <svg style=\"width: 24px; height: 24px;\" viewBox=\"0 0 24 24\">\n      <path d=\"M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z\" fill=\"#000\"/>\n    </svg>\n  </div>\n</div>"
 
-    
+          }
+        ]
+      }
+    }
+  },
+  methods: {
     // 初始化编辑器
-    const initEditor = async () => {
-      editor = createStudioEditor({
+    initEditor() {
+      this.editor = createStudioEditor({
         root: '#studio-editor',
         theme: 'light',
         customTheme: {
@@ -99,28 +101,41 @@ export default {
         storage: {
           type: 'self',
           autosaveChanges: 5, // save after every 5 changes
-          
+
           onSave: async ({ project }) => {
-            // await saveToSessionStorage('UIGENIUS_PROJECT_ID', project);
+            // await this.saveToSessionStorage('UIGENIUS_PROJECT_ID', project);
             // console.log('Project saved', { project });
           },
-          
+
           onLoad: async () => {
-            const latest_generated_page = JSON.parse(uni.getStorageSync('latest_generated_page'));
-            const project = JSON.parse(latest_generated_page);
-            // console.log(project)
-            // console.log('Project loaded', { project });
-            
-            // If the project doesn't exist (eg. first load), use projectJSONFromServer
-            return {
-              project: project || projectJSONFromServer.value
-            };
+            try {
+              const latest_generated_page = uni.getStorageSync('latest_generated_page');
+              let project = null;
+
+              if (latest_generated_page) {
+                try {
+                  project = JSON.parse(latest_generated_page);
+                } catch (parseError) {
+                  console.error('Error parsing latest_generated_page:', parseError);
+                }
+              }
+
+              // If the project doesn't exist (eg. first load), use projectJSONFromServer
+              return {
+                project: project || this.projectJSONFromServer
+              };
+            } catch (error) {
+              console.error('Error in onLoad:', error);
+              return {
+                project: this.projectJSONFromServer
+              };
+            }
           },
         },
       })
-    }
+    },
     // Helper functions for session storage
-    const saveToSessionStorage = async (key, data) => {
+    async saveToSessionStorage(key, data) {
       try {
         if (typeof uni !== 'undefined') {
           uni.setStorageSync(key, JSON.stringify(data));
@@ -132,9 +147,8 @@ export default {
         console.error('Error saving to storage:', error);
         return false;
       }
-    };
-
-    const loadFromSessionStorage = async (key) => {
+    },
+    async loadFromSessionStorage(key) {
       try {
         let data;
         if (typeof uni !== 'undefined') {
@@ -147,20 +161,15 @@ export default {
         console.error('Error loading from storage:', error);
         return null;
       }
-    };
-
-    // 组件挂载时初始化
-    onMounted(async () => {
-      initEditor()
-    })
-
-    // 组件卸载前销毁编辑器
-    onBeforeUnmount(() => {
-    })
-
-    return {
-      editorContainer
     }
+  },
+  // 组件挂载时初始化
+  mounted() {
+    this.initEditor();
+  },
+  // 组件卸载前销毁编辑器
+  beforeDestroy() {
+    // 在Vue2中使用beforeDestroy替代onBeforeUnmount
   }
 }
 </script>
