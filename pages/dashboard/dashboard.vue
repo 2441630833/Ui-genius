@@ -234,7 +234,7 @@ export default {
       });
       await uni.removeStorageSync('request_project_id');
       // 先 removeStorageSync 再 setStorageSync
-      await uni.removeStorageSync('latest_generated_page');
+      await uni.removeStorageSync('latest_7_overall_page');
       // Call the generate-page API
       // store the projectDescription in the projectDescription variable
       uni.setStorageSync('projectDescription', this.projectDescription);

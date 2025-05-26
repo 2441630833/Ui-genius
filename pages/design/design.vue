@@ -1,5 +1,118 @@
 <template>
   <view class="design-container">
+    <!-- Progress Bar Overlay -->
+    <view v-if="isGenerating" class="progress-overlay">
+      <view class="progress-container">
+        <text class="progress-title">Generating UI Design</text>
+        <view class="progress-bar-container">
+          <view class="progress-bar" :style="{ width: generationProgress + '%' }"></view>
+        </view>
+        <text class="progress-percentage">{{ Math.floor(generationProgress) }}%</text>
+        <text class="progress-message">Please wait, this may take a moment...</text>
+      </view>
+    </view>
+
+    <!-- Hidden Template Previews for html2canvas -->
+    <view class="hidden-templates">
+      <!-- Signup Template Preview -->
+      <view id="template-signup" class="template-preview-content">
+        <view class="preview-header">
+          <text class="preview-title">Signup</text>
+        </view>
+        <view class="preview-form">
+          <view class="preview-input"></view>
+          <view class="preview-input"></view>
+          <view class="preview-button"></view>
+        </view>
+      </view>
+
+      <!-- Home Template Preview -->
+      <view id="template-home" class="template-preview-content">
+        <view class="preview-header">
+          <text class="preview-title">Home</text>
+        </view>
+        <view class="preview-content">
+          <view class="preview-card"></view>
+          <view class="preview-card"></view>
+          <view class="preview-card"></view>
+        </view>
+      </view>
+
+      <!-- Notifications Template Preview -->
+      <view id="template-notifications" class="template-preview-content">
+        <view class="preview-header">
+          <text class="preview-title">Notifications</text>
+        </view>
+        <view class="preview-list">
+          <view class="preview-list-item"></view>
+          <view class="preview-list-item"></view>
+          <view class="preview-list-item"></view>
+        </view>
+      </view>
+
+      <!-- Profile Template Preview -->
+      <view id="template-profile" class="template-preview-content">
+        <view class="preview-avatar"></view>
+        <view class="preview-header">
+          <text class="preview-title">Profile</text>
+        </view>
+        <view class="preview-info">
+          <view class="preview-info-item"></view>
+          <view class="preview-info-item"></view>
+        </view>
+      </view>
+
+      <!-- Settings Template Preview -->
+      <view id="template-settings" class="template-preview-content">
+        <view class="preview-header">
+          <text class="preview-title">Settings</text>
+        </view>
+        <view class="preview-settings">
+          <view class="preview-settings-item"></view>
+          <view class="preview-settings-item"></view>
+          <view class="preview-settings-item"></view>
+        </view>
+      </view>
+
+      <!-- Login Proposal Preview -->
+      <view id="proposal-login" class="template-preview-content">
+        <view class="preview-header">
+          <text class="preview-title">Login</text>
+        </view>
+        <view class="preview-form">
+          <view class="preview-input"></view>
+          <view class="preview-input"></view>
+          <view class="preview-button"></view>
+        </view>
+      </view>
+
+      <!-- Dashboard Proposal Preview -->
+      <view id="proposal-dashboard" class="template-preview-content">
+        <view class="preview-header">
+          <text class="preview-title">Dashboard</text>
+        </view>
+        <view class="preview-dashboard">
+          <view class="preview-chart"></view>
+          <view class="preview-stats">
+            <view class="preview-stat-item"></view>
+            <view class="preview-stat-item"></view>
+          </view>
+        </view>
+      </view>
+
+      <!-- Settings Alt Proposal Preview -->
+      <view id="proposal-settings" class="template-preview-content">
+        <view class="preview-header">
+          <text class="preview-title">Settings Alt</text>
+        </view>
+        <view class="preview-settings-alt">
+          <view class="preview-toggle"></view>
+          <view class="preview-toggle"></view>
+          <view class="preview-toggle"></view>
+        </view>
+      </view>
+    </view>
+
     <!-- Design Toolbar -->
     <view class="design-toolbar">
       <view class="logo-container">
@@ -89,9 +202,11 @@
           <!-- Signup Template -->
           <x-skeleton type="banner" :loading="templateLoadingStates.signup">
             <view class="template-item" @click="navigateToGrapesEditor()">
-              <image class="template-image"
-                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
-                mode="aspectFill"></image>
+              <view class="template-preview" id="template-signup">
+                <image class="template-image"
+                  :src="capturedImages.signup || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
+                  mode="aspectFill"></image>
+              </view>
               <view class="template-label">
                 <text class="template-name">Signup</text>
               </view>
@@ -101,9 +216,11 @@
           <!-- Home Template -->
           <x-skeleton type="banner" :loading="templateLoadingStates.home">
             <view class="template-item" @click="selectTemplate('home')">
-              <image class="template-image"
-                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
-                mode="aspectFill"></image>
+              <view class="template-preview" id="template-home">
+                <image class="template-image"
+                  :src="capturedImages.home || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
+                  mode="aspectFill"></image>
+              </view>
               <view class="template-label">
                 <text class="template-name">Home</text>
               </view>
@@ -113,9 +230,11 @@
           <!-- Notifications Template -->
           <x-skeleton type="banner" :loading="templateLoadingStates.notifications">
             <view class="template-item" @click="selectTemplate('notifications')">
-              <image class="template-image"
-                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
-                mode="aspectFill"></image>
+              <view class="template-preview" id="template-notifications">
+                <image class="template-image"
+                  :src="capturedImages.notifications || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
+                  mode="aspectFill"></image>
+              </view>
               <view class="template-label">
                 <text class="template-name">Notifications</text>
               </view>
@@ -125,9 +244,11 @@
           <!-- Profile Template -->
           <x-skeleton type="banner" :loading="templateLoadingStates.profile">
             <view class="template-item" @click="selectTemplate('profile')">
-              <image class="template-image"
-                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
-                mode="aspectFill"></image>
+              <view class="template-preview" id="template-profile">
+                <image class="template-image"
+                  :src="capturedImages.profile || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
+                  mode="aspectFill"></image>
+              </view>
               <view class="template-label">
                 <text class="template-name">Profile</text>
               </view>
@@ -137,9 +258,11 @@
           <!-- Settings Template -->
           <x-skeleton type="banner" :loading="templateLoadingStates.settings">
             <view class="template-item" @click="selectTemplate('settings')">
-              <image class="template-image"
-                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
-                mode="aspectFill"></image>
+              <view class="template-preview" id="template-settings">
+                <image class="template-image"
+                  :src="capturedImages.settings || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
+                  mode="aspectFill"></image>
+              </view>
               <view class="template-label">
                 <text class="template-name">Settings</text>
               </view>
@@ -155,9 +278,11 @@
           <!-- Login Screen -->
           <x-skeleton type="banner" :loading="proposalLoadingStates.login">
             <view class="proposal-item" @click="selectProposal('login')">
-              <image class="proposal-image"
-                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
-                mode="aspectFill"></image>
+              <view class="proposal-preview" id="proposal-login">
+                <image class="proposal-image"
+                  :src="capturedImages.login || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
+                  mode="aspectFill"></image>
+              </view>
               <view class="proposal-label">
                 <text class="proposal-name">Login Screen</text>
               </view>
@@ -167,9 +292,11 @@
           <!-- Dashboard Screen -->
           <x-skeleton type="banner" :loading="proposalLoadingStates.dashboard">
             <view class="proposal-item" @click="selectProposal('dashboard')">
-              <image class="proposal-image"
-                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
-                mode="aspectFill"></image>
+              <view class="proposal-preview" id="proposal-dashboard">
+                <image class="proposal-image"
+                  :src="capturedImages.dashboard || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
+                  mode="aspectFill"></image>
+              </view>
               <view class="proposal-label">
                 <text class="proposal-name">Dashboard Screen</text>
               </view>
@@ -179,9 +306,11 @@
           <!-- Settings Screen -->
           <x-skeleton type="banner" :loading="proposalLoadingStates.settings">
             <view class="proposal-item" @click="selectProposal('settings-alt')">
-              <image class="proposal-image"
-                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
-                mode="aspectFill"></image>
+              <view class="proposal-preview" id="proposal-settings">
+                <image class="proposal-image"
+                  :src="capturedImages.settingsAlt || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
+                  mode="aspectFill"></image>
+              </view>
               <view class="proposal-label">
                 <text class="proposal-name">Settings</text>
               </view>
@@ -194,10 +323,13 @@
 </template>
 
 <script>
+import html2canvas from 'html2canvas';
+
 export default {
   name: 'Design',
   data() {
     return {
+      capturedImages: {},
       activeNavItem: 'home',
       selectedTemplate: null,
       selectedProposal: null,
@@ -205,6 +337,9 @@ export default {
       project_id: '',
       templatesLoading: true,
       proposalsLoading: true,
+      isGenerating: false,
+      generationProgress: 0,
+      progressInterval: null,
       templateLoadingStates: {
         signup: true,
         home: true,
@@ -241,6 +376,11 @@ export default {
     setTimeout(() => {
       this.templateLoadingStates.settings = false;
       this.templatesLoading = false;
+      
+      // Generate preview images after templates are loaded
+      setTimeout(() => {
+        this.generatePreviewImages();
+      }, 1000);
     }, 2000);
     
     // Staggered loading for proposals
@@ -256,6 +396,26 @@ export default {
       this.proposalLoadingStates.settings = false;
       this.proposalsLoading = false;
     }, 2300);
+
+    // Listen for image capture events from renderjs
+    uni.$on('image-captured', this.receiveImageData);
+    uni.$on('capture-error', (data) => {
+      this._errAlert(`Error capturing image: ${data.error}`);
+    });
+  },
+  
+  onShow(){
+    // Only generate UI if we haven't already and we have a project description
+    if (!uni.getStorageSync('latest_7_overall_page') && 
+        uni.getStorageSync('projectDescription')) {
+      this.generateUI();
+    }
+  },
+
+  beforeDestroy() {
+    // Clean up event listeners
+    uni.$off('image-captured', this.receiveImageData);
+    uni.$off('capture-error');
   },
 
   methods: {
@@ -313,44 +473,190 @@ export default {
       }, 2300);
     },
     
-    displayUI() {
+    // Methods to handle HTML2Canvas
+    _showLoading(message) {
+      uni.showLoading({
+        title: message || 'Loading...',
+        mask: true
+      });
+    },
+    
+    _errAlert(message) {
+      uni.hideLoading();
+      uni.showToast({
+        title: message,
+        icon: 'none',
+        duration: 3000
+      });
+    },
+    
+    receiveImageData(data) {
+      uni.hideLoading();
+      console.log(`Received image data for ${data.element}`);
+      
+      // Map element IDs to data properties
+      const elementMap = {
+        'template-signup': 'signup',
+        'template-home': 'home',
+        'template-notifications': 'notifications',
+        'template-profile': 'profile',
+        'template-settings': 'settings',
+        'proposal-login': 'login',
+        'proposal-dashboard': 'dashboard',
+        'proposal-settings': 'settingsAlt'
+      };
+      
+      // Update the captured images
+      if (elementMap[data.element]) {
+        // Use Vue.set to ensure reactivity
+        this.$set(this.capturedImages, elementMap[data.element], data.imageData);
+      }
+    },
+    
+    generatePreviewImages() {
+      const templateIds = [
+        'template-signup', 
+        'template-home', 
+        'template-notifications',
+        'template-profile',
+        'template-settings',
+        'proposal-login',
+        'proposal-dashboard',
+        'proposal-settings'
+      ];
+      
+      templateIds.forEach((id, index) => {
+        setTimeout(() => {
+          this._showLoading('Generating preview image...');
+          uni.$emit('capture-element', { elementId: id });
+        }, index * 500); // Stagger the captures
+      });
+    },
+    
+    generateUI() {
+      // Prevent multiple simultaneous API calls
+      if (this.isGenerating) {
+        console.log('Generation already in progress, skipping duplicate call');
+        return;
+      }
+      
       this.project_id = uni.getStorageSync('request_project_id');
       if (this.project_id) {
         console.log(this.project_id);
-      }
-      else {
+      } else {
         this.projectDescription = uni.getStorageSync('projectDescription');
-        uni.request({
-          url: 'http://localhost:8000/api/generate-ui',
-          method: 'POST',
-          data: {
-            prompt: this.projectDescription
-          },
-          header: {
-            'content-type': 'application/x-www-form-urlencoded'
-          },
-          success: (res) => {
-            // Hide loading indicator
-            uni.hideLoading();
-
-            // Store the response in local storage
-            try {
-              uni.setStorageSync('latest_generated_page', JSON.stringify(res.data));
-              console.log(res.data);
-              console.log('Page generation successful!');
-            } catch (e) {
-              console.error('Error storing generated page data:', e);
-              this.errorMessage = 'Failed to save generated page data';
+        if (this.projectDescription) {
+          // Start progress bar
+          this.isGenerating = true;
+          this.generationProgress = 5;
+          
+          const xhr = new XMLHttpRequest();
+          xhr.open('POST', 'http://localhost:8000/api/generate-ui', true);
+          xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
+          xhr.timeout = 300000; // 5 minutes timeout
+          
+          let receivedContent = '';
+          
+          // Handle progress updates
+          xhr.onprogress = (event) => {
+            if (event.currentTarget.responseText) {
+              const lines = event.currentTarget.responseText.split('\n').filter(line => line.trim());
+              
+              // Process only the latest line to avoid reprocessing
+              if (lines.length > 0) {
+                try {
+                  const latestLine = lines[lines.length - 1];
+                  const data = JSON.parse(latestLine);
+                  
+                  // Update progress based on status
+                  if (data.status === 'started' || data.status === 'generating') {
+                    this.generationProgress = data.progress;
+                    
+                    // Accumulate content if available
+                    if (data.chunk) {
+                      receivedContent += data.chunk;
+                    }
+                  } else if (data.status === 'completed') {
+                    // Complete progress bar
+                    this.generationProgress = 100;
+                    
+                    // Use the complete content
+                    const fullContent = data.content || receivedContent;
+                    
+                    // Store the response in local storage
+                    try {
+                      // Try to parse the content to ensure it's valid JSON
+                      let jsonContent = fullContent;
+                      
+                      // If it's a string, try to parse it first to validate
+                      if (typeof fullContent === 'string') {
+                        // Clean the content if needed
+                        let cleanContent = fullContent.trim();
+                        
+                        // Remove code block markers if present
+                        if (cleanContent.startsWith('```json')) {
+                          cleanContent = cleanContent.replace(/^```json\s*/, '').replace(/```\s*$/, '');
+                        } else if (cleanContent.startsWith('```')) {
+                          cleanContent = cleanContent.replace(/^```\s*/, '').replace(/```\s*$/, '');
+                        }
+                        
+                        // Parse and stringify to ensure valid JSON
+                        const parsedContent = JSON.parse(cleanContent);
+                        jsonContent = JSON.stringify(parsedContent);
+                      }
+                      
+                      uni.setStorageSync('latest_7_overall_page', jsonContent);
+                      uni.removeStorageSync('projectDescription');
+                      console.log('Page generation successful!');
+                    } catch (e) {
+                      console.error('Error processing generated page data:', e);
+                      console.log('Raw content:', fullContent);
+                      this.errorMessage = 'Failed to save generated page data';
+                    }
+                    
+                    // Hide progress bar after a short delay
+                    setTimeout(() => {
+                      this.isGenerating = false;
+                    }, 500);
+                  }
+                } catch (e) {
+                  console.error('Error processing stream chunk:', e);
+                }
+              }
             }
-          },
-          fail: (err) => {
-            // Hide loading indicator
+          };
+          
+          // Handle completion
+          xhr.onload = () => {
+            if (xhr.status === 200) {
+              console.log('Stream complete');
+            } else {
+              console.error('Request failed with status:', xhr.status);
+              this.isGenerating = false;
+            }
+          };
+          
+          // Handle errors
+          xhr.onerror = (err) => {
+            this.isGenerating = false;
             uni.hideLoading();
-
             console.error('API call failed:', err);
             this.errorMessage = 'Failed to generate page. Please try again.';
-          }
-        });
+          };
+          
+          // Handle timeout
+          xhr.ontimeout = () => {
+            this.isGenerating = false;
+            uni.hideLoading();
+            console.error('API call timed out');
+            this.errorMessage = 'Generation timed out. Please try again.';
+          };
+          
+          // Send the request
+          xhr.send('prompt=' + encodeURIComponent(this.projectDescription));
+        } else {
+          console.log(uni.getStorageSync('latest_7_overall_page'));
+        }
       }
     },
     navigateTo(item) {
@@ -375,6 +681,54 @@ export default {
       uni.switchTab({
         url: '/pages/grapesEditor/grapesEditor'
       });
+    }
+  }
+}
+</script>
+
+<script module="renderjs" lang="renderjs">
+import html2canvas from 'html2canvas';
+
+export default {
+  mounted() {
+    // Listen for capture-element events
+    uni.$on('capture-element', this.captureElement);
+  },
+  
+  beforeDestroy() {
+    // Clean up event listener
+    uni.$off('capture-element', this.captureElement);
+  },
+  
+  methods: {
+    captureElement(data) {
+      const { elementId } = data;
+      setTimeout(() => {
+        const dom = document.getElementById(elementId);
+        if (!dom) {
+          console.error(`Element not found: ${elementId}`);
+          uni.$emit('capture-error', { element: elementId, error: 'Element not found' });
+          return;
+        }
+        
+        console.log(`Capturing element: ${elementId}`);
+        
+        html2canvas(dom, {
+          width: dom.clientWidth,
+          height: dom.clientHeight,
+          scrollY: 0,
+          scrollX: 0,
+          useCORS: true,
+          scale: 2 // Higher quality
+        }).then((canvas) => {
+          const imageData = canvas.toDataURL('image/png');
+          // Send the image data back to the Vue component
+          uni.$emit('image-captured', { element: elementId, imageData });
+        }).catch(err => {
+          console.error(`Failed to generate image for ${elementId}:`, err);
+          uni.$emit('capture-error', { element: elementId, error: err.toString() });
+        });
+      }, 100);
     }
   }
 }
@@ -711,5 +1065,220 @@ export default {
   .proposals-grid {
     grid-template-columns: 1fr;
   }
+}
+
+/* Progress Bar Styles */
+.progress-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.9);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.progress-container {
+  background-color: white;
+  padding: 30px;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  width: 80%;
+  max-width: 500px;
+  text-align: center;
+}
+
+.progress-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.progress-bar-container {
+  height: 8px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  margin: 15px 0;
+  overflow: hidden;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #e53935;
+  border-radius: 4px;
+  transition: width 0.3s ease;
+}
+
+.progress-percentage {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.progress-message {
+  font-size: 14px;
+  color: #666;
+}
+
+/* Hidden Templates Styles */
+.hidden-templates {
+  position: fixed;
+  top: -9999px;
+  left: -9999px;
+  z-index: -1;
+  opacity: 0;
+}
+
+.template-preview-content {
+  width: 300px;
+  height: 200px;
+  background-color: #ffffff;
+  border-radius: 8px;
+  overflow: hidden;
+  padding: 16px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.preview-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.preview-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.preview-form {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.preview-input {
+  height: 36px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.preview-button {
+  height: 40px;
+  background-color: #e53935;
+  border-radius: 4px;
+  margin-top: 8px;
+}
+
+.preview-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.preview-card {
+  height: 36px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.preview-list {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.preview-list-item {
+  height: 36px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.preview-avatar {
+  width: 64px;
+  height: 64px;
+  border-radius: 32px;
+  background-color: #e0e0e0;
+  margin: 0 auto 16px;
+}
+
+.preview-info {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+}
+
+.preview-info-item {
+  height: 24px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.preview-settings {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.preview-settings-item {
+  height: 36px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.preview-dashboard {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.preview-chart {
+  height: 80px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.preview-stats {
+  display: flex;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.preview-stat-item {
+  flex: 1;
+  height: 40px;
+  background-color: #f5f5f5;
+  border-radius: 4px;
+}
+
+.preview-settings-alt {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.preview-toggle {
+  height: 32px;
+  background-color: #f5f5f5;
+  border-radius: 16px;
+  position: relative;
+}
+
+.preview-toggle::after {
+  content: '';
+  position: absolute;
+  top: 4px;
+  right: 4px;
+  width: 24px;
+  height: 24px;
+  border-radius: 12px;
+  background-color: #e53935;
 }
 </style>

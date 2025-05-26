@@ -79,5 +79,8 @@
     "dependencies": {
         "@grapesjs/studio-sdk": "^1.0.45",
         "@grapesjs/studio-sdk-plugins": "^1.0.21"
+    },
+    "devDependencies": {
+        "html2canvas": "^1.4.1"
     }
 }
