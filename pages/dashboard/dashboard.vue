@@ -51,40 +51,46 @@
 
       <view class="projects-grid">
         <!-- Project Alpha -->
-        <view class="project-card">
-          <image class="project-image"
-            src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png" mode="aspectFill">
-          </image>
-          <view class="project-content">
-            <text class="project-title">Project Alpha</text>
-            <text class="project-description">An innovative project using the latest design tools to create
-              user-friendly interfaces.</text>
+        <x-skeleton type="banner" :loading="projectLoadingStates.alpha">
+          <view class="project-card">
+            <image class="project-image"
+              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png" mode="aspectFill">
+            </image>
+            <view class="project-content">
+              <text class="project-title">Project Alpha</text>
+              <text class="project-description">An innovative project using the latest design tools to create
+                user-friendly interfaces.</text>
+            </view>
           </view>
-        </view>
+        </x-skeleton>
 
         <!-- Project Beta -->
-        <view class="project-card">
-          <image class="project-image"
-            src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(2).png" mode="aspectFill">
-          </image>
-          <view class="project-content">
-            <text class="project-title">Project Beta</text>
-            <text class="project-description">Focusing on enhancing user experience through refined design
-              methodologies.</text>
+        <x-skeleton type="banner" :loading="projectLoadingStates.beta">
+          <view class="project-card">
+            <image class="project-image"
+              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(2).png" mode="aspectFill">
+            </image>
+            <view class="project-content">
+              <text class="project-title">Project Beta</text>
+              <text class="project-description">Focusing on enhancing user experience through refined design
+                methodologies.</text>
+            </view>
           </view>
-        </view>
+        </x-skeleton>
 
         <!-- Project Gamma -->
-        <view class="project-card">
-          <image class="project-image"
-            src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(3).png" mode="aspectFill">
-          </image>
-          <view class="project-content">
-            <text class="project-title">Project Gamma</text>
-            <text class="project-description">Exploring new design paradigms to create futuristic and engaging
-              interfaces.</text>
+        <x-skeleton type="banner" :loading="projectLoadingStates.gamma">
+          <view class="project-card">
+            <image class="project-image"
+              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(3).png" mode="aspectFill">
+            </image>
+            <view class="project-content">
+              <text class="project-title">Project Gamma</text>
+              <text class="project-description">Exploring new design paradigms to create futuristic and engaging
+                interfaces.</text>
+            </view>
           </view>
-        </view>
+        </x-skeleton>
       </view>
     </view>
 
@@ -141,12 +147,55 @@ export default {
       projectDescription: '',
       exampleDescription: 'Dating app for people with magical powers',
       errorMessage: '',
-      request_project_id: ''
+      request_project_id: '',
+      projectLoadingStates: {
+        alpha: true,
+        beta: true,
+        gamma: true
+      }
     }
   },
+  mounted() {
+    // Staggered loading for projects
+    setTimeout(() => {
+      this.projectLoadingStates.alpha = false;
+    }, 800);
+    
+    setTimeout(() => {
+      this.projectLoadingStates.beta = false;
+    }, 1300);
+    
+    setTimeout(() => {
+      this.projectLoadingStates.gamma = false;
+    }, 1800);
+  },
   methods: {
+    refreshProjects() {
+      // Reset all project loading states
+      this.projectLoadingStates.alpha = true;
+      this.projectLoadingStates.beta = true;
+      this.projectLoadingStates.gamma = true;
+      
+      // Staggered loading for projects
+      setTimeout(() => {
+        this.projectLoadingStates.alpha = false;
+      }, 800);
+      
+      setTimeout(() => {
+        this.projectLoadingStates.beta = false;
+      }, 1300);
+      
+      setTimeout(() => {
+        this.projectLoadingStates.gamma = false;
+      }, 1800);
+    },
     setActiveNavItem(item) {
       this.activeNavItem = item;
+      
+      // Refresh projects when switching to dashboard
+      if (item === 'dashboard') {
+        this.refreshProjects();
+      }
     },
     openCreateProjectDialog() {
       this.setActiveNavItem('plus');

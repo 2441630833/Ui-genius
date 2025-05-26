@@ -87,54 +87,64 @@
         <text class="section-title">Interactive Prototype</text>
         <view class="templates-grid">
           <!-- Signup Template -->
-          <view class="template-item" @click="navigateToGrapesEditor()">
-            <image class="template-image"
-              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
-              mode="aspectFill"></image>
-            <view class="template-label">
-              <text class="template-name">Signup</text>
+          <x-skeleton type="banner" :loading="templateLoadingStates.signup">
+            <view class="template-item" @click="navigateToGrapesEditor()">
+              <image class="template-image"
+                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
+                mode="aspectFill"></image>
+              <view class="template-label">
+                <text class="template-name">Signup</text>
+              </view>
             </view>
-          </view>
+          </x-skeleton>
 
           <!-- Home Template -->
-          <view class="template-item" @click="selectTemplate('home')">
-            <image class="template-image"
-              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
-              mode="aspectFill"></image>
-            <view class="template-label">
-              <text class="template-name">Home</text>
+          <x-skeleton type="banner" :loading="templateLoadingStates.home">
+            <view class="template-item" @click="selectTemplate('home')">
+              <image class="template-image"
+                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
+                mode="aspectFill"></image>
+              <view class="template-label">
+                <text class="template-name">Home</text>
+              </view>
             </view>
-          </view>
+          </x-skeleton>
 
           <!-- Notifications Template -->
-          <view class="template-item" @click="selectTemplate('notifications')">
-            <image class="template-image"
-              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
-              mode="aspectFill"></image>
-            <view class="template-label">
-              <text class="template-name">Notifications</text>
+          <x-skeleton type="banner" :loading="templateLoadingStates.notifications">
+            <view class="template-item" @click="selectTemplate('notifications')">
+              <image class="template-image"
+                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
+                mode="aspectFill"></image>
+              <view class="template-label">
+                <text class="template-name">Notifications</text>
+              </view>
             </view>
-          </view>
+          </x-skeleton>
 
           <!-- Profile Template -->
-          <view class="template-item" @click="selectTemplate('profile')">
-            <image class="template-image"
-              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
-              mode="aspectFill"></image>
-            <view class="template-label">
-              <text class="template-name">Profile</text>
+          <x-skeleton type="banner" :loading="templateLoadingStates.profile">
+            <view class="template-item" @click="selectTemplate('profile')">
+              <image class="template-image"
+                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
+                mode="aspectFill"></image>
+              <view class="template-label">
+                <text class="template-name">Profile</text>
+              </view>
             </view>
-          </view>
+          </x-skeleton>
 
           <!-- Settings Template -->
-          <view class="template-item" @click="selectTemplate('settings')">
-            <image class="template-image"
-              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
-              mode="aspectFill"></image>
-            <view class="template-label">
-              <text class="template-name">Settings</text>
+          <x-skeleton type="banner" :loading="templateLoadingStates.settings">
+            <view class="template-item" @click="selectTemplate('settings')">
+              <image class="template-image"
+                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
+                mode="aspectFill"></image>
+              <view class="template-label">
+                <text class="template-name">Settings</text>
+              </view>
             </view>
-          </view>
+          </x-skeleton>
         </view>
       </view>
 
@@ -143,34 +153,40 @@
         <text class="section-title">Additional Design Proposals</text>
         <view class="proposals-grid">
           <!-- Login Screen -->
-          <view class="proposal-item" @click="selectProposal('login')">
-            <image class="proposal-image"
-              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
-              mode="aspectFill"></image>
-            <view class="proposal-label">
-              <text class="proposal-name">Login Screen</text>
+          <x-skeleton type="banner" :loading="proposalLoadingStates.login">
+            <view class="proposal-item" @click="selectProposal('login')">
+              <image class="proposal-image"
+                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
+                mode="aspectFill"></image>
+              <view class="proposal-label">
+                <text class="proposal-name">Login Screen</text>
+              </view>
             </view>
-          </view>
+          </x-skeleton>
 
           <!-- Dashboard Screen -->
-          <view class="proposal-item" @click="selectProposal('dashboard')">
-            <image class="proposal-image"
-              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
-              mode="aspectFill"></image>
-            <view class="proposal-label">
-              <text class="proposal-name">Dashboard Screen</text>
+          <x-skeleton type="banner" :loading="proposalLoadingStates.dashboard">
+            <view class="proposal-item" @click="selectProposal('dashboard')">
+              <image class="proposal-image"
+                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
+                mode="aspectFill"></image>
+              <view class="proposal-label">
+                <text class="proposal-name">Dashboard Screen</text>
+              </view>
             </view>
-          </view>
+          </x-skeleton>
 
           <!-- Settings Screen -->
-          <view class="proposal-item" @click="selectProposal('settings-alt')">
-            <image class="proposal-image"
-              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
-              mode="aspectFill"></image>
-            <view class="proposal-label">
-              <text class="proposal-name">Settings</text>
+          <x-skeleton type="banner" :loading="proposalLoadingStates.settings">
+            <view class="proposal-item" @click="selectProposal('settings-alt')">
+              <image class="proposal-image"
+                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
+                mode="aspectFill"></image>
+              <view class="proposal-label">
+                <text class="proposal-name">Settings</text>
+              </view>
             </view>
-          </view>
+          </x-skeleton>
         </view>
       </view>
     </view>
@@ -186,11 +202,117 @@ export default {
       selectedTemplate: null,
       selectedProposal: null,
       projectDescription: '',
-      project_id: ''
+      project_id: '',
+      templatesLoading: true,
+      proposalsLoading: true,
+      templateLoadingStates: {
+        signup: true,
+        home: true,
+        notifications: true,
+        profile: true,
+        settings: true
+      },
+      proposalLoadingStates: {
+        login: true,
+        dashboard: true,
+        settings: true
+      }
     }
   },
 
+  mounted() {
+    // Staggered loading for templates
+    setTimeout(() => {
+      this.templateLoadingStates.signup = false;
+    }, 800);
+    
+    setTimeout(() => {
+      this.templateLoadingStates.home = false;
+    }, 1100);
+    
+    setTimeout(() => {
+      this.templateLoadingStates.notifications = false;
+    }, 1400);
+    
+    setTimeout(() => {
+      this.templateLoadingStates.profile = false;
+    }, 1700);
+    
+    setTimeout(() => {
+      this.templateLoadingStates.settings = false;
+      this.templatesLoading = false;
+    }, 2000);
+    
+    // Staggered loading for proposals
+    setTimeout(() => {
+      this.proposalLoadingStates.login = false;
+    }, 1500);
+    
+    setTimeout(() => {
+      this.proposalLoadingStates.dashboard = false;
+    }, 1900);
+    
+    setTimeout(() => {
+      this.proposalLoadingStates.settings = false;
+      this.proposalsLoading = false;
+    }, 2300);
+  },
+
   methods: {
+    refreshData() {
+      // Reset all loading states
+      this.templatesLoading = true;
+      this.proposalsLoading = true;
+      
+      // Reset template loading states
+      this.templateLoadingStates.signup = true;
+      this.templateLoadingStates.home = true;
+      this.templateLoadingStates.notifications = true;
+      this.templateLoadingStates.profile = true;
+      this.templateLoadingStates.settings = true;
+      
+      // Reset proposal loading states
+      this.proposalLoadingStates.login = true;
+      this.proposalLoadingStates.dashboard = true;
+      this.proposalLoadingStates.settings = true;
+      
+      // Staggered loading for templates
+      setTimeout(() => {
+        this.templateLoadingStates.signup = false;
+      }, 800);
+      
+      setTimeout(() => {
+        this.templateLoadingStates.home = false;
+      }, 1100);
+      
+      setTimeout(() => {
+        this.templateLoadingStates.notifications = false;
+      }, 1400);
+      
+      setTimeout(() => {
+        this.templateLoadingStates.profile = false;
+      }, 1700);
+      
+      setTimeout(() => {
+        this.templateLoadingStates.settings = false;
+        this.templatesLoading = false;
+      }, 2000);
+      
+      // Staggered loading for proposals
+      setTimeout(() => {
+        this.proposalLoadingStates.login = false;
+      }, 1500);
+      
+      setTimeout(() => {
+        this.proposalLoadingStates.dashboard = false;
+      }, 1900);
+      
+      setTimeout(() => {
+        this.proposalLoadingStates.settings = false;
+        this.proposalsLoading = false;
+      }, 2300);
+    },
+    
     displayUI() {
       this.project_id = uni.getStorageSync('request_project_id');
       if (this.project_id) {
