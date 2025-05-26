@@ -215,7 +215,7 @@
 
           <!-- Home Template -->
           <x-skeleton type="banner" :loading="templateLoadingStates.home">
-            <view class="template-item" @click="selectTemplate('home')">
+            <view class="template-item" @click="navigateToGrapesEditor()">
               <view class="template-preview" id="template-home">
                 <image class="template-image"
                   :src="capturedImages.home || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
@@ -229,7 +229,7 @@
 
           <!-- Notifications Template -->
           <x-skeleton type="banner" :loading="templateLoadingStates.notifications">
-            <view class="template-item" @click="selectTemplate('notifications')">
+            <view class="template-item" @click="navigateToGrapesEditor()">
               <view class="template-preview" id="template-notifications">
                 <image class="template-image"
                   :src="capturedImages.notifications || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
@@ -243,7 +243,7 @@
 
           <!-- Profile Template -->
           <x-skeleton type="banner" :loading="templateLoadingStates.profile">
-            <view class="template-item" @click="selectTemplate('profile')">
+            <view class="template-item" @click="navigateToGrapesEditor()">
               <view class="template-preview" id="template-profile">
                 <image class="template-image"
                   :src="capturedImages.profile || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
@@ -257,7 +257,7 @@
 
           <!-- Settings Template -->
           <x-skeleton type="banner" :loading="templateLoadingStates.settings">
-            <view class="template-item" @click="selectTemplate('settings')">
+            <view class="template-item" @click="navigateToGrapesEditor()">
               <view class="template-preview" id="template-settings">
                 <image class="template-image"
                   :src="capturedImages.settings || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
@@ -277,7 +277,7 @@
         <view class="proposals-grid">
           <!-- Login Screen -->
           <x-skeleton type="banner" :loading="proposalLoadingStates.login">
-            <view class="proposal-item" @click="selectProposal('login')">
+            <view class="proposal-item" @click="navigateToGrapesEditor()">
               <view class="proposal-preview" id="proposal-login">
                 <image class="proposal-image"
                   :src="capturedImages.login || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
@@ -291,7 +291,7 @@
 
           <!-- Dashboard Screen -->
           <x-skeleton type="banner" :loading="proposalLoadingStates.dashboard">
-            <view class="proposal-item" @click="selectProposal('dashboard')">
+            <view class="proposal-item" @click="navigateToGrapesEditor()">
               <view class="proposal-preview" id="proposal-dashboard">
                 <image class="proposal-image"
                   :src="capturedImages.dashboard || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
@@ -305,7 +305,7 @@
 
           <!-- Settings Screen -->
           <x-skeleton type="banner" :loading="proposalLoadingStates.settings">
-            <view class="proposal-item" @click="selectProposal('settings-alt')">
+            <view class="proposal-item" @click="navigateToGrapesEditor()">
               <view class="proposal-preview" id="proposal-settings">
                 <image class="proposal-image"
                   :src="capturedImages.settingsAlt || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
