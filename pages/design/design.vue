@@ -896,9 +896,11 @@ export default {
   .preview-button {
     display: flex;
     align-items: center;
+    height: 16px;
     gap: 6px;
     background-color: #e53935;
     padding: 7px 14px;
+    margin-bottom: 7px;
     border-radius: 4px;
     cursor: pointer;
     transition: background-color 0.2s;
