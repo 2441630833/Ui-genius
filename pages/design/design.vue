@@ -14,103 +14,117 @@
 
     <!-- Hidden Template Previews for html2canvas -->
     <view class="hidden-templates">
-      <!-- Signup Template Preview -->
-      <view id="template-signup" class="template-preview-content">
-        <view class="preview-header">
-          <text class="preview-title">Signup</text>
+      <!-- Dynamic Templates from JSON -->
+      <template v-if="jsonTemplates.length > 0">
+        <!-- Only render the filtered templates -->
+        <view v-for="(template, index) in filteredTemplates" :key="index" 
+              :id="'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')" 
+              class="template-preview-content">
+          <view class="preview-header">
+            <text class="preview-title">{{ template.name.replace(/ Page/i, '') }}</text>
+          </view>
+          <view class="preview-content" v-html="getSimplifiedPreview(template)"></view>
         </view>
-        <view class="preview-form">
-          <view class="preview-input"></view>
-          <view class="preview-input"></view>
-          <view class="preview-button"></view>
+        
+        <!-- Render proposal templates separately -->
+        <view v-for="(template, index) in activeProposalTemplates" :key="'proposal-'+index" 
+              :id="'proposal-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')" 
+              class="template-preview-content">
+          <view class="preview-header">
+            <text class="preview-title">{{ template.name.replace(/ Page/i, '') }}</text>
+          </view>
+          <view class="preview-content" v-html="getSimplifiedPreview(template)"></view>
         </view>
-      </view>
-
-      <!-- Home Template Preview -->
-      <view id="template-home" class="template-preview-content">
-        <view class="preview-header">
-          <text class="preview-title">Home</text>
-        </view>
-        <view class="preview-content">
-          <view class="preview-card"></view>
-          <view class="preview-card"></view>
-          <view class="preview-card"></view>
-        </view>
-      </view>
-
-      <!-- Notifications Template Preview -->
-      <view id="template-notifications" class="template-preview-content">
-        <view class="preview-header">
-          <text class="preview-title">Notifications</text>
-        </view>
-        <view class="preview-list">
-          <view class="preview-list-item"></view>
-          <view class="preview-list-item"></view>
-          <view class="preview-list-item"></view>
-        </view>
-      </view>
-
-      <!-- Profile Template Preview -->
-      <view id="template-profile" class="template-preview-content">
-        <view class="preview-avatar"></view>
-        <view class="preview-header">
-          <text class="preview-title">Profile</text>
-        </view>
-        <view class="preview-info">
-          <view class="preview-info-item"></view>
-          <view class="preview-info-item"></view>
-        </view>
-      </view>
-
-      <!-- Settings Template Preview -->
-      <view id="template-settings" class="template-preview-content">
-        <view class="preview-header">
-          <text class="preview-title">Settings</text>
-        </view>
-        <view class="preview-settings">
-          <view class="preview-settings-item"></view>
-          <view class="preview-settings-item"></view>
-          <view class="preview-settings-item"></view>
-        </view>
-      </view>
-
-      <!-- Login Proposal Preview -->
-      <view id="proposal-login" class="template-preview-content">
-        <view class="preview-header">
-          <text class="preview-title">Login</text>
-        </view>
-        <view class="preview-form">
-          <view class="preview-input"></view>
-          <view class="preview-input"></view>
-          <view class="preview-button"></view>
-        </view>
-      </view>
-
-      <!-- Dashboard Proposal Preview -->
-      <view id="proposal-dashboard" class="template-preview-content">
-        <view class="preview-header">
-          <text class="preview-title">Dashboard</text>
-        </view>
-        <view class="preview-dashboard">
-          <view class="preview-chart"></view>
-          <view class="preview-stats">
-            <view class="preview-stat-item"></view>
-            <view class="preview-stat-item"></view>
+      </template>
+      
+      <!-- Fallback Static Templates -->
+      <template v-else>
+        <!-- Signup Template Preview -->
+        <view id="template-signup" class="template-preview-content">
+          <view class="preview-header">
+            <text class="preview-title">Signup</text>
+          </view>
+          <view class="preview-form">
+            <view class="preview-input"></view>
+            <view class="preview-input"></view>
+            <view class="preview-button"></view>
           </view>
         </view>
-      </view>
 
-      <!-- Settings Alt Proposal Preview -->
-      <view id="proposal-settings" class="template-preview-content">
-        <view class="preview-header">
-          <text class="preview-title">Settings Alt</text>
+        <!-- Home Template Preview -->
+        <view id="template-home" class="template-preview-content">
+          <view class="preview-header">
+            <text class="preview-title">Home</text>
+          </view>
+          <view class="preview-content">
+            <view class="preview-card"></view>
+            <view class="preview-card"></view>
+            <view class="preview-card"></view>
+          </view>
         </view>
-        <view class="preview-settings-alt">
-          <view class="preview-toggle"></view>
-          <view class="preview-toggle"></view>
-          <view class="preview-toggle"></view>
+
+        <!-- notification Template Preview -->
+        <view id="template-notification" class="template-preview-content">
+          <view class="preview-header">
+            <text class="preview-title">notification</text>
+          </view>
+          <view class="preview-list">
+            <view class="preview-list-item"></view>
+            <view class="preview-list-item"></view>
+            <view class="preview-list-item"></view>
+          </view>
         </view>
-      </view>
+
+        <!-- Profile Template Preview -->
+        <view id="template-profile" class="template-preview-content">
+          <view class="preview-avatar"></view>
+          <view class="preview-header">
+            <text class="preview-title">Profile</text>
+          </view>
+          <view class="preview-info">
+            <view class="preview-info-item"></view>
+            <view class="preview-info-item"></view>
+          </view>
+        </view>
+
+        <!-- Settings Template Preview -->
+        <view id="template-settings" class="template-preview-content">
+          <view class="preview-header">
+            <text class="preview-title">Settings</text>
+          </view>
+          <view class="preview-settings">
+            <view class="preview-settings-item"></view>
+            <view class="preview-settings-item"></view>
+            <view class="preview-settings-item"></view>
+          </view>
+        </view>
+
+        <!-- Login Proposal Preview -->
+        <view id="proposal-login" class="template-preview-content">
+          <view class="preview-header">
+            <text class="preview-title">Login</text>
+          </view>
+          <view class="preview-form">
+            <view class="preview-input"></view>
+            <view class="preview-input"></view>
+            <view class="preview-button"></view>
+          </view>
+        </view>
+
+        <!-- Dashboard Proposal Preview -->
+        <view id="proposal-dashboard" class="template-preview-content">
+          <view class="preview-header">
+            <text class="preview-title">Dashboard</text>
+          </view>
+          <view class="preview-dashboard">
+            <view class="preview-chart"></view>
+            <view class="preview-stats">
+              <view class="preview-stat-item"></view>
+              <view class="preview-stat-item"></view>
+            </view>
+          </view>
+        </view>
+      </template>
     </view>
 
     <!-- Design Toolbar -->
@@ -199,75 +213,96 @@
       <view class="section">
         <text class="section-title">Interactive Prototype</text>
         <view class="templates-grid">
-          <!-- Signup Template -->
-          <x-skeleton type="banner" :loading="templateLoadingStates.signup">
-            <view class="template-item" @click="navigateToGrapesEditor()">
-              <view class="template-preview" id="template-signup">
-                <image class="template-image"
-                  :src="capturedImages.signup"
-                  mode="aspectFill"></image>
+          <!-- Dynamic Templates from JSON -->
+          <template v-if="jsonTemplates.length > 0">
+            <!-- Filter to only show the 5 main templates -->
+            <x-skeleton v-for="(template, index) in filteredTemplates" :key="index"
+                      type="banner" :loading="templateLoadingStates[template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')]">
+              <view class="template-item" @click="navigateToGrapesEditor()">
+                <view class="template-preview" :id="'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')">
+                  <image class="template-image"
+                    :src="capturedImages[template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')] || ''"
+                    mode="aspectFill"></image>
+                </view>
+                <view class="template-label">
+                  <text class="template-name">{{ template.name.replace(/ Page/i, '') }}</text>
+                </view>
               </view>
-              <view class="template-label">
-                <text class="template-name">Signup</text>
+            </x-skeleton>
+          </template>
+          
+          <!-- Fallback Static Templates -->
+          <template v-else>
+            <!-- Signup Template -->
+            <x-skeleton type="banner" :loading="templateLoadingStates.signup">
+              <view class="template-item" @click="navigateToGrapesEditor()">
+                <view class="template-preview" id="template-signup">
+                  <image class="template-image"
+                    :src="capturedImages.signup"
+                    mode="aspectFill"></image>
+                </view>
+                <view class="template-label">
+                  <text class="template-name">Signup</text>
+                </view>
               </view>
-            </view>
-          </x-skeleton>
+            </x-skeleton>
 
-          <!-- Home Template -->
-          <x-skeleton type="banner" :loading="templateLoadingStates.home">
-            <view class="template-item" @click="navigateToGrapesEditor()">
-              <view class="template-preview" id="template-home">
-                <image class="template-image"
-                  :src="capturedImages.home"
-                  mode="aspectFill"></image>
+            <!-- Home Template -->
+            <x-skeleton type="banner" :loading="templateLoadingStates.home">
+              <view class="template-item" @click="navigateToGrapesEditor()">
+                <view class="template-preview" id="template-home">
+                  <image class="template-image"
+                    :src="capturedImages.home"
+                    mode="aspectFill"></image>
+                </view>
+                <view class="template-label">
+                  <text class="template-name">Home</text>
+                </view>
               </view>
-              <view class="template-label">
-                <text class="template-name">Home</text>
-              </view>
-            </view>
-          </x-skeleton>
+            </x-skeleton>
 
-          <!-- Notifications Template -->
-          <x-skeleton type="banner" :loading="templateLoadingStates.notifications">
-            <view class="template-item" @click="navigateToGrapesEditor()">
-              <view class="template-preview" id="template-notifications">
-                <image class="template-image"
-                  :src="capturedImages.notifications"
-                  mode="aspectFill"></image>
+            <!-- notification Template -->
+            <x-skeleton type="banner" :loading="templateLoadingStates.notification">
+              <view class="template-item" @click="navigateToGrapesEditor()">
+                <view class="template-preview" id="template-notification">
+                  <image class="template-image"
+                    :src="capturedImages.notification"
+                    mode="aspectFill"></image>
+                </view>
+                <view class="template-label">
+                  <text class="template-name">notification</text>
+                </view>
               </view>
-              <view class="template-label">
-                <text class="template-name">Notifications</text>
-              </view>
-            </view>
-          </x-skeleton>
+            </x-skeleton>
 
-          <!-- Profile Template -->
-          <x-skeleton type="banner" :loading="templateLoadingStates.profile">
-            <view class="template-item" @click="navigateToGrapesEditor()">
-              <view class="template-preview" id="template-profile">
-                <image class="template-image"
-                  :src="capturedImages.profile"
-                  mode="aspectFill"></image>
+            <!-- Profile Template -->
+            <x-skeleton type="banner" :loading="templateLoadingStates.profile">
+              <view class="template-item" @click="navigateToGrapesEditor()">
+                <view class="template-preview" id="template-profile">
+                  <image class="template-image"
+                    :src="capturedImages.profile"
+                    mode="aspectFill"></image>
+                </view>
+                <view class="template-label">
+                  <text class="template-name">Profile</text>
+                </view>
               </view>
-              <view class="template-label">
-                <text class="template-name">Profile</text>
-              </view>
-            </view>
-          </x-skeleton>
+            </x-skeleton>
 
-          <!-- Settings Template -->
-          <x-skeleton type="banner" :loading="templateLoadingStates.settings">
-            <view class="template-item" @click="navigateToGrapesEditor()">
-              <view class="template-preview" id="template-settings">
-                <image class="template-image"
-                  :src="capturedImages.settings"
-                  mode="aspectFill"></image>
+            <!-- Settings Template -->
+            <x-skeleton type="banner" :loading="templateLoadingStates.settings">
+              <view class="template-item" @click="navigateToGrapesEditor()">
+                <view class="template-preview" id="template-settings">
+                  <image class="template-image"
+                    :src="capturedImages.settings"
+                    mode="aspectFill"></image>
+                </view>
+                <view class="template-label">
+                  <text class="template-name">Settings</text>
+                </view>
               </view>
-              <view class="template-label">
-                <text class="template-name">Settings</text>
-              </view>
-            </view>
-          </x-skeleton>
+            </x-skeleton>
+          </template>
         </view>
       </view>
 
@@ -275,47 +310,54 @@
       <view class="section">
         <text class="section-title">Additional Design Proposals</text>
         <view class="proposals-grid">
-          <!-- Login Screen -->
-          <x-skeleton type="banner" :loading="proposalLoadingStates.login">
-            <view class="proposal-item" @click="navigateToGrapesEditor()">
-              <view class="proposal-preview" id="proposal-login">
-                <image class="proposal-image"
-                  :src="capturedImages.login"
-                  mode="aspectFill"></image>
+          <!-- Dynamic Proposals from JSON -->
+          <template v-if="jsonTemplates.length > 0 && activeProposalTemplates.length > 0">
+            <!-- Take a subset of templates to show as proposals (different layouts) -->
+            <x-skeleton v-for="(template, index) in activeProposalTemplates" :key="index"
+                      type="banner" :loading="proposalLoadingStates[template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')]">
+              <view class="proposal-item" @click="navigateToGrapesEditor()">
+                <view class="proposal-preview" :id="'proposal-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')">
+                  <image class="proposal-image"
+                    :src="capturedImages['alt-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')] || ''"
+                    mode="aspectFill"></image>
+                </view>
+                <view class="proposal-label">
+                  <text class="proposal-name">{{ template.name.replace(/ Page/i, '') }} Alternative</text>
+                </view>
               </view>
-              <view class="proposal-label">
-                <text class="proposal-name">Login Screen</text>
+            </x-skeleton>
+          </template>
+          
+          <!-- Fallback Static Proposals -->
+          <template v-else>
+            <!-- Login Screen -->
+            <x-skeleton type="banner" :loading="proposalLoadingStates.login">
+              <view class="proposal-item" @click="navigateToGrapesEditor()">
+                <view class="proposal-preview" id="proposal-login">
+                  <image class="proposal-image"
+                    :src="capturedImages.login"
+                    mode="aspectFill"></image>
+                </view>
+                <view class="proposal-label">
+                  <text class="proposal-name">Login Screen</text>
+                </view>
               </view>
-            </view>
-          </x-skeleton>
+            </x-skeleton>
 
-          <!-- Dashboard Screen -->
-          <x-skeleton type="banner" :loading="proposalLoadingStates.dashboard">
-            <view class="proposal-item" @click="navigateToGrapesEditor()">
-              <view class="proposal-preview" id="proposal-dashboard">
-                <image class="proposal-image"
-                  :src="capturedImages.dashboard"
-                  mode="aspectFill"></image>
+            <!-- Dashboard Screen -->
+            <x-skeleton type="banner" :loading="proposalLoadingStates.dashboard">
+              <view class="proposal-item" @click="navigateToGrapesEditor()">
+                <view class="proposal-preview" id="proposal-dashboard">
+                  <image class="proposal-image"
+                    :src="capturedImages.dashboard"
+                    mode="aspectFill"></image>
+                </view>
+                <view class="proposal-label">
+                  <text class="proposal-name">Dashboard Screen</text>
+                </view>
               </view>
-              <view class="proposal-label">
-                <text class="proposal-name">Dashboard Screen</text>
-              </view>
-            </view>
-          </x-skeleton>
-
-          <!-- Settings Screen -->
-          <x-skeleton type="banner" :loading="proposalLoadingStates.settings">
-            <view class="proposal-item" @click="navigateToGrapesEditor()">
-              <view class="proposal-preview" id="proposal-settings">
-                <image class="proposal-image"
-                  :src="capturedImages.settingsAlt"
-                  mode="aspectFill"></image>
-              </view>
-              <view class="proposal-label">
-                <text class="proposal-name">Settings</text>
-              </view>
-            </view>
-          </x-skeleton>
+            </x-skeleton>
+          </template>
         </view>
       </view>
     </view>
@@ -332,12 +374,11 @@ export default {
       capturedImages: {
         signup: '',
         home: '',
-        notifications: '',
+        notification: '',
         profile: '',
         settings: '',
         login: '',
-        dashboard: '',
-        settingsAlt: ''
+        dashboard: ''
       },
       activeNavItem: 'home',
       selectedTemplate: null,
@@ -352,15 +393,57 @@ export default {
       templateLoadingStates: {
         signup: true,
         home: true,
-        notifications: true,
+        notification: true,
         profile: true,
         settings: true
       },
       proposalLoadingStates: {
         login: true,
-        dashboard: true,
-        settings: true
+        dashboard: true
+      },
+      jsonTemplates: [],
+      dynamicTemplateIds: [],
+      proposalTemplates: []
+    }
+  },
+
+  computed: {
+    // Computed property for proposal templates to avoid infinite loop
+    activeProposalTemplates() {
+      return this.proposalTemplates;
+    },
+    filteredTemplates() {
+      // Only show the 5 main templates that match the fallback static templates
+      if (!this.jsonTemplates || this.jsonTemplates.length === 0) {
+        return [];
       }
+      
+      // Define the template types we want to show
+      const desiredTypes = ['home', 'signup', 'notification', 'profile', 'settings'];
+      const filteredTemplates = [];
+      
+      // First try to find templates matching our desired types
+      for (const type of desiredTypes) {
+        const match = this.jsonTemplates.find(template => 
+          template.name.toLowerCase().includes(type)
+        );
+        
+        if (match) {
+          filteredTemplates.push(match);
+        }
+      }
+      
+      // If we don't have 5 templates yet, add others until we reach 5
+      if (filteredTemplates.length < 5) {
+        for (const template of this.jsonTemplates) {
+          if (!filteredTemplates.includes(template)) {
+            filteredTemplates.push(template);
+            if (filteredTemplates.length >= 5) break;
+          }
+        }
+      }
+      
+      return filteredTemplates;
     }
   },
 
@@ -370,6 +453,9 @@ export default {
     uni.$on('capture-error', (data) => {
       this._errAlert(`Error capturing image: ${data.error}`);
     });
+    
+    // Load JSON templates if available
+    this.loadJsonTemplates();
     
     // Generate preview images first
     this.generatePreviewImages();
@@ -384,7 +470,7 @@ export default {
     }, 1800);
     
     setTimeout(() => {
-      this.templateLoadingStates.notifications = false;
+      this.templateLoadingStates.notification = false;
     }, 2100);
     
     setTimeout(() => {
@@ -403,12 +489,8 @@ export default {
     
     setTimeout(() => {
       this.proposalLoadingStates.dashboard = false;
-    }, 2500);
-    
-    setTimeout(() => {
-      this.proposalLoadingStates.settings = false;
       this.proposalsLoading = false;
-    }, 2800);
+    }, 2500);
   },
   
   onShow(){
@@ -416,6 +498,9 @@ export default {
     if (!uni.getStorageSync('latest_7_overall_page') && 
         uni.getStorageSync('projectDescription')) {
       this.generateUI();
+    } else {
+      // If we already have JSON data, load it
+      this.loadJsonTemplates();
     }
   },
 
@@ -426,61 +511,115 @@ export default {
   },
 
   methods: {
+    loadJsonTemplates() {
+      const jsonData = uni.getStorageSync('latest_7_overall_page');
+      if (jsonData) {
+        try {
+          // Parse JSON if it's a string
+          const data = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+          
+          // Check if we have pages in the JSON
+          if (data && data.pages && Array.isArray(data.pages)) {
+            this.jsonTemplates = data.pages;
+            
+            // Generate template IDs based on page names
+            this.dynamicTemplateIds = this.jsonTemplates.map(template => 
+              'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')
+            );
+            
+            console.log('Loaded JSON templates:', this.jsonTemplates.length);
+            console.log('Dynamic template IDs:', this.dynamicTemplateIds);
+            
+            // Update loading states for dynamic templates
+            this.updateLoadingStates();
+            
+            // Generate proposal templates
+            this.proposalTemplates = this.getProposalTemplates();
+          }
+        } catch (e) {
+          console.error('Error parsing JSON template data:', e);
+        }
+      }
+    },
+    
+    updateLoadingStates() {
+      // Reset loading states
+      this.templateLoadingStates = {};
+      
+      // Create loading states for each template
+      this.dynamicTemplateIds.forEach(id => {
+        const key = id.replace('template-', '');
+        this.$set(this.templateLoadingStates, key, true);
+        
+        // Also prepare capturedImages object
+        if (!this.capturedImages[key]) {
+          this.$set(this.capturedImages, key, '');
+        }
+      });
+    },
+    
     refreshData() {
       // Reset all loading states
       this.templatesLoading = true;
       this.proposalsLoading = true;
       
-      // Reset template loading states
-      this.templateLoadingStates.signup = true;
-      this.templateLoadingStates.home = true;
-      this.templateLoadingStates.notifications = true;
-      this.templateLoadingStates.profile = true;
-      this.templateLoadingStates.settings = true;
+      // Load JSON templates if available
+      this.loadJsonTemplates();
       
-      // Reset proposal loading states
-      this.proposalLoadingStates.login = true;
-      this.proposalLoadingStates.dashboard = true;
-      this.proposalLoadingStates.settings = true;
+      if (this.dynamicTemplateIds.length > 0) {
+        // Reset dynamic template loading states
+        Object.keys(this.templateLoadingStates).forEach(key => {
+          this.$set(this.templateLoadingStates, key, true);
+        });
+      } else {
+        // Reset static template loading states
+        this.templateLoadingStates.signup = true;
+        this.templateLoadingStates.home = true;
+        this.templateLoadingStates.notification = true;
+        this.templateLoadingStates.profile = true;
+        this.templateLoadingStates.settings = true;
+        
+        // Reset proposal loading states for static templates
+        this.proposalLoadingStates.login = true;
+        this.proposalLoadingStates.dashboard = true;
+      }
       
       // Generate preview images first
       this.generatePreviewImages();
       
-      // After generating images, start revealing templates with staggered timing
-      setTimeout(() => {
-        this.templateLoadingStates.signup = false;
-      }, 1500);
+      // Start revealing templates with staggered timing
+      const keys = Object.keys(this.templateLoadingStates);
+      keys.forEach((key, index) => {
+        setTimeout(() => {
+          this.$set(this.templateLoadingStates, key, false);
+          if (index === keys.length - 1) {
+            this.templatesLoading = false;
+          }
+        }, 1500 + (index * 300));
+      });
       
-      setTimeout(() => {
-        this.templateLoadingStates.home = false;
-      }, 1800);
-      
-      setTimeout(() => {
-        this.templateLoadingStates.notifications = false;
-      }, 2100);
-      
-      setTimeout(() => {
-        this.templateLoadingStates.profile = false;
-      }, 2400);
-      
-      setTimeout(() => {
-        this.templateLoadingStates.settings = false;
-        this.templatesLoading = false;
-      }, 2700);
-      
-      // Staggered loading for proposals
-      setTimeout(() => {
-        this.proposalLoadingStates.login = false;
-      }, 2200);
-      
-      setTimeout(() => {
-        this.proposalLoadingStates.dashboard = false;
-      }, 2500);
-      
-      setTimeout(() => {
-        this.proposalLoadingStates.settings = false;
-        this.proposalsLoading = false;
-      }, 2800);
+      // For static templates, use staggered loading for proposals
+      if (this.dynamicTemplateIds.length === 0) {
+        setTimeout(() => {
+          this.proposalLoadingStates.login = false;
+        }, 2200);
+        
+        setTimeout(() => {
+          this.proposalLoadingStates.dashboard = false;
+          this.proposalsLoading = false;
+        }, 2500);
+      } else {
+        // For dynamic templates, reveal proposals with staggered timing
+        const proposalKeys = Object.keys(this.proposalLoadingStates);
+        proposalKeys.forEach((key, index) => {
+          setTimeout(() => {
+            this.$set(this.proposalLoadingStates, key, false);
+            if (index === proposalKeys.length - 1) {
+              this.proposalsLoading = false;
+            }
+          }, 2200 + (index * 300));
+        });
+      }
     },
     
     // Methods to handle HTML2Canvas
@@ -508,13 +647,18 @@ export default {
       const elementMap = {
         'template-signup': 'signup',
         'template-home': 'home',
-        'template-notifications': 'notifications',
+        'template-notification': 'notification',
         'template-profile': 'profile',
         'template-settings': 'settings',
         'proposal-login': 'login',
-        'proposal-dashboard': 'dashboard',
-        'proposal-settings': 'settingsAlt'
+        'proposal-dashboard': 'dashboard'
       };
+      
+      // For dynamic templates, create mapping based on ID
+      if (this.dynamicTemplateIds.includes(data.element)) {
+        const key = data.element.replace('template-', '');
+        elementMap[data.element] = key;
+      }
       
       // Update the captured images
       if (elementMap[data.element]) {
@@ -526,16 +670,41 @@ export default {
     generatePreviewImages() {
       // this._showLoading('Generating preview images...');
       
-      const templateIds = [
-        'template-signup', 
-        'template-home', 
-        'template-notifications',
-        'template-profile',
-        'template-settings',
-        'proposal-login',
-        'proposal-dashboard',
-        'proposal-settings'
-      ];
+      // Use dynamic template IDs if available, otherwise use static ones
+      let templateIds = [];
+      
+      if (this.jsonTemplates.length > 0) {
+        // Only use template IDs for the filtered templates
+        templateIds = this.filteredTemplates.map(template => 
+          'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')
+        );
+        
+        // Add proposal template IDs
+        const proposalIds = this.activeProposalTemplates.map(template => 
+          'proposal-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')
+        );
+        
+        // Combine template and proposal IDs
+        templateIds = [...templateIds, ...proposalIds];
+        
+        // Store the template IDs for later use
+        this.dynamicTemplateIds = templateIds.filter(id => id.startsWith('template-'));
+        
+        console.log('Using dynamic template IDs:', templateIds);
+      } else {
+        // Fallback to static template IDs
+        templateIds = [
+          'template-signup', 
+          'template-home', 
+          'template-notification',
+          'template-profile',
+          'template-settings',
+          'proposal-login',
+          'proposal-dashboard'
+        ];
+        
+        console.log('Using static template IDs:', templateIds);
+      }
       
       // Capture elements sequentially with a shorter delay
       const captureSequentially = (index) => {
@@ -545,6 +714,18 @@ export default {
         }
         
         const id = templateIds[index];
+        
+        // Check if element exists before trying to capture it
+        const element = document.getElementById(id);
+        if (!element) {
+          console.warn(`Element not found: ${id}, skipping capture`);
+          // Move to next element
+          setTimeout(() => {
+            captureSequentially(index + 1);
+          }, 50);
+          return;
+        }
+        
         uni.$emit('capture-element', { elementId: id });
         
         // Move to next element after a short delay
@@ -705,6 +886,136 @@ export default {
       uni.switchTab({
         url: '/pages/grapesEditor/grapesEditor'
       });
+    },
+    getSimplifiedPreview(template) {
+      // Extract a simplified preview from the component HTML
+      // This is a basic implementation that should be enhanced based on your needs
+      if (!template || !template.component) {
+        return '<div class="preview-placeholder">No preview available</div>';
+      }
+      
+      // Create a simplified preview based on the component type
+      const name = template.name.toLowerCase();
+      
+      if (name.includes('login') || name.includes('signup')) {
+        return `
+          <view class="preview-form">
+            <view class="preview-input"></view>
+            <view class="preview-input"></view>
+            <view class="preview-button"></view>
+          </view>
+        `;
+      } else if (name.includes('home')) {
+        return `
+          <view class="preview-content">
+            <view class="preview-card"></view>
+            <view class="preview-card"></view>
+            <view class="preview-card"></view>
+          </view>
+        `;
+      } else if (name.includes('notification')) {
+        return `
+          <view class="preview-list">
+            <view class="preview-list-item"></view>
+            <view class="preview-list-item"></view>
+            <view class="preview-list-item"></view>
+          </view>
+        `;
+      } else if (name.includes('profile')) {
+        return `
+          <view>
+            <view class="preview-avatar"></view>
+            <view class="preview-info">
+              <view class="preview-info-item"></view>
+              <view class="preview-info-item"></view>
+            </view>
+          </view>
+        `;
+      } else if (name.includes('dashboard')) {
+        return `
+          <view class="preview-dashboard">
+            <view class="preview-chart"></view>
+            <view class="preview-stats">
+              <view class="preview-stat-item"></view>
+              <view class="preview-stat-item"></view>
+            </view>
+          </view>
+        `;
+      } else if (name.includes('settings')) {
+        return `
+          <view class="preview-settings">
+            <view class="preview-settings-item"></view>
+            <view class="preview-settings-item"></view>
+            <view class="preview-settings-item"></view>
+          </view>
+        `;
+      } else {
+        // Default preview for unknown types
+        return `
+          <view class="preview-generic">
+            <view class="preview-generic-item"></view>
+            <view class="preview-generic-item"></view>
+          </view>
+        `;
+      }
+    },
+    getProposalTemplates() {
+      // Select a subset of templates to use as proposals with alternative layouts
+      if (!this.jsonTemplates || this.jsonTemplates.length === 0) {
+        return [];
+      }
+      
+      // Prioritize certain page types for proposals
+      const priorityTypes = ['login', 'dashboard'];
+      const proposals = [];
+      
+      // First try to find pages matching our priority types
+      for (const type of priorityTypes) {
+        const match = this.jsonTemplates.find(template => 
+          template.name.toLowerCase().includes(type)
+        );
+        
+        if (match && !proposals.includes(match)) {
+          proposals.push(match);
+        }
+      }
+      
+      // If we don't have enough, add other templates
+      if (proposals.length < 2) {
+        for (const template of this.jsonTemplates) {
+          if (!proposals.includes(template)) {
+            proposals.push(template);
+            if (proposals.length >= 2) break;
+          }
+        }
+      }
+      
+      // Create a copy of the proposals array to avoid reactivity issues
+      const proposalsToReturn = proposals.slice(0, 2); // Limit to 2 proposals
+      
+      // Update proposal loading states - do this separately to avoid infinite loop
+      this.$nextTick(() => {
+        this.updateProposalLoadingStates(proposalsToReturn);
+      });
+      
+      return proposalsToReturn;
+    },
+    
+    updateProposalLoadingStates(proposals) {
+      // Reset proposal loading states
+      this.proposalLoadingStates = {};
+      
+      // Create loading states for each proposal
+      proposals.forEach(template => {
+        const key = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+        this.$set(this.proposalLoadingStates, key, true);
+        
+        // Also prepare capturedImages object for proposals
+        const altKey = 'alt-' + key;
+        if (!this.capturedImages[altKey]) {
+          this.$set(this.capturedImages, altKey, '');
+        }
+      });
     }
   }
 }
@@ -717,11 +1028,15 @@ export default {
   mounted() {
     // Listen for capture-element events
     uni.$on('capture-element', this.captureElement);
+    
+    // Listen for proposal capture events
+    uni.$on('capture-proposal', this.captureProposal);
   },
   
   beforeDestroy() {
-    // Clean up event listener
+    // Clean up event listeners
     uni.$off('capture-element', this.captureElement);
+    uni.$off('capture-proposal', this.captureProposal);
   },
   
   methods: {
@@ -748,11 +1063,118 @@ export default {
           const imageData = canvas.toDataURL('image/png');
           // Send the image data back to the Vue component
           uni.$emit('image-captured', { element: elementId, imageData });
+          
+          // If this is a template, also create a proposal version with slight modifications
+          // Only do this for templates that match our expected format
+          if (elementId.startsWith('template-') && !elementId.includes('proposal')) {
+            try {
+              const baseName = elementId.substring(9); // Remove 'template-' prefix
+              const proposalId = 'proposal-' + baseName;
+              const altKey = 'alt-' + baseName;
+              
+              // Create a slightly modified version for the proposal
+              this.createAlternativeDesign(canvas).then(altCanvas => {
+                const altImageData = altCanvas.toDataURL('image/png');
+                
+                // Emit with both IDs for flexibility
+                uni.$emit('image-captured', { element: proposalId, imageData: altImageData });
+                uni.$emit('image-captured', { element: altKey, imageData: altImageData });
+                
+                console.log(`Generated alternative design for: ${baseName}`);
+              }).catch(err => {
+                console.error(`Failed to generate alternative design for ${baseName}:`, err);
+              });
+            } catch (err) {
+              console.error('Error generating proposal:', err);
+            }
+          }
         }).catch(err => {
           console.error(`Failed to generate image for ${elementId}:`, err);
           uni.$emit('capture-error', { element: elementId, error: err.toString() });
         });
       }, 100);
+    },
+    
+    captureProposal(data) {
+      const { templateId } = data;
+      
+      // Validate template ID format
+      if (!templateId || !templateId.startsWith('template-')) {
+        console.error(`Invalid template ID for proposal: ${templateId}`);
+        return;
+      }
+      
+      const proposalId = 'proposal-' + templateId.substring(9);
+      
+      setTimeout(() => {
+        const dom = document.getElementById(templateId);
+        if (!dom) {
+          console.error(`Template not found for proposal: ${templateId}`);
+          uni.$emit('capture-error', { element: proposalId, error: 'Template not found' });
+          return;
+        }
+        
+        console.log(`Creating proposal from template: ${templateId}`);
+        
+        html2canvas(dom, {
+          width: dom.clientWidth,
+          height: dom.clientHeight,
+          scrollY: 0,
+          scrollX: 0,
+          useCORS: true,
+          scale: 2
+        }).then((canvas) => {
+          // Create a modified version for the proposal
+          return this.createAlternativeDesign(canvas);
+        }).then((altCanvas) => {
+          const imageData = altCanvas.toDataURL('image/png');
+          // Send the image data back to the Vue component
+          uni.$emit('image-captured', { element: proposalId, imageData });
+        }).catch(err => {
+          console.error(`Failed to generate proposal for ${proposalId}:`, err);
+          uni.$emit('capture-error', { element: proposalId, error: err.toString() });
+        });
+      }, 100);
+    },
+    
+    createAlternativeDesign(canvas) {
+      return new Promise((resolve) => {
+        try {
+          // Create a new canvas with the same dimensions
+          const altCanvas = document.createElement('canvas');
+          altCanvas.width = canvas.width;
+          altCanvas.height = canvas.height;
+          const ctx = altCanvas.getContext('2d');
+          
+          // Draw the original canvas
+          ctx.drawImage(canvas, 0, 0);
+          
+          // Apply modifications to create an alternative design
+          // These are simple modifications for demonstration purposes
+          
+          // 1. Apply a slight color overlay
+          ctx.fillStyle = 'rgba(229, 57, 53, 0.1)'; // Red with low opacity
+          ctx.fillRect(0, 0, altCanvas.width, altCanvas.height);
+          
+          // 2. Add some alternative styling elements
+          // For example, add a border or header color change
+          ctx.fillStyle = 'rgba(229, 57, 53, 0.8)';
+          ctx.fillRect(0, 0, altCanvas.width, 10); // Top border
+          
+          // 3. Add some decorative elements
+          ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
+          ctx.beginPath();
+          ctx.arc(altCanvas.width - 20, 20, 10, 0, Math.PI * 2);
+          ctx.fill();
+          
+          // Return the modified canvas
+          resolve(altCanvas);
+        } catch (err) {
+          console.error('Error creating alternative design:', err);
+          // If there's an error, return the original canvas
+          resolve(canvas);
+        }
+      });
     }
   }
 }
