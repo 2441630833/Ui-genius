@@ -126,14 +126,14 @@ export default {
                     if (typeof latest_generated_page === 'string') {
                       // Clean the string before parsing
                       let cleanJson = latest_generated_page.trim();
-                      
+
                       // Check if it starts with a backtick or code block marker
                       if (cleanJson.startsWith('```json')) {
                         cleanJson = cleanJson.replace(/^```json\s*/, '').replace(/```\s*$/, '');
                       } else if (cleanJson.startsWith('```')) {
                         cleanJson = cleanJson.replace(/^```\s*/, '').replace(/```\s*$/, '');
                       }
-                      
+
                       project = JSON.parse(cleanJson);
                     } else if (typeof latest_generated_page === 'object') {
                       // If it's already an object, use it directly

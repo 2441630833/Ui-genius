@@ -204,7 +204,7 @@
             <view class="template-item" @click="navigateToGrapesEditor()">
               <view class="template-preview" id="template-signup">
                 <image class="template-image"
-                  :src="capturedImages.signup || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
+                  :src="capturedImages.signup"
                   mode="aspectFill"></image>
               </view>
               <view class="template-label">
@@ -218,7 +218,7 @@
             <view class="template-item" @click="navigateToGrapesEditor()">
               <view class="template-preview" id="template-home">
                 <image class="template-image"
-                  :src="capturedImages.home || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
+                  :src="capturedImages.home"
                   mode="aspectFill"></image>
               </view>
               <view class="template-label">
@@ -232,7 +232,7 @@
             <view class="template-item" @click="navigateToGrapesEditor()">
               <view class="template-preview" id="template-notifications">
                 <image class="template-image"
-                  :src="capturedImages.notifications || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
+                  :src="capturedImages.notifications"
                   mode="aspectFill"></image>
               </view>
               <view class="template-label">
@@ -246,7 +246,7 @@
             <view class="template-item" @click="navigateToGrapesEditor()">
               <view class="template-preview" id="template-profile">
                 <image class="template-image"
-                  :src="capturedImages.profile || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
+                  :src="capturedImages.profile"
                   mode="aspectFill"></image>
               </view>
               <view class="template-label">
@@ -260,7 +260,7 @@
             <view class="template-item" @click="navigateToGrapesEditor()">
               <view class="template-preview" id="template-settings">
                 <image class="template-image"
-                  :src="capturedImages.settings || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
+                  :src="capturedImages.settings"
                   mode="aspectFill"></image>
               </view>
               <view class="template-label">
@@ -280,7 +280,7 @@
             <view class="proposal-item" @click="navigateToGrapesEditor()">
               <view class="proposal-preview" id="proposal-login">
                 <image class="proposal-image"
-                  :src="capturedImages.login || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
+                  :src="capturedImages.login"
                   mode="aspectFill"></image>
               </view>
               <view class="proposal-label">
@@ -294,7 +294,7 @@
             <view class="proposal-item" @click="navigateToGrapesEditor()">
               <view class="proposal-preview" id="proposal-dashboard">
                 <image class="proposal-image"
-                  :src="capturedImages.dashboard || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
+                  :src="capturedImages.dashboard"
                   mode="aspectFill"></image>
               </view>
               <view class="proposal-label">
@@ -308,7 +308,7 @@
             <view class="proposal-item" @click="navigateToGrapesEditor()">
               <view class="proposal-preview" id="proposal-settings">
                 <image class="proposal-image"
-                  :src="capturedImages.settingsAlt || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png'"
+                  :src="capturedImages.settingsAlt"
                   mode="aspectFill"></image>
               </view>
               <view class="proposal-label">
@@ -329,7 +329,16 @@ export default {
   name: 'Design',
   data() {
     return {
-      capturedImages: {},
+      capturedImages: {
+        signup: '',
+        home: '',
+        notifications: '',
+        profile: '',
+        settings: '',
+        login: '',
+        dashboard: '',
+        settingsAlt: ''
+      },
       activeNavItem: 'home',
       selectedTemplate: null,
       selectedProposal: null,
@@ -356,52 +365,50 @@ export default {
   },
 
   mounted() {
-    // Staggered loading for templates
-    setTimeout(() => {
-      this.templateLoadingStates.signup = false;
-    }, 800);
-    
-    setTimeout(() => {
-      this.templateLoadingStates.home = false;
-    }, 1100);
-    
-    setTimeout(() => {
-      this.templateLoadingStates.notifications = false;
-    }, 1400);
-    
-    setTimeout(() => {
-      this.templateLoadingStates.profile = false;
-    }, 1700);
-    
-    setTimeout(() => {
-      this.templateLoadingStates.settings = false;
-      this.templatesLoading = false;
-      
-      // Generate preview images after templates are loaded
-      setTimeout(() => {
-        this.generatePreviewImages();
-      }, 1000);
-    }, 2000);
-    
-    // Staggered loading for proposals
-    setTimeout(() => {
-      this.proposalLoadingStates.login = false;
-    }, 1500);
-    
-    setTimeout(() => {
-      this.proposalLoadingStates.dashboard = false;
-    }, 1900);
-    
-    setTimeout(() => {
-      this.proposalLoadingStates.settings = false;
-      this.proposalsLoading = false;
-    }, 2300);
-
     // Listen for image capture events from renderjs
     uni.$on('image-captured', this.receiveImageData);
     uni.$on('capture-error', (data) => {
       this._errAlert(`Error capturing image: ${data.error}`);
     });
+    
+    // Generate preview images first
+    this.generatePreviewImages();
+    
+    // After generating images, start revealing templates with staggered timing
+    setTimeout(() => {
+      this.templateLoadingStates.signup = false;
+    }, 1500);
+    
+    setTimeout(() => {
+      this.templateLoadingStates.home = false;
+    }, 1800);
+    
+    setTimeout(() => {
+      this.templateLoadingStates.notifications = false;
+    }, 2100);
+    
+    setTimeout(() => {
+      this.templateLoadingStates.profile = false;
+    }, 2400);
+    
+    setTimeout(() => {
+      this.templateLoadingStates.settings = false;
+      this.templatesLoading = false;
+    }, 2700);
+    
+    // Staggered loading for proposals
+    setTimeout(() => {
+      this.proposalLoadingStates.login = false;
+    }, 2200);
+    
+    setTimeout(() => {
+      this.proposalLoadingStates.dashboard = false;
+    }, 2500);
+    
+    setTimeout(() => {
+      this.proposalLoadingStates.settings = false;
+      this.proposalsLoading = false;
+    }, 2800);
   },
   
   onShow(){
@@ -436,41 +443,44 @@ export default {
       this.proposalLoadingStates.dashboard = true;
       this.proposalLoadingStates.settings = true;
       
-      // Staggered loading for templates
+      // Generate preview images first
+      this.generatePreviewImages();
+      
+      // After generating images, start revealing templates with staggered timing
       setTimeout(() => {
         this.templateLoadingStates.signup = false;
-      }, 800);
+      }, 1500);
       
       setTimeout(() => {
         this.templateLoadingStates.home = false;
-      }, 1100);
+      }, 1800);
       
       setTimeout(() => {
         this.templateLoadingStates.notifications = false;
-      }, 1400);
+      }, 2100);
       
       setTimeout(() => {
         this.templateLoadingStates.profile = false;
-      }, 1700);
+      }, 2400);
       
       setTimeout(() => {
         this.templateLoadingStates.settings = false;
         this.templatesLoading = false;
-      }, 2000);
+      }, 2700);
       
       // Staggered loading for proposals
       setTimeout(() => {
         this.proposalLoadingStates.login = false;
-      }, 1500);
+      }, 2200);
       
       setTimeout(() => {
         this.proposalLoadingStates.dashboard = false;
-      }, 1900);
+      }, 2500);
       
       setTimeout(() => {
         this.proposalLoadingStates.settings = false;
         this.proposalsLoading = false;
-      }, 2300);
+      }, 2800);
     },
     
     // Methods to handle HTML2Canvas
@@ -514,6 +524,8 @@ export default {
     },
     
     generatePreviewImages() {
+      // this._showLoading('Generating preview images...');
+      
       const templateIds = [
         'template-signup', 
         'template-home', 
@@ -525,12 +537,24 @@ export default {
         'proposal-settings'
       ];
       
-      templateIds.forEach((id, index) => {
+      // Capture elements sequentially with a shorter delay
+      const captureSequentially = (index) => {
+        if (index >= templateIds.length) {
+          uni.hideLoading();
+          return;
+        }
+        
+        const id = templateIds[index];
+        uni.$emit('capture-element', { elementId: id });
+        
+        // Move to next element after a short delay
         setTimeout(() => {
-          this._showLoading('Generating preview image...');
-          uni.$emit('capture-element', { elementId: id });
-        }, index * 500); // Stagger the captures
-      });
+          captureSequentially(index + 1);
+        }, 300);
+      };
+      
+      // Start the sequential capture
+      captureSequentially(0);
     },
     
     generateUI() {
