@@ -201,6 +201,11 @@
           <view class="tool-button">
             <text class="button-text">Export</text>
           </view>
+          
+          <!-- Refresh Button -->
+          <view class="tool-button" @click="refreshData">
+            <text class="button-text">Refresh</text>
+          </view>
 
           <view class="preview-button">
             <image class="icon" src="/static/play_white.png"></image>
@@ -448,6 +453,9 @@ export default {
   },
 
   mounted() {
+    // Load images from local storage first
+    this.loadImagesFromStorage();
+    
     // Listen for image capture events from renderjs
     uni.$on('image-captured', this.receiveImageData);
     uni.$on('capture-error', (data) => {
@@ -457,8 +465,10 @@ export default {
     // Load JSON templates if available
     this.loadJsonTemplates();
     
-    // Generate preview images first
-    this.generatePreviewImages();
+    // Generate preview images first (only if we don't have them in storage)
+    if (this.needsImageGeneration()) {
+      this.generatePreviewImages();
+    }
     
     // After generating images, start revealing templates with staggered timing
     setTimeout(() => {
@@ -559,6 +569,9 @@ export default {
     },
     
     refreshData() {
+      // Clear stored images first
+      this.clearStoredImages();
+      
       // Reset all loading states
       this.templatesLoading = true;
       this.proposalsLoading = true;
@@ -662,8 +675,17 @@ export default {
       
       // Update the captured images
       if (elementMap[data.element]) {
+        const key = elementMap[data.element];
         // Use Vue.set to ensure reactivity
-        this.$set(this.capturedImages, elementMap[data.element], data.imageData);
+        this.$set(this.capturedImages, key, data.imageData);
+        
+        // Store in local storage with a prefix to identify our app's data
+        try {
+          uni.setStorageSync(`uigenius_image_${key}`, data.imageData);
+          console.log(`Stored image data for ${key} in local storage`);
+        } catch (e) {
+          console.error(`Failed to store image data for ${key} in local storage:`, e);
+        }
       }
     },
     
@@ -1015,6 +1037,122 @@ export default {
         if (!this.capturedImages[altKey]) {
           this.$set(this.capturedImages, altKey, '');
         }
+      });
+    },
+    loadImagesFromStorage() {
+      console.log('Loading images from local storage');
+      
+      // Define the keys we want to load
+      const imageKeys = [
+        'signup', 
+        'home', 
+        'notification', 
+        'profile', 
+        'settings', 
+        'login', 
+        'dashboard',
+      ];
+      
+      // Try to load each image from storage
+      let loadedCount = 0;
+      
+      for (const key of imageKeys) {
+        try {
+          const imageData = uni.getStorageSync(`uigenius_image_${key}`);
+          if (imageData) {
+            // Use Vue.set to ensure reactivity
+            this.$set(this.capturedImages, key, imageData);
+            loadedCount++;
+            console.log(`Loaded image data for ${key} from local storage`);
+          }
+        } catch (e) {
+          console.error(`Failed to load image data for ${key} from local storage:`, e);
+        }
+      }
+      
+      console.log(`Loaded ${loadedCount} images from local storage`);
+      
+      // If we loaded images, we can skip the loading states
+      if (loadedCount > 0) {
+        this.skipLoadingStates();
+      }
+    },
+    
+    skipLoadingStates() {
+      // Immediately set all loading states to false
+      Object.keys(this.templateLoadingStates).forEach(key => {
+        this.$set(this.templateLoadingStates, key, false);
+      });
+      
+      Object.keys(this.proposalLoadingStates).forEach(key => {
+        this.$set(this.proposalLoadingStates, key, false);
+      });
+      
+      this.templatesLoading = false;
+      this.proposalsLoading = false;
+    },
+    
+    needsImageGeneration() {
+      // Check if we already have images in storage
+      const keysToCheck = ['signup', 'home', 'notification', 'profile', 'settings'];
+      let missingCount = 0;
+      
+      for (const key of keysToCheck) {
+        try {
+          const imageData = uni.getStorageSync(`uigenius_image_${key}`);
+          if (!imageData) {
+            missingCount++;
+          }
+        } catch (e) {
+          missingCount++;
+        }
+      }
+      
+      // If we're missing any of the main images, we need to generate them
+      const needsGeneration = missingCount > 0;
+      console.log(`Missing ${missingCount} images, needs generation: ${needsGeneration}`);
+      return needsGeneration;
+    },
+    clearStoredImages() {
+      console.log('Clearing stored images');
+      
+      // Define the keys we want to clear
+      const imageKeys = [
+        'signup', 
+        'home', 
+        'notification', 
+        'profile', 
+        'settings', 
+        'login', 
+        'dashboard',
+      ];
+      
+      // Clear each image from storage
+      for (const key of imageKeys) {
+        try {
+          uni.removeStorageSync(`uigenius_image_${key}`);
+          console.log(`Cleared image data for ${key} from local storage`);
+        } catch (e) {
+          console.error(`Failed to clear image data for ${key} from local storage:`, e);
+        }
+      }
+      
+      // Reset captured images
+      this.capturedImages = {
+        signup: '',
+        home: '',
+        notification: '',
+        profile: '',
+        settings: '',
+        login: '',
+        dashboard: ''
+      };
+      
+      // Show toast
+      uni.showToast({
+        title: 'Images cleared',
+        icon: 'none',
+        duration: 2000
       });
     }
   }
