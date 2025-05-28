@@ -323,7 +323,7 @@
               <view class="proposal-item" @click="navigateToGrapesEditor()">
                 <view class="proposal-preview" :id="'proposal-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')">
                   <image class="proposal-image"
-                    :src="capturedImages['alt-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')] || ''"
+                    :src="capturedImages[template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')] || ''"
                     mode="aspectFill"></image>
                 </view>
                 <view class="proposal-label">
@@ -453,24 +453,16 @@ export default {
   },
 
   mounted() {
-    // Load images from local storage first
-    this.loadImagesFromStorage();
-    
     // Listen for image capture events from renderjs
     uni.$on('image-captured', this.receiveImageData);
     uni.$on('capture-error', (data) => {
       this._errAlert(`Error capturing image: ${data.error}`);
     });
     
-    // Load JSON templates if available
-    this.loadJsonTemplates();
+    // Load images from storage on initial mount to avoid display issues
+    this.loadImagesFromStorage();
     
-    // Generate preview images first (only if we don't have them in storage)
-    if (this.needsImageGeneration()) {
-      this.generatePreviewImages();
-    }
-    
-    // After generating images, start revealing templates with staggered timing
+    // Set up loading state timers
     setTimeout(() => {
       this.templateLoadingStates.signup = false;
     }, 1500);
@@ -504,14 +496,28 @@ export default {
   },
   
   onShow(){
-    // Only generate UI if we haven't already and we have a project description
-    if (!uni.getStorageSync('latest_7_overall_page') && 
-        uni.getStorageSync('projectDescription')) {
-      this.generateUI();
-    } else {
-      // If we already have JSON data, load it
+    // Load images from local storage first and wait for a tick to ensure reactivity
+    this.loadImagesFromStorage();
+    
+    // Use nextTick to ensure the previous operation completes
+    this.$nextTick(() => {
+      // Load JSON templates if available
       this.loadJsonTemplates();
-    }
+      
+      // Generate preview images first (only if we don't have them in storage)
+      if (this.needsImageGeneration()) {
+        this.generatePreviewImages();
+      }
+      
+      // Only generate UI if we haven't already and we have a project description
+      if (!uni.getStorageSync('latest_7_overall_page') && 
+          uni.getStorageSync('projectDescription')) {
+        this.generateUI();
+      } else {
+        // If we already have JSON data, load it
+        this.loadJsonTemplates();
+      }
+    });
   },
 
   beforeDestroy() {
@@ -676,6 +682,7 @@ export default {
       // Update the captured images
       if (elementMap[data.element]) {
         const key = elementMap[data.element];
+        
         // Use Vue.set to ensure reactivity
         this.$set(this.capturedImages, key, data.imageData);
         
@@ -684,13 +691,13 @@ export default {
           uni.setStorageSync(`uigenius_image_${key}`, data.imageData);
           console.log(`Stored image data for ${key} in local storage`);
         } catch (e) {
-          console.error(`Failed to store image data for ${key} in local storage:`, e);
+          console.error(`Failed to store image data for ${key} from local storage:`, e);
         }
       }
     },
     
     generatePreviewImages() {
-      // this._showLoading('Generating preview images...');
+      console.log('Generating preview images');
       
       // Use dynamic template IDs if available, otherwise use static ones
       let templateIds = [];
@@ -728,14 +735,42 @@ export default {
         console.log('Using static template IDs:', templateIds);
       }
       
+      // Filter out templates that already have images in storage
+      const templatesToGenerate = templateIds.filter(id => {
+        // Get the key for storage lookup
+        let key;
+        if (id.startsWith('template-')) {
+          key = id.replace('template-', '');
+        } else if (id.startsWith('proposal-')) {
+          key = id.replace('proposal-', '');
+        }
+          
+        try {
+          const imageData = uni.getStorageSync(`uigenius_image_${key}`);
+          return !imageData; // Only include templates that don't have images
+        } catch (e) {
+          return true; // If there's an error, include the template
+        }
+      });
+      
+      if (templatesToGenerate.length === 0) {
+        console.log('All templates already have images in storage, skipping generation');
+        return;
+      }
+      
+      console.log(`Generating ${templatesToGenerate.length} templates:`, templatesToGenerate);
+      
+      // Show loading indicator
+      this._showLoading(`Generating ${templatesToGenerate.length} images...`);
+      
       // Capture elements sequentially with a shorter delay
       const captureSequentially = (index) => {
-        if (index >= templateIds.length) {
+        if (index >= templatesToGenerate.length) {
           uni.hideLoading();
           return;
         }
         
-        const id = templateIds[index];
+        const id = templatesToGenerate[index];
         
         // Check if element exists before trying to capture it
         const element = document.getElementById(id);
@@ -1042,40 +1077,98 @@ export default {
     loadImagesFromStorage() {
       console.log('Loading images from local storage');
       
-      // Define the keys we want to load
-      const imageKeys = [
+      // Define the main template keys we need
+      const mainTemplateKeys = [
         'signup', 
         'home', 
         'notification', 
         'profile', 
-        'settings', 
-        'login', 
-        'dashboard',
+        'settings'
+      ];
+      
+      // Define proposal keys
+      const proposalKeys = [
+        'login',
+        'dashboard'
       ];
       
       // Try to load each image from storage
-      let loadedCount = 0;
+      let mainLoadedCount = 0;
+      let proposalLoadedCount = 0;
       
-      for (const key of imageKeys) {
+      // Create a temporary object to hold all image data
+      const tempImages = {};
+      
+      // Load main template images
+      for (const key of mainTemplateKeys) {
         try {
           const imageData = uni.getStorageSync(`uigenius_image_${key}`);
           if (imageData) {
-            // Use Vue.set to ensure reactivity
-            this.$set(this.capturedImages, key, imageData);
-            loadedCount++;
-            console.log(`Loaded image data for ${key} from local storage`);
+            // Store in temp object
+            tempImages[key] = imageData;
+            mainLoadedCount++;
+            
+            // Immediately set the loading state to false for this template
+            if (this.templateLoadingStates[key]) {
+              this.$set(this.templateLoadingStates, key, false);
+            }
+            
+            console.log(`Loaded main template image for ${key} from local storage`);
           }
         } catch (e) {
           console.error(`Failed to load image data for ${key} from local storage:`, e);
         }
       }
       
-      console.log(`Loaded ${loadedCount} images from local storage`);
-      
-      // If we loaded images, we can skip the loading states
-      if (loadedCount > 0) {
-        this.skipLoadingStates();
+      // Load proposal images
+      for (const key of proposalKeys) {
+        try {
+          const imageData = uni.getStorageSync(`uigenius_image_${key}`);
+          if (imageData) {
+            // Store in temp object
+            tempImages[key] = imageData;
+            proposalLoadedCount++;
+            
+            // Set the loading state to false for this proposal
+            if (this.proposalLoadingStates[key]) {
+              this.$set(this.proposalLoadingStates, key, false);
+            }
+            
+            console.log(`Loaded proposal image for ${key} from local storage`);
+          }
+        } catch (e) {
+          console.error(`Failed to load image data for ${key} from local storage:`, e);
+        }
       }
+      
+      // Wait for next tick then update all images at once to ensure reactivity
+      this.$nextTick(() => {
+        // Update all images at once
+        Object.keys(tempImages).forEach(key => {
+          this.$set(this.capturedImages, key, tempImages[key]);
+        });
+        
+        // Force update after all images are set
+        this.$forceUpdate();
+        
+        console.log(`Loaded ${mainLoadedCount}/${mainTemplateKeys.length} main templates and ${proposalLoadedCount}/${proposalKeys.length} proposals from local storage`);
+      });
+      
+      // If we loaded all needed main templates, we can skip the loading states
+      if (mainLoadedCount >= mainTemplateKeys.length) {
+        this.templatesLoading = false;
+        console.log('All required main templates loaded from storage');
+        
+        // If we also loaded all proposals, we can skip proposal loading states
+        if (proposalLoadedCount >= proposalKeys.length) {
+          this.proposalsLoading = false;
+          console.log('All proposals loaded from storage');
+        }
+        
+        return true;
+      }
+      
+      return false;
     },
     
     skipLoadingStates() {
@@ -1093,42 +1186,90 @@ export default {
     },
     
     needsImageGeneration() {
-      // Check if we already have images in storage
-      const keysToCheck = ['signup', 'home', 'notification', 'profile', 'settings'];
-      let missingCount = 0;
+      // Define the main template keys we need
+      const mainTemplateKeys = [
+        'signup', 
+        'home', 
+        'notification', 
+        'profile', 
+        'settings'
+      ];
       
+      // Define proposal keys
+      const proposalKeys = [
+        'login',
+        'dashboard'
+      ];
+      
+      // If we're using dynamic templates, check those instead
+      const keysToCheck = this.filteredTemplates && this.filteredTemplates.length > 0 
+        ? this.filteredTemplates.map(t => t.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-'))
+        : mainTemplateKeys;
+      
+      let missingMainTemplates = [];
+      let missingProposals = [];
+      
+      // Check main templates
       for (const key of keysToCheck) {
         try {
           const imageData = uni.getStorageSync(`uigenius_image_${key}`);
           if (!imageData) {
-            missingCount++;
+            missingMainTemplates.push(key);
           }
         } catch (e) {
-          missingCount++;
+          missingMainTemplates.push(key);
         }
       }
       
-      // If we're missing any of the main images, we need to generate them
-      const needsGeneration = missingCount > 0;
-      console.log(`Missing ${missingCount} images, needs generation: ${needsGeneration}`);
+      // Check proposal templates
+      for (const key of proposalKeys) {
+        try {
+          const imageData = uni.getStorageSync(`uigenius_image_${key}`);
+          if (!imageData) {
+            missingProposals.push(key);
+          }
+        } catch (e) {
+          missingProposals.push(key);
+        }
+      }
+      
+      // If we're missing any of the main templates, we need to generate them
+      const needsGeneration = missingMainTemplates.length > 0 || missingProposals.length > 0;
+      
+      if (missingMainTemplates.length > 0) {
+        console.log(`Missing ${missingMainTemplates.length} main templates: [${missingMainTemplates.join(', ')}]`);
+      }
+      
+      if (missingProposals.length > 0) {
+        console.log(`Missing ${missingProposals.length} proposals: [${missingProposals.join(', ')}]`);
+      }
+      
+      console.log(`Needs generation: ${needsGeneration}`);
       return needsGeneration;
     },
     clearStoredImages() {
       console.log('Clearing stored images');
       
-      // Define the keys we want to clear
-      const imageKeys = [
+      // Define the main template keys we need
+      const mainTemplateKeys = [
         'signup', 
         'home', 
         'notification', 
         'profile', 
-        'settings', 
-        'login', 
-        'dashboard',
+        'settings'
       ];
       
+      // Define proposal keys
+      const proposalKeys = [
+        'login',
+        'dashboard'
+      ];
+      
+      // Combine all keys
+      const allKeys = [...mainTemplateKeys, ...proposalKeys];
+      
       // Clear each image from storage
-      for (const key of imageKeys) {
+      for (const key of allKeys) {
         try {
           uni.removeStorageSync(`uigenius_image_${key}`);
           console.log(`Cleared image data for ${key} from local storage`);
@@ -1166,15 +1307,11 @@ export default {
   mounted() {
     // Listen for capture-element events
     uni.$on('capture-element', this.captureElement);
-    
-    // Listen for proposal capture events
-    uni.$on('capture-proposal', this.captureProposal);
   },
   
   beforeDestroy() {
     // Clean up event listeners
     uni.$off('capture-element', this.captureElement);
-    uni.$off('capture-proposal', this.captureProposal);
   },
   
   methods: {
@@ -1201,118 +1338,11 @@ export default {
           const imageData = canvas.toDataURL('image/png');
           // Send the image data back to the Vue component
           uni.$emit('image-captured', { element: elementId, imageData });
-          
-          // If this is a template, also create a proposal version with slight modifications
-          // Only do this for templates that match our expected format
-          if (elementId.startsWith('template-') && !elementId.includes('proposal')) {
-            try {
-              const baseName = elementId.substring(9); // Remove 'template-' prefix
-              const proposalId = 'proposal-' + baseName;
-              const altKey = 'alt-' + baseName;
-              
-              // Create a slightly modified version for the proposal
-              this.createAlternativeDesign(canvas).then(altCanvas => {
-                const altImageData = altCanvas.toDataURL('image/png');
-                
-                // Emit with both IDs for flexibility
-                uni.$emit('image-captured', { element: proposalId, imageData: altImageData });
-                uni.$emit('image-captured', { element: altKey, imageData: altImageData });
-                
-                console.log(`Generated alternative design for: ${baseName}`);
-              }).catch(err => {
-                console.error(`Failed to generate alternative design for ${baseName}:`, err);
-              });
-            } catch (err) {
-              console.error('Error generating proposal:', err);
-            }
-          }
         }).catch(err => {
           console.error(`Failed to generate image for ${elementId}:`, err);
           uni.$emit('capture-error', { element: elementId, error: err.toString() });
         });
       }, 100);
-    },
-    
-    captureProposal(data) {
-      const { templateId } = data;
-      
-      // Validate template ID format
-      if (!templateId || !templateId.startsWith('template-')) {
-        console.error(`Invalid template ID for proposal: ${templateId}`);
-        return;
-      }
-      
-      const proposalId = 'proposal-' + templateId.substring(9);
-      
-      setTimeout(() => {
-        const dom = document.getElementById(templateId);
-        if (!dom) {
-          console.error(`Template not found for proposal: ${templateId}`);
-          uni.$emit('capture-error', { element: proposalId, error: 'Template not found' });
-          return;
-        }
-        
-        console.log(`Creating proposal from template: ${templateId}`);
-        
-        html2canvas(dom, {
-          width: dom.clientWidth,
-          height: dom.clientHeight,
-          scrollY: 0,
-          scrollX: 0,
-          useCORS: true,
-          scale: 2
-        }).then((canvas) => {
-          // Create a modified version for the proposal
-          return this.createAlternativeDesign(canvas);
-        }).then((altCanvas) => {
-          const imageData = altCanvas.toDataURL('image/png');
-          // Send the image data back to the Vue component
-          uni.$emit('image-captured', { element: proposalId, imageData });
-        }).catch(err => {
-          console.error(`Failed to generate proposal for ${proposalId}:`, err);
-          uni.$emit('capture-error', { element: proposalId, error: err.toString() });
-        });
-      }, 100);
-    },
-    
-    createAlternativeDesign(canvas) {
-      return new Promise((resolve) => {
-        try {
-          // Create a new canvas with the same dimensions
-          const altCanvas = document.createElement('canvas');
-          altCanvas.width = canvas.width;
-          altCanvas.height = canvas.height;
-          const ctx = altCanvas.getContext('2d');
-          
-          // Draw the original canvas
-          ctx.drawImage(canvas, 0, 0);
-          
-          // Apply modifications to create an alternative design
-          // These are simple modifications for demonstration purposes
-          
-          // 1. Apply a slight color overlay
-          ctx.fillStyle = 'rgba(229, 57, 53, 0.1)'; // Red with low opacity
-          ctx.fillRect(0, 0, altCanvas.width, altCanvas.height);
-          
-          // 2. Add some alternative styling elements
-          // For example, add a border or header color change
-          ctx.fillStyle = 'rgba(229, 57, 53, 0.8)';
-          ctx.fillRect(0, 0, altCanvas.width, 10); // Top border
-          
-          // 3. Add some decorative elements
-          ctx.fillStyle = 'rgba(255, 255, 255, 0.7)';
-          ctx.beginPath();
-          ctx.arc(altCanvas.width - 20, 20, 10, 0, Math.PI * 2);
-          ctx.fill();
-          
-          // Return the modified canvas
-          resolve(altCanvas);
-        } catch (err) {
-          console.error('Error creating alternative design:', err);
-          // If there's an error, return the original canvas
-          resolve(canvas);
-        }
-      });
     }
   }
 }
@@ -1868,3 +1898,5 @@ export default {
   background-color: #e53935;
 }
 </style>
+
+
