@@ -543,8 +543,8 @@ export default {
               'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')
             );
             
-            console.log('Loaded JSON templates:', this.jsonTemplates.length);
-            console.log('Dynamic template IDs:', this.dynamicTemplateIds);
+            // console.log('Loaded JSON templates:', this.jsonTemplates.length);
+            // console.log('Dynamic template IDs:', this.dynamicTemplateIds);
             
             // Update loading states for dynamic templates
             this.updateLoadingStates();
@@ -553,7 +553,7 @@ export default {
             this.proposalTemplates = this.getProposalTemplates();
           }
         } catch (e) {
-          console.error('Error parsing JSON template data:', e);
+          // console.error('Error parsing JSON template data:', e);
         }
       }
     },
@@ -660,7 +660,7 @@ export default {
     
     receiveImageData(data) {
       uni.hideLoading();
-      console.log(`Received image data for ${data.element}`);
+      // console.log(`Received image data for ${data.element}`);
       
       // Map element IDs to data properties
       const elementMap = {
@@ -689,15 +689,15 @@ export default {
         // Store in local storage with a prefix to identify our app's data
         try {
           uni.setStorageSync(`uigenius_image_${key}`, data.imageData);
-          console.log(`Stored image data for ${key} in local storage`);
+          // console.log(`Stored image data for ${key} in local storage`);
         } catch (e) {
-          console.error(`Failed to store image data for ${key} from local storage:`, e);
+          // console.error(`Failed to store image data for ${key} from local storage:`, e);
         }
       }
     },
     
     generatePreviewImages() {
-      console.log('Generating preview images');
+      // console.log('Generating preview images');
       
       // Use dynamic template IDs if available, otherwise use static ones
       let templateIds = [];
@@ -719,7 +719,7 @@ export default {
         // Store the template IDs for later use
         this.dynamicTemplateIds = templateIds.filter(id => id.startsWith('template-'));
         
-        console.log('Using dynamic template IDs:', templateIds);
+        // console.log('Using dynamic template IDs:', templateIds);
       } else {
         // Fallback to static template IDs
         templateIds = [
@@ -732,7 +732,7 @@ export default {
           'proposal-dashboard'
         ];
         
-        console.log('Using static template IDs:', templateIds);
+        // console.log('Using static template IDs:', templateIds);
       }
       
       // Filter out templates that already have images in storage
@@ -754,11 +754,11 @@ export default {
       });
       
       if (templatesToGenerate.length === 0) {
-        console.log('All templates already have images in storage, skipping generation');
+        // console.log('All templates already have images in storage, skipping generation');
         return;
       }
       
-      console.log(`Generating ${templatesToGenerate.length} templates:`, templatesToGenerate);
+      // console.log(`Generating ${templatesToGenerate.length} templates:`, templatesToGenerate);
       
       // Show loading indicator
       this._showLoading(`Generating ${templatesToGenerate.length} images...`);
@@ -775,7 +775,7 @@ export default {
         // Check if element exists before trying to capture it
         const element = document.getElementById(id);
         if (!element) {
-          console.warn(`Element not found: ${id}, skipping capture`);
+          // console.warn(`Element not found: ${id}, skipping capture`);
           // Move to next element
           setTimeout(() => {
             captureSequentially(index + 1);
@@ -798,13 +798,13 @@ export default {
     generateUI() {
       // Prevent multiple simultaneous API calls
       if (this.isGenerating) {
-        console.log('Generation already in progress, skipping duplicate call');
+        // console.log('Generation already in progress, skipping duplicate call');
         return;
       }
       
       this.project_id = uni.getStorageSync('request_project_id');
       if (this.project_id) {
-        console.log(this.project_id);
+        // console.log(this.project_id);
       } else {
         this.projectDescription = uni.getStorageSync('projectDescription');
         if (this.projectDescription) {
@@ -869,10 +869,10 @@ export default {
                       
                       uni.setStorageSync('latest_7_overall_page', jsonContent);
                       uni.removeStorageSync('projectDescription');
-                      console.log('Page generation successful!');
+                      // console.log('Page generation successful!');
                     } catch (e) {
-                      console.error('Error processing generated page data:', e);
-                      console.log('Raw content:', fullContent);
+                      // console.error('Error processing generated page data:', e);
+                      // console.log('Raw content:', fullContent);
                       this.errorMessage = 'Failed to save generated page data';
                     }
                     
@@ -882,7 +882,7 @@ export default {
                     }, 500);
                   }
                 } catch (e) {
-                  console.error('Error processing stream chunk:', e);
+                  // console.error('Error processing stream chunk:', e);
                 }
               }
             }
@@ -891,9 +891,9 @@ export default {
           // Handle completion
           xhr.onload = () => {
             if (xhr.status === 200) {
-              console.log('Stream complete');
+              // console.log('Stream complete');
             } else {
-              console.error('Request failed with status:', xhr.status);
+              // console.error('Request failed with status:', xhr.status);
               this.isGenerating = false;
             }
           };
@@ -902,7 +902,7 @@ export default {
           xhr.onerror = (err) => {
             this.isGenerating = false;
             uni.hideLoading();
-            console.error('API call failed:', err);
+            // console.error('API call failed:', err);
             this.errorMessage = 'Failed to generate page. Please try again.';
           };
           
@@ -910,14 +910,14 @@ export default {
           xhr.ontimeout = () => {
             this.isGenerating = false;
             uni.hideLoading();
-            console.error('API call timed out');
+            // console.error('API call timed out');
             this.errorMessage = 'Generation timed out. Please try again.';
           };
           
           // Send the request
           xhr.send('prompt=' + encodeURIComponent(this.projectDescription));
         } else {
-          console.log(uni.getStorageSync('latest_7_overall_page'));
+          // console.log(uni.getStorageSync('latest_7_overall_page'));
         }
       }
     },
@@ -1075,7 +1075,7 @@ export default {
       });
     },
     loadImagesFromStorage() {
-      console.log('Loading images from local storage');
+      // console.log('Loading images from local storage');
       
       // Define the main template keys we need
       const mainTemplateKeys = [
@@ -1113,10 +1113,10 @@ export default {
               this.$set(this.templateLoadingStates, key, false);
             }
             
-            console.log(`Loaded main template image for ${key} from local storage`);
+            // console.log(`Loaded main template image for ${key} from local storage`);
           }
         } catch (e) {
-          console.error(`Failed to load image data for ${key} from local storage:`, e);
+          // console.error(`Failed to load image data for ${key} from local storage:`, e);
         }
       }
       
@@ -1134,10 +1134,10 @@ export default {
               this.$set(this.proposalLoadingStates, key, false);
             }
             
-            console.log(`Loaded proposal image for ${key} from local storage`);
+            // console.log(`Loaded proposal image for ${key} from local storage`);
           }
         } catch (e) {
-          console.error(`Failed to load image data for ${key} from local storage:`, e);
+          // console.error(`Failed to load image data for ${key} from local storage:`, e);
         }
       }
       
@@ -1151,18 +1151,18 @@ export default {
         // Force update after all images are set
         this.$forceUpdate();
         
-        console.log(`Loaded ${mainLoadedCount}/${mainTemplateKeys.length} main templates and ${proposalLoadedCount}/${proposalKeys.length} proposals from local storage`);
+        // console.log(`Loaded ${mainLoadedCount}/${mainTemplateKeys.length} main templates and ${proposalLoadedCount}/${proposalKeys.length} proposals from local storage`);
       });
       
       // If we loaded all needed main templates, we can skip the loading states
       if (mainLoadedCount >= mainTemplateKeys.length) {
         this.templatesLoading = false;
-        console.log('All required main templates loaded from storage');
+        // console.log('All required main templates loaded from storage');
         
         // If we also loaded all proposals, we can skip proposal loading states
         if (proposalLoadedCount >= proposalKeys.length) {
           this.proposalsLoading = false;
-          console.log('All proposals loaded from storage');
+          // console.log('All proposals loaded from storage');
         }
         
         return true;
@@ -1237,18 +1237,18 @@ export default {
       const needsGeneration = missingMainTemplates.length > 0 || missingProposals.length > 0;
       
       if (missingMainTemplates.length > 0) {
-        console.log(`Missing ${missingMainTemplates.length} main templates: [${missingMainTemplates.join(', ')}]`);
+        // console.log(`Missing ${missingMainTemplates.length} main templates: [${missingMainTemplates.join(', ')}]`);
       }
       
       if (missingProposals.length > 0) {
-        console.log(`Missing ${missingProposals.length} proposals: [${missingProposals.join(', ')}]`);
+        // console.log(`Missing ${missingProposals.length} proposals: [${missingProposals.join(', ')}]`);
       }
       
-      console.log(`Needs generation: ${needsGeneration}`);
+      // console.log(`Needs generation: ${needsGeneration}`);
       return needsGeneration;
     },
     clearStoredImages() {
-      console.log('Clearing stored images');
+      // console.log('Clearing stored images');
       
       // Define the main template keys we need
       const mainTemplateKeys = [
@@ -1272,9 +1272,9 @@ export default {
       for (const key of allKeys) {
         try {
           uni.removeStorageSync(`uigenius_image_${key}`);
-          console.log(`Cleared image data for ${key} from local storage`);
+          // console.log(`Cleared image data for ${key} from local storage`);
         } catch (e) {
-          console.error(`Failed to clear image data for ${key} from local storage:`, e);
+          // console.error(`Failed to clear image data for ${key} from local storage:`, e);
         }
       }
       
@@ -1320,12 +1320,12 @@ export default {
       setTimeout(() => {
         const dom = document.getElementById(elementId);
         if (!dom) {
-          console.error(`Element not found: ${elementId}`);
+          // console.error(`Element not found: ${elementId}`);   
           uni.$emit('capture-error', { element: elementId, error: 'Element not found' });
           return;
         }
         
-        console.log(`Capturing element: ${elementId}`);
+        // console.log(`Capturing element: ${elementId}`);
         
         html2canvas(dom, {
           width: dom.clientWidth,
@@ -1339,7 +1339,7 @@ export default {
           // Send the image data back to the Vue component
           uni.$emit('image-captured', { element: elementId, imageData });
         }).catch(err => {
-          console.error(`Failed to generate image for ${elementId}:`, err);
+          // console.error(`Failed to generate image for ${elementId}:`, err);
           uni.$emit('capture-error', { element: elementId, error: err.toString() });
         });
       }, 100);
