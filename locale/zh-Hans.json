@@ -20,5 +20,6 @@
 	"api.message": "提示",
   "schema.name": "姓名",
 	"schema.add": "新增",
-	"schema.add-success": "新增成功"
+	"schema.add-success": "新增成功",
+	"index.design": "设计"
 }

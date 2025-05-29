@@ -5,7 +5,7 @@
   </template>
   
   <script>
-  import GrapesEditor from '../component/grapesEditor.vue';
+  import GrapesEditor from '../../component/grapesEditor.vue';
   
   export default {
   name: 'App',

@@ -23,7 +23,7 @@
 		{
 			"path": "pages/design/design",
 			"style": {
-				"navigationBarTitleText": "%index.schema%",
+				"navigationBarTitleText": "%index.design%",
 				"enablePullDownRefresh": false
 			}
 		},
@@ -53,16 +53,12 @@
 				"text": "%index.login%"
 			},
 			{
-				"pagePath": "pages/index/index",
-				"text": "%index.home%"
-			},
-			{
 				"pagePath": "pages/dashboard/dashboard",
 				"text": "%index.dashboard%"
 			},
 			{
 				"pagePath": "pages/design/design",
-				"text": "%index.schema%"
+				"text": "%index.design%"
 			},
 			{
 				"pagePath": "pages/grapesEditor/grapesEditor",

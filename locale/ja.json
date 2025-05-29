@@ -19,5 +19,6 @@
   "index.language-change-confirm": "この設定を適用すると、アプリが再起動します",
   "api.message": "メッセージ",
   "schema.add": "追加",
-  "schema.add-success": "成功を追加"
+  "schema.add-success": "成功を追加",
+  "index.design": "デザイン"
 }

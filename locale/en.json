@@ -22,5 +22,6 @@
   "api.message": "Message",
   "schema.name": "Name",
   "schema.add": "Add",
-  "schema.add-success": "Add success"
+  "schema.add-success": "Add success",
+  "index.design": "Design"
 }

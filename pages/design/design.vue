@@ -20,9 +20,9 @@
         <view v-for="(template, index) in filteredTemplates" :key="index" 
               :id="'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')" 
               class="template-preview-content">
-          <view class="preview-header">
+          <!-- <view class="preview-header">
             <text class="preview-title">{{ template.name.replace(/ Page/i, '') }}</text>
-          </view>
+          </view> -->
           <view class="preview-content" v-html="getSimplifiedPreview(template)"></view>
         </view>
         
@@ -30,9 +30,9 @@
         <view v-for="(template, index) in activeProposalTemplates" :key="'proposal-'+index" 
               :id="'proposal-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')" 
               class="template-preview-content">
-          <view class="preview-header">
+          <!-- <view class="preview-header">
             <text class="preview-title">{{ template.name.replace(/ Page/i, '') }}</text>
-          </view>
+          </view> -->
           <view class="preview-content" v-html="getSimplifiedPreview(template)"></view>
         </view>
       </template>
