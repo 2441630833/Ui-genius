@@ -385,6 +385,8 @@ export default {
         login: '',
         dashboard: ''
       },
+      // Add a version tracker for template content
+      templateVersions: {},
       activeNavItem: 'home',
       selectedTemplate: null,
       selectedProposal: null,
@@ -493,6 +495,7 @@ export default {
       this.proposalLoadingStates.dashboard = false;
       this.proposalsLoading = false;
     }, 2500);
+    // console.log(this.jsonTemplates);
   },
   
   onShow(){
@@ -537,14 +540,15 @@ export default {
           // Check if we have pages in the JSON
           if (data && data.pages && Array.isArray(data.pages)) {
             this.jsonTemplates = data.pages;
+            // console.log(this.jsonTemplates);
             
             // Generate template IDs based on page names
             this.dynamicTemplateIds = this.jsonTemplates.map(template => 
               'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')
             );
             
-            // console.log('Loaded JSON templates:', this.jsonTemplates.length);
-            // console.log('Dynamic template IDs:', this.dynamicTemplateIds);
+            // Check if templates have changed and need re-rendering
+            this.checkTemplateVersions();
             
             // Update loading states for dynamic templates
             this.updateLoadingStates();
@@ -556,6 +560,52 @@ export default {
           // console.error('Error parsing JSON template data:', e);
         }
       }
+    },
+    
+    // Add a new method to check template versions
+    checkTemplateVersions() {
+      let needsUpdate = false;
+      
+      // Check each template to see if its content has changed
+      this.jsonTemplates.forEach(template => {
+        const key = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+        // Create a simple hash of the component content
+        const contentHash = this.hashString(template.component || '');
+        
+        // If we don't have a stored version or the hash has changed
+        if (!this.templateVersions[key] || this.templateVersions[key] !== contentHash) {
+          // Update the version
+          this.templateVersions[key] = contentHash;
+          // Store the new version in storage
+          uni.setStorageSync(`uigenius_template_version_${key}`, contentHash);
+          // Mark that we need to update images
+          needsUpdate = true;
+          // Remove the old image from storage
+          uni.removeStorageSync(`uigenius_image_${key}`);
+        }
+      });
+      
+      // If any templates have changed, regenerate the images
+      if (needsUpdate) {
+        // Set a short timeout to allow the DOM to update first
+        setTimeout(() => {
+          this.generatePreviewImages();
+        }, 300);
+      }
+    },
+    
+    // Add a simple string hashing function
+    hashString(str) {
+      let hash = 0;
+      if (str.length === 0) return hash;
+      
+      for (let i = 0; i < str.length; i++) {
+        const char = str.charCodeAt(i);
+        hash = ((hash << 5) - hash) + char;
+        hash = hash & hash; // Convert to 32bit integer
+      }
+      
+      return hash.toString();
     },
     
     updateLoadingStates() {
@@ -945,75 +995,18 @@ export default {
       });
     },
     getSimplifiedPreview(template) {
-      // Extract a simplified preview from the component HTML
-      // This is a basic implementation that should be enhanced based on your needs
+      // console.log(template);  
+      // Return the component property as a string
       if (!template || !template.component) {
         return '<div class="preview-placeholder">No preview available</div>';
       }
       
-      // Create a simplified preview based on the component type
-      const name = template.name.toLowerCase();
-      
-      if (name.includes('login') || name.includes('signup')) {
-        return `
-          <view class="preview-form">
-            <view class="preview-input"></view>
-            <view class="preview-input"></view>
-            <view class="preview-button"></view>
-          </view>
-        `;
-      } else if (name.includes('home')) {
-        return `
-          <view class="preview-content">
-            <view class="preview-card"></view>
-            <view class="preview-card"></view>
-            <view class="preview-card"></view>
-          </view>
-        `;
-      } else if (name.includes('notification')) {
-        return `
-          <view class="preview-list">
-            <view class="preview-list-item"></view>
-            <view class="preview-list-item"></view>
-            <view class="preview-list-item"></view>
-          </view>
-        `;
-      } else if (name.includes('profile')) {
-        return `
-          <view>
-            <view class="preview-avatar"></view>
-            <view class="preview-info">
-              <view class="preview-info-item"></view>
-              <view class="preview-info-item"></view>
-            </view>
-          </view>
-        `;
-      } else if (name.includes('dashboard')) {
-        return `
-          <view class="preview-dashboard">
-            <view class="preview-chart"></view>
-            <view class="preview-stats">
-              <view class="preview-stat-item"></view>
-              <view class="preview-stat-item"></view>
-            </view>
-          </view>
-        `;
-      } else if (name.includes('settings')) {
-        return `
-          <view class="preview-settings">
-            <view class="preview-settings-item"></view>
-            <view class="preview-settings-item"></view>
-            <view class="preview-settings-item"></view>
-          </view>
-        `;
-      } else {
-        // Default preview for unknown types
-        return `
-          <view class="preview-generic">
-            <view class="preview-generic-item"></view>
-            <view class="preview-generic-item"></view>
-          </view>
-        `;
+      try {
+        // The component is already a string, so just return it
+        return template.component;
+      } catch (e) {
+        console.error('Error rendering component:', e);
+        return '<div class="preview-placeholder">Error rendering preview</div>';
       }
     },
     getProposalTemplates() {
@@ -1099,6 +1092,9 @@ export default {
       // Create a temporary object to hold all image data
       const tempImages = {};
       
+      // Load previously stored template versions
+      this.loadTemplateVersions();
+      
       // Load main template images
       for (const key of mainTemplateKeys) {
         try {
@@ -1169,6 +1165,44 @@ export default {
       }
       
       return false;
+    },
+    
+    // Add a new method to load template versions
+    loadTemplateVersions() {
+      // Load template versions from storage
+      this.templateVersions = {};
+      
+      // If we have dynamic templates from JSON
+      if (this.jsonTemplates.length > 0) {
+        this.jsonTemplates.forEach(template => {
+          const key = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+          try {
+            const version = uni.getStorageSync(`uigenius_template_version_${key}`);
+            if (version) {
+              this.templateVersions[key] = version;
+            }
+          } catch (e) {
+            // Ignore errors
+          }
+        });
+      } else {
+        // For static templates
+        const staticKeys = [
+          'signup', 'home', 'notification', 'profile', 'settings',
+          'login', 'dashboard'
+        ];
+        
+        staticKeys.forEach(key => {
+          try {
+            const version = uni.getStorageSync(`uigenius_template_version_${key}`);
+            if (version) {
+              this.templateVersions[key] = version;
+            }
+          } catch (e) {
+            // Ignore errors
+          }
+        });
+      }
     },
     
     skipLoadingStates() {
@@ -1272,6 +1306,8 @@ export default {
       for (const key of allKeys) {
         try {
           uni.removeStorageSync(`uigenius_image_${key}`);
+          // Also clear version information
+          uni.removeStorageSync(`uigenius_template_version_${key}`);
           // console.log(`Cleared image data for ${key} from local storage`);
         } catch (e) {
           // console.error(`Failed to clear image data for ${key} from local storage:`, e);
@@ -1288,6 +1324,9 @@ export default {
         login: '',
         dashboard: ''
       };
+      
+      // Also reset template versions
+      this.templateVersions = {};
       
       // Show toast
       uni.showToast({
