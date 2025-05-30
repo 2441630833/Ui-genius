@@ -108,13 +108,13 @@
           <view class="device-options">
             <view class="device-option" :class="{ 'selected': selectedDevice === 'mobile' }"
               @click="selectDevice('mobile')">
-              <image class="device-icon" src="../../static/plus.png"></image>
+              <image class="device-icon" src="../../static/mobile.png"></image>
               <text>Mobile</text>
             </view>
 
             <view class="device-option" :class="{ 'selected': selectedDevice === 'desktop' }"
               @click="selectDevice('desktop')">
-              <image class="device-icon" src="../../static/plus.png"></image>
+              <image class="device-icon" src="../../static/desktop.png"></image>
               <text>Desktop</text>
             </view>
           </view>

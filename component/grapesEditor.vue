@@ -43,7 +43,7 @@ export default {
           console.error('Editor element not found! Make sure the element exists in the DOM.');
           return;
         }
-        
+
         this.editor = createStudioEditor({
           root: editorElement,
           theme: 'light',
@@ -103,6 +103,12 @@ export default {
             swiperComponent,
             dialogComponent
           ],
+          onReady: editor => {
+            editor.setDevice('Mobile portrait');
+          },
+          // gjsOptions: {
+          //   deviceManager: { default: 'mobilePortrait' }
+          // },
           // licenseKey wait to test if necessary
           licenseKey: '9a64fa1035cf4c80b9caeb2bb58d9de2d03fe0ea4d594504a4cdeab362b4b295',
 

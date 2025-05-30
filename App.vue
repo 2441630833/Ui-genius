@@ -24,7 +24,7 @@ import initPermission from './common/permission.js'
   }
   
   /* Custom TabBar Styles */
-  .uni-tabbar {
+  /* .uni-tabbar {
     border-radius: 24px !important;
     margin: 0 15px 15px;
     box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
@@ -69,5 +69,5 @@ import initPermission from './common/permission.js'
   
   .uni-tabbar__icon {
     margin-bottom: 4px;
-  }
+  } */
 </style>
