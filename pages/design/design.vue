@@ -410,7 +410,9 @@ export default {
       },
       jsonTemplates: [],
       dynamicTemplateIds: [],
-      proposalTemplates: []
+      proposalTemplates: [],
+      // Add a flag to track if we should generate UI
+      shouldGenerateUI: false
     }
   },
 
@@ -512,9 +514,15 @@ export default {
         this.generatePreviewImages();
       }
       
-      // Only generate UI if we haven't already and we have a project description
-      if (!uni.getStorageSync('latest_7_overall_page') && 
+      // Check if we should generate UI based on the flag from createProject
+      this.shouldGenerateUI = uni.getStorageSync('shouldGenerateUI') === 'true';
+      
+      // Only generate UI if the flag is set and we have a project description
+      if (this.shouldGenerateUI && 
+          !uni.getStorageSync('latest_7_overall_page') && 
           uni.getStorageSync('projectDescription')) {
+        // Clear the flag after using it
+        uni.removeStorageSync('shouldGenerateUI');
         this.generateUI();
       } else {
         // If we already have JSON data, load it
@@ -527,6 +535,12 @@ export default {
     // Clean up event listeners
     uni.$off('image-captured', this.receiveImageData);
     uni.$off('capture-error');
+    
+    // Clean up progress interval if it exists
+    if (this.progressInterval) {
+      clearInterval(this.progressInterval);
+      this.progressInterval = null;
+    }
   },
 
   methods: {
@@ -858,9 +872,27 @@ export default {
       } else {
         this.projectDescription = uni.getStorageSync('projectDescription');
         if (this.projectDescription) {
-          // Start progress bar
+          // Start progress bar with improved initial progress
           this.isGenerating = true;
-          this.generationProgress = 5;
+          this.generationProgress = 10;
+          
+          // Add simulated progress to avoid stalling perception
+          this.progressInterval = setInterval(() => {
+            // Increase progress gradually but slow down as we approach key milestones
+            if (this.generationProgress < 20) {
+              this.generationProgress += 1.5;
+            } else if (this.generationProgress < 50) {
+              this.generationProgress += 0.8;
+            } else if (this.generationProgress < 80) {
+              this.generationProgress += 0.4;
+            } else if (this.generationProgress < 90) {
+              this.generationProgress += 0.2;
+            }
+            // Cap at 90% - the real completion will set it to 100%
+            if (this.generationProgress > 90) {
+              this.generationProgress = 90;
+            }
+          }, 500);
           
           const xhr = new XMLHttpRequest();
           xhr.open('POST', 'http://localhost:8000/api/generate-ui', true);
@@ -880,15 +912,37 @@ export default {
                   const latestLine = lines[lines.length - 1];
                   const data = JSON.parse(latestLine);
                   
-                  // Update progress based on status
-                  if (data.status === 'started' || data.status === 'generating') {
-                    this.generationProgress = data.progress;
+                  // Update progress based on status with improved distribution
+                  if (data.status === 'started') {
+                    // Clear the interval when we get real progress
+                    if (this.progressInterval) {
+                      clearInterval(this.progressInterval);
+                      this.progressInterval = null;
+                    }
+                    // Set to at least 20% when started
+                    this.generationProgress = Math.max(20, data.progress);
+                    
+                    // Accumulate content if available
+                    if (data.chunk) {
+                      receivedContent += data.chunk;
+                    }
+                  } else if (data.status === 'generating') {
+                    // Map server progress (0-100) to a more balanced range (20-90)
+                    // This avoids the 5% and 95% stalling perception
+                    const serverProgress = data.progress || 0;
+                    this.generationProgress = 20 + (serverProgress * 0.7);
                     
                     // Accumulate content if available
                     if (data.chunk) {
                       receivedContent += data.chunk;
                     }
                   } else if (data.status === 'completed') {
+                    // Clear any remaining interval
+                    if (this.progressInterval) {
+                      clearInterval(this.progressInterval);
+                      this.progressInterval = null;
+                    }
+                    
                     // Complete progress bar
                     this.generationProgress = 100;
                     
@@ -940,6 +994,12 @@ export default {
           
           // Handle completion
           xhr.onload = () => {
+            // Clear any remaining interval
+            if (this.progressInterval) {
+              clearInterval(this.progressInterval);
+              this.progressInterval = null;
+            }
+            
             if (xhr.status === 200) {
               // console.log('Stream complete');
             } else {
@@ -950,6 +1010,12 @@ export default {
           
           // Handle errors
           xhr.onerror = (err) => {
+            // Clear any remaining interval
+            if (this.progressInterval) {
+              clearInterval(this.progressInterval);
+              this.progressInterval = null;
+            }
+            
             this.isGenerating = false;
             uni.hideLoading();
             // console.error('API call failed:', err);
@@ -958,6 +1024,12 @@ export default {
           
           // Handle timeout
           xhr.ontimeout = () => {
+            // Clear any remaining interval
+            if (this.progressInterval) {
+              clearInterval(this.progressInterval);
+              this.progressInterval = null;
+            }
+            
             this.isGenerating = false;
             uni.hideLoading();
             // console.error('API call timed out');

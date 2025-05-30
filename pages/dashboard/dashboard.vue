@@ -133,6 +133,19 @@
         </view>
       </view>
     </view>
+
+    <!-- Network Error Toast Overlay -->
+    <view class="toast-overlay" v-if="networkErrorVisible" @click="networkErrorVisible = false">
+      <!-- Network Error Toast -->
+      <view class="network-error-toast" @click.stop>
+        <text class="toast-icon">⚠️</text>
+        <text class="toast-message">{{ networkErrorMessage }}</text>
+        <view class="toast-actions">
+          <text class="toast-retry" @click="retryCreateProject">Retry</text>
+          <text class="toast-close" @click="networkErrorVisible = false">×</text>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -152,7 +165,9 @@ export default {
         alpha: true,
         beta: true,
         gamma: true
-      }
+      },
+      networkErrorVisible: false,
+      networkErrorMessage: ''
     }
   },
   mounted() {
@@ -219,6 +234,9 @@ export default {
       this.projectDescription = this.exampleDescription;
     },
     async createProject() {
+      // Hide any previous network error toast
+      this.networkErrorVisible = false;
+      
       if (!this.selectedDevice) {
         // Show error or notification that device must be selected
         this.errorMessage = 'Please select a device type first';
@@ -233,24 +251,78 @@ export default {
       // Clear error message when validation passes
       this.errorMessage = '';
 
-      // Show loading indicator
-      uni.showLoading({
-        title: 'Generating your page...'
-      });
+      // Start API connection check with a race between fetch and timeout
+      const checkApiConnection = async () => {
+        try {
+          // Race between fetch and timeout for faster response
+          const timeoutPromise = new Promise((_, reject) => 
+            setTimeout(() => reject(new Error('Timeout')), 1000)
+          );
+          
+          const fetchPromise = fetch('http://localhost:8000/api/generate-ui', {
+            method: 'HEAD',
+            cache: 'no-cache'
+          });
+          
+          // Use Promise.race to take the first resolved promise
+          const response = await Promise.race([fetchPromise, timeoutPromise]);
+          
+          if (!response.ok) {
+            throw new Error('API server error');
+          }
+          
+          return true;
+        } catch (error) {
+          if (error.message === 'Timeout') {
+            this.showNetworkErrorToast('Connection timeout. API server is not responding.');
+          } else if (error.name === 'TypeError') {
+            this.showNetworkErrorToast('Cannot connect to API server. Please check your network connection.');
+          } else {
+            this.showNetworkErrorToast('API server error. Please try again later.');
+          }
+          console.error('Network error:', error);
+          return false;
+        }
+      };
+      
+      // Check connection and proceed if successful
+      const isConnected = await checkApiConnection();
+      if (!isConnected) return;
+      
+      // If we reach here, connection is good
       await uni.removeStorageSync('request_project_id');
-      // 先 removeStorageSync 再 setStorageSync
-      await uni.removeStorageSync('latest_7_overall_page');
-      // Call the generate-page API
-      // store the projectDescription in the projectDescription variable
       uni.setStorageSync('projectDescription', this.projectDescription);
-      // Close dialog after successful API response
+      // Set flag to indicate we should generate UI when design page loads
+      uni.setStorageSync('shouldGenerateUI', 'true');
       this.closeCreateProjectDialog();
       uni.switchTab({
         url: '/pages/design/design'
       });
-
-      // Don't close dialog immediately, wait for API response
-      // this.closeCreateProjectDialog();
+    },
+    
+    // Custom toast for network errors
+    showNetworkErrorToast(message = 'Network error. Please check your connection to the API server.') {
+      // Set the error message
+      this.networkErrorMessage = message;
+      
+      // Create a custom toast using uni-app's component - show immediately
+      this.$nextTick(() => {
+        this.networkErrorVisible = true;
+      });
+      
+      // Auto-hide after 5 seconds
+      setTimeout(() => {
+        this.networkErrorVisible = false;
+      }, 5000);
+    },
+    retryCreateProject() {
+      // Hide the toast immediately
+      this.networkErrorVisible = false;
+      
+      // Wait a moment before retrying to give visual feedback
+      setTimeout(() => {
+        this.createProject();
+      }, 100);
     }
   }
 }
@@ -627,4 +699,96 @@ export default {
     font-size: 14px;
   }
 }
+
+/* Toast Overlay */
+.toast-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1000;
+  pointer-events: none; /* Allow clicks to pass through except on the toast itself */
+}
+
+/* Network Error Toast styles */
+.network-error-toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  border-radius: 8px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1001;
+  animation: toast-in 0.15s ease-out forwards; // Faster animation
+  pointer-events: auto; /* Ensure the toast itself captures clicks */
+  will-change: transform, opacity; /* Optimize for animations */
+
+  @keyframes toast-in {
+    0% {
+      opacity: 0;
+      transform: translate(-50%, 20px);
+    }
+    100% {
+      opacity: 1;
+      transform: translate(-50%, 0);
+    }
+  }
+
+  .toast-icon {
+    font-size: 20px;
+    color: #fff;
+  }
+
+  .toast-message {
+    color: #fff;
+    font-size: 14px;
+    flex: 1;
+  }
+  
+  .toast-actions {
+    display: flex;
+    align-items: center;
+    gap: 15px;
+  }
+  
+  .toast-retry {
+    color: #e53935;
+    font-size: 14px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 5px;
+    
+    &:hover {
+      text-decoration: underline;
+    }
+  }
+  
+  .toast-close {
+    color: #fff;
+    font-size: 20px;
+    font-weight: bold;
+    cursor: pointer;
+    padding: 0 5px;
+    
+    &:hover {
+      opacity: 0.8;
+    }
+  }
+  
+  @media (max-width: 480px) {
+    width: 80%;
+    max-width: 300px;
+    
+    .toast-message {
+      font-size: 13px;
+    }
+  }
+}
 </style>
+
