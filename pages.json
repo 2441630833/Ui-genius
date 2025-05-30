@@ -38,9 +38,9 @@
 	],
 	"tabBar": {
 		"color": "#7A7E83",
-		"selectedColor": "#007AFF",
-		"borderStyle": "black",
-		"backgroundColor": "#F8F8F8",
+		"selectedColor": "#e53935",
+		"borderStyle": "white",
+		"backgroundColor": "#FFFFFF",
 		"list": [
 			{
 				"pagePath": "pages/login/login",

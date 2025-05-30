@@ -216,7 +216,7 @@
 
       <!-- Templates Grid -->
       <view class="section">
-        <text class="section-title">Interactive Prototype</text>
+        <text class="section-title">Basic Prototype</text>
         <view class="templates-grid">
           <!-- Dynamic Templates from JSON -->
           <template v-if="jsonTemplates.length > 0">
@@ -313,7 +313,7 @@
 
       <!-- Additional Design Proposals -->
       <view class="section">
-        <text class="section-title">Additional Design Proposals</text>
+        <text class="section-title">Additional Pages</text>
         <view class="proposals-grid">
           <!-- Dynamic Proposals from JSON -->
           <template v-if="jsonTemplates.length > 0 && activeProposalTemplates.length > 0">

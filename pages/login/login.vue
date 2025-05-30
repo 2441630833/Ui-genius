@@ -236,6 +236,9 @@ export default {
                   this.pic = userRes.data.picture;
                   this.email = userRes.data.email;
                   console.log('User Info:', userRes.data);
+                  uni.switchTab({
+                    url: '/pages/dashboard/dashboard'
+                  });
                 }
               },
               fail: (error) => {
@@ -301,6 +304,7 @@ export default {
 }
 .login-input:focus {
   box-shadow: 0 2px 8px rgba(229,57,53,0.10);
+  outline: none;
 }
 .main-btn {
   cursor: pointer;
