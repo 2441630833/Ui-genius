@@ -23,5 +23,12 @@
   "schema.name": "Name",
   "schema.add": "Add",
   "schema.add-success": "Add success",
-  "index.design": "Design"
+  "index.design": "Design",
+  "index.editor": "Editor",
+  "index.register": "Register",
+  "index.logout": "Logout",
+  "index.profile": "Profile",
+  "index.settings": "Settings",
+  "index.help": "Help",
+  "index.about": "About"
 }

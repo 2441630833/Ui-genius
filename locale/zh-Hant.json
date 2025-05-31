@@ -21,5 +21,14 @@
   "schema.name": "姓名",
   "schema.add": "新增",
   "schema.add-success": "新增成功",
-  "index.design": "設計"
+  "index.design": "設計",
+  "index.dashboard": "面板",
+  "index.editor": "編輯器",
+  "index.login": "登錄",
+  "index.register": "註冊",
+  "index.logout": "退出",
+  "index.profile": "個人中心",
+  "index.settings": "設置",
+  "index.help": "幫助",
+  "index.about": "關於"
 }
