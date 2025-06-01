@@ -216,7 +216,9 @@ export default {
                 })
         },
         navigateBack() {
-            uni.navigateBack()
+            uni.switchTab({
+                url: '/pages/login/login'
+            })
         },
         toLogin() {
             uni.navigateTo({
@@ -275,7 +277,7 @@ export default {
   font-size: 1.1rem;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   transition: box-shadow 0.2s;
-  width: 95%; /* Ensure input takes full width */
+  width: 90%; /* Ensure input takes full width */
 }
 
 .login-input:focus {
