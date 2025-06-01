@@ -26,6 +26,8 @@
 			type: 'toast'
 		}
 	})
+	// Import token management functions
+	import { setTokenWithExpiration, setGoogleTokenWithExpiration } from '@/common/permission.js'
 // 添加一个简单的 URLSearchParams polyfill
 // #ifndef H5
 class URLSearchParamsPolyfill {
@@ -113,10 +115,15 @@ export default {
     },
     loginSuccess(e) {
       console.log('Login successful', e)
+      
+      // Store token with expiration
+      setTokenWithExpiration(e)
+      
       uni.showToast({
         title: 'Login successful',
         icon: 'success'
       })
+      
       // Navigate to dashboard after successful login
       uni.switchTab({
         url: '/pages/dashboard/dashboard'
@@ -247,8 +254,10 @@ export default {
       })
         .then(response => response.json())
         .then(data => {
-          const googleToken = data.access_token
-          uni.setStorageSync('googleToken', googleToken)
+          const googleToken = data.access_token    
+          // Store Google token with expiration
+          setGoogleTokenWithExpiration(googleToken)
+          
           return fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
             headers: {
               Authorization: `Bearer ${googleToken}`
@@ -261,6 +270,11 @@ export default {
           this.googlePic = userInfo.picture
           this.googleEmail = userInfo.email
           console.log('User Info:', userInfo)
+          
+          // Navigate to dashboard
+          uni.switchTab({
+            url: '/pages/dashboard/dashboard'
+          })
         })
         .catch(error => {
           console.error('Error during authentication:', error)
@@ -286,7 +300,8 @@ export default {
         success: (tokenRes) => {
           if (tokenRes.statusCode === 200 && tokenRes.data.access_token) {
             const googleToken = tokenRes.data.access_token;
-            uni.setStorageSync('googleToken', googleToken);
+            // Store Google token with expiration
+            setGoogleTokenWithExpiration(googleToken);
             
             // 获取用户信息
             uni.request({
@@ -301,6 +316,7 @@ export default {
                   this.googlePic = userRes.data.picture;
                   this.googleEmail = userRes.data.email;
                   console.log('User Info:', userRes.data);
+                  
                   uni.switchTab({
                     url: '/pages/dashboard/dashboard'
                   });

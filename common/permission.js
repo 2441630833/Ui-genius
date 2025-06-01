@@ -5,6 +5,82 @@ const whiteList = [
 ]
 //登录页
 const loginPage = "/pages/login/login"
+
+// Token expiration time in milliseconds (e.g., 7 days)
+const TOKEN_EXPIRATION_TIME = 7 * 24 * 60 * 60 * 1000;
+
+// Function to store token with expiration
+export function setTokenWithExpiration(tokenData) {
+	// Store the actual token
+	if (tokenData.newToken) {
+		uni.setStorageSync('token', tokenData.newToken);
+	}
+	
+	// Store user ID if available
+	if (tokenData.uid) {
+		uni.setStorageSync('uid', tokenData.uid);
+	}
+	
+	// Set token expiration timestamp
+	const expirationTime = Date.now() + TOKEN_EXPIRATION_TIME;
+	uni.setStorageSync('tokenExpiration', expirationTime);
+	
+	console.log('Token stored with expiration:', new Date(expirationTime).toLocaleString());
+}
+
+export function setGoogleTokenWithExpiration(tokenData) {
+	if (tokenData) {
+		uni.setStorageSync('googleToken', tokenData);
+	}
+	
+	// Set token expiration timestamp
+	const expirationTime = Date.now() + TOKEN_EXPIRATION_TIME;
+	uni.setStorageSync('googleTokenExpiration', expirationTime);
+	
+	console.log('Google Token stored with expiration:', new Date(expirationTime).toLocaleString());
+}
+
+// Function to check if token is expired
+export function isTokenExpired() {
+	const expirationTime = uni.getStorageSync('tokenExpiration');
+	if (!expirationTime) return true;
+	
+	return Date.now() > expirationTime;
+}
+
+// Function to check if Google token is expired
+export function isGoogleTokenExpired() {
+	const expirationTime = uni.getStorageSync('googleTokenExpiration');
+	if (!expirationTime) return true;
+	
+	return Date.now() > expirationTime;
+}
+
+// Function to clear all auth data
+export function clearAuthData() {
+	uni.removeStorageSync('token');
+	uni.removeStorageSync('googleToken');
+	uni.removeStorageSync('tokenExpiration');
+	uni.removeStorageSync('googleTokenExpiration');
+	uni.removeStorageSync('uid');
+}
+
+// Function to determine which auth method is currently active and valid,avoidding the duplicate login logic
+// export function getActiveAuthMethod() {
+// 	const token = uni.getStorageSync('token');
+// 	const googleToken = uni.getStorageSync('googleToken');
+// 	const tokenExpired = isTokenExpired();
+// 	const googleTokenExpired = isGoogleTokenExpired();
+	
+// 	if (token && !tokenExpired) {
+// 		return 'standard';
+// 	} else if (googleToken && !googleTokenExpired) {
+// 		return 'google';
+// 	} else {
+// 		return null; // No valid auth
+// 	}
+// }
+
 export default function initPermission() {
 	/**
 	 * 页面跳转拦截器
@@ -13,23 +89,31 @@ export default function initPermission() {
 	list.forEach(item => { //用遍历的方式分别为,uni.navigateTo,uni.redirectTo,uni.reLaunch,uni.switchTab这4个路由方法添加拦截器
 		uni.addInterceptor(item, {
 			invoke(e) { // 调用前拦截
-				console.log('拦截', e)
+				// console.log('拦截', e)
 				//获取用户的token
 				const token = uni.getStorageSync('token')
 				const googleToken = uni.getStorageSync('googleToken')
-					//获取要跳转的页面路径（url去掉"?"和"?"后的参数）
-				url = e.url.split('?')[0];
+				//获取要跳转的页面路径（url去掉"?"和"?"后的参数）
+				const url = e.url.split('?')[0];
 				let notNeed = whiteList.includes(url)
+				
 				// 如果在whiteList里面就不需要登录
 				if (notNeed) {
 					return e
 				} else {
-					//如果token和googleToken都为空，则需要登录
-					if (!token && !googleToken) {
+					// Check if we have valid authentication
+					const hasValidToken = token && !isTokenExpired();
+					const hasValidGoogleToken = googleToken && !isGoogleTokenExpired();
+					
+					if (!hasValidToken && !hasValidGoogleToken) {
+						// If neither token is valid, clear all auth data
+						clearAuthData();
+						
 						uni.showToast({
-							title: '请先登录',
+							title: 'login expired, please login first',
 							icon: 'none'
 						})
+						
 						uni.switchTab({
 							url: loginPage
 						})
@@ -40,12 +124,9 @@ export default function initPermission() {
 				}
 			},
 			fail(err) { // 失败回调拦截 
-				console.log(err);
+				// console.log(err);
 			}
 		})
 	})
-
-
-
 }
 

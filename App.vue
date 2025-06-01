@@ -3,7 +3,7 @@ import initPermission from './common/permission.js'
   export default {
     onLaunch: function() {
       console.log('App Launch')
-      // initPermission()
+      initPermission()
     },
     onShow: function() {
       console.log('App Show')
