@@ -105,7 +105,7 @@ export default {
       // Add your login logic here
     },
     signup() {
-      uni.switchTab({
+      uni.navigateTo({
         url: '/pages/signup/signup'
       })
     },
