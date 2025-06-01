@@ -12,35 +12,42 @@
       </div>
       <div class="remember-link">
         <checkbox-group>
-          <label><checkbox value="psw" :checked='rememberPsw' @tap="rememberPsw =! rememberPsw" color="#e53935"/>Remember email and password</label>
+          <label>
+            <checkbox value="psw" :checked='rememberPsw' @tap="rememberPsw = !rememberPsw" color="#e53935" />Remember
+            email and password
+          </label>
         </checkbox-group>
       </div>
-      <div class="forgot-link">Forgot your password?</div>
+      <!-- <div class="forgot-link">Forgot your password?</div> -->
     </div>
   </div>
 </template>
 
 <script>
-	const uniIdCo = uniCloud.importObject("uni-id-co", {
-		errorOptions: {
-			type: 'toast'
-		}
-	})
-	// Import token management functions
-	import { setTokenWithExpiration, setGoogleTokenWithExpiration } from '@/common/permission.js'
+const uniIdCo = uniCloud.importObject("uni-id-co", {
+  loadingOptions: { // loading 
+    title: 'logging in...', 
+    mask: true // 
+  },
+  errorOptions: {
+    type: 'toast'
+  }
+})
+// Import token management functions
+import { setTokenWithExpiration, setGoogleTokenWithExpiration } from '@/common/permission.js'
 // 添加一个简单的 URLSearchParams polyfill
 // #ifndef H5
 class URLSearchParamsPolyfill {
   constructor(searchString) {
     this.params = new Map();
-    
+
     if (!searchString || typeof searchString !== 'string') {
       return;
     }
-    
+
     // 移除开头的 '?' 符号
     const search = searchString.startsWith('?') ? searchString.substring(1) : searchString;
-    
+
     // 解析参数
     const pairs = search.split('&');
     for (const pair of pairs) {
@@ -51,15 +58,15 @@ class URLSearchParamsPolyfill {
       this.params.set(key, value);
     }
   }
-  
+
   get(key) {
     return this.params.get(key) || null;
   }
-  
+
   getAll(key) {
     return this.params.get(key) ? [this.params.get(key)] : [];
   }
-  
+
   has(key) {
     return this.params.has(key);
   }
@@ -109,68 +116,68 @@ export default {
         uni.removeStorageSync('userEmail')
         uni.removeStorageSync('userPsw')
       }
-      
+
       // Call the pwdLogin method
       this.pwdLogin()
     },
     loginSuccess(e) {
       console.log('Login successful', e)
-      
+
       // Store token with expiration
       setTokenWithExpiration(e)
-      
+
       uni.showToast({
         title: 'Login successful',
         icon: 'success'
       })
-      
+
       // Navigate to dashboard after successful login
       uni.switchTab({
         url: '/pages/dashboard/dashboard'
       })
     },
     pwdLogin() {
-				if (!this.user.password.length) {
-					this.focusPassword = true
-					return uni.showToast({
-						title: 'password is required',
-						icon: 'none',
-						duration: 3000
-					});
-				}
-				if (!this.user.email.length) {
-					this.focusUsername = true
-					return uni.showToast({
-						title: 'email is required',
-						icon: 'none',
-						duration: 3000
-					});
-				}
+      if (!this.user.password.length) {
+        this.focusPassword = true
+        return uni.showToast({
+          title: 'password is required',
+          icon: 'none',
+          duration: 3000
+        });
+      }
+      if (!this.user.email.length) {
+        this.focusUsername = true
+        return uni.showToast({
+          title: 'email is required',
+          icon: 'none',
+          duration: 3000
+        });
+      }
 
-				let data = {
-					"password": this.user.password,
-				}
+      let data = {
+        "password": this.user.password,
+      }
 
-				if (/^1\d{10}$/.test(this.user.email)) {
-					data.mobile = this.user.email
-				} else if (/@/.test(this.user.email)) {
-					data.email = this.user.email
-				} else {
-					data.username = this.user.email
-				}
+      if (/^1\d{10}$/.test(this.user.email)) {
+        data.mobile = this.user.email
+      } else if (/@/.test(this.user.email)) {
+        data.email = this.user.email
+      } else {
+        data.username = this.user.email
+      }
 
-				uniIdCo.login(data).then(e => {
-					this.loginSuccess(e)
-				}).catch(e => {
-					if (e.errCode == 'uni-id-captcha-required') {
-						// this.needCaptcha = true
-            console.log('captcha required')
-					} else if (this.needCaptcha) {
-						//登录失败，自动重新获取验证码
-						this.$refs.captcha.getImageCaptcha()
-					}
-				})
-			},
+      uniIdCo.login(data).then(e => {
+        this.loginSuccess(e)
+      }).catch(e => {
+        if (e.errCode == 'uni-id-captcha-required') {
+          // this.needCaptcha = true
+          console.log('captcha required')
+        } else if (this.needCaptcha) {
+          //登录失败，自动重新获取验证码
+          this.$refs.captcha.getImageCaptcha()
+        }
+      })
+    },
     signup() {
       uni.navigateTo({
         url: '/pages/signup/signup'
@@ -193,36 +200,36 @@ export default {
       window.grantType = 'authorization_code'
 
       window.authUrl = `https://accounts.google.com/o/oauth2/v2/auth?client_id=${window.clientId}&redirect_uri=${window.redirectUri}&scope=${window.scope}&state=${window.state}&response_type=${window.responseType}`
-      
+
       // Redirect to Google auth page
       window.location.href = window.authUrl
       // #endif
-      
+
       // #ifndef H5
       // 非 H5 平台的 Google 登录处理
-      uni.showToast({
-        title: '当前平台暂不支持 Google 登录',
-        icon: 'none'
-      });
+      // uni.showToast({
+      //   title: '当前平台暂不支持 Google 登录',
+      //   icon: 'none'
+      // });
       // #endif
     },
 
     getUserInfo() {
       let code = null;
-      
+
       // #ifdef H5
       // H5 环境下从 URL 获取 code 参数
       const urlParams = new URLSearchParams(window.location.search);
       code = urlParams.get('code');
       // #endif
-      
+
       // #ifdef MP-WEIXIN || MP-ALIPAY || MP-BAIDU || MP-TOUTIAO || MP-QQ || MP-KUAISHOU
       // 小程序环境从页面参数获取 code
       if (this.$mp && this.$mp.query && this.$mp.query.code) {
         code = this.$mp.query.code;
       }
       // #endif
-      
+
       // #ifdef APP-PLUS
       // App 环境从页面参数获取 code
       const pages = getCurrentPages();
@@ -231,7 +238,7 @@ export default {
         code = currentPage.options.code;
       }
       // #endif
-      
+
       if (!code) {
         return;
       }
@@ -254,10 +261,10 @@ export default {
       })
         .then(response => response.json())
         .then(data => {
-          const googleToken = data.access_token    
+          const googleToken = data.access_token
           // Store Google token with expiration
           setGoogleTokenWithExpiration(googleToken)
-          
+
           return fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
             headers: {
               Authorization: `Bearer ${googleToken}`
@@ -270,7 +277,7 @@ export default {
           this.googlePic = userInfo.picture
           this.googleEmail = userInfo.email
           console.log('User Info:', userInfo)
-          
+
           // Navigate to dashboard
           uni.switchTab({
             url: '/pages/dashboard/dashboard'
@@ -280,7 +287,7 @@ export default {
           console.error('Error during authentication:', error)
         })
       // #endif
-      
+
       // #ifndef H5
       // 非 H5 环境下，使用 uni.request 代替 fetch
       // 获取 access_token
@@ -302,7 +309,7 @@ export default {
             const googleToken = tokenRes.data.access_token;
             // Store Google token with expiration
             setGoogleTokenWithExpiration(googleToken);
-            
+
             // 获取用户信息
             uni.request({
               url: 'https://www.googleapis.com/oauth2/v2/userinfo',
@@ -316,7 +323,7 @@ export default {
                   this.googlePic = userRes.data.picture;
                   this.googleEmail = userRes.data.email;
                   console.log('User Info:', userRes.data);
-                  
+
                   uni.switchTab({
                     url: '/pages/dashboard/dashboard'
                   });
@@ -324,14 +331,14 @@ export default {
               },
               fail: (error) => {
                 console.error('Error getting user info:', error);
-                uni.showToast({ title: '获取用户信息失败', icon: 'none' });
+                uni.showToast({ title: 'get user info failed', icon: 'none' });
               }
             });
           }
         },
         fail: (error) => {
           console.error('Error during authentication:', error);
-          uni.showToast({ title: '身份验证失败', icon: 'none' });
+          uni.showToast({ title: 'authentication failed', icon: 'none' });
         }
       });
       // #endif
@@ -354,10 +361,11 @@ export default {
   align-items: center;
   justify-content: center;
 }
+
 .login-card {
   background: #fff;
   border-radius: 24px;
-  box-shadow: 0 8px 32px rgba(0,0,0,0.18);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.18);
   padding: 48px 36px 36px 36px;
   width: 100%;
   max-width: 400px;
@@ -365,6 +373,7 @@ export default {
   flex-direction: column;
   align-items: stretch;
 }
+
 .login-title {
   text-align: center;
   font-size: 2rem;
@@ -372,6 +381,7 @@ export default {
   margin-bottom: 32px;
   color: #222;
 }
+
 .login-input {
   border: none;
   outline: none;
@@ -380,13 +390,15 @@ export default {
   margin-bottom: 18px;
   background: #f5f5f5;
   font-size: 1.1rem;
-  box-shadow: 0 1px 4px rgba(0,0,0,0.04);
+  box-shadow: 0 1px 4px rgba(0, 0, 0, 0.04);
   transition: box-shadow 0.2s;
 }
+
 .login-input:focus {
-  box-shadow: 0 2px 8px rgba(229,57,53,0.10);
+  box-shadow: 0 2px 8px rgba(229, 57, 53, 0.10);
   outline: none;
 }
+
 .main-btn {
   cursor: pointer;
   position: relative;
@@ -412,9 +424,11 @@ export default {
   justify-content: center;
   text-align: center;
 }
+
 .main-btn:hover {
   background: #b71c1c;
 }
+
 .secondary-btn {
   cursor: pointer;
   position: relative;
@@ -440,9 +454,11 @@ export default {
   justify-content: center;
   text-align: center;
 }
+
 .secondary-btn:hover {
   background: #fbe9e7;
 }
+
 .forgot-link {
   text-align: center;
   margin-top: 18px;
@@ -450,6 +466,7 @@ export default {
   font-size: 0.98rem;
   cursor: pointer;
 }
+
 .google-login {
   display: flex;
   align-items: center;

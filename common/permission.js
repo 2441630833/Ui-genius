@@ -1,6 +1,6 @@
 //白名单 不需要验证token
 const whiteList = [
-	"/pages/index/index",
+	"/pages/signup/signup",
 	"/pages/login/login",
 ]
 //登录页
