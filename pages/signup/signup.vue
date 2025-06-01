@@ -11,37 +11,77 @@
             </match-media>
             <uni-forms ref="form" :value="formData" :rules="rules" validate-trigger="submit" err-show-type="toast">
                 <uni-forms-item name="email" required>
-                    <uni-easyinput :inputBorder="false" :focus="focusEmail" @blur="focusEmail = false" class="login-input"
-                        placeholder="Email address" v-model="formData.email" trim="both" />
+                    <uni-easyinput 
+                        :inputBorder="false" 
+                        :focus="focusEmail" 
+                        @blur="focusEmail = false" 
+                        class="login-input"
+                        placeholder="Email address" 
+                        v-model="formData.email" 
+                        trim="both" 
+                    />
                 </uni-forms-item>
-                <uni-forms-item name="nickname">
-                    <uni-easyinput :inputBorder="false" :focus="focusNickname" @blur="focusNickname = false"
-                        class="login-input" placeholder="Username" v-model="formData.nickname" trim="both" />
+                
+                <uni-forms-item name="nickname" required>
+                    <uni-easyinput 
+                        :inputBorder="false" 
+                        :focus="focusNickname" 
+                        @blur="focusNickname = false"
+                        class="login-input" 
+                        placeholder="Username" 
+                        v-model="formData.nickname" 
+                        trim="both" 
+                    />
                 </uni-forms-item>
+                
                 <uni-forms-item name="password" v-model="formData.password" required>
-                    <uni-easyinput :inputBorder="false" :focus="focusPassword" @blur="focusPassword = false"
-                        class="login-input" maxlength="20"
-                        :placeholder="'Password (' + (config.passwordStrength == 'weak' ? '6' : '8') + '-16 characters)'" type="password"
-                        v-model="formData.password" trim="both" />
+                    <uni-easyinput 
+                        :inputBorder="false" 
+                        :focus="focusPassword" 
+                        @blur="focusPassword = false"
+                        class="login-input" 
+                        maxlength="20"
+                        :placeholder="'Password (' + (config.passwordStrength == 'weak' ? '6' : '8') + '-16 characters)'" 
+                        type="password"
+                        v-model="formData.password" 
+                        trim="both" 
+                    />
                 </uni-forms-item>
+                
                 <uni-forms-item name="password2" v-model="formData.password2" required>
-                    <uni-easyinput :inputBorder="false" :focus="focusPassword2" @blur="focusPassword2 = false"
-                        class="login-input" placeholder="Confirm password" maxlength="20" type="password" v-model="formData.password2"
-                        trim="both" />
+                    <uni-easyinput 
+                        :inputBorder="false" 
+                        :focus="focusPassword2" 
+                        @blur="focusPassword2 = false"
+                        class="login-input" 
+                        placeholder="Confirm password" 
+                        maxlength="20" 
+                        type="password" 
+                        v-model="formData.password2"
+                        trim="both" 
+                    />
                 </uni-forms-item>
-                <!-- <uni-forms-item name="code" >
-				<uni-id-pages-email-form ref="shortCode" :email="formData.email" type="register" v-model="formData.code">
-				</uni-id-pages-email-form>
-			</uni-forms-item> -->
-                <!-- <uni-id-pages-agreements scope="register" ref="agreements" ></uni-id-pages-agreements> -->
+                
+                <!-- <uni-forms-item name="code">
+                    <uni-id-pages-email-form 
+                        ref="shortCode" 
+                        :email="formData.email" 
+                        type="register" 
+                        v-model="formData.code"
+                    />
+                </uni-forms-item> -->
+                
+                <!-- <uni-id-pages-agreements scope="register" ref="agreements"></uni-id-pages-agreements> -->
+                
                 <button class="main-btn" type="primary" @click="submit">Sign Up</button>
                 <button @click="navigateBack" class="secondary-btn">Back</button>
+                
                 <!-- <match-media :min-width="690">
-				<view class="link-box">
-					<text class="link" @click="registerByUserName">Register with username</text>
-					<text class="link" @click="toLogin">Already have an account? Login here</text>
-				</view>
-			</match-media> -->
+                    <view class="link-box">
+                        <text class="link" @click="registerByUserName">Register with username</text>
+                        <text class="link" @click="toLogin">Already have an account? Login here</text>
+                    </view>
+                </match-media> -->
             </uni-forms>
         </view>
     </view>
@@ -213,6 +253,7 @@ export default {
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  overflow: hidden; /* Prevent content from overflowing */
 }
 
 .login-title {
@@ -221,6 +262,7 @@ export default {
   font-weight: 500;
   margin-bottom: 32px;
   color: #222;
+  display: block;
 }
 
 .login-input {
@@ -233,6 +275,7 @@ export default {
   font-size: 1.1rem;
   box-shadow: 0 1px 4px rgba(0,0,0,0.04);
   transition: box-shadow 0.2s;
+  width: 95%; /* Ensure input takes full width */
 }
 
 .login-input:focus {
@@ -319,10 +362,5 @@ export default {
     .link {
         font-size: 12px;
     }
-}
-
-.uni-content ::v-deep .uni-forms-item__label {
-    position: absolute;
-    left: -15px;
 }
 </style>
