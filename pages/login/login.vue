@@ -21,6 +21,11 @@
 </template>
 
 <script>
+	const uniIdCo = uniCloud.importObject("uni-id-co", {
+		errorOptions: {
+			type: 'toast'
+		}
+	})
 // 添加一个简单的 URLSearchParams polyfill
 // #ifndef H5
 class URLSearchParamsPolyfill {
@@ -68,13 +73,14 @@ export default {
   name: 'LoginPage',
   data() {
     return {
-      title: '',
-      pic: '',
-      email: '',
+      googleName: '',
+      googlePic: '',
+      googleEmail: '',
       user: {
         email: '',
         password: ''
       },
+      needCaptcha: false,
       rememberPsw: true
     }
   },
@@ -102,8 +108,62 @@ export default {
         uni.removeStorageSync('userPsw')
       }
       
-      // Add your login logic here
+      // Call the pwdLogin method
+      this.pwdLogin()
     },
+    loginSuccess(e) {
+      console.log('Login successful', e)
+      uni.showToast({
+        title: 'Login successful',
+        icon: 'success'
+      })
+      // Navigate to dashboard after successful login
+      uni.switchTab({
+        url: '/pages/dashboard/dashboard'
+      })
+    },
+    pwdLogin() {
+				if (!this.user.password.length) {
+					this.focusPassword = true
+					return uni.showToast({
+						title: 'password is required',
+						icon: 'none',
+						duration: 3000
+					});
+				}
+				if (!this.user.email.length) {
+					this.focusUsername = true
+					return uni.showToast({
+						title: 'email is required',
+						icon: 'none',
+						duration: 3000
+					});
+				}
+
+				let data = {
+					"password": this.user.password,
+				}
+
+				if (/^1\d{10}$/.test(this.user.email)) {
+					data.mobile = this.user.email
+				} else if (/@/.test(this.user.email)) {
+					data.email = this.user.email
+				} else {
+					data.username = this.user.email
+				}
+
+				uniIdCo.login(data).then(e => {
+					this.loginSuccess(e)
+				}).catch(e => {
+					if (e.errCode == 'uni-id-captcha-required') {
+						// this.needCaptcha = true
+            console.log('captcha required')
+					} else if (this.needCaptcha) {
+						//登录失败，自动重新获取验证码
+						this.$refs.captcha.getImageCaptcha()
+					}
+				})
+			},
     signup() {
       uni.navigateTo({
         url: '/pages/signup/signup'
@@ -197,9 +257,9 @@ export default {
         })
         .then(response => response.json())
         .then(userInfo => {
-          this.title = userInfo.name
-          this.pic = userInfo.picture
-          this.email = userInfo.email
+          this.googleName = userInfo.name
+          this.googlePic = userInfo.picture
+          this.googleEmail = userInfo.email
           console.log('User Info:', userInfo)
         })
         .catch(error => {
@@ -237,9 +297,9 @@ export default {
               },
               success: (userRes) => {
                 if (userRes.statusCode === 200) {
-                  this.title = userRes.data.name;
-                  this.pic = userRes.data.picture;
-                  this.email = userRes.data.email;
+                  this.googleName = userRes.data.name;
+                  this.googlePic = userRes.data.picture;
+                  this.googleEmail = userRes.data.email;
                   console.log('User Info:', userRes.data);
                   uni.switchTab({
                     url: '/pages/dashboard/dashboard'
