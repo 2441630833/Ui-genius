@@ -5,7 +5,7 @@
       <input type="text" class="login-input" placeholder="Email" v-model="user.email" />
       <input type="password" class="login-input" placeholder="Password" v-model="user.password" />
       <button class="main-btn" @click="login">Login</button>
-      <button class="secondary-btn">Sign Up</button>
+      <button class="secondary-btn" @click="signup">Sign Up</button>
       <div class="google-login" @click="auth">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="google-icon" />
         <span>Continue with Google</span>
@@ -103,6 +103,11 @@ export default {
       }
       
       // Add your login logic here
+    },
+    signup() {
+      uni.switchTab({
+        url: '/pages/signup/signup'
+      })
     },
     auth() {
       // #ifdef H5
