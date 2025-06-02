@@ -292,6 +292,7 @@ export default {
       // If we reach here, connection is good
       await uni.removeStorageSync('request_project_id');
       uni.setStorageSync('projectDescription', this.projectDescription);
+      uni.setStorageSync('selectedDevice', this.selectedDevice);
       // Set flag to indicate we should generate UI when design page loads
       uni.setStorageSync('shouldGenerateUI', 'true');
       this.closeCreateProjectDialog();

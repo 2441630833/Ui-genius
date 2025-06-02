@@ -164,19 +164,20 @@
     <!-- Main Content -->
     <view class="main-content">
       <view class="header">
-        <!-- <view class="left-controls">
-          <view class="device-preview">
-            <image class="icon" src="/static/desktop.png"></image>
-            <image class="icon" src="/static/mobile.png"></image>
-          </view>
+        <view class="left-controls">
+          <!-- <view class="device-preview">
+            <image class="icon" :src="selectedDevice === 'desktop' ? '/static/desktop_active.png' : '/static/desktop.png'" @click="selectDevice('desktop')"></image>
+            <image class="icon" :src="selectedDevice === 'mobile' ? '/static/mobile_active.png' : '/static/mobile.png'" @click="selectDevice('mobile')"></image>
+          </view> -->
           
-          <view class="navigation-controls">
+          <!-- <view class="navigation-controls">
             <image class="icon" src="/static/back.png"></image>
             <image class="icon" src="/static/forward.png"></image>
-          </view>
-        </view> -->
+          </view> -->
+        </view>
 
         <view class="zoom-controls">
+          
           <!-- <image class="icon" src="/static/minus.png"></image>
           <text class="zoom-text">15%</text>
           <image class="icon" src="/static/plus.png"></image> -->
@@ -189,6 +190,10 @@
           <view class="action-button code-button">
             <image class="icon" src="/static/code.png"></image>
           </view> -->
+          <view class="device-preview">
+            <image class="icon" :src="selectedDevice === 'desktop' ? '/static/desktop_active.png' : '/static/desktop.png'" @click="selectDevice('desktop')"></image>
+            <image class="icon" :src="selectedDevice === 'mobile' ? '/static/mobile_active.png' : '/static/mobile.png'" @click="selectDevice('mobile')"></image>
+          </view>
 
           <view class="separator"></view>
 
@@ -412,7 +417,9 @@ export default {
       dynamicTemplateIds: [],
       proposalTemplates: [],
       // Add a flag to track if we should generate UI
-      shouldGenerateUI: false
+      shouldGenerateUI: false,
+      // Add selectedDevice property with default value 'desktop'
+      selectedDevice: 'desktop'
     }
   },
 
@@ -466,6 +473,12 @@ export default {
     // Load images from storage on initial mount to avoid display issues
     this.loadImagesFromStorage();
     
+    // Load selectedDevice from storage if available
+    const storedDevice = uni.getStorageSync('selectedDevice');
+    if (storedDevice) {
+      this.selectedDevice = storedDevice;
+    }
+    
     // Set up loading state timers
     setTimeout(() => {
       this.templateLoadingStates.signup = false;
@@ -503,6 +516,12 @@ export default {
   onShow(){
     // Load images from local storage first and wait for a tick to ensure reactivity
     this.loadImagesFromStorage();
+    
+    // Load selectedDevice from storage if available
+    const storedDevice = uni.getStorageSync('selectedDevice');
+    if (storedDevice) {
+      this.selectedDevice = storedDevice;
+    }
     
     // Use nextTick to ensure the previous operation completes
     this.$nextTick(() => {
@@ -544,6 +563,12 @@ export default {
   },
 
   methods: {
+    selectDevice(device) {
+      this.selectedDevice = device;
+      // Save selected device to storage
+      uni.setStorageSync('selectedDevice', device);
+    },
+    
     loadJsonTemplates() {
       const jsonData = uni.getStorageSync('latest_7_overall_page');
       if (jsonData) {
@@ -973,6 +998,7 @@ export default {
                       
                       uni.setStorageSync('latest_7_overall_page', jsonContent);
                       uni.removeStorageSync('projectDescription');
+                      uni.removeStorageSync('selectedDevice')
                       // console.log('Page generation successful!');
                     } catch (e) {
                       // console.error('Error processing generated page data:', e);
@@ -1036,8 +1062,11 @@ export default {
             this.errorMessage = 'Generation timed out. Please try again.';
           };
           
-          // Send the request
-          xhr.send('prompt=' + encodeURIComponent(this.projectDescription));
+          // Send the request with both prompt and selectedDevice
+          xhr.send(
+            'prompt=' + encodeURIComponent(this.projectDescription) + 
+            '&device_type=' + encodeURIComponent(this.selectedDevice)
+          );
         } else {
           // console.log(uni.getStorageSync('latest_7_overall_page'));
         }
