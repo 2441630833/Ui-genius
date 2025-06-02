@@ -29,12 +29,23 @@ export function setTokenWithExpiration(tokenData) {
 }
 
 export function setGoogleTokenWithExpiration(tokenData) {
-	if (tokenData) {
-		uni.setStorageSync('googleToken', tokenData);
+	// Store the token
+	if (tokenData.token) {
+		uni.setStorageSync('googleToken', tokenData.token);
 	}
 	
-	// Set token expiration timestamp
-	const expirationTime = Date.now() + TOKEN_EXPIRATION_TIME;
+	// Store user ID if available
+	if (tokenData.uid) {
+		uni.setStorageSync('googleUid', tokenData.uid);
+	}
+	
+	// Store user info if available
+	if (tokenData.userInfo) {
+		uni.setStorageSync('googleUserInfo', tokenData.userInfo);
+	}
+	
+	// Set token expiration timestamp using provided tokenExpired or default expiration time
+	const expirationTime = tokenData.tokenExpired || (Date.now() + TOKEN_EXPIRATION_TIME);
 	uni.setStorageSync('googleTokenExpiration', expirationTime);
 	
 	console.log('Google Token stored with expiration:', new Date(expirationTime).toLocaleString());

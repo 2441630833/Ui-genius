@@ -26,7 +26,7 @@
 <script>
 const uniIdCo = uniCloud.importObject("uni-id-co", {
   loadingOptions: { // loading 
-    title: 'logging in...', 
+    title: 'logging in...',
     mask: true // 
   },
   errorOptions: {
@@ -126,14 +126,35 @@ export default {
       // Store token with expiration
       setTokenWithExpiration(e)
 
+
+
+      // Navigate to dashboard after successful login
+      uni.switchTab({
+        url: '/pages/dashboard/dashboard'
+      })
+
       uni.showToast({
         title: 'Login successful',
         icon: 'success'
       })
 
+    },
+    googleLoginSuccess(e) {
+      console.log('Google login successful', e)
+
+      // Store Google token with expiration
+      setGoogleTokenWithExpiration(e)
+
+
+
       // Navigate to dashboard after successful login
       uni.switchTab({
         url: '/pages/dashboard/dashboard'
+      })
+
+      uni.showToast({
+        title: 'Google login successful',
+        icon: 'success'
       })
     },
     pwdLogin() {
@@ -189,7 +210,7 @@ export default {
         title: 'Logging in...',
         mask: true
       })
-  
+
       // Google OAuth client ID
       window.clientId = '137524279748-rg43jumis252rh8odausn13glj64nmit.apps.googleusercontent.com'
       // Redirect URI
@@ -267,7 +288,7 @@ export default {
           if (!data.access_token) {
             throw new Error('No access token received from Google');
           }
-          
+
           const googleToken = data.access_token
 
           return fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
@@ -287,7 +308,7 @@ export default {
           this.googlePic = userInfo.picture
           this.googleEmail = userInfo.email
           console.log('User Info:', userInfo)
-          
+
           // Debug log to check exactly what's in userInfo
           console.log('User ID:', userInfo.id)
           console.log('User Email:', userInfo.email)
@@ -307,7 +328,7 @@ export default {
             family_name: userInfo.family_name,
             verified_email: userInfo.verified_email
           }
-          
+
           console.log('Google Info Object:', googleInfo)
 
           // Store Google user info to uni-id-co
@@ -315,16 +336,16 @@ export default {
           uniIdCo.loginByGoogle(googleInfo).then(result => {
             console.log('Google login success:', result)
             // Login success, store token
-            this.loginSuccess(result)
+            this.googleLoginSuccess(result)
           }).catch(err => {
             console.error('Error storing Google user info:', err)
             console.error('Error details:', err.message || err)
-            
+
             // If direct params failed, try with nested params
             console.log('Retrying with nested params')
             uniIdCo.loginByGoogle({ googleInfo }).then(result => {
               console.log('Google login success with nested params:', result)
-              this.loginSuccess(result)
+              this.googleLoginSuccess(result)
             }).catch(nestedErr => {
               console.error('Error with nested params too:', nestedErr)
               uni.showToast({
@@ -337,12 +358,12 @@ export default {
           })
         })
         .catch(error => {
-          console.error('Error during authentication:', error)
-          uni.showToast({
-            title: 'Google login failed: ' + error.message,
-            icon: 'none',
-            duration: 3000
-          })
+          // console.error('Error during authentication:', error)
+          // uni.showToast({
+          //   title: 'Google login failed: ' + error.message,
+          //   icon: 'none',
+          //   duration: 3000
+          // })
           uni.hideLoading()
         })
       // #endif
@@ -380,7 +401,7 @@ export default {
                   this.googlePic = userRes.data.picture;
                   this.googleEmail = userRes.data.email;
                   console.log('User Info:', userRes.data);
-                  
+
                   // Debug log to check exactly what's in userRes.data
                   console.log('User ID:', userRes.data.id)
                   console.log('User Email:', userRes.data.email)
@@ -400,7 +421,7 @@ export default {
                     family_name: userRes.data.family_name,
                     verified_email: userRes.data.verified_email
                   }
-                  
+
                   console.log('Google Info Object:', googleInfo)
 
                   // Store Google user info to uni-id-co
@@ -408,16 +429,16 @@ export default {
                   uniIdCo.loginByGoogle(googleInfo).then(result => {
                     console.log('Google login success:', result)
                     // Login success, store token
-                    this.loginSuccess(result)
+                    this.googleLoginSuccess(result)
                   }).catch(err => {
                     console.error('Error storing Google user info:', err)
                     console.error('Error details:', err.message || err)
-                    
+
                     // If direct params failed, try with nested params
                     console.log('Retrying with nested params')
                     uniIdCo.loginByGoogle({ googleInfo }).then(result => {
                       console.log('Google login success with nested params:', result)
-                      this.loginSuccess(result)
+                      this.googleLoginSuccess(result)
                     }).catch(nestedErr => {
                       console.error('Error with nested params too:', nestedErr)
                       uni.showToast({
@@ -439,8 +460,8 @@ export default {
               },
               fail: (error) => {
                 console.error('Error getting user info:', error);
-                uni.showToast({ 
-                  title: 'Failed to get user info', 
+                uni.showToast({
+                  title: 'Failed to get user info',
                   icon: 'none',
                   duration: 3000
                 });
@@ -458,8 +479,8 @@ export default {
         },
         fail: (error) => {
           console.error('Error during authentication:', error);
-          uni.showToast({ 
-            title: 'Authentication failed', 
+          uni.showToast({
+            title: 'Authentication failed',
             icon: 'none',
             duration: 3000
           });
