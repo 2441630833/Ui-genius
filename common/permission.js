@@ -74,6 +74,8 @@ export function clearAuthData() {
 	uni.removeStorageSync('tokenExpiration');
 	uni.removeStorageSync('googleTokenExpiration');
 	uni.removeStorageSync('uid');
+	uni.removeStorageSync('googleUid');
+	uni.removeStorageSync('googleUserInfo');
 }
 
 // Function to determine which auth method is currently active and valid,avoidding the duplicate login logic
