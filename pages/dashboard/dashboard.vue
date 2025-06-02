@@ -150,6 +150,8 @@
 </template>
 
 <script>
+import { API_BASE_URL } from '../../env.js';
+
 export default {
   name: 'Dashboard',
   data() {
@@ -259,7 +261,7 @@ export default {
             setTimeout(() => reject(new Error('Timeout')), 1000)
           );
           
-          const fetchPromise = fetch('http://localhost:8000/api/generate-ui', {
+          const fetchPromise = fetch(`${API_BASE_URL}/generate-ui`, {
             method: 'HEAD',
             cache: 'no-cache'
           });

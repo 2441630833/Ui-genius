@@ -375,7 +375,8 @@
 </template>
 
 <script>
-import html2canvas from 'html2canvas';
+// import html2canvas from 'html2canvas';
+import { API_BASE_URL } from '../../env.js';
 
 export default {
   name: 'Design',
@@ -926,7 +927,7 @@ export default {
           
           try {
             const xhr = new XMLHttpRequest();
-            xhr.open('POST', 'http://localhost:8000/api/generate-ui', true);
+            xhr.open('POST', `${API_BASE_URL}/generate-ui`, true);
             xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded');
             xhr.timeout = 300000; // 5 minutes timeout
             
