@@ -162,7 +162,6 @@ export default {
       projectDescription: '',
       exampleDescription: 'Dating app for people with magical powers',
       errorMessage: '',
-      request_project_id: '',
       projectLoadingStates: {
         alpha: true,
         beta: true,
@@ -292,7 +291,11 @@ export default {
       if (!isConnected) return;
       
       // If we reach here, connection is good
-      await uni.removeStorageSync('request_project_id');
+      
+      await uni.removeStorageSync('latest_7_overall_page');
+      await uni.removeStorageSync('projectDescription');
+      await uni.removeStorageSync('selectedDevice');
+      await uni.removeStorageSync('shouldGenerateUI');
       uni.setStorageSync('projectDescription', this.projectDescription);
       uni.setStorageSync('selectedDevice', this.selectedDevice);
       // Set flag to indicate we should generate UI when design page loads

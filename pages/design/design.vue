@@ -896,11 +896,7 @@ export default {
       
       // Clear any previous error message
       this.errorMessage = '';
-      
-      this.project_id = uni.getStorageSync('request_project_id');
-      if (this.project_id) {
-        // console.log(this.project_id);
-      } else {
+    
         this.projectDescription = uni.getStorageSync('projectDescription');
         if (this.projectDescription) {
           // Start progress bar with improved initial progress
@@ -1112,7 +1108,7 @@ export default {
         } else {
           // console.log(uni.getStorageSync('latest_7_overall_page'));
         }
-      }
+      
     },
     navigateTo(item) {
       this.activeNavItem = item;
