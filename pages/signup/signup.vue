@@ -89,9 +89,9 @@
 
 <script>
 import rules from './validator.js';
-import mixin from '@/uni_modules/uni-id-pages/common/login-page.mixin.js';
-import config from '@/uni_modules/uni-id-pages/config.js'
-import passwordMod from '@/uni_modules/uni-id-pages/common/password.js'
+import mixin from './login-page.mixin.js';
+import config from './config.js'
+import passwordMod from './password.js'
 const uniIdCo = uniCloud.importObject("uni-id-co")
 export default {
     mixins: [mixin],
