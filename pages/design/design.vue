@@ -597,6 +597,7 @@ export default {
   },
 
   mounted() {
+    // this.saveProjectToCloud();
     // Check if we have a stored project description
     const projectDescription = uni.getStorageSync('projectDescription');
     if (projectDescription) {
@@ -1140,7 +1141,7 @@ export default {
                         uni.removeStorageSync('selectedDevice');
                         
                         // Save to cloud database
-                        this.saveProjectToCloud(parsedContent);
+                        this.saveProjectToCloud();
                         
                         // console.log('Page generation successful!');
                       } catch (e) {
@@ -1736,7 +1737,8 @@ export default {
       // Check if the color is a valid hex color
       return /^#([0-9A-F]{3}){1,2}$/i.test(color);
     },
-    saveProjectToCloud(content) {      
+    saveProjectToCloud() {      
+      const content = uni.getStorageSync('latest_7_overall_page');
       // Get user ID
       const userId = uni.getStorageSync('uid');
       if (!userId) {

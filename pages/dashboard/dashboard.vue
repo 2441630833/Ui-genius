@@ -96,11 +96,11 @@
           </x-skeleton>
           
           <!-- User Projects -->
-          <template v-if="userProjects.length > 0">
-            <x-skeleton v-for="(project, index) in userProjects.slice(0, 3)" :key="'user-project-' + index" type="banner" :loading="false">
+          <template v-if="Array.isArray(userProjects) && userProjects.length > 0">
+            <x-skeleton v-for="(project, index) in userProjects" :key="'user-project-' + index" type="banner" :loading="false">
               <view class="project-card" @click="jumpToDesign">
                 <image class="project-image"
-                  :src="getProjectImage(index)" mode="aspectFill">
+                  src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(3).png" mode="aspectFill">
                 </image>
                 <view class="project-content">
                   <text class="project-title">{{ project.projectTitle }}</text>
@@ -184,6 +184,14 @@
           
           <button class="save-btn" @click="changePassword">Change password</button>
         </view>
+        
+        <!-- Logout Section -->
+        <view class="settings-section">
+          <text class="section-title">Logout</text>
+          <text class="section-description">You can logout from your account below</text>
+          
+          <button class="logout-btn" @click="logout">Logout</button>
+        </view>
       </view>
 
       <!-- Settings Content (placeholder for future implementation) -->
@@ -222,9 +230,9 @@
 
           <text class="description-label">Describe your project in plain English</text>
           <view class="description-container">
-            <!-- <view class="try-example-container">
+            <view class="try-example-container">
               <button class="try-example-btn" @click="tryExample">Try example</button>
-            </view> -->
+            </view>
             <textarea class="project-description-input" placeholder="Enter your project description"
               v-model="projectDescription" maxlength="300"></textarea>
             <text class="char-count">{{ projectDescription.length }}/300</text>
@@ -343,7 +351,7 @@ export default {
       
       // Refresh projects when switching to dashboard
       if (item === 'dashboard') {
-        this.refreshProjects();
+        // this.refreshProjects();
       }
     },
     jumpToDesign() {
@@ -501,7 +509,9 @@ export default {
       }).then(res => {
         uni.hideLoading();
         if (res.result && res.result.success) {
-          this.userProjects = res.result.data || [];
+          console.log(res.result)
+          // Ensure userProjects is always an array
+          this.userProjects = Array.isArray(res.result.data) ? res.result.data : [];
           console.log(`Loaded ${this.userProjects.length} projects for user ID ${userId}`);
           
           // Update the project grid with user projects
@@ -540,35 +550,45 @@ export default {
     },
     
     updateProjectGrid() {
-      // Only update if we have user projects
-      if (this.userProjects.length === 0) {
-        // If no user projects, show default projects with staggered loading
-        setTimeout(() => {
-          this.projectLoadingStates.alpha = false;
-        }, 800);
-        
-        setTimeout(() => {
-          this.projectLoadingStates.beta = false;
-        }, 1300);
-        
-        setTimeout(() => {
-          this.projectLoadingStates.gamma = false;
-        }, 1800);
-        return;
-      }
-      
-      // If we have user projects, update the loading states for them
-      this.projectLoadingStates = {};
-      
-      // Create loading states for user projects with staggered timing
-      this.userProjects.slice(0, 3).forEach((project, index) => {
-        const key = `user-project-${index}`;
-        this.projectLoadingStates[key] = true;
-        
-        setTimeout(() => {
-          this.projectLoadingStates[key] = false;
-        }, 800 + (index * 500));
+      this.projectLoadingStates.alpha = false;
+      this.projectLoadingStates.beta = false;
+      this.projectLoadingStates.gamma = false;
+      this.userProjects.forEach((project, index) => {
+        this.projectLoadingStates[`user-project-${index}`] = false;
       });
+
+
+
+
+      // Only update if we have user projects
+      // if (!Array.isArray(this.userProjects) || this.userProjects.length === 0) {
+      //   // If no user projects, show default projects with staggered loading
+      //   setTimeout(() => {
+      //     this.projectLoadingStates.alpha = false;
+      //   }, 800);
+        
+      //   setTimeout(() => {
+      //     this.projectLoadingStates.beta = false;
+      //   }, 1300);
+        
+      //   setTimeout(() => {
+      //     this.projectLoadingStates.gamma = false;
+      //   }, 1800);
+      //   return;
+      // }
+      
+      // // If we have user projects, update the loading states for them
+      // this.projectLoadingStates = {};
+      
+      // // Create loading states for user projects with staggered timing
+      // this.userProjects.slice(0, 3).forEach((project, index) => {
+      //   const key = `user-project-${index}`;
+      //   this.projectLoadingStates[key] = true;
+        
+      //   setTimeout(() => {
+      //     this.projectLoadingStates[key] = false;
+      //   }, 800 + (index * 500));
+      // });
     },
     
     loadProjectById(id) {
@@ -797,6 +817,43 @@ export default {
       } else {
         this.passwordStrengthText = 'strong';
       }
+    },
+    logout() {
+      // Show loading indicator
+      uni.showLoading({
+        title: 'Logging out...'
+      });
+      
+      // Simulate API call with timeout
+      setTimeout(() => {
+        // Clear user data from storage
+        uni.removeStorageSync('googleUserInfo');
+        uni.removeStorageSync('uid');
+        uni.removeStorageSync('token');
+        uni.removeStorageSync('tokenExpiration');
+
+        uni.removeStorageSync('googleToken');
+        uni.removeStorageSync('googleTokenExpiration');
+        uni.removeStorageSync('googleUid');
+
+        uni.removeStorageSync('latest_7_overall_page');
+        uni.removeStorageSync('currentProjectId');
+        
+        // Hide loading and show success message
+        uni.hideLoading();
+        uni.showToast({
+          title: 'Logged out successfully',
+          icon: 'success',
+          duration: 2000
+        });
+        
+        // Redirect to login page after a short delay
+        setTimeout(() => {
+          uni.reLaunch({
+            url: '/pages/login/login'
+          });
+        }, 1500);
+      }, 1000);
     }
   }
 }
@@ -1428,6 +1485,28 @@ export default {
 /* Settings Content styles */
 .settings-content {
   padding: 20px;
+}
+
+/* Logout button styles */
+.logout-btn {
+  background-color: #f44336;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 50px;
+
+  &:hover {
+    background-color: #d32f2f;
+  }
 }
 </style>
 
