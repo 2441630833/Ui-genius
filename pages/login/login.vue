@@ -207,10 +207,12 @@ export default {
 
       uniIdCo.login(data).then(e => {
         this.loginSuccess(e)
+        uni.setStorageSync('email', this.user.email)
       }).catch(e => {
         if (e.errCode == 'uni-id-captcha-required') {
           // this.needCaptcha = true
           console.log('captcha required')
+
         } else if (this.needCaptcha) {
           //登录失败，自动重新获取验证码
           this.$refs.captcha.getImageCaptcha()
@@ -343,6 +345,7 @@ export default {
           this.googleName = userInfo.name
           this.googlePic = userInfo.picture
           this.googleEmail = userInfo.email
+          uni.setStorageSync('email', userInfo.email)
           console.log('User Info:', userInfo)
 
           // Debug log to check exactly what's in userInfo
@@ -436,6 +439,7 @@ export default {
                   this.googleName = userRes.data.name;
                   this.googlePic = userRes.data.picture;
                   this.googleEmail = userRes.data.email;
+                  uni.setStorageSync('email', userInfo.email)
                   console.log('User Info:', userRes.data);
 
                   // Debug log to check exactly what's in userRes.data

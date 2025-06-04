@@ -597,6 +597,18 @@ export default {
   },
 
   mounted() {
+    // Check if we have a stored project description
+    const projectDescription = uni.getStorageSync('projectDescription');
+    if (projectDescription) {
+      this.projectDescription = projectDescription;
+    }
+    
+    // Check if we have a stored device selection
+    const selectedDevice = uni.getStorageSync('selectedDevice');
+    if (selectedDevice) {
+      this.selectedDevice = selectedDevice;
+    }
+    
     // Listen for image capture events from renderjs
     uni.$on('image-captured', this.receiveImageData);
     uni.$on('capture-error', (data) => {
@@ -605,12 +617,6 @@ export default {
     
     // Load images from storage on initial mount to avoid display issues
     this.loadImagesFromStorage();
-    
-    // Load selectedDevice from storage if available
-    const storedDevice = uni.getStorageSync('selectedDevice');
-    if (storedDevice) {
-      this.selectedDevice = storedDevice;
-    }
     
     // Set up loading state timers
     setTimeout(() => {
@@ -1132,6 +1138,10 @@ export default {
                         uni.setStorageSync('latest_7_overall_page', jsonContent);
                         uni.removeStorageSync('projectDescription');
                         uni.removeStorageSync('selectedDevice');
+                        
+                        // Save to cloud database
+                        this.saveProjectToCloud(parsedContent);
+                        
                         // console.log('Page generation successful!');
                       } catch (e) {
                         // console.error('Error processing generated page data:', e);
@@ -1725,6 +1735,40 @@ export default {
     isValidColor(color) {
       // Check if the color is a valid hex color
       return /^#([0-9A-F]{3}){1,2}$/i.test(color);
+    },
+    saveProjectToCloud(content) {      
+      // Get user ID
+      const userId = uni.getStorageSync('uid');
+      if (!userId) {
+        console.log('No user ID');
+        return;
+      }
+      
+      // Prepare project data
+      const projectData = {
+        uid: userId,
+        email: uni.getStorageSync('email') || '',
+        projectTitle: content.AIProjectName || 'Untitled Project',
+        projectDescription: content.AIProjectDescription || 'No description',
+        generated_overall_pages: content
+      };
+      
+      // Call the cloud function to save the project
+      uniCloud.callFunction({
+        name: 'user-project',
+        data: {
+          action: 'create',
+          data: projectData
+        }
+      }).then(res => {
+        if (res.result && res.result.success && res.result.data && res.result.data.id) {
+          // Store the project ID for future reference
+          uni.setStorageSync('currentProjectId', res.result.data.id);
+          console.log('Project saved successfully with ID:', res.result.data.id);
+        }
+      }).catch(err => {
+        console.error('Cloud function error:', err);
+      });
     }
   }
 }

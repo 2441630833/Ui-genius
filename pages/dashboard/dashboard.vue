@@ -44,6 +44,7 @@
       <view class="header">
         <text class="title">Dashboard</text>
         <view class="user-actions">
+          <button class="refresh-btn" @click="refreshProjects">Refresh Projects</button>
           <image class="bell-icon" src="../../static/bell.png"></image>
           <image class="avatar" src="../../static/avatar1.png"></image>
         </view>
@@ -91,6 +92,21 @@
             </view>
           </view>
         </x-skeleton>
+        
+        <!-- User Projects -->
+        <template v-if="userProjects.length > 0">
+          <x-skeleton v-for="(project, index) in userProjects.slice(0, 3)" :key="'user-project-' + index" type="banner" :loading="false">
+            <view class="project-card" @click="jumpToDesign">
+              <image class="project-image"
+                :src="getProjectImage(index)" mode="aspectFill">
+              </image>
+              <view class="project-content">
+                <text class="project-title">{{ project.projectTitle }}</text>
+                <text class="project-description">{{ project.projectDescription }}</text>
+              </view>
+            </view>
+          </x-skeleton>
+        </template>
       </view>
     </view>
 
@@ -168,7 +184,8 @@ export default {
         gamma: true
       },
       networkErrorVisible: false,
-      networkErrorMessage: ''
+      networkErrorMessage: '',
+      userProjects: []
     }
   },
   mounted() {
@@ -184,6 +201,9 @@ export default {
     setTimeout(() => {
       this.projectLoadingStates.gamma = false;
     }, 1800);
+    
+    // Load user projects from cloud
+    this.loadProjectsByUid();
   },
   methods: {
     refreshProjects() {
@@ -192,7 +212,10 @@ export default {
       this.projectLoadingStates.beta = true;
       this.projectLoadingStates.gamma = true;
       
-      // Staggered loading for projects
+      // Reload user projects from cloud
+      this.loadProjectsByUid();
+      
+      // Staggered loading for default projects
       setTimeout(() => {
         this.projectLoadingStates.alpha = false;
       }, 800);
@@ -214,6 +237,10 @@ export default {
       }
     },
     jumpToDesign() {
+      // Clear any existing project data to start fresh
+      // uni.removeStorageSync('latest_7_overall_page');
+      // uni.removeStorageSync('currentProjectId');
+      
       uni.switchTab({
         url: '/pages/design/design'
       });
@@ -329,6 +356,184 @@ export default {
       setTimeout(() => {
         this.createProject();
       }, 100);
+    },
+    loadProjectsByUid() {
+      // Check if user is logged in
+      if (!this.checkUserLogin()) {
+        return;
+      }
+      
+      const userId = uni.getStorageSync('uid');
+      
+      if (!userId) {
+        console.log('No user ID found');
+        uni.showToast({
+          title: 'User ID not found',
+          icon: 'none',
+          duration: 2000
+        });
+        return;
+      }
+      
+      console.log('Loading projects for user ID:', userId);
+      
+      uni.showLoading({
+        title: 'Loading your projects...'
+      });
+      
+      // Pass uid directly as a parameter
+      uniCloud.callFunction({
+        name: 'user-project',
+        data: {
+          action: 'read',
+          id: userId
+        }
+      }).then(res => {
+        uni.hideLoading();
+        if (res.result && res.result.success) {
+          this.userProjects = res.result.data || [];
+          console.log(`Loaded ${this.userProjects.length} projects for user ID ${userId}`);
+          
+          // Update the project grid with user projects
+          this.updateProjectGrid();
+        } else {
+          uni.showToast({
+            title: 'Failed to load projects',
+            icon: 'none'
+          });
+          console.error('Cloud function error:', res.result);
+        }
+      }).catch(err => {
+        uni.hideLoading();
+        uni.showToast({
+          title: 'Error loading projects',
+          icon: 'none'
+        });
+        console.error('Cloud function error:', err);
+      });
+    },
+    
+    checkUserLogin() {
+      // Check for user ID
+      const userId = uni.getStorageSync('uid');
+      if (!userId) {
+        console.log('No user ID found');
+        uni.showToast({
+          title: 'User ID not found',
+          icon: 'none',
+          duration: 2000
+        });
+        return false;
+      }
+      
+      return true;
+    },
+    
+    updateProjectGrid() {
+      // Only update if we have user projects
+      if (this.userProjects.length === 0) {
+        // If no user projects, show default projects with staggered loading
+        setTimeout(() => {
+          this.projectLoadingStates.alpha = false;
+        }, 800);
+        
+        setTimeout(() => {
+          this.projectLoadingStates.beta = false;
+        }, 1300);
+        
+        setTimeout(() => {
+          this.projectLoadingStates.gamma = false;
+        }, 1800);
+        return;
+      }
+      
+      // If we have user projects, update the loading states for them
+      this.projectLoadingStates = {};
+      
+      // Create loading states for user projects with staggered timing
+      this.userProjects.slice(0, 3).forEach((project, index) => {
+        const key = `user-project-${index}`;
+        this.projectLoadingStates[key] = true;
+        
+        setTimeout(() => {
+          this.projectLoadingStates[key] = false;
+        }, 800 + (index * 500));
+      });
+    },
+    
+    loadProjectById(id) {
+      // Check if user is logged in
+      if (!this.checkUserLogin()) {
+        return;
+      }
+      
+      if (!id) {
+        console.log('No project ID provided');
+        return;
+      }
+      
+      uni.showLoading({
+        title: 'Loading project...'
+      });
+      
+      uniCloud.callFunction({
+        name: 'user-project',
+        data: {
+          action: 'read',
+          id: id
+        }
+      }).then(res => {
+        uni.hideLoading();
+        if (res.result && res.result.success && res.result.data) {
+          // Load the project data
+          const projectData = res.result.data;
+          if (projectData.generated_overall_pages) {
+            // Store the loaded project data
+            uni.setStorageSync('latest_7_overall_page', JSON.stringify(projectData.generated_overall_pages));
+            
+            uni.showToast({
+              title: 'Project loaded, redirecting...',
+              icon: 'success'
+            });
+            
+            // Navigate to design page
+            setTimeout(() => {
+              uni.switchTab({
+                url: '/pages/design/design'
+              });
+            }, 1000);
+          } else {
+            uni.showToast({
+              title: 'Invalid project data',
+              icon: 'none'
+            });
+          }
+        } else {
+          uni.showToast({
+            title: 'Failed to load project',
+            icon: 'none'
+          });
+          console.error('Cloud function error:', res.result);
+        }
+      }).catch(err => {
+        uni.hideLoading();
+        uni.showToast({
+          title: 'Error loading project',
+          icon: 'none'
+        });
+        console.error('Cloud function error:', err);
+      });
+    },
+    getProjectImage(index) {
+      // Array of default project images
+      const defaultImages = [
+        'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(4).png',
+        'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(5).png',
+        'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(6).png'
+      ];
+      
+      // Return the image at the corresponding index, or the first image if index is out of bounds
+      return defaultImages[index % defaultImages.length];
     }
   }
 }
@@ -459,6 +664,21 @@ export default {
       border-radius: 50%;
       cursor: pointer;
       object-fit: cover;
+    }
+    
+    .refresh-btn {
+      background-color: #e53935;
+      color: white;
+      border: none;
+      padding: 8px 15px;
+      border-radius: 4px;
+      cursor: pointer;
+      font-size: 14px;
+      transition: background-color 0.2s;
+      
+      &:hover {
+        background-color: #c62828;
+      }
     }
   }
 }
