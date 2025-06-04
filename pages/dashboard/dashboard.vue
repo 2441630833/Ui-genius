@@ -46,7 +46,7 @@
         <view class="header">
           <text class="title">Dashboard</text>
           <view class="user-actions">
-            <button class="refresh-btn" @click="refreshProjects">Refresh Projects</button>
+            <!-- <button class="refresh-btn" @click="refreshProjects">Refresh Projects</button> -->
             <image class="bell-icon" src="../../static/bell.png"></image>
             <image class="avatar" :src="userInfo.picture ? userInfo.picture : '../../static/avatar1.png'"></image>
           </view>
@@ -364,7 +364,7 @@ export default {
       });
     },
     openCreateProjectDialog() {
-      this.setActiveNavItem('plus');
+      this.setActiveNavItem('dashboard');
       this.showCreateProjectDialog = true;
       this.errorMessage = '';
     },
