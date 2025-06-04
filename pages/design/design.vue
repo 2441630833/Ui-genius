@@ -12,6 +12,102 @@
       </view>
     </view>
 
+    <!-- Update the color palette component -->
+    <view v-if="showColorPalette" class="color-palette-overlay">
+      <view class="color-palette-container">
+        <text class="color-palette-title" style="display: block;">Select Theme Color For Your Project</text>
+        
+        <!-- Error message area -->
+        <view v-if="colorPaletteError" class="color-palette-error">
+          <text class="error-text">{{ colorPaletteError }}</text>
+        </view>
+        
+        <!-- Neutral Colors Row -->
+        <view class="color-palette-row">
+          <view 
+            v-for="(color, index) in neutralColors" 
+            :key="'neutral-'+index" 
+            class="color-swatch" 
+            :style="{ backgroundColor: color.hex }"
+            :class="{ 'selected': selectedColor === color.hex }"
+            @click="selectColor(color.hex)">
+            <text v-if="selectedColor === color.hex" class="color-check">✓</text>
+            <text class="color-hex">{{ color.hex }}</text>
+          </view>
+        </view>
+        
+        <!-- Pastel Colors Row -->
+        <view class="color-palette-row">
+          <view 
+            v-for="(color, index) in pastelColors" 
+            :key="'pastel-'+index" 
+            class="color-swatch" 
+            :style="{ backgroundColor: color.hex }"
+            :class="{ 'selected': selectedColor === color.hex }"
+            @click="selectColor(color.hex)">
+            <text v-if="selectedColor === color.hex" class="color-check">✓</text>
+            <text class="color-hex">{{ color.hex }}</text>
+          </view>
+        </view>
+        
+        <!-- Warm Colors Row -->
+        <view class="color-palette-row">
+          <view 
+            v-for="(color, index) in warmColors" 
+            :key="'warm-'+index" 
+            class="color-swatch" 
+            :style="{ backgroundColor: color.hex }"
+            :class="{ 'selected': selectedColor === color.hex }"
+            @click="selectColor(color.hex)">
+            <text v-if="selectedColor === color.hex" class="color-check">✓</text>
+            <text class="color-hex">{{ color.hex }}</text>
+          </view>
+        </view>
+        
+        <!-- Cool Colors Row -->
+        <view class="color-palette-row">
+          <view 
+            v-for="(color, index) in coolColors" 
+            :key="'cool-'+index" 
+            class="color-swatch" 
+            :style="{ backgroundColor: color.hex }"
+            :class="{ 'selected': selectedColor === color.hex }"
+            @click="selectColor(color.hex)">
+            <text v-if="selectedColor === color.hex" class="color-check">✓</text>
+            <text class="color-hex">{{ color.hex }}</text>
+          </view>
+        </view>
+        
+        <!-- Custom color input -->
+        <view class="color-input-container">
+          <text class="color-input-label">Custom Color:</text>
+          <input 
+            type="text" 
+            v-model="customColor" 
+            class="color-input" 
+            placeholder="#RRGGBB" 
+            @input="validateColorInput"
+          />
+          <view 
+            class="color-preview-swatch" 
+            :style="{ backgroundColor: isValidColor(customColor) ? customColor : '#cccccc' }"
+            :class="{ 'selected': customColor && isValidColor(customColor) && !selectedColor }"
+          ></view>
+        </view>
+        
+        <!-- Simplified Preview section - only button -->
+        <!-- <view class="color-preview-section">
+          <text class="preview-label">Preview:</text>
+          <view class="preview-button" :style="{ backgroundColor: previewColor }">Button</view>
+        </view> -->
+        
+        <view class="color-actions">
+          <button class="color-confirm" :style="{ backgroundColor: previewColor, color: '#ffffff' }" @click="confirmColorSelection">Apply Theme</button>
+          <button class="color-cancel" @click="cancelColorSelection">Cancel</button>
+        </view>
+      </view>
+    </view>
+
     <!-- Hidden Template Previews for html2canvas -->
     <view class="hidden-templates">
       <!-- Dynamic Templates from JSON -->
@@ -422,7 +518,41 @@ export default {
       // Add selectedDevice property with default value 'desktop'
       selectedDevice: 'desktop',
       // Add errorMessage property
-      errorMessage: ''
+      errorMessage: '',
+      showColorPalette: false,
+      // Replace themeColors with color palette groups
+      neutralColors: [
+        { hex: '#FFFFFF', name: 'White' },
+        { hex: '#E7E7E7', name: 'Light Gray' },
+        { hex: '#D1D1D1', name: 'Gray' },
+        { hex: '#B6B6B6', name: 'Medium Gray' },
+        { hex: '#9B9B9B', name: 'Dark Gray' }
+      ],
+      pastelColors: [
+        { hex: '#AAC9CE', name: 'Pastel Teal' },
+        { hex: '#B6B4C2', name: 'Pastel Purple' },
+        { hex: '#C9B8CB', name: 'Pastel Lavender' },
+        { hex: '#E5C1CD', name: 'Pastel Pink' },
+        { hex: '#F3DBCF', name: 'Pastel Peach' }
+      ],
+      warmColors: [
+        { hex: '#F5CEC7', name: 'Soft Peach' },
+        { hex: '#E79796', name: 'Coral' },
+        { hex: '#FFC9BB', name: 'Salmon' },
+        { hex: '#FFB284', name: 'Light Orange' },
+        { hex: '#C8C09C', name: 'Sage' }
+      ],
+      coolColors: [
+        { hex: '#86E3CE', name: 'Mint' },
+        { hex: '#D0E6A5', name: 'Light Green' },
+        { hex: '#FFDD94', name: 'Light Yellow' },
+        { hex: '#FA897B', name: 'Coral Red' },
+        { hex: '#CCABD8', name: 'Lavender' }
+      ],
+      selectedColor: '',
+      customColor: '',
+      previewColor: '#86E3CE', // Change default color to mint
+      colorPaletteError: ''
     }
   },
 
@@ -1112,6 +1242,16 @@ export default {
     },
     navigateTo(item) {
       this.activeNavItem = item;
+      
+      // Show color palette if color nav item is clicked
+      if (item === 'color') {
+        this.showColorPalette = true;
+        // Set default selected color to mint
+        if (!this.selectedColor && !this.customColor) {
+          this.selectedColor = this.coolColors[0].hex; // Mint color
+          this.previewColor = this.coolColors[0].hex;
+        }
+      }
     },
     selectTemplate(template) {
       this.selectedTemplate = template;
@@ -1473,6 +1613,118 @@ export default {
         icon: 'none',
         duration: 2000
       });
+    },
+    selectColor(color) {
+      // Clear any error message when selecting a color
+      this.colorPaletteError = '';
+      
+      this.selectedColor = color;
+      this.customColor = ''; // Clear custom color when a predefined color is selected
+      this.previewColor = color; // Update preview color
+    },
+    cancelColorSelection() {
+      this.showColorPalette = false;
+      this.selectedColor = '';
+      this.customColor = '';
+      this.previewColor = '#86E3CE'; // Reset to default color
+      this.colorPaletteError = ''; // Clear any error message
+    },
+    confirmColorSelection() {
+      // Clear any previous error
+      this.colorPaletteError = '';
+      
+      // Use either selected color from swatches or custom color input
+      const themeColor = this.customColor && this.isValidColor(this.customColor) 
+        ? this.customColor 
+        : this.selectedColor;
+      
+      if (!themeColor) {
+        this.colorPaletteError = 'Please select a valid color';
+        return;
+      }
+      
+      // Show loading
+      uni.showLoading({
+        title: 'Updating theme...',
+        mask: true
+      });
+      
+      // Get the current template data
+      const jsonData = uni.getStorageSync('latest_7_overall_page');
+      if (!jsonData) {
+        uni.hideLoading();
+        this.colorPaletteError = 'No usable page data available, please generate your project first';
+        return;
+      }
+      
+      // Send the color and template data to backend
+      this.updateThemeColor(themeColor, jsonData);
+    },
+    updateThemeColor(color, templateData) {
+      // Make API call to update theme color
+      uni.request({
+        url: `${API_BASE_URL}/update-theme-color`,
+        method: 'POST',
+        data: {
+          themeColor: color,
+          templateData: typeof templateData === 'string' ? templateData : JSON.stringify(templateData)
+        },
+        header: {
+          'content-type': 'application/json'
+        },
+        success: (res) => {
+          uni.hideLoading();
+          
+          if (res.statusCode === 200 && res.data) {
+            // Store the updated template data
+            uni.setStorageSync('latest_7_overall_page', res.data);
+            
+            // Clear stored images to force regeneration with new theme
+            this.clearStoredImages();
+            
+            // Refresh the UI
+            this.loadJsonTemplates();
+            this.generatePreviewImages();
+            
+            // Hide color palette
+            this.showColorPalette = false;
+            
+            uni.showToast({
+              title: 'Theme updated successfully',
+              icon: 'success',
+              duration: 2000
+            });
+          } else {
+            this.colorPaletteError = 'Failed to update theme';
+          }
+        },
+        fail: (err) => {
+          uni.hideLoading();
+          this.colorPaletteError = 'Error updating theme: ' + (err.errMsg || 'Unknown error');
+        }
+      });
+    },
+    validateColorInput() {
+      // Clear any error message when entering a custom color
+      this.colorPaletteError = '';
+      
+      // Clear selected color when custom color is being entered
+      if (this.customColor) {
+        this.selectedColor = '';
+      }
+      
+      // Update preview color if valid
+      if (this.isValidColor(this.customColor)) {
+        this.previewColor = this.customColor;
+      } else if (this.selectedColor) {
+        this.previewColor = this.selectedColor;
+      } else {
+        this.previewColor = '#86E3CE'; // Default color
+      }
+    },
+    isValidColor(color) {
+      // Check if the color is a valid hex color
+      return /^#([0-9A-F]{3}){1,2}$/i.test(color);
     }
   }
 }
@@ -1536,7 +1788,7 @@ export default {
 
 /* Design Toolbar styles */
 .design-toolbar {
-  width: 60px;
+  width: 75px;
   background-color: #f8f8f8;
   display: flex;
   flex-direction: column;
@@ -2074,6 +2326,210 @@ export default {
   height: 24px;
   border-radius: 12px;
   background-color: #e53935;
+}
+
+/* Add this color palette component right after the progress overlay */
+.color-palette-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(255, 255, 255, 0.95);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+}
+
+.color-palette-container {
+  background-color: white;
+  padding: 30px;
+  border-radius: 15px;
+  box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+  width: 90%;
+  max-width: 750px; /* Increased to accommodate more colors */
+  text-align: center;
+}
+
+.color-palette-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 25px;
+}
+
+.color-palette-row {
+  display: flex;
+  justify-content: center;
+  gap: 15px;
+  margin-bottom: 20px;
+  flex-wrap: wrap; /* Allow wrapping on smaller screens */
+}
+
+.color-swatch {
+  width: 70px; /* Wider to match image */
+  height: 50px; /* Taller to match image */
+  border-radius: 25px; /* More rounded to match pill shape */
+  cursor: pointer;
+  transition: transform 0.2s, box-shadow 0.2s;
+  position: relative;
+  border: 2px solid transparent;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding-bottom: 30px; /* Space for the hex text */
+
+  &:hover {
+    transform: scale(1.05);
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+  }
+
+  &.selected {
+    border: 2px solid #333;
+    box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
+  }
+}
+
+.color-check {
+  color: white;
+  font-size: 18px;
+  text-shadow: 0 1px 2px rgba(0, 0, 0, 0.5);
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+}
+
+.color-hex {
+  font-size: 10px;
+  color: #333;
+  position: absolute;
+  bottom: 5px;
+  left: 0;
+  right: 0;
+  text-align: center;
+  background-color: rgba(255, 255, 255, 0.7);
+  padding: 2px 0;
+  border-radius: 0 0 25px 25px;
+}
+
+.color-input-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  margin: 25px 0;
+}
+
+.color-preview-section {
+  margin: 25px 0;
+}
+
+.preview-button {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 25px; /* Rounded to match color swatches */
+  cursor: pointer;
+  color: white;
+  font-weight: 500;
+  text-align: center;
+  display: inline-block;
+  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
+}
+
+.preview-label {
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 10px;
+}
+
+.preview-accent {
+  width: 40px;
+  height: 40px;
+  border: 3px solid;
+  border-radius: 8px;
+  background-color: white;
+}
+
+.color-actions {
+  display: inline;
+}
+
+.color-cancel,
+.color-confirm {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 10px 20px; /* Reduced padding */
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  transition: background-color 0.2s, transform 0.2s;
+  font-weight: 500;
+  min-width: 100px; /* Reduced from 120px */
+  font-size: 14px; /* Reduced from 16px */
+
+  &:hover {
+    transform: translateY(-2px);
+  }
+}
+
+.color-cancel {
+  background-color: #f5f5f5;
+  color: #333;
+  
+  &:hover {
+    background-color: #e0e0e0;
+  }
+}
+
+.color-confirm {
+  &:hover {
+    opacity: 0.9;
+  }
+}
+
+.color-input-label {
+  font-size: 14px;
+  color: #333;
+  margin-right: 10px;
+}
+
+.color-input {
+  height: 36px;
+  width: 100px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 0 8px;
+}
+
+.color-preview-swatch {
+  width: 40px;
+  height: 40px;
+  border-radius: 8px;
+  margin-left: 10px;
+}
+
+.color-palette-error {
+  margin: 15px auto;
+  padding: 12px 15px;
+  background-color: #ffebee;
+  border-radius: 8px;
+  border: 1px solid #ffcdd2;
+  max-width: 80%;
+  text-align: center;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.error-text {
+  font-size: 14px;
+  color: #d32f2f;
+  font-weight: 500;
 }
 </style>
 
