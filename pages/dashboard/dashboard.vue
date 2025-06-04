@@ -228,11 +228,11 @@
             </view>
           </view>
 
-          <text class="description-label">Describe your project in plain English</text>
+          <view class="try-example-container">
+            <text class="description-label">Describe your project in plain English</text>
+            <button class="try-example-btn" @click="tryExample">Try example</button>
+          </view>
           <view class="description-container">
-            <view class="try-example-container">
-              <button class="try-example-btn" @click="tryExample">Try example</button>
-            </view>
             <textarea class="project-description-input" placeholder="Enter your project description"
               v-model="projectDescription" maxlength="300"></textarea>
             <text class="char-count">{{ projectDescription.length }}/300</text>
@@ -1168,26 +1168,25 @@ export default {
   margin-bottom: 30px;
 }
 
-// .try-example-container {
-//   position: absolute;
-//   top: 0;
-//   right: 0;
-//   z-index: 2;
-//   margin-top: 5px;
-// }
+.try-example-container {
+  display: flex;
+  justify-content: space-between;
+}
 
-// .try-example-btn {
-//   background: none;
-//   border: 1px solid #e53935;
-//   color: #e53935;
-//   cursor: pointer;
-//   font-size: 16px;
-//   border-radius: 5px;
+.try-example-btn {
+  background-color: #e53935;
+  color: #fff;
+  margin-right: 0px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
 
-//   &:hover {
-//     background-color: rgba(253, 215, 215, 0.861);
-//   }
-// }
+  &:hover {
+    background-color: #d32f2f;
+  }
+}
 
 .project-description-input {
   width: 100%;
