@@ -2,7 +2,8 @@ import App from './App'
 import messages from './locale/index'
 
 let i18nConfig = {
-  locale: uni.getLocale(),
+  // locale: uni.getLocale(),
+  locale: uni.getSystemInfoSync().language,
   messages
 }
 
@@ -11,6 +12,7 @@ import Vue from 'vue'
 import VueI18n from 'vue-i18n'
 Vue.use(VueI18n)
 const i18n = new VueI18n(i18nConfig)
+// console.log(i18nConfig)
 Vue.config.productionTip = false
 App.mpType = 'app'
 const app = new Vue({

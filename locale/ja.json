@@ -28,5 +28,7 @@
   "index.settings": "設定",
   "index.help": "ヘルプ",
   "index.about": "アバウト",
-  "index.signup": "サインアップ"
+  "index.signup": "サインアップ",
+  "index.dashboard": "ダッシュボード",
+  "index.login": "ログイン"
 }

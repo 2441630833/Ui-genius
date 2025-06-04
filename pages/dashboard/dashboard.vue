@@ -41,72 +41,157 @@
 
     <!-- Main Content -->
     <view class="main-content">
-      <view class="header">
-        <text class="title">Dashboard</text>
-        <view class="user-actions">
-          <button class="refresh-btn" @click="refreshProjects">Refresh Projects</button>
-          <image class="bell-icon" src="../../static/bell.png"></image>
-          <image class="avatar" src="../../static/avatar1.png"></image>
+      <!-- Dashboard Content -->
+      <view v-if="activeNavItem === 'dashboard'">
+        <view class="header">
+          <text class="title">Dashboard</text>
+          <view class="user-actions">
+            <button class="refresh-btn" @click="refreshProjects">Refresh Projects</button>
+            <image class="bell-icon" src="../../static/bell.png"></image>
+            <image class="avatar" :src="userInfo.picture ? userInfo.picture : '../../static/avatar1.png'"></image>
+          </view>
         </view>
-      </view>
 
-      <view class="projects-grid">
-        <!-- Project Alpha -->
-        <x-skeleton type="banner" :loading="projectLoadingStates.alpha">
-          <view class="project-card" @click="jumpToDesign">
-            <image class="project-image"
-              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png" mode="aspectFill">
-            </image>
-            <view class="project-content">
-              <text class="project-title">Project Alpha</text>
-              <text class="project-description">An innovative project using the latest design tools to create
-                user-friendly interfaces.</text>
-            </view>
-          </view>
-        </x-skeleton>
-
-        <!-- Project Beta -->
-        <x-skeleton type="banner" :loading="projectLoadingStates.beta">
-          <view class="project-card" @click="jumpToDesign">
-            <image class="project-image"
-              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(2).png" mode="aspectFill">
-            </image>
-            <view class="project-content">
-              <text class="project-title">Project Beta</text>
-              <text class="project-description">Focusing on enhancing user experience through refined design
-                methodologies.</text>
-            </view>
-          </view>
-        </x-skeleton>
-
-        <!-- Project Gamma -->
-        <x-skeleton type="banner" :loading="projectLoadingStates.gamma">
-          <view class="project-card" @click="jumpToDesign">
-            <image class="project-image"
-              src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(3).png" mode="aspectFill">
-            </image>
-            <view class="project-content">
-              <text class="project-title">Project Gamma</text>
-              <text class="project-description">Exploring new design paradigms to create futuristic and engaging
-                interfaces.</text>
-            </view>
-          </view>
-        </x-skeleton>
-        
-        <!-- User Projects -->
-        <template v-if="userProjects.length > 0">
-          <x-skeleton v-for="(project, index) in userProjects.slice(0, 3)" :key="'user-project-' + index" type="banner" :loading="false">
+        <view class="projects-grid">
+          <!-- Project Alpha -->
+          <x-skeleton type="banner" :loading="projectLoadingStates.alpha">
             <view class="project-card" @click="jumpToDesign">
               <image class="project-image"
-                :src="getProjectImage(index)" mode="aspectFill">
+                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png" mode="aspectFill">
               </image>
               <view class="project-content">
-                <text class="project-title">{{ project.projectTitle }}</text>
-                <text class="project-description">{{ project.projectDescription }}</text>
+                <text class="project-title">Project Alpha</text>
+                <text class="project-description">An innovative project using the latest design tools to create
+                  user-friendly interfaces.</text>
               </view>
             </view>
           </x-skeleton>
-        </template>
+
+          <!-- Project Beta -->
+          <x-skeleton type="banner" :loading="projectLoadingStates.beta">
+            <view class="project-card" @click="jumpToDesign">
+              <image class="project-image"
+                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(2).png" mode="aspectFill">
+              </image>
+              <view class="project-content">
+                <text class="project-title">Project Beta</text>
+                <text class="project-description">Focusing on enhancing user experience through refined design
+                  methodologies.</text>
+              </view>
+            </view>
+          </x-skeleton>
+
+          <!-- Project Gamma -->
+          <x-skeleton type="banner" :loading="projectLoadingStates.gamma">
+            <view class="project-card" @click="jumpToDesign">
+              <image class="project-image"
+                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(3).png" mode="aspectFill">
+              </image>
+              <view class="project-content">
+                <text class="project-title">Project Gamma</text>
+                <text class="project-description">Exploring new design paradigms to create futuristic and engaging
+                  interfaces.</text>
+              </view>
+            </view>
+          </x-skeleton>
+          
+          <!-- User Projects -->
+          <template v-if="userProjects.length > 0">
+            <x-skeleton v-for="(project, index) in userProjects.slice(0, 3)" :key="'user-project-' + index" type="banner" :loading="false">
+              <view class="project-card" @click="jumpToDesign">
+                <image class="project-image"
+                  :src="getProjectImage(index)" mode="aspectFill">
+                </image>
+                <view class="project-content">
+                  <text class="project-title">{{ project.projectTitle }}</text>
+                  <text class="project-description">{{ project.projectDescription }}</text>
+                </view>
+              </view>
+            </x-skeleton>
+          </template>
+        </view>
+      </view>
+
+      <!-- Account Settings Content -->
+      <view v-if="activeNavItem === 'account'" class="account-settings">
+        <view class="header">
+          <text class="title">User Settings</text>
+        </view>
+
+        <!-- Profile Section -->
+        <view class="settings-section">
+          <text class="section-title">Profile</text>
+          <text class="section-description">You can change your profile information below</text>
+          
+          <view class="form-row">
+            <view class="form-group">
+              <text class="form-label">First name</text>
+              <input class="form-input" type="text" v-model="accountSettings.firstName" placeholder="First name" />
+            </view>
+            
+            <view class="form-group">
+              <text class="form-label">Last name</text>
+              <input class="form-input" type="text" v-model="accountSettings.lastName" placeholder="Last name" />
+            </view>
+          </view>
+          
+          <view class="form-group">
+            <text class="form-label">Profile photo</text>
+            <view class="profile-photo-container">
+              <view class="profile-photo">
+                <image class="upload-icon" src="../../static/account.png"></image>
+              </view>
+            </view>
+          </view>
+          
+          <button class="save-btn" @click="saveProfileChanges">Save changes</button>
+        </view>
+        
+        <!-- Email Section -->
+        <view class="settings-section">
+          <text class="section-title">Email</text>
+          <text class="section-description">You can change your email below</text>
+          
+          <view class="form-group">
+            <text class="form-label">Email</text>
+            <input class="form-input" type="email" v-model="accountSettings.email" placeholder="New email address" />
+          </view>
+          
+          <button class="save-btn" @click="changeEmail">Change email</button>
+        </view>
+        
+        <!-- Password Section -->
+        <view class="settings-section">
+          <text class="section-title">Password</text>
+          <text class="section-description">You can change your password below</text>
+          
+          <view class="form-group">
+            <text class="form-label">New password</text>
+            <input class="form-input" type="password" v-model="accountSettings.newPassword" placeholder="New password" />
+          </view>
+          
+          <view class="form-group">
+            <text class="form-label">Repeat new password</text>
+            <input class="form-input" type="password" v-model="accountSettings.confirmPassword" placeholder="********" />
+          </view>
+          
+          <view class="password-strength" v-if="accountSettings.newPassword">
+            <view class="strength-bar">
+              <view class="strength-indicator" :style="{ width: passwordStrength + '%' }"></view>
+            </view>
+            <text class="strength-text">Password is {{ passwordStrengthText }}</text>
+          </view>
+          
+          <button class="save-btn" @click="changePassword">Change password</button>
+        </view>
+      </view>
+
+      <!-- Settings Content (placeholder for future implementation) -->
+      <view v-if="activeNavItem === 'settings'" class="settings-content">
+        <view class="header">
+          <text class="title">Settings</text>
+        </view>
+        <text>Settings page content will be implemented here.</text>
       </view>
     </view>
 
@@ -185,7 +270,22 @@ export default {
       },
       networkErrorVisible: false,
       networkErrorMessage: '',
-      userProjects: []
+      userProjects: [],
+      userInfo: uni.getStorageSync('googleUserInfo'),
+      accountSettings: {
+        firstName: '',
+        lastName: '',
+        email: '',
+        newPassword: '',
+        confirmPassword: ''
+      },
+      passwordStrength: 0,
+      passwordStrengthText: ''
+    }
+  },
+  watch: {
+    'accountSettings.newPassword': function(newVal) {
+      this.updatePasswordStrength();
     }
   },
   mounted() {
@@ -204,8 +304,18 @@ export default {
     
     // Load user projects from cloud
     this.loadProjectsByUid();
+    
+    // Initialize account settings from user info
+    this.initializeAccountSettings();
   },
   methods: {
+    // Initialize account settings from stored user info
+    initializeAccountSettings() {
+      const userInfo = uni.getStorageSync('googleUserInfo') || {};
+      this.accountSettings.firstName = userInfo.given_name || '';
+      this.accountSettings.lastName = userInfo.family_name || '';
+      this.accountSettings.email = userInfo.email || '';
+    },
     refreshProjects() {
       // Reset all project loading states
       this.projectLoadingStates.alpha = true;
@@ -534,6 +644,159 @@ export default {
       
       // Return the image at the corresponding index, or the first image if index is out of bounds
       return defaultImages[index % defaultImages.length];
+    },
+    saveProfileChanges() {
+      // Validate inputs
+      if (!this.accountSettings.firstName || !this.accountSettings.lastName) {
+        uni.showToast({
+          title: 'Please fill in all required fields',
+          icon: 'none',
+          duration: 2000
+        });
+        return;
+      }
+      
+      // Show loading indicator
+      uni.showLoading({
+        title: 'Saving changes...'
+      });
+      
+      // Simulate API call with timeout
+      setTimeout(() => {
+        // Update local storage with new values
+        const userInfo = uni.getStorageSync('googleUserInfo') || {};
+        userInfo.given_name = this.accountSettings.firstName;
+        userInfo.family_name = this.accountSettings.lastName;
+        uni.setStorageSync('googleUserInfo', userInfo);
+        
+        // Update the current userInfo object
+        this.userInfo = userInfo;
+        
+        // Hide loading and show success message
+        uni.hideLoading();
+        uni.showToast({
+          title: 'Profile updated successfully',
+          icon: 'success',
+          duration: 2000
+        });
+      }, 1000);
+    },
+    changeEmail() {
+      // Validate email
+      const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+      if (!this.accountSettings.email || !emailRegex.test(this.accountSettings.email)) {
+        uni.showToast({
+          title: 'Please enter a valid email address',
+          icon: 'none',
+          duration: 2000
+        });
+        return;
+      }
+      
+      // Show loading indicator
+      uni.showLoading({
+        title: 'Updating email...'
+      });
+      
+      // Simulate API call with timeout
+      setTimeout(() => {
+        // Update local storage with new email
+        const userInfo = uni.getStorageSync('googleUserInfo') || {};
+        userInfo.email = this.accountSettings.email;
+        uni.setStorageSync('googleUserInfo', userInfo);
+        
+        // Update the current userInfo object
+        this.userInfo = userInfo;
+        
+        // Hide loading and show success message
+        uni.hideLoading();
+        uni.showToast({
+          title: 'Email updated successfully',
+          icon: 'success',
+          duration: 2000
+        });
+      }, 1000);
+    },
+    changePassword() {
+      // Validate password
+      if (!this.accountSettings.newPassword || this.accountSettings.newPassword.length < 8) {
+        uni.showToast({
+          title: 'Password must be at least 8 characters',
+          icon: 'none',
+          duration: 2000
+        });
+        return;
+      }
+      
+      // Check if passwords match
+      if (this.accountSettings.newPassword !== this.accountSettings.confirmPassword) {
+        uni.showToast({
+          title: 'Passwords do not match',
+          icon: 'none',
+          duration: 2000
+        });
+        return;
+      }
+      
+      // Show loading indicator
+      uni.showLoading({
+        title: 'Updating password...'
+      });
+      
+      // Simulate API call with timeout
+      setTimeout(() => {
+        // In a real app, you would call an API to update the password
+        
+        // Clear password fields
+        this.accountSettings.newPassword = '';
+        this.accountSettings.confirmPassword = '';
+        this.passwordStrength = 0;
+        this.passwordStrengthText = '';
+        
+        // Hide loading and show success message
+        uni.hideLoading();
+        uni.showToast({
+          title: 'Password updated successfully',
+          icon: 'success',
+          duration: 2000
+        });
+      }, 1000);
+    },
+    // Watch for password changes to calculate strength
+    updatePasswordStrength() {
+      const password = this.accountSettings.newPassword;
+      
+      if (!password) {
+        this.passwordStrength = 0;
+        this.passwordStrengthText = '';
+        return;
+      }
+      
+      // Simple password strength calculation
+      let strength = 0;
+      
+      // Length check
+      if (password.length >= 8) strength += 25;
+      
+      // Contains lowercase
+      if (/[a-z]/.test(password)) strength += 25;
+      
+      // Contains uppercase
+      if (/[A-Z]/.test(password)) strength += 25;
+      
+      // Contains number or special char
+      if (/[0-9!@#$%^&*]/.test(password)) strength += 25;
+      
+      this.passwordStrength = strength;
+      
+      // Set text based on strength
+      if (strength < 50) {
+        this.passwordStrengthText = 'weak';
+      } else if (strength < 75) {
+        this.passwordStrengthText = 'medium';
+      } else {
+        this.passwordStrengthText = 'strong';
+      }
     }
   }
 }
@@ -1015,6 +1278,156 @@ export default {
       font-size: 13px;
     }
   }
+}
+
+/* Account Settings styles */
+.account-settings {
+  padding: 30px;
+  max-width: 800px;
+  margin: 0 auto;
+}
+
+.settings-section {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 30px;
+  margin-bottom: 30px;
+  box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+}
+
+.section-title {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #333;
+}
+
+.section-description {
+  display: block;
+  font-size: 14px;
+  color: #666;
+  margin-bottom: 25px;
+}
+
+.form-row {
+  display: flex;
+  gap: 20px;
+  margin-bottom: 10px;
+  
+  @media (max-width: 768px) {
+    flex-direction: column;
+  }
+}
+
+.form-group {
+  flex: 1;
+  margin-bottom: 20px;
+}
+
+.form-label {
+  display: block;
+  font-size: 14px;
+  color: #333;
+  margin-bottom: 8px;
+}
+
+.form-input {
+  width: 96.5%;
+  padding: 12px;
+  border: 1px solid #eaeaea;
+  border-radius: 5px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+  
+  &:focus {
+    border-color: #e53935;
+    outline: none;
+  }
+  
+  &::placeholder {
+    color: #aaa;
+  }
+}
+
+.profile-photo-container {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.profile-photo {
+  width: 80px;
+  height: 80px;
+  border-radius: 5px;
+  overflow: hidden;
+  background-color: #f8f8f8;
+  border: 1px dashed #ccc;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: #f0f0f0;
+  }
+}
+
+.upload-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+  opacity: 0.7;
+}
+
+.save-btn {
+  background-color: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 50px;
+
+  &:hover {
+    background-color: #d32f2f;
+  }
+}
+
+.password-strength {
+  margin-top: 10px;
+  margin-bottom: 20px;
+}
+
+.strength-bar {
+  height: 6px;
+  background-color: #f0f0f0;
+  border-radius: 3px;
+  overflow: hidden;
+  margin-bottom: 5px;
+}
+
+.strength-indicator {
+  height: 100%;
+  background-color: #e53935;
+  transition: width 0.3s;
+}
+
+.strength-text {
+  font-size: 12px;
+  color: #666;
+}
+
+/* Settings Content styles */
+.settings-content {
+  padding: 20px;
 }
 </style>
 

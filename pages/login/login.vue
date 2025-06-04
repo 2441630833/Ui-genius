@@ -111,21 +111,21 @@ export default {
       // Check if user already has a valid token
       const token = uni.getStorageSync('token');
       const hasValidToken = token && !isTokenExpired();
-      
+
       if (hasValidToken) {
         uni.showToast({
           title: 'You are already logged in',
           icon: 'none',
           duration: 3000
         });
-        
+
         // Navigate to dashboard if already logged in
         uni.switchTab({
           url: '/pages/dashboard/dashboard'
         });
         return;
       }
-      
+
       // Save email and password to local storage if rememberPsw is checked
       if (this.rememberPsw) {
         uni.setStorageSync('userEmail', this.user.email)
@@ -155,7 +155,7 @@ export default {
         title: 'Login successful',
         icon: 'success'
       })
- 
+
     },
     googleLoginSuccess(e) {
       console.log('Google login successful', e)
@@ -228,21 +228,21 @@ export default {
       // Check if user already has a valid Google token
       const googleToken = uni.getStorageSync('googleToken');
       const hasValidGoogleToken = googleToken && !isGoogleTokenExpired();
-      
+
       if (hasValidGoogleToken) {
         uni.showToast({
           title: 'You are already logged in with Google',
           icon: 'none',
           duration: 3000
         });
-        
+
         // Navigate to dashboard if already logged in
         uni.switchTab({
           url: '/pages/dashboard/dashboard'
         });
         return;
       }
-      
+
       // Show loading toast
       uni.showLoading({
         title: 'Logging in...',
