@@ -24,17 +24,17 @@
           <text class="nav-text">Dashboard</text>
         </view>
 
+        <view class="nav-item" :class="{ active: activeNavItem === 'account' }" @click="setActiveNavItem('account')">
+          <image class="sidebar-icon"
+            :src="activeNavItem === 'account' ? '../../static/account_white.png' : '../../static/account.png'"></image>
+          <text class="nav-text">Account</text>
+        </view>
+
         <view class="nav-item" :class="{ active: activeNavItem === 'settings' }" @click="setActiveNavItem('settings')">
           <image class="sidebar-icon"
             :src="activeNavItem === 'settings' ? '../../static/settings_white.png' : '../../static/settings.png'">
           </image>
           <text class="nav-text">Settings</text>
-        </view>
-
-        <view class="nav-item" :class="{ active: activeNavItem === 'account' }" @click="setActiveNavItem('account')">
-          <image class="sidebar-icon"
-            :src="activeNavItem === 'account' ? '../../static/account_white.png' : '../../static/account.png'"></image>
-          <text class="nav-text">Account</text>
         </view>
       </view>
     </view>
@@ -57,7 +57,8 @@
           <x-skeleton type="banner" :loading="projectLoadingStates.alpha">
             <view class="project-card" @click="jumpToDesign">
               <image class="project-image"
-                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png" mode="aspectFill">
+                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
+                mode="aspectFill">
               </image>
               <view class="project-content">
                 <text class="project-title">Project Alpha</text>
@@ -71,7 +72,8 @@
           <x-skeleton type="banner" :loading="projectLoadingStates.beta">
             <view class="project-card" @click="jumpToDesign">
               <image class="project-image"
-                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(2).png" mode="aspectFill">
+                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(2).png"
+                mode="aspectFill">
               </image>
               <view class="project-content">
                 <text class="project-title">Project Beta</text>
@@ -85,7 +87,8 @@
           <x-skeleton type="banner" :loading="projectLoadingStates.gamma">
             <view class="project-card" @click="jumpToDesign">
               <image class="project-image"
-                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(3).png" mode="aspectFill">
+                src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(3).png"
+                mode="aspectFill">
               </image>
               <view class="project-content">
                 <text class="project-title">Project Gamma</text>
@@ -94,13 +97,15 @@
               </view>
             </view>
           </x-skeleton>
-          
+
           <!-- User Projects -->
           <template v-if="Array.isArray(userProjects) && userProjects.length > 0">
-            <x-skeleton v-for="(project, index) in userProjects" :key="'user-project-' + index" type="banner" :loading="false">
+            <x-skeleton v-for="(project, index) in userProjects" :key="'user-project-' + index" type="banner"
+              :loading="false">
               <view class="project-card" @click="jumpToDesign">
                 <image class="project-image"
-                  src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(3).png" mode="aspectFill">
+                  src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(3).png"
+                  mode="aspectFill">
                 </image>
                 <view class="project-content">
                   <text class="project-title">{{ project.projectTitle }}</text>
@@ -122,19 +127,19 @@
         <view class="settings-section">
           <text class="section-title">Profile</text>
           <text class="section-description">You can change your profile information below</text>
-          
+
           <view class="form-row">
             <view class="form-group">
               <text class="form-label">First name</text>
               <input class="form-input" type="text" v-model="accountSettings.firstName" placeholder="First name" />
             </view>
-            
+
             <view class="form-group">
               <text class="form-label">Last name</text>
               <input class="form-input" type="text" v-model="accountSettings.lastName" placeholder="Last name" />
             </view>
           </view>
-          
+
           <view class="form-group">
             <text class="form-label">Profile photo</text>
             <view class="profile-photo-container">
@@ -143,53 +148,55 @@
               </view>
             </view>
           </view>
-          
+
           <button class="save-btn" @click="saveProfileChanges">Save changes</button>
         </view>
-        
+
         <!-- Email Section -->
         <view class="settings-section">
           <text class="section-title">Email</text>
           <text class="section-description">You can change your email below</text>
-          
+
           <view class="form-group">
             <text class="form-label">Email</text>
             <input class="form-input" type="email" v-model="accountSettings.email" placeholder="New email address" />
           </view>
-          
+
           <button class="save-btn" @click="changeEmail">Change email</button>
         </view>
-        
+
         <!-- Password Section -->
         <view class="settings-section">
           <text class="section-title">Password</text>
           <text class="section-description">You can change your password below</text>
-          
+
           <view class="form-group">
             <text class="form-label">New password</text>
-            <input class="form-input" type="password" v-model="accountSettings.newPassword" placeholder="New password" />
+            <input class="form-input" type="password" v-model="accountSettings.newPassword"
+              placeholder="New password" />
           </view>
-          
+
           <view class="form-group">
             <text class="form-label">Repeat new password</text>
-            <input class="form-input" type="password" v-model="accountSettings.confirmPassword" placeholder="********" />
+            <input class="form-input" type="password" v-model="accountSettings.confirmPassword"
+              placeholder="********" />
           </view>
-          
+
           <view class="password-strength" v-if="accountSettings.newPassword">
             <view class="strength-bar">
               <view class="strength-indicator" :style="{ width: passwordStrength + '%' }"></view>
             </view>
             <text class="strength-text">Password is {{ passwordStrengthText }}</text>
           </view>
-          
+
           <button class="save-btn" @click="changePassword">Change password</button>
         </view>
-        
+
         <!-- Logout Section -->
         <view class="settings-section">
           <text class="section-title">Logout</text>
           <text class="section-description">You can logout from your account below</text>
-          
+
           <button class="logout-btn" @click="logout">Logout</button>
         </view>
       </view>
@@ -292,7 +299,7 @@ export default {
     }
   },
   watch: {
-    'accountSettings.newPassword': function(newVal) {
+    'accountSettings.newPassword': function (newVal) {
       this.updatePasswordStrength();
     }
   },
@@ -301,18 +308,18 @@ export default {
     setTimeout(() => {
       this.projectLoadingStates.alpha = false;
     }, 800);
-    
+
     setTimeout(() => {
       this.projectLoadingStates.beta = false;
     }, 1300);
-    
+
     setTimeout(() => {
       this.projectLoadingStates.gamma = false;
     }, 1800);
-    
+
     // Load user projects from cloud
     this.loadProjectsByUid();
-    
+
     // Initialize account settings from user info
     this.initializeAccountSettings();
   },
@@ -329,26 +336,26 @@ export default {
       this.projectLoadingStates.alpha = true;
       this.projectLoadingStates.beta = true;
       this.projectLoadingStates.gamma = true;
-      
+
       // Reload user projects from cloud
       this.loadProjectsByUid();
-      
+
       // Staggered loading for default projects
       setTimeout(() => {
         this.projectLoadingStates.alpha = false;
       }, 800);
-      
+
       setTimeout(() => {
         this.projectLoadingStates.beta = false;
       }, 1300);
-      
+
       setTimeout(() => {
         this.projectLoadingStates.gamma = false;
       }, 1800);
     },
     setActiveNavItem(item) {
       this.activeNavItem = item;
-      
+
       // Refresh projects when switching to dashboard
       if (item === 'dashboard') {
         // this.refreshProjects();
@@ -358,7 +365,7 @@ export default {
       // Clear any existing project data to start fresh
       // uni.removeStorageSync('latest_7_overall_page');
       // uni.removeStorageSync('currentProjectId');
-      
+
       uni.switchTab({
         url: '/pages/design/design'
       });
@@ -382,7 +389,7 @@ export default {
     async createProject() {
       // Hide any previous network error toast
       this.networkErrorVisible = false;
-      
+
       if (!this.selectedDevice) {
         // Show error or notification that device must be selected
         this.errorMessage = 'Please select a device type first';
@@ -401,22 +408,22 @@ export default {
       const checkApiConnection = async () => {
         try {
           // Race between fetch and timeout for faster response
-          const timeoutPromise = new Promise((_, reject) => 
+          const timeoutPromise = new Promise((_, reject) =>
             setTimeout(() => reject(new Error('Timeout')), 1000)
           );
-          
+
           const fetchPromise = fetch(`${API_BASE_URL}/generate-ui`, {
             method: 'HEAD',
             cache: 'no-cache'
           });
-          
+
           // Use Promise.race to take the first resolved promise
           const response = await Promise.race([fetchPromise, timeoutPromise]);
-          
+
           if (!response.ok) {
             throw new Error('API server error');
           }
-          
+
           return true;
         } catch (error) {
           if (error.message === 'Timeout') {
@@ -430,13 +437,13 @@ export default {
           return false;
         }
       };
-      
+
       // Check connection and proceed if successful
       const isConnected = await checkApiConnection();
       if (!isConnected) return;
-      
+
       // If we reach here, connection is good
-      
+
       await uni.removeStorageSync('latest_7_overall_page');
       await uni.removeStorageSync('projectDescription');
       await uni.removeStorageSync('selectedDevice');
@@ -450,17 +457,17 @@ export default {
         url: '/pages/design/design'
       });
     },
-    
+
     // Custom toast for network errors
     showNetworkErrorToast(message = 'Network error. Please check your connection to the API server.') {
       // Set the error message
       this.networkErrorMessage = message;
-      
+
       // Create a custom toast using uni-app's component - show immediately
       this.$nextTick(() => {
         this.networkErrorVisible = true;
       });
-      
+
       // Auto-hide after 5 seconds
       setTimeout(() => {
         this.networkErrorVisible = false;
@@ -469,7 +476,7 @@ export default {
     retryCreateProject() {
       // Hide the toast immediately
       this.networkErrorVisible = false;
-      
+
       // Wait a moment before retrying to give visual feedback
       setTimeout(() => {
         this.createProject();
@@ -480,9 +487,9 @@ export default {
       if (!this.checkUserLogin()) {
         return;
       }
-      
+
       const userId = uni.getStorageSync('uid');
-      
+
       if (!userId) {
         console.log('No user ID found');
         uni.showToast({
@@ -492,13 +499,13 @@ export default {
         });
         return;
       }
-      
+
       console.log('Loading projects for user ID:', userId);
-      
+
       uni.showLoading({
         title: 'Loading your projects...'
       });
-      
+
       // Pass uid directly as a parameter
       uniCloud.callFunction({
         name: 'user-project',
@@ -513,7 +520,7 @@ export default {
           // Ensure userProjects is always an array
           this.userProjects = Array.isArray(res.result.data) ? res.result.data : [];
           console.log(`Loaded ${this.userProjects.length} projects for user ID ${userId}`);
-          
+
           // Update the project grid with user projects
           this.updateProjectGrid();
         } else {
@@ -532,7 +539,7 @@ export default {
         console.error('Cloud function error:', err);
       });
     },
-    
+
     checkUserLogin() {
       // Check for user ID
       const userId = uni.getStorageSync('uid');
@@ -545,10 +552,10 @@ export default {
         });
         return false;
       }
-      
+
       return true;
     },
-    
+
     updateProjectGrid() {
       this.projectLoadingStates.alpha = false;
       this.projectLoadingStates.beta = false;
@@ -566,46 +573,46 @@ export default {
       //   setTimeout(() => {
       //     this.projectLoadingStates.alpha = false;
       //   }, 800);
-        
+
       //   setTimeout(() => {
       //     this.projectLoadingStates.beta = false;
       //   }, 1300);
-        
+
       //   setTimeout(() => {
       //     this.projectLoadingStates.gamma = false;
       //   }, 1800);
       //   return;
       // }
-      
+
       // // If we have user projects, update the loading states for them
       // this.projectLoadingStates = {};
-      
+
       // // Create loading states for user projects with staggered timing
       // this.userProjects.slice(0, 3).forEach((project, index) => {
       //   const key = `user-project-${index}`;
       //   this.projectLoadingStates[key] = true;
-        
+
       //   setTimeout(() => {
       //     this.projectLoadingStates[key] = false;
       //   }, 800 + (index * 500));
       // });
     },
-    
+
     loadProjectById(id) {
       // Check if user is logged in
       if (!this.checkUserLogin()) {
         return;
       }
-      
+
       if (!id) {
         console.log('No project ID provided');
         return;
       }
-      
+
       uni.showLoading({
         title: 'Loading project...'
       });
-      
+
       uniCloud.callFunction({
         name: 'user-project',
         data: {
@@ -620,12 +627,12 @@ export default {
           if (projectData.generated_overall_pages) {
             // Store the loaded project data
             uni.setStorageSync('latest_7_overall_page', JSON.stringify(projectData.generated_overall_pages));
-            
+
             uni.showToast({
               title: 'Project loaded, redirecting...',
               icon: 'success'
             });
-            
+
             // Navigate to design page
             setTimeout(() => {
               uni.switchTab({
@@ -661,7 +668,7 @@ export default {
         'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(5).png',
         'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(6).png'
       ];
-      
+
       // Return the image at the corresponding index, or the first image if index is out of bounds
       return defaultImages[index % defaultImages.length];
     },
@@ -675,12 +682,12 @@ export default {
         });
         return;
       }
-      
+
       // Show loading indicator
       uni.showLoading({
         title: 'Saving changes...'
       });
-      
+
       // Simulate API call with timeout
       setTimeout(() => {
         // Update local storage with new values
@@ -688,10 +695,10 @@ export default {
         userInfo.given_name = this.accountSettings.firstName;
         userInfo.family_name = this.accountSettings.lastName;
         uni.setStorageSync('googleUserInfo', userInfo);
-        
+
         // Update the current userInfo object
         this.userInfo = userInfo;
-        
+
         // Hide loading and show success message
         uni.hideLoading();
         uni.showToast({
@@ -712,22 +719,22 @@ export default {
         });
         return;
       }
-      
+
       // Show loading indicator
       uni.showLoading({
         title: 'Updating email...'
       });
-      
+
       // Simulate API call with timeout
       setTimeout(() => {
         // Update local storage with new email
         const userInfo = uni.getStorageSync('googleUserInfo') || {};
         userInfo.email = this.accountSettings.email;
         uni.setStorageSync('googleUserInfo', userInfo);
-        
+
         // Update the current userInfo object
         this.userInfo = userInfo;
-        
+
         // Hide loading and show success message
         uni.hideLoading();
         uni.showToast({
@@ -747,7 +754,7 @@ export default {
         });
         return;
       }
-      
+
       // Check if passwords match
       if (this.accountSettings.newPassword !== this.accountSettings.confirmPassword) {
         uni.showToast({
@@ -757,22 +764,22 @@ export default {
         });
         return;
       }
-      
+
       // Show loading indicator
       uni.showLoading({
         title: 'Updating password...'
       });
-      
+
       // Simulate API call with timeout
       setTimeout(() => {
         // In a real app, you would call an API to update the password
-        
+
         // Clear password fields
         this.accountSettings.newPassword = '';
         this.accountSettings.confirmPassword = '';
         this.passwordStrength = 0;
         this.passwordStrengthText = '';
-        
+
         // Hide loading and show success message
         uni.hideLoading();
         uni.showToast({
@@ -785,30 +792,30 @@ export default {
     // Watch for password changes to calculate strength
     updatePasswordStrength() {
       const password = this.accountSettings.newPassword;
-      
+
       if (!password) {
         this.passwordStrength = 0;
         this.passwordStrengthText = '';
         return;
       }
-      
+
       // Simple password strength calculation
       let strength = 0;
-      
+
       // Length check
       if (password.length >= 8) strength += 25;
-      
+
       // Contains lowercase
       if (/[a-z]/.test(password)) strength += 25;
-      
+
       // Contains uppercase
       if (/[A-Z]/.test(password)) strength += 25;
-      
+
       // Contains number or special char
       if (/[0-9!@#$%^&*]/.test(password)) strength += 25;
-      
+
       this.passwordStrength = strength;
-      
+
       // Set text based on strength
       if (strength < 50) {
         this.passwordStrengthText = 'weak';
@@ -823,7 +830,7 @@ export default {
       uni.showLoading({
         title: 'Logging out...'
       });
-      
+
       // Simulate API call with timeout
       setTimeout(() => {
         // Clear user data from storage
@@ -838,7 +845,7 @@ export default {
 
         uni.removeStorageSync('latest_7_overall_page');
         uni.removeStorageSync('currentProjectId');
-        
+
         // Hide loading and show success message
         uni.hideLoading();
         uni.showToast({
@@ -846,7 +853,7 @@ export default {
           icon: 'success',
           duration: 2000
         });
-        
+
         // Redirect to login page after a short delay
         setTimeout(() => {
           uni.reLaunch({
@@ -985,7 +992,7 @@ export default {
       cursor: pointer;
       object-fit: cover;
     }
-    
+
     .refresh-btn {
       background-color: #e53935;
       color: white;
@@ -995,7 +1002,7 @@ export default {
       cursor: pointer;
       font-size: 14px;
       transition: background-color 0.2s;
-      
+
       &:hover {
         background-color: #c62828;
       }
@@ -1253,7 +1260,8 @@ export default {
   right: 0;
   bottom: 0;
   z-index: 1000;
-  pointer-events: none; /* Allow clicks to pass through except on the toast itself */
+  pointer-events: none;
+  /* Allow clicks to pass through except on the toast itself */
 }
 
 /* Network Error Toast styles */
@@ -1271,14 +1279,17 @@ export default {
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
   z-index: 1001;
   animation: toast-in 0.15s ease-out forwards; // Faster animation
-  pointer-events: auto; /* Ensure the toast itself captures clicks */
-  will-change: transform, opacity; /* Optimize for animations */
+  pointer-events: auto;
+  /* Ensure the toast itself captures clicks */
+  will-change: transform, opacity;
+  /* Optimize for animations */
 
   @keyframes toast-in {
     0% {
       opacity: 0;
       transform: translate(-50%, 20px);
     }
+
     100% {
       opacity: 1;
       transform: translate(-50%, 0);
@@ -1295,41 +1306,41 @@ export default {
     font-size: 14px;
     flex: 1;
   }
-  
+
   .toast-actions {
     display: flex;
     align-items: center;
     gap: 15px;
   }
-  
+
   .toast-retry {
     color: #e53935;
     font-size: 14px;
     font-weight: bold;
     cursor: pointer;
     padding: 5px;
-    
+
     &:hover {
       text-decoration: underline;
     }
   }
-  
+
   .toast-close {
     color: #fff;
     font-size: 20px;
     font-weight: bold;
     cursor: pointer;
     padding: 0 5px;
-    
+
     &:hover {
       opacity: 0.8;
     }
   }
-  
+
   @media (max-width: 480px) {
     width: 80%;
     max-width: 300px;
-    
+
     .toast-message {
       font-size: 13px;
     }
@@ -1370,7 +1381,7 @@ export default {
   display: flex;
   gap: 20px;
   margin-bottom: 10px;
-  
+
   @media (max-width: 768px) {
     flex-direction: column;
   }
@@ -1395,12 +1406,12 @@ export default {
   border-radius: 5px;
   font-size: 14px;
   transition: border-color 0.2s;
-  
+
   &:focus {
     border-color: #e53935;
     outline: none;
   }
-  
+
   &::placeholder {
     color: #aaa;
   }
@@ -1423,7 +1434,7 @@ export default {
   justify-content: center;
   cursor: pointer;
   transition: background-color 0.2s;
-  
+
   &:hover {
     background-color: #f0f0f0;
   }
@@ -1508,4 +1519,3 @@ export default {
   }
 }
 </style>
-

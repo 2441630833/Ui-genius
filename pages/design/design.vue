@@ -236,10 +236,10 @@
           </image>
         </view>
 
-        <view class="nav-item" :class="{ active: activeNavItem === 'magic' }" @click="navigateTo('magic')">
+        <!-- <view class="nav-item" :class="{ active: activeNavItem === 'magic' }" @click="navigateTo('magic')">
           <image class="nav-icon" :src="activeNavItem === 'magic' ? '/static/magic_white.png' : '/static/magic.png'">
           </image>
-        </view>
+        </view> -->
 
         <view class="nav-item" :class="{ active: activeNavItem === 'color' }" @click="navigateTo('color')">
           <image class="nav-icon" :src="activeNavItem === 'color' ? '/static/color_white.png' : '/static/color.png'">
@@ -299,9 +299,9 @@
           <view class="tool-button">
             <text class="button-text">Share</text>
           </view>
-          <view class="tool-button">
+          <!-- <view class="tool-button">
             <text class="button-text">Export</text>
-          </view>
+          </view> -->
           
           <!-- Refresh Button -->
           <view class="tool-button" @click="refreshData">
@@ -309,8 +309,8 @@
           </view>
 
           <view class="preview-button">
-            <image class="icon" src="/static/play_white.png"></image>
-            <text class="preview-text">Preview</text>
+            <image class="icon" src="/static/export_white.png"></image>
+            <text class="preview-text">Export</text>
           </view>
         </view>
       </view>
@@ -1986,7 +1986,7 @@ export default {
   .preview-button {
     display: flex;
     align-items: center;
-    height: 16px;
+    height: 10%;
     gap: 6px;
     background-color: #e53935;
     padding: 7px 14px;
