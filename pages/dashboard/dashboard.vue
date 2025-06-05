@@ -505,6 +505,11 @@ export default {
       uni.showLoading({
         title: 'Loading your projects...'
       });
+      // test mode no login,just return 
+      if (userId == '123bcbfeqqaeabfaf5a') {
+        uni.hideLoading();
+        return
+      }
 
       // Pass uid directly as a parameter
       uniCloud.callFunction({
@@ -598,69 +603,69 @@ export default {
       // });
     },
 
-    loadProjectById(id) {
-      // Check if user is logged in
-      if (!this.checkUserLogin()) {
-        return;
-      }
+    // loadProjectById(id) {
+    //   // Check if user is logged in
+    //   if (!this.checkUserLogin()) {
+    //     return;
+    //   }
 
-      if (!id) {
-        console.log('No project ID provided');
-        return;
-      }
+    //   if (!id) {
+    //     console.log('No project ID provided');
+    //     return;
+    //   }
 
-      uni.showLoading({
-        title: 'Loading project...'
-      });
+    //   uni.showLoading({
+    //     title: 'Loading project...'
+    //   });
 
-      uniCloud.callFunction({
-        name: 'user-project',
-        data: {
-          action: 'read',
-          id: id
-        }
-      }).then(res => {
-        uni.hideLoading();
-        if (res.result && res.result.success && res.result.data) {
-          // Load the project data
-          const projectData = res.result.data;
-          if (projectData.generated_overall_pages) {
-            // Store the loaded project data
-            uni.setStorageSync('latest_7_overall_page', JSON.stringify(projectData.generated_overall_pages));
+    //   uniCloud.callFunction({
+    //     name: 'user-project',
+    //     data: {
+    //       action: 'read',
+    //       id: id
+    //     }
+    //   }).then(res => {
+    //     uni.hideLoading();
+    //     if (res.result && res.result.success && res.result.data) {
+    //       // Load the project data
+    //       const projectData = res.result.data;
+    //       if (projectData.generated_overall_pages) {
+    //         // Store the loaded project data
+    //         uni.setStorageSync('latest_7_overall_page', JSON.stringify(projectData.generated_overall_pages));
 
-            uni.showToast({
-              title: 'Project loaded, redirecting...',
-              icon: 'success'
-            });
+    //         uni.showToast({
+    //           title: 'Project loaded, redirecting...',
+    //           icon: 'success'
+    //         });
 
-            // Navigate to design page
-            setTimeout(() => {
-              uni.switchTab({
-                url: '/pages/design/design'
-              });
-            }, 1000);
-          } else {
-            uni.showToast({
-              title: 'Invalid project data',
-              icon: 'none'
-            });
-          }
-        } else {
-          uni.showToast({
-            title: 'Failed to load project',
-            icon: 'none'
-          });
-          console.error('Cloud function error:', res.result);
-        }
-      }).catch(err => {
-        uni.hideLoading();
-        uni.showToast({
-          title: 'Error loading project',
-          icon: 'none'
-        });
-        console.error('Cloud function error:', err);
-      });
-    },
+    //         // Navigate to design page
+    //         setTimeout(() => {
+    //           uni.switchTab({
+    //             url: '/pages/design/design'
+    //           });
+    //         }, 1000);
+    //       } else {
+    //         uni.showToast({
+    //           title: 'Invalid project data',
+    //           icon: 'none'
+    //         });
+    //       }
+    //     } else {
+    //       uni.showToast({
+    //         title: 'Failed to load project',
+    //         icon: 'none'
+    //       });
+    //       console.error('Cloud function error:', res.result);
+    //     }
+    //   }).catch(err => {
+    //     uni.hideLoading();
+    //     uni.showToast({
+    //       title: 'Error loading project',
+    //       icon: 'none'
+    //     });
+    //     console.error('Cloud function error:', err);
+    //   });
+    // },
     getProjectImage(index) {
       // Array of default project images
       const defaultImages = [

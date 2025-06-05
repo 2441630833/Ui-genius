@@ -10,6 +10,8 @@
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="google-icon" />
         <span>Continue with Google</span>
       </div>
+      <!-- skip login -->
+      <div class="skip-login" @click="skipLogin">Skip Login</div>
       <div class="remember-link">
         <checkbox-group>
           <label>
@@ -90,7 +92,11 @@ export default {
         password: ''
       },
       needCaptcha: false,
-      rememberPsw: true
+      rememberPsw: true,
+      fakeToken: {
+        newToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9M',
+        uid: '123bcbfeqqaeabfaf5a'
+      }
     }
   },
   mounted() {
@@ -107,17 +113,29 @@ export default {
     }
   },
   methods: {
+    skipLogin() {
+      setTokenWithExpiration(this.fakeToken)
+      // Navigate to dashboard after successful login
+      uni.switchTab({
+        url: '/pages/dashboard/dashboard'
+      })
+
+      uni.showToast({
+        title: 'Login successful',
+        icon: 'success'
+      })
+    },
     login() {
       // Check if user already has a valid token
       const token = uni.getStorageSync('token');
       const hasValidToken = token && !isTokenExpired();
 
       if (hasValidToken) {
-        uni.showToast({
-          title: 'You are already logged in',
-          icon: 'none',
-          duration: 3000
-        });
+        // uni.showToast({
+        //   title: 'You are already logged in',
+        //   icon: 'none',
+        //   duration: 3000
+        // });
 
         // Navigate to dashboard if already logged in
         uni.switchTab({
@@ -209,14 +227,15 @@ export default {
         this.loginSuccess(e)
         uni.setStorageSync('email', this.user.email)
       }).catch(e => {
-        if (e.errCode == 'uni-id-captcha-required') {
-          // this.needCaptcha = true
-          console.log('captcha required')
+        console.log(e)
+        // if (e.errCode == 'uni-id-captcha-required') {
+        //   // this.needCaptcha = true
+        //   console.log('captcha required')
 
-        } else if (this.needCaptcha) {
-          //登录失败，自动重新获取验证码
-          this.$refs.captcha.getImageCaptcha()
-        }
+        // } else if (this.needCaptcha) {
+        //   //登录失败，自动重新获取验证码
+        //   this.$refs.captcha.getImageCaptcha()
+        // }
       })
     },
     signup() {
@@ -645,7 +664,7 @@ export default {
   background: #fbe9e7;
 }
 
-.forgot-link {
+.skip-login {
   text-align: center;
   margin-top: 18px;
   color: #888;
