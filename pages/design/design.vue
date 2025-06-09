@@ -1056,7 +1056,7 @@ export default {
         this.generationProgress = 10; // Start at 10% instead of 5%
         
         // Set up static progress simulation with faster progression
-        const totalDuration = 90000; // 1.5 minutes instead of 2 minutes
+        const totalDuration = 360000; // 6 minutes instead of 2 minutes
         const progressInterval = 400; // Update every 400ms instead of 500ms
         const progressSteps = totalDuration / progressInterval;
         const progressIncrement = 85 / progressSteps; // Max 95% for simulation
@@ -1086,7 +1086,7 @@ export default {
               device_type: deviceType,
               num_pages: numPages
             },
-            timeout: 180000, // 3 minutes timeout instead of 5 minutes
+            timeout: 360000, // 6 minutes timeout instead of 5 minutes
             success: (res) => {
               // Clear any remaining interval
               if (this.progressInterval) {
