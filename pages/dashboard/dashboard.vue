@@ -456,6 +456,15 @@ export default {
       await uni.removeStorageSync('projectDescription');
       await uni.removeStorageSync('selectedDevice');
       await uni.removeStorageSync('shouldGenerateUI');
+      await uni.removeStorageSync('uigenius_image_dashboard');
+      await uni.removeStorageSync('uigenius_image_generated');
+      await uni.removeStorageSync('uigenius_image_home');
+      await uni.removeStorageSync('uigenius_image_signup');
+      await uni.removeStorageSync('uigenius_image_settings');
+      await uni.removeStorageSync('uigenius_image_profile');
+      await uni.removeStorageSync('uigenius_image_notification');
+
+
       uni.setStorageSync('projectDescription', this.projectDescription);
       uni.setStorageSync('selectedDevice', this.selectedDevice);
       uni.setStorageSync('numPages', this.numPages);
