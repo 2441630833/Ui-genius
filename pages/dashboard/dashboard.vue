@@ -245,6 +245,13 @@
             <text class="char-count">{{ projectDescription.length }}/300</text>
           </view>
 
+          <!-- Number of Pages Selector -->
+          <view class="pages-selector-container">
+            <text class="pages-selector-label">Number of Pages: {{ numPages }}</text>
+            <slider class="pages-selector" min="1" max="7" step="1" show-value 
+              :value="numPages" @change="onNumPagesChange" />
+          </view>
+
           <button class="continue-btn" @click="createProject">Continue</button>
         </view>
       </view>
@@ -276,6 +283,7 @@ export default {
       showCreateProjectDialog: false,
       selectedDevice: '',
       projectDescription: '',
+      numPages: 1,
       exampleDescription: 'Dating app for people with magical powers',
       errorMessage: '',
       projectLoadingStates: {
@@ -450,6 +458,7 @@ export default {
       await uni.removeStorageSync('shouldGenerateUI');
       uni.setStorageSync('projectDescription', this.projectDescription);
       uni.setStorageSync('selectedDevice', this.selectedDevice);
+      uni.setStorageSync('numPages', this.numPages);
       // Set flag to indicate we should generate UI when design page loads
       uni.setStorageSync('shouldGenerateUI', 'true');
       this.closeCreateProjectDialog();
@@ -866,6 +875,9 @@ export default {
           });
         }, 1500);
       }, 1000);
+    },
+    onNumPagesChange(e) {
+      this.numPages = e.detail.value;
     }
   }
 }
@@ -1522,5 +1534,26 @@ export default {
   &:hover {
     background-color: #d32f2f;
   }
+}
+
+/* Pages Selector styles */
+.pages-selector-container {
+  margin-top: 15px;
+  margin-bottom: 25px;
+  background-color: #f9f9f9;
+  padding: 15px;
+  border-radius: 8px;
+}
+
+.pages-selector-label {
+  display: block;
+  margin-bottom: 10px;
+  font-weight: 600;
+  color: #333;
+  font-size: 16px;
+}
+
+.pages-selector {
+  width: 100%;
 }
 </style>
