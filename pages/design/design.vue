@@ -440,8 +440,8 @@
 </template>
 
 <script>
-// import html2canvas from 'html2canvas';
 import { API_BASE_URL } from '../../env.js';
+import html2canvas from 'html2canvas';
 
 export default {
   name: 'Design',
@@ -598,34 +598,34 @@ export default {
     // Set up loading state timers
     setTimeout(() => {
       this.templateLoadingStates.signup = false;
-    }, 1500);
+    }, 500); // Reduced from 1500ms
 
     setTimeout(() => {
       this.templateLoadingStates.home = false;
-    }, 1800);
+    }, 600); // Reduced from 1800ms
 
     setTimeout(() => {
       this.templateLoadingStates.notification = false;
-    }, 2100);
+    }, 700); // Reduced from 2100ms
 
     setTimeout(() => {
       this.templateLoadingStates.profile = false;
-    }, 2400);
+    }, 800); // Reduced from 2400ms
 
     setTimeout(() => {
       this.templateLoadingStates.settings = false;
       this.templatesLoading = false;
-    }, 2700);
+    }, 900); // Reduced from 2700ms
 
     // Staggered loading for proposals
     setTimeout(() => {
       this.proposalLoadingStates.login = false;
-    }, 2200);
+    }, 750); // Reduced from 2200ms
 
     setTimeout(() => {
       this.proposalLoadingStates.dashboard = false;
       this.proposalsLoading = false;
-    }, 2500);
+    }, 850); // Reduced from 2500ms
     // console.log(this.jsonTemplates);
   },
 
@@ -694,6 +694,11 @@ export default {
 
           // Check if we have pages in the JSON
           if (data && data.pages && Array.isArray(data.pages)) {
+            // Clear previous templates
+            this.jsonTemplates = [];
+            this.dynamicTemplateIds = [];
+            
+            // Set new templates
             this.jsonTemplates = data.pages;
             // console.log(this.jsonTemplates);
 
@@ -710,9 +715,12 @@ export default {
 
             // Generate proposal templates
             this.proposalTemplates = this.getProposalTemplates();
+            
+            // Force a re-render
+            this.$forceUpdate();
           }
         } catch (e) {
-          // console.error('Error parsing JSON template data:', e);
+          console.error('Error parsing JSON template data:', e);
         }
       }
     },
@@ -737,15 +745,29 @@ export default {
           needsUpdate = true;
           // Remove the old image from storage
           uni.removeStorageSync(`uigenius_image_${key}`);
+          console.log(`Template ${key} has changed, will regenerate image`);
         }
       });
+      
+      // Always force regeneration after a UI generation
+      const forceRegeneration = uni.getStorageSync('force_regeneration') === 'true';
+      if (forceRegeneration) {
+        needsUpdate = true;
+        uni.removeStorageSync('force_regeneration');
+        console.log('Forcing template regeneration after UI generation');
+      }
 
       // If any templates have changed, regenerate the images
       if (needsUpdate) {
+        // Reset loading states to show skeletons
+        Object.keys(this.templateLoadingStates).forEach(key => {
+          this.$set(this.templateLoadingStates, key, true);
+        });
+        
         // Set a short timeout to allow the DOM to update first
         setTimeout(() => {
           this.generatePreviewImages();
-        }, 300);
+        }, 100); // Reduced from 300ms
       }
     },
 
@@ -776,7 +798,25 @@ export default {
         if (!this.capturedImages[key]) {
           this.$set(this.capturedImages, key, '');
         }
+        
+        // Set a timeout to turn off loading state after a delay - REDUCED TIME
+        setTimeout(() => {
+          this.$set(this.templateLoadingStates, key, false);
+        }, 500 + (Math.random() * 300)); // Reduced from 1500-2500ms to 500-800ms
       });
+      
+      // If we have proposal templates, update their loading states too
+      if (this.activeProposalTemplates && this.activeProposalTemplates.length > 0) {
+        this.activeProposalTemplates.forEach((template, index) => {
+          const key = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+          this.$set(this.proposalLoadingStates, key, true);
+          
+          // Set a timeout to turn off loading state after a delay - REDUCED TIME
+          setTimeout(() => {
+            this.$set(this.proposalLoadingStates, key, false);
+          }, 700 + (index * 100)); // Reduced from 2000ms to 700ms
+        });
+      }
     },
 
     refreshData() {
@@ -984,7 +1024,7 @@ export default {
           // Move to next element
           setTimeout(() => {
             captureSequentially(index + 1);
-          }, 50);
+          }, 20); // Reduced from 50ms
           return;
         }
 
@@ -993,7 +1033,7 @@ export default {
         // Move to next element after a short delay
         setTimeout(() => {
           captureSequentially(index + 1);
-        }, 300);
+        }, 150); // Reduced from 300ms
       };
 
       // Start the sequential capture
@@ -1013,13 +1053,13 @@ export default {
       if (this.projectDescription) {
         // Start progress bar
         this.isGenerating = true;
-        this.generationProgress = 5;
+        this.generationProgress = 10; // Start at 10% instead of 5%
         
-        // Set up static progress simulation
-        const totalDuration = 120000; // 2 minutes in milliseconds
-        const progressInterval = 500; // Update every 500ms
+        // Set up static progress simulation with faster progression
+        const totalDuration = 90000; // 1.5 minutes instead of 2 minutes
+        const progressInterval = 400; // Update every 400ms instead of 500ms
         const progressSteps = totalDuration / progressInterval;
-        const progressIncrement = 90 / progressSteps; // Max 95% for simulation
+        const progressIncrement = 85 / progressSteps; // Max 95% for simulation
         
         // Start the progress simulation
         this.progressInterval = setInterval(() => {
@@ -1046,7 +1086,7 @@ export default {
               device_type: deviceType,
               num_pages: numPages
             },
-            timeout: 300000, // 5 minutes timeout
+            timeout: 180000, // 3 minutes timeout instead of 5 minutes
             success: (res) => {
               // Clear any remaining interval
               if (this.progressInterval) {
@@ -1105,14 +1145,36 @@ export default {
                     throw new Error('Unexpected response format');
                   }
                   
+                  // Clear existing stored images before saving new content
+                  this.clearStoredImages();
+                  
                   // Store the response in local storage
                   uni.setStorageSync('latest_7_overall_page', jsonContent);
                   uni.removeStorageSync('projectDescription');
                   uni.removeStorageSync('selectedDevice');
                   uni.removeStorageSync('numPages');
                   
+                  // Set flag to force regeneration of images
+                  uni.setStorageSync('force_regeneration', 'true');
+                  
                   // Save to cloud database
-                  this.saveProjectToCloud();
+                  this.saveProjectToCloud(jsonContent);
+                  
+                  // Load the new templates and reset loading states
+                  this.$nextTick(() => {
+                    this.loadJsonTemplates();
+                    this.updateLoadingStates();
+                    
+                    // Force generation of new preview images
+                    setTimeout(() => {
+                      this.generatePreviewImages();
+                    }, 100); // Reduced from 300ms
+                    
+                    // Complete refresh after a delay to ensure everything is loaded
+                    setTimeout(() => {
+                      this.refreshTemplates();
+                    }, 500); // Reduced from 1000ms
+                  });
                 } catch (e) {
                   this.errorMessage = 'Failed to process generated page data';
                   uni.showToast({
@@ -1664,8 +1726,8 @@ export default {
       // Check if the color is a valid hex color
       return /^#([0-9A-F]{3}){1,2}$/i.test(color);
     },
-    saveProjectToCloud() {
-      const content = uni.getStorageSync('latest_7_overall_page');
+    saveProjectToCloud(content) {
+      // const content = uni.getStorageSync('latest_7_overall_page');
       // Get user ID
       const userId = uni.getStorageSync('uid');
       if (!userId) {
@@ -1701,6 +1763,52 @@ export default {
       }).catch(err => {
         console.error('Cloud function error:', err);
       });
+    },
+    // Add a new method to fully refresh templates
+    refreshTemplates() {
+      console.log('Refreshing templates completely');
+      
+      // Reset all loading states
+      this.templatesLoading = true;
+      this.proposalsLoading = true;
+      
+      // Reset all template loading states
+      Object.keys(this.templateLoadingStates).forEach(key => {
+        this.$set(this.templateLoadingStates, key, true);
+      });
+      
+      // Reset all proposal loading states
+      Object.keys(this.proposalLoadingStates).forEach(key => {
+        this.$set(this.proposalLoadingStates, key, true);
+      });
+      
+      // Reload JSON templates
+      this.loadJsonTemplates();
+      
+      // Generate new preview images
+      this.generatePreviewImages();
+      
+      // Start revealing templates with staggered timing - REDUCED TIMES
+      const keys = Object.keys(this.templateLoadingStates);
+      keys.forEach((key, index) => {
+        setTimeout(() => {
+          this.$set(this.templateLoadingStates, key, false);
+          if (index === keys.length - 1) {
+            this.templatesLoading = false;
+          }
+        }, 500 + (index * 100)); // Reduced from 1500ms + 300ms per item
+      });
+      
+      // For proposals, reveal with staggered timing - REDUCED TIMES
+      const proposalKeys = Object.keys(this.proposalLoadingStates);
+      proposalKeys.forEach((key, index) => {
+        setTimeout(() => {
+          this.$set(this.proposalLoadingStates, key, false);
+          if (index === proposalKeys.length - 1) {
+            this.proposalsLoading = false;
+          }
+        }, 700 + (index * 100)); // Reduced from 2200ms + 300ms per item
+      });
     }
   }
 }
@@ -1713,6 +1821,7 @@ export default {
   mounted() {
     // Listen for capture-element events
     uni.$on('capture-element', this.captureElement);
+    console.log('Renderjs module mounted, html2canvas ready');
   },
   
   beforeDestroy() {
@@ -1726,12 +1835,12 @@ export default {
       setTimeout(() => {
         const dom = document.getElementById(elementId);
         if (!dom) {
-          // console.error(`Element not found: ${elementId}`);   
+          console.error(`Element not found: ${elementId}`);   
           uni.$emit('capture-error', { element: elementId, error: 'Element not found' });
           return;
         }
         
-        // console.log(`Capturing element: ${elementId}`);
+        console.log(`Capturing element: ${elementId}`);
         
         html2canvas(dom, {
           width: dom.clientWidth,
@@ -1739,16 +1848,22 @@ export default {
           scrollY: 0,
           scrollX: 0,
           useCORS: true,
-          scale: 2 // Higher quality
+          scale: 1.5, // Reduced from 2 for faster rendering
+          logging: false, // Disable logging for performance
+          backgroundColor: null, // Transparent background
+          imageTimeout: 0, // No timeout for images
+          allowTaint: true, // Allow tainted canvas for better performance
+          removeContainer: true // Clean up after rendering
         }).then((canvas) => {
-          const imageData = canvas.toDataURL('image/png');
+          const imageData = canvas.toDataURL('image/png', 0.85); // Added compression for faster processing
           // Send the image data back to the Vue component
           uni.$emit('image-captured', { element: elementId, imageData });
+          console.log(`Successfully captured ${elementId}`);
         }).catch(err => {
-          // console.error(`Failed to generate image for ${elementId}:`, err);
+          console.error(`Failed to generate image for ${elementId}:`, err);
           uni.$emit('capture-error', { element: elementId, error: err.toString() });
         });
-      }, 100);
+      }, 50); // Reduced from 100ms
     }
   }
 }
