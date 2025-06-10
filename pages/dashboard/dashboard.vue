@@ -53,9 +53,26 @@
         </view>
 
         <view class="projects-grid">
+          <!-- User Projects -->
+          <template v-if="Array.isArray(userProjects) && userProjects.length > 0">
+            <x-skeleton v-for="(project, index) in userProjects" :key="'user-project-' + index" type="banner"
+              :loading="false">
+              <view class="project-card" @click="jumpToDesign(project)">
+                <image class="project-image"
+                  src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(3).png"
+                  mode="aspectFill">
+                </image>
+                <view class="project-content">
+                  <text class="project-title">{{ project.projectTitle }}</text>
+                  <text class="project-description">{{ project.projectDescription }}</text>
+                </view>
+              </view>
+            </x-skeleton>
+          </template>
+
           <!-- Project Alpha -->
           <x-skeleton type="banner" :loading="projectLoadingStates.alpha">
-            <view class="project-card" @click="jumpToDesign">
+            <view class="project-card" @click="jumpToDesign()">
               <image class="project-image"
                 src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(1).png"
                 mode="aspectFill">
@@ -70,7 +87,7 @@
 
           <!-- Project Beta -->
           <x-skeleton type="banner" :loading="projectLoadingStates.beta">
-            <view class="project-card" @click="jumpToDesign">
+            <view class="project-card" @click="jumpToDesign()">
               <image class="project-image"
                 src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(2).png"
                 mode="aspectFill">
@@ -85,7 +102,7 @@
 
           <!-- Project Gamma -->
           <x-skeleton type="banner" :loading="projectLoadingStates.gamma">
-            <view class="project-card" @click="jumpToDesign">
+            <view class="project-card" @click="jumpToDesign()">
               <image class="project-image"
                 src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(3).png"
                 mode="aspectFill">
@@ -97,23 +114,6 @@
               </view>
             </view>
           </x-skeleton>
-
-          <!-- User Projects -->
-          <template v-if="Array.isArray(userProjects) && userProjects.length > 0">
-            <x-skeleton v-for="(project, index) in userProjects" :key="'user-project-' + index" type="banner"
-              :loading="false">
-              <view class="project-card" @click="jumpToDesign">
-                <image class="project-image"
-                  src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(3).png"
-                  mode="aspectFill">
-                </image>
-                <view class="project-content">
-                  <text class="project-title">{{ project.projectTitle }}</text>
-                  <text class="project-description">{{ project.projectDescription }}</text>
-                </view>
-              </view>
-            </x-skeleton>
-          </template>
         </view>
       </view>
 
@@ -369,13 +369,62 @@ export default {
         // this.refreshProjects();
       }
     },
-    jumpToDesign() {
-      // Clear any existing project data to start fresh
-      // uni.removeStorageSync('latest_7_overall_page');
-      // uni.removeStorageSync('currentProjectId');
-
-      uni.switchTab({
-        url: '/pages/design/design'
+    jumpToDesign(project) {
+      // If no project is provided (for default projects), just navigate to design page
+      if (!project) {
+        uni.switchTab({
+          url: '/pages/design/design'
+        });
+        return;
+      }
+      
+      // Get the project id
+      const projectId = project._id;
+      
+      if (!projectId) {
+        uni.showToast({
+          title: 'Invalid project',
+          icon: 'none'
+        });
+        return;
+      }
+      
+      uni.showLoading({
+        title: 'Loading project data...'
+      });
+      
+      // Call the generated-overall-pages cloud function to get the project data
+      uniCloud.callFunction({
+        name: 'generated-overall-pages',
+        data: {
+          action: 'read',
+          id: projectId
+        }
+      }).then(res => {
+        uni.hideLoading();
+        
+        if (res.result && res.result.success && res.result.data) {
+          // Store the project data in local storage
+          uni.setStorageSync('latest_7_overall_page', res.result.data);
+          uni.setStorageSync('currentProjectId', projectId);
+          
+          // Navigate to design page
+          uni.switchTab({
+            url: '/pages/design/design'
+          });
+        } else {
+          uni.showToast({
+            title: 'Failed to load project data',
+            icon: 'none'
+          });
+        }
+      }).catch(err => {
+        uni.hideLoading();
+        uni.showToast({
+          title: 'Error loading project data',
+          icon: 'none'
+        });
+        console.error('Cloud function error:', err);
       });
     },
     openCreateProjectDialog() {
