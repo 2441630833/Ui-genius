@@ -656,9 +656,8 @@ export default {
       if (this.shouldGenerateUI &&
         !uni.getStorageSync('latest_7_overall_page') &&
         uni.getStorageSync('projectDescription')) {
-        // Clear the flag after using it
-        uni.removeStorageSync('shouldGenerateUI');
-        this.generateUI();
+        await this.generateUI();
+        uni.setStorageSync('shouldGenerateUI', 'false');
       } else {
         // If we already have JSON data, load it
         this.loadJsonTemplates();

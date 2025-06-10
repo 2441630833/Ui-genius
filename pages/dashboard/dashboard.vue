@@ -514,11 +514,11 @@ export default {
       await uni.removeStorageSync('uigenius_image_notification');
 
 
-      uni.setStorageSync('projectDescription', this.projectDescription);
-      uni.setStorageSync('selectedDevice', this.selectedDevice);
-      uni.setStorageSync('numPages', this.numPages);
+      await uni.setStorageSync('projectDescription', this.projectDescription);
+      await uni.setStorageSync('selectedDevice', this.selectedDevice);
+      await uni.setStorageSync('numPages', this.numPages);
       // Set flag to indicate we should generate UI when design page loads
-      uni.setStorageSync('shouldGenerateUI', 'true');
+      await uni.setStorageSync('shouldGenerateUI', 'true');
       this.closeCreateProjectDialog();
       uni.switchTab({
         url: '/pages/design/design'
