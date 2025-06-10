@@ -114,18 +114,36 @@ export default {
   },
   methods: {
     skipLogin() {
-      setTokenWithExpiration(this.fakeToken)
-      // Navigate to dashboard after successful login
-      uni.switchTab({
-        url: '/pages/dashboard/dashboard'
-      })
+      const token = uni.getStorageSync('token');
+      const hasValidToken = token && !isTokenExpired();
+      if (hasValidToken) {
+        uni.switchTab({
+          url: '/pages/dashboard/dashboard'
+        })
+        return
+      }
+      else {
+        uni.setStorageSync('isSkipLogin', true)
+        setTokenWithExpiration(this.fakeToken)
+        // Navigate to dashboard after successful login
+        uni.switchTab({
+          url: '/pages/dashboard/dashboard'
+        })
 
-      uni.showToast({
-        title: 'Login successful',
-        icon: 'success'
-      })
+        uni.showToast({
+          title: 'Login successful',
+          icon: 'success'
+        })
+      }
+
     },
     login() {
+      if (uni.getStorageSync('isSkipLogin')) {
+        uni.removeStorageSync('isSkipLogin')
+        uni.removeStorageSync('token')
+        uni.removeStorageSync('tokenExpiration')
+        return
+      }
       // Check if user already has a valid token
       const token = uni.getStorageSync('token');
       const hasValidToken = token && !isTokenExpired();
