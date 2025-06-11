@@ -78,7 +78,9 @@
     },
     "dependencies": {
         "@grapesjs/studio-sdk": "^1.0.45",
-        "@grapesjs/studio-sdk-plugins": "^1.0.21"
+        "@grapesjs/studio-sdk-plugins": "^1.0.21",
+        "file-saver": "^2.0.5",
+        "jszip": "^3.10.1"
     },
     "devDependencies": {
         "html2canvas": "^1.4.1"
