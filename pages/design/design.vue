@@ -278,7 +278,7 @@
             <text class="button-text">Comments</text>
           </view> -->
           <view class="tool-button">
-            <text class="button-text">Share</text>
+            <text class="button-text" @click="shareProject">Share</text>
           </view>
           <!-- <view class="tool-button">
             <text class="button-text">Export</text>
@@ -815,6 +815,18 @@ export default {
   },
 
   methods: {
+    shareProject() {
+      uni.showToast({ 
+        title: 'This feature is developing, please wait for the update',
+        icon: 'none',
+        duration: 2000
+      });
+      // Share the project
+      // uni.share({
+      //   title: 'Share Project',
+      //   path: '/pages/design/design',
+      // });
+    },
     exportProject() {
       // Show custom action sheet instead of uni.showActionSheet
       this.showCustomActionSheet = true;
@@ -4005,13 +4017,18 @@ export default {
 }
 
 .try-example-btn {
-  padding: 10px 20px;
-  border: none;
-  border-radius: 25px;
-  cursor: pointer;
   background-color: #e53935;
-  color: white;
-  font-weight: 500;
+  color: #fff;
+  margin-right: 0px;
+  border: none;
+  border-radius: 10px;
+  cursor: pointer;
+  font-size: 16px;
+  border-radius: 5px;
+
+  &:hover {
+    background-color: #d32f2f;
+  }
 }
 
 .description-container {
@@ -4045,15 +4062,16 @@ export default {
   border: none;
   border-radius: 10px;
   padding: 14px 20px;
-  font-size: 16px;
+  font-size: 18px;
   font-weight: 500;
+  height: 50px;
   width: 100%;
   display: flex;
   align-items: center;
   justify-content: center;
   cursor: pointer;
   transition: background-color 0.2s;
-  
+
   &:hover {
     background-color: #d32f2f;
   }
