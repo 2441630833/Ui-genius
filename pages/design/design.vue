@@ -2946,6 +2946,14 @@ export default {
       this.pageDescription = this.examplePageDescription;
     },
     createPage() {
+      // temporary return and show toast the back end is constructing within 1 week, please wait
+      this.showCreatePageDialog = false;
+      uni.showToast({
+        title: 'This feature is under construction, will be available within 1 week, please wait',
+        icon: 'none',
+        duration: 2000
+      });
+      return;
       // Validate the page description
       if (!this.pageDescription) {
         this.errorMessage = 'Please enter a page description';

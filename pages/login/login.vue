@@ -289,7 +289,7 @@ export default {
       // Google OAuth client ID
       window.clientId = '137524279748-rg43jumis252rh8odausn13glj64nmit.apps.googleusercontent.com'
       // Redirect URI
-      window.redirectUri = 'http://localhost:5173'
+      window.redirectUri = 'https://uigenius.top'
       // Requested scopes
       window.scope = 'email profile'
       // CSRF protection state
@@ -336,128 +336,15 @@ export default {
         uni.hideLoading();
         return;
       }
-
-      // #ifdef H5
-      const tokenEndpoint = 'https://oauth2.googleapis.com/token'
-      const requestBody = new URLSearchParams()
-      requestBody.append('code', code)
-      requestBody.append('client_id', '137524279748-rg43jumis252rh8odausn13glj64nmit.apps.googleusercontent.com')
-      requestBody.append('client_secret', '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')
-      requestBody.append('redirect_uri', 'http://localhost:5173')
-      requestBody.append('grant_type', 'authorization_code')
-
-      fetch(tokenEndpoint, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/x-www-form-urlencoded',
-        },
-        body: requestBody
-      })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`Token request failed: ${response.status} ${response.statusText}`);
-          }
-          return response.json();
-        })
-        .then(data => {
-          if (!data.access_token) {
-            throw new Error('No access token received from Google');
-          }
-
-          const googleToken = data.access_token
-
-          return fetch('https://www.googleapis.com/oauth2/v2/userinfo', {
-            headers: {
-              Authorization: `Bearer ${googleToken}`
-            }
-          })
-        })
-        .then(response => {
-          if (!response.ok) {
-            throw new Error(`User info request failed: ${response.status} ${response.statusText}`);
-          }
-          return response.json();
-        })
-        .then(userInfo => {
-          this.googleName = userInfo.name
-          this.googlePic = userInfo.picture
-          this.googleEmail = userInfo.email
-          uni.setStorageSync('email', userInfo.email)
-          console.log('User Info:', userInfo)
-
-          // Debug log to check exactly what's in userInfo
-          console.log('User ID:', userInfo.id)
-          console.log('User Email:', userInfo.email)
-          console.log('User Name:', userInfo.name)
-          console.log('User Picture:', userInfo.picture)
-          console.log('User Given Name:', userInfo.given_name)
-          console.log('User Family Name:', userInfo.family_name)
-          console.log('User Email Verified:', userInfo.verified_email)
-
-          // Create Google info object
-          const googleInfo = {
-            id: userInfo.id,
-            name: userInfo.name,
-            email: userInfo.email,
-            picture: userInfo.picture,
-            given_name: userInfo.given_name,
-            family_name: userInfo.family_name,
-            verified_email: userInfo.verified_email
-          }
-
-          console.log('Google Info Object:', googleInfo)
-
-          // Store Google user info to uni-id-co
-          console.log('About to call loginByGoogle with direct params')
-          uniIdCo.loginByGoogle(googleInfo).then(result => {
-            console.log('Google login success:', result)
-            // Login success, store token
-            this.googleLoginSuccess(result)
-          }).catch(err => {
-            console.error('Error storing Google user info:', err)
-            console.error('Error details:', err.message || err)
-
-            // If direct params failed, try with nested params
-            console.log('Retrying with nested params')
-            uniIdCo.loginByGoogle({ googleInfo }).then(result => {
-              console.log('Google login success with nested params:', result)
-              this.googleLoginSuccess(result)
-            }).catch(nestedErr => {
-              console.error('Error with nested params too:', nestedErr)
-              uni.showToast({
-                title: 'Failed to login with Google',
-                icon: 'none',
-                duration: 3000
-              })
-              uni.hideLoading()
-            })
-          })
-        })
-        .catch(error => {
-          // console.error('Error during authentication:', error)
-          // uni.showToast({
-          //   title: 'Google login failed: ' + error.message,
-          //   icon: 'none',
-          //   duration: 3000
-          // })
-          uni.hideLoading()
-        })
-      // #endif
-
-      // #ifndef H5
-      // 非 H5 环境下，使用 uni.request 代替 fetch
       // 获取 access_token
       uni.request({
         url: 'https://oauth2.googleapis.com/token',
         method: 'POST',
-        header: {
-          'Content-Type': 'application/x-www-form-urlencoded'
-        },
         data: {
           code: code,
           client_id: '137524279748-rg43jumis252rh8odausn13glj64nmit.apps.googleusercontent.com',
           client_secret: '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',
-          redirect_uri: 'http://localhost:5173',
+          redirect_uri: 'https://uigenius.top',
           grant_type: 'authorization_code'
         },
         success: (tokenRes) => {
@@ -564,7 +451,7 @@ export default {
           uni.hideLoading();
         }
       });
-      // #endif
+
     }
   },
   // 添加 onLoad 生命周期钩子，确保在小程序环境下也能正确获取参数
