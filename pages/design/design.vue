@@ -452,6 +452,106 @@
         <view class="custom-action-sheet-cancel" @click="closeCustomActionSheet">Cancel</view>
       </view>
     </view>
+
+    <!-- Create New Page Dialog -->
+    <view class="dialog-overlay" v-if="showCreatePageDialog" @click="closeCreatePageDialog">
+      <view class="dialog-container" @click.stop>
+        <view class="dialog-content">
+          <text class="dialog-title">Create a New Page</text>
+
+          <!-- Error notification -->
+          <view class="error-notification" v-if="errorMessage">
+            <text>{{ errorMessage }}</text>
+          </view>
+
+          <view class="try-example-container">
+            <text class="description-label">Describe your page in plain English</text>
+            <button class="try-example-btn" @click="tryPageExample">Try example</button>
+          </view>
+          <view class="description-container">
+            <textarea class="project-description-input" placeholder="Enter your page description"
+              v-model="pageDescription" maxlength="300"></textarea>
+            <text class="char-count">{{ pageDescription.length }}/300</text>
+          </view>
+
+          <button class="continue-btn" @click="createPage">Continue</button>
+        </view>
+      </view>
+    </view>
+
+    <!-- Color Palette Overlay -->
+    <view v-if="showColorPalette" class="color-palette-overlay">
+      <view class="color-palette-container">
+        <text class="color-palette-title" style="display: block;">Select Theme Color For Your Project</text>
+
+        <!-- Error message area -->
+        <view v-if="colorPaletteError" class="color-palette-error">
+          <text class="error-text">{{ colorPaletteError }}</text>
+        </view>
+
+        <!-- Neutral Colors Row -->
+        <view class="color-palette-row">
+          <view v-for="(color, index) in neutralColors" :key="'neutral-' + index" class="color-swatch"
+            :style="{ backgroundColor: color.hex }" :class="{ 'selected': selectedColor === color.hex }"
+            @click="selectColor(color.hex)">
+            <text v-if="selectedColor === color.hex" class="color-check">✓</text>
+            <text class="color-hex">{{ color.hex }}</text>
+          </view>
+        </view>
+
+        <!-- Pastel Colors Row -->
+        <view class="color-palette-row">
+          <view v-for="(color, index) in pastelColors" :key="'pastel-' + index" class="color-swatch"
+            :style="{ backgroundColor: color.hex }" :class="{ 'selected': selectedColor === color.hex }"
+            @click="selectColor(color.hex)">
+            <text v-if="selectedColor === color.hex" class="color-check">✓</text>
+            <text class="color-hex">{{ color.hex }}</text>
+          </view>
+        </view>
+
+        <!-- Warm Colors Row -->
+        <view class="color-palette-row">
+          <view v-for="(color, index) in warmColors" :key="'warm-' + index" class="color-swatch"
+            :style="{ backgroundColor: color.hex }" :class="{ 'selected': selectedColor === color.hex }"
+            @click="selectColor(color.hex)">
+            <text v-if="selectedColor === color.hex" class="color-check">✓</text>
+            <text class="color-hex">{{ color.hex }}</text>
+          </view>
+        </view>
+
+        <!-- Cool Colors Row -->
+        <view class="color-palette-row">
+          <view v-for="(color, index) in coolColors" :key="'cool-' + index" class="color-swatch"
+            :style="{ backgroundColor: color.hex }" :class="{ 'selected': selectedColor === color.hex }"
+            @click="selectColor(color.hex)">
+            <text v-if="selectedColor === color.hex" class="color-check">✓</text>
+            <text class="color-hex">{{ color.hex }}</text>
+          </view>
+        </view>
+
+        <!-- Custom color input -->
+        <view class="color-input-container">
+          <text class="color-input-label">Custom Color:</text>
+          <input type="text" v-model="customColor" class="color-input" placeholder="#RRGGBB"
+            @input="validateColorInput" />
+          <view class="color-preview-swatch"
+            :style="{ backgroundColor: isValidColor(customColor) ? customColor : '#cccccc' }"
+            :class="{ 'selected': customColor && isValidColor(customColor) && !selectedColor }"></view>
+        </view>
+
+        <!-- Simplified Preview section - only button -->
+        <!-- <view class="color-preview-section">
+          <text class="preview-label">Preview:</text>
+          <view class="preview-button" :style="{ backgroundColor: previewColor }">Button</view>
+        </view> -->
+
+        <view class="color-actions">
+          <button class="color-confirm" :style="{ backgroundColor: previewColor, color: '#ffffff' }"
+            @click="confirmColorSelection">Apply Theme</button>
+          <button class="color-cancel" @click="cancelColorSelection">Cancel</button>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -556,7 +656,10 @@ export default {
       
       // Custom action sheet properties
       showCustomActionSheet: false,
-      actionSheetOptions: ['Export as Images', 'Export as HTML', 'Export as Vue 2', 'Export as Vue 3', 'Export as React'],
+              actionSheetOptions: ['Export as Images', 'Export as HTML', 'Export as Vue 2', 'Export as Vue 3', 'Export as React'],
+        showCreatePageDialog: false,
+        pageDescription: '',
+        examplePageDescription: 'A modern contact page with a form and interactive map, including name, email, and message fields',
     }
   },
 
@@ -2019,6 +2122,13 @@ export default {
           this.previewColor = this.coolColors[0].hex;
         }
       }
+      
+      // Show create new page dialog if plus nav item is clicked
+      if (item === 'plus') {
+        this.showCreatePageDialog = true;
+        this.pageDescription = '';
+        this.errorMessage = '';
+      }
     },
     selectTemplate(template) {
       this.selectedTemplate = template;
@@ -2823,7 +2933,145 @@ export default {
         });
         console.error(`Error exporting ${framework} code:`, error);
       }
-    }
+    },
+         tryPageExample() {
+       this.pageDescription = this.examplePageDescription;
+     },
+         createPage() {
+       // Validate the page description
+       if (!this.pageDescription) {
+         this.errorMessage = 'Please enter a page description';
+         return;
+       }
+       
+       // Clear error message when validation passes
+       this.errorMessage = '';
+       
+       // Show generation progress overlay
+       this.isGenerating = true;
+       this.generationProgress = 0;
+       
+       // Set up progress interval
+       const progressInterval = setInterval(() => {
+         if (this.generationProgress < 90) {
+           this.generationProgress += 5;
+         }
+       }, 1000);
+       
+       // Get existing project data
+       const existingProjectData = uni.getStorageSync('latest_7_overall_page');
+       let projectData;
+       
+       if (existingProjectData) {
+         // Use existing project data if available
+         projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
+       } else {
+         // Create new project data structure if none exists
+         projectData = {
+           pages: [],
+           AIProjectDescription: 'My Project',
+           AIProjectName: 'UI Genius Project',
+           themeColor: '#F5CEC7'
+         };
+       }
+       
+               // Call the API to generate the new page
+       
+       // Prepare form data for uni.request
+       const formData = {
+         prompt: this.pageDescription,
+         device_type: uni.getStorageSync('selectedDevice') || 'desktop',
+       };
+       
+       // Make the API call using uni.request instead of fetch
+       uni.request({
+         url: `${API_BASE_URL}/api/generate-ui`,
+         method: 'POST',
+         data: formData,
+         success: (response) => {
+           // Stop the progress interval
+           clearInterval(progressInterval);
+           this.generationProgress = 100;
+           
+           // Handle successful response
+           if (response.statusCode !== 200) {
+             // Handle API error
+             this.isGenerating = false;
+             this.showCreatePageDialog = false;
+             uni.showToast({
+               title: 'API error: ' + response.statusCode,
+               icon: 'none',
+               duration: 2000
+             });
+             return;
+           }
+           
+           const data = response.data;
+         
+         // Process the generated page
+         if (data && data.pages && data.pages.length > 0) {
+           // Add the generated page to the existing project
+           const newPage = data.pages[0];
+           
+           // Rename the page if needed
+           if (!newPage.name.toLowerCase().includes('page')) {
+             newPage.name = newPage.name + ' Page';
+           }
+           
+           // Add the new page to the project
+           projectData.pages.push(newPage);
+           
+           // Save the updated project data
+           uni.setStorageSync('latest_7_overall_page', projectData);
+           
+           // Save project to the cloud if logged in
+           this.saveProjectToCloud(projectData);
+           
+           // Hide generation overlay
+           setTimeout(() => {
+             this.isGenerating = false;
+             this.showCreatePageDialog = false;
+             
+             // Refresh templates to show the new page
+             this.refreshTemplates();
+             
+             // Show success message
+             uni.showToast({
+               title: 'New page created successfully!',
+               icon: 'success',
+               duration: 2000
+             });
+           }, 1000);
+         } else {
+           // Handle error
+           this.isGenerating = false;
+           this.showCreatePageDialog = false;
+           uni.showToast({
+             title: 'Failed to generate page',
+             icon: 'none',
+             duration: 2000
+           });
+         }
+         },
+         fail: (error) => {
+           // Stop the progress interval
+           clearInterval(progressInterval);
+           
+           // Handle error
+           console.error('Error generating page:', error);
+           this.isGenerating = false;
+           this.showCreatePageDialog = false;
+           uni.showToast({
+             title: 'Error generating page',
+             icon: 'none',
+             duration: 2000
+           });
+         }
+       });
+     },
+    closeCreatePageDialog() {
+      this.showCreatePageDialog = false;
+    },
   }
 }
 </script>
@@ -3707,6 +3955,107 @@ export default {
   }
   to {
     transform: translateY(0);
+  }
+}
+
+/* Create New Page Dialog Styles */
+.dialog-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1002;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.dialog-container {
+  background-color: white;
+  border-radius: 10px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 500px;
+  padding: 30px;
+  position: relative;
+}
+
+.dialog-title {
+  font-size: 20px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.error-notification {
+  background-color: #ffebee;
+  border-radius: 8px;
+  border: 1px solid #ffcdd2;
+  padding: 12px 15px;
+  margin-bottom: 20px;
+}
+
+.try-example-container {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 20px;
+}
+
+.try-example-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 25px;
+  cursor: pointer;
+  background-color: #e53935;
+  color: white;
+  font-weight: 500;
+}
+
+.description-container {
+  position: relative;
+  margin-bottom: 20px;
+}
+
+.description-label {
+  font-size: 14px;
+  color: #333;
+  margin-right: 10px;
+}
+
+.project-description-input {
+  width: 100%;
+  height: 100px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 10px;
+}
+
+.char-count {
+  font-size: 12px;
+  color: #999;
+}
+
+.continue-btn {
+  background-color: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: #d32f2f;
   }
 }
 </style>
