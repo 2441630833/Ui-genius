@@ -103,7 +103,7 @@ export default {
             dialogComponent
           ],
           onReady: editor => {
-            editor.setDevice('Mobile portrait');
+            editor.setDevice('Desktop');
           },
           // gjsOptions: {
           //   deviceManager: { default: 'mobilePortrait' }
