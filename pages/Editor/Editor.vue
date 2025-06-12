@@ -1,16 +1,16 @@
 <template>
   <div id="app">
-  <GrapesEditor />
+  <Editor />
   </div>
   </template>
   
   <script>
-  import GrapesEditor from '../../component/grapesEditor.vue';
+  import Editor from '../../component/Editor.vue';
   
   export default {
   name: 'App',
   components: {
-  GrapesEditor,
+  Editor,
   },
   };
   </script>

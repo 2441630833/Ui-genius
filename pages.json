@@ -29,7 +29,7 @@
             }
         },
         {
-            "path": "pages/grapesEditor/grapesEditor",
+            "path": "pages/Editor/Editor",
             "style": {
                 "navigationBarTitleText": "%index.editor%",
                 "enablePullDownRefresh": false
@@ -61,7 +61,7 @@
                 "text": "%index.design%"
             },
             {
-                "pagePath": "pages/grapesEditor/grapesEditor",
+                "pagePath": "pages/Editor/Editor",
                 "text": "%index.editor%"
             }
         ]
