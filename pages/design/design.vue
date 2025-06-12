@@ -441,12 +441,8 @@
     <view v-if="showCustomActionSheet" class="custom-action-sheet-overlay" @click="closeCustomActionSheet">
       <view class="custom-action-sheet" @click.stop>
         <view class="custom-action-sheet-title">Export Options</view>
-        <view 
-          v-for="(option, index) in actionSheetOptions" 
-          :key="index" 
-          class="custom-action-sheet-item"
-          @click="handleActionSheetSelection(index)"
-        >
+        <view v-for="(option, index) in actionSheetOptions" :key="index" class="custom-action-sheet-item"
+          @click="handleActionSheetSelection(index)">
           {{ option }}
         </view>
         <view class="custom-action-sheet-cancel" @click="closeCustomActionSheet">Cancel</view>
@@ -653,13 +649,13 @@ export default {
       exportLoading: false,
       exportError: '',
       isExporting: false, // Add flag to prevent multiple simultaneous exports
-      
+
       // Custom action sheet properties
       showCustomActionSheet: false,
-              actionSheetOptions: ['Export as Images', 'Export as HTML', 'Export as Vue 2', 'Export as Vue 3', 'Export as React'],
-        showCreatePageDialog: false,
-        pageDescription: '',
-        examplePageDescription: 'A modern contact page with a form and interactive map, including name, email, and message fields',
+      actionSheetOptions: ['Export as Images', 'Export as HTML', 'Export as Vue 2', 'Export as Vue 3', 'Export as React'],
+      showCreatePageDialog: false,
+      pageDescription: '',
+      examplePageDescription: 'A modern contact page with a form and interactive map, including name, email, and message fields',
     }
   },
 
@@ -816,7 +812,7 @@ export default {
 
   methods: {
     shareProject() {
-      uni.showToast({ 
+      uni.showToast({
         title: 'This feature is developing, please wait for the update',
         icon: 'none',
         duration: 2000
@@ -831,18 +827,18 @@ export default {
       // Show custom action sheet instead of uni.showActionSheet
       this.showCustomActionSheet = true;
     },
-    
+
     closeCustomActionSheet() {
       this.showCustomActionSheet = false;
     },
-    
+
     handleActionSheetSelection(index) {
       this.closeCustomActionSheet();
-      
+
       const exportTypes = ['images', 'html', 'vue2', 'vue3', 'react'];
       this.exportType = exportTypes[index];
-      
-      switch(this.exportType) {
+
+      switch (this.exportType) {
         // case 'images':
         //   console.log(this.exportType);
         case 'images':
@@ -870,26 +866,26 @@ export default {
         });
         return;
       }
-      
+
       this.isExporting = true;
-      
+
       // Show loading toast
       uni.showLoading({
         title: 'Preparing images...',
         mask: true
       });
-      
+
       try {
         // Define image keys to export
         const imageKeys = [
-          'signup', 'home', 'notification', 'profile', 
+          'signup', 'home', 'notification', 'profile',
           'settings', 'login', 'dashboard'
         ];
-        
+
         // Check if we have any images in storage
         let hasImages = false;
         const imagesToExport = [];
-        
+
         await imageKeys.forEach(async key => {
           const imageData = uni.getStorageSync(`uigenius_image_${key}`);
           if (imageData) {
@@ -900,7 +896,7 @@ export default {
             });
           }
         });
-        
+
         if (!hasImages) {
           uni.hideLoading();
           uni.showToast({
@@ -929,12 +925,12 @@ export default {
         this.isExporting = false;
       }
     },
-    
+
     exportImagesMobile(images) {
       try {
         // For mobile platforms, save images one by one to downloads folder
         let savedCount = 0;
-        
+
         const saveNext = (index) => {
           if (index >= images.length) {
             uni.hideLoading();
@@ -946,14 +942,14 @@ export default {
             this.isExporting = false; // Reset export flag when done
             return;
           }
-          
+
           const image = images[index];
           const filePath = `${uni.env.USER_DATA_PATH}/${image.key}.png`;
-          
+
           // Convert base64 to file and save
           const fs = uni.getFileSystemManager();
           const buffer = uni.base64ToArrayBuffer(image.data.split(',')[1]);
-          
+
           fs.writeFile({
             filePath: filePath,
             data: buffer,
@@ -978,7 +974,7 @@ export default {
             }
           });
         };
-        
+
         saveNext(0);
       } catch (error) {
         uni.hideLoading();
@@ -991,7 +987,7 @@ export default {
         this.isExporting = false; // Reset export flag on error
       }
     },
-    
+
     async exportImagesWeb(images) {
       try {
         // Use the imported JSZip and saveAs
@@ -1007,13 +1003,13 @@ export default {
           this.isExporting = false;
           return;
         }
-        
+
         console.log(`Exporting ${images.length} images to a single zip file`);
-        
+
         // Create a single zip file with all images
         const zip = new JSZip();
         let imagesFolder = zip.folder("ui_genius_images");
-        
+
         // Convert all images to blobs and add them to the zip
         for (let i = 0; i < images.length; i++) {
           const image = images[i];
@@ -1024,25 +1020,25 @@ export default {
             const raw = window.atob(parts[1]);
             const rawLength = raw.length;
             const uInt8Array = new Uint8Array(rawLength);
-            
+
             for (let j = 0; j < rawLength; ++j) {
               uInt8Array[j] = raw.charCodeAt(j);
             }
-            
+
             const blob = new Blob([uInt8Array], { type: contentType });
             imagesFolder.file(`${image.key}.png`, blob);
-            console.log(`Added ${image.key}.png to zip (${i+1}/${images.length})`);
+            console.log(`Added ${image.key}.png to zip (${i + 1}/${images.length})`);
           } catch (error) {
             console.error(`Error processing image ${image.key}:`, error);
           }
         }
-        
+
         // Generate and save the zip
         // console.log('Generating zip file...');
-        const content = await zip.generateAsync({type: "blob"});
+        const content = await zip.generateAsync({ type: "blob" });
         // console.log('Zip generated, saving file...');
         saveAs(content, "ui_genius_images.zip");
-        
+
         uni.hideLoading();
         uni.showToast({
           title: 'Images exported successfully!',
@@ -1063,7 +1059,7 @@ export default {
         this.isExporting = false;
       }
     },
-    
+
     exportImagesIndividually(images) {
       // Fallback method to download images one by one
       uni.showToast({
@@ -1071,7 +1067,7 @@ export default {
         icon: 'none',
         duration: 2000
       });
-      
+
       images.forEach(image => {
         try {
           const a = document.createElement('a');
@@ -1085,14 +1081,14 @@ export default {
         }
       });
     },
-    
+
     exportHTML() {
       // Show loading toast
       uni.showLoading({
         title: 'Preparing HTML...',
         mask: true
       });
-      
+
       try {
         // Get project data from storage
         const jsonData = uni.getStorageSync('latest_7_overall_page');
@@ -1105,10 +1101,10 @@ export default {
           });
           return;
         }
-        
+
         // Parse the JSON data
         const projectData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
-        
+
         // Extract page components
         if (!projectData.pages || !projectData.pages.length) {
           uni.hideLoading();
@@ -1119,13 +1115,13 @@ export default {
           });
           return;
         }
-        
+
         // For mobile, save to file directly
         if (uni.getSystemInfoSync().platform !== 'web') {
           this.exportHTMLMobile(projectData);
           return;
         }
-        
+
         // For web, try to create a zip file using the imported libraries
         try {
           // Use the imported JSZip and saveAs
@@ -1134,12 +1130,12 @@ export default {
             this.exportHTMLSimple(projectData);
             return;
           }
-          
+
           const zip = new JSZip();
-          
+
           // Project name for zip file name
           const projectName = projectData.AIProjectName || 'ui_genius_project';
-          
+
           // Basic HTML template
           const htmlTemplate = (title, content) => `<!DOCTYPE html>
 <html lang="en">
@@ -1159,24 +1155,24 @@ export default {
   ${content}
 </body>
 </html>`;
-          
+
           // Create an index.html with links to all pages
           let indexContent = `<div style="max-width: 800px; margin: 0 auto; padding: 20px;">
   <h1 style="color: var(--theme-color); margin-bottom: 20px;">${projectName}</h1>
   <p style="margin-bottom: 20px;">${projectData.AIProjectDescription || ''}</p>
   <h2 style="margin-bottom: 15px;">Pages:</h2>
   <ul style="list-style: none;">`;
-          
+
           // Add each page to the zip and create link in index
           projectData.pages.forEach((page) => {
             const pageName = page.name.replace(/ Page/i, '');
             const fileName = pageName.toLowerCase().replace(/\s+/g, '-') + '.html';
-            
+
             // Create HTML file for the page
             const pageContent = page.component || '<div>No content available</div>';
             const fullHtml = htmlTemplate(pageName, pageContent);
             zip.file(fileName, fullHtml);
-            
+
             // Add link to index
             indexContent += `<li style="margin-bottom: 10px;">
       <a href="${fileName}" style="color: var(--theme-color); text-decoration: none; font-weight: bold; padding: 5px 0; display: inline-block;">
@@ -1184,15 +1180,15 @@ export default {
       </a>
     </li>`;
           });
-          
+
           // Close the index HTML
           indexContent += `</ul></div>`;
-          
+
           // Add index.html to zip
           zip.file('index.html', htmlTemplate(projectName, indexContent));
-          
+
           // Generate and save the zip
-          zip.generateAsync({type: "blob"}).then((content) => {
+          zip.generateAsync({ type: "blob" }).then((content) => {
             saveAs(content, `${projectName.toLowerCase().replace(/\s+/g, '-')}_html.zip`);
             uni.hideLoading();
             uni.showToast({
@@ -1215,7 +1211,7 @@ export default {
         console.error('Error exporting HTML:', error);
       }
     },
-    
+
     exportHTMLMobile(projectData) {
       // Create a single HTML file with all pages for mobile platforms
       const projectName = projectData.AIProjectName || 'ui_genius_project';
@@ -1242,39 +1238,39 @@ export default {
 <body>
   <nav class="nav">
     <ul>`;
-      
+
       // Add navigation links
       projectData.pages.forEach((page) => {
         const pageName = page.name.replace(/ Page/i, '');
         const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
         content += `<li><a href="#${pageId}">${pageName}</a></li>`;
       });
-      
+
       content += `</ul>
   </nav>
   <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
     <h1 style="color: var(--theme-color);">${projectName}</h1>
     <p style="margin-bottom: 30px;">${projectData.AIProjectDescription || ''}</p>
   </div>`;
-      
+
       // Add each page
       projectData.pages.forEach((page) => {
         const pageName = page.name.replace(/ Page/i, '');
         const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
         const pageContent = page.component || '<div>No content available</div>';
-        
+
         content += `<div id="${pageId}" class="page">
     <h2 style="color: var(--theme-color); margin-bottom: 20px;">${pageName}</h2>
     ${pageContent}
   </div>`;
       });
-      
+
       content += `</body></html>`;
-      
+
       // Save the file
       const filePath = `${uni.env.USER_DATA_PATH}/${projectName.toLowerCase().replace(/\s+/g, '-')}.html`;
       const fs = uni.getFileSystemManager();
-      
+
       fs.writeFile({
         filePath: filePath,
         data: content,
@@ -1286,7 +1282,7 @@ export default {
             icon: 'success',
             duration: 2000
           });
-          
+
           // Open the file if possible
           uni.openDocument({
             filePath: filePath,
@@ -1307,7 +1303,7 @@ export default {
         }
       });
     },
-    
+
     exportHTMLSimple(projectData) {
       // Create a single HTML file for all pages
       const projectName = projectData.AIProjectName || 'ui_genius_project';
@@ -1334,35 +1330,35 @@ export default {
 <body>
   <nav class="nav">
     <ul>`;
-      
+
       // Add navigation links
       projectData.pages.forEach((page) => {
         const pageName = page.name.replace(/ Page/i, '');
         const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
         content += `<li><a href="#${pageId}">${pageName}</a></li>`;
       });
-      
+
       content += `</ul>
   </nav>
   <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
     <h1 style="color: var(--theme-color);">${projectName}</h1>
     <p style="margin-bottom: 30px;">${projectData.AIProjectDescription || ''}</p>
   </div>`;
-      
+
       // Add each page
       projectData.pages.forEach((page) => {
         const pageName = page.name.replace(/ Page/i, '');
         const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
         const pageContent = page.component || '<div>No content available</div>';
-        
+
         content += `<div id="${pageId}" class="page">
     <h2 style="color: var(--theme-color); margin-bottom: 20px;">${pageName}</h2>
     ${pageContent}
   </div>`;
       });
-      
+
       content += `</body></html>`;
-      
+
       // Download the file
       try {
         const blob = new Blob([content], { type: 'text/html' });
@@ -1374,7 +1370,7 @@ export default {
         a.click();
         document.body.removeChild(a);
         URL.revokeObjectURL(url);
-        
+
         uni.hideLoading();
         uni.showToast({
           title: 'HTML exported successfully!',
@@ -1391,14 +1387,14 @@ export default {
         console.error('Error downloading HTML:', error);
       }
     },
-    
+
     exportFrameworkCode(framework) {
       // Show loading toast
       uni.showLoading({
         title: `Preparing ${framework.toUpperCase()} code...`,
         mask: true
       });
-      
+
       try {
         // Get project data from storage
         const jsonData = uni.getStorageSync('latest_7_overall_page');
@@ -1411,10 +1407,10 @@ export default {
           });
           return;
         }
-        
+
         // Parse the JSON data if it's a string
         const projectData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
-        
+
         // Make API call to backend for code conversion
         uni.request({
           url: `${API_BASE_URL}/export-code`,
@@ -1428,7 +1424,7 @@ export default {
           },
           success: (res) => {
             uni.hideLoading();
-            
+
             if (res.statusCode === 200 && res.data) {
               // Platform-specific handling
               if (uni.getSystemInfoSync().platform !== 'web') {
@@ -1453,7 +1449,7 @@ export default {
             });
           }
         });
-        
+
       } catch (error) {
         uni.hideLoading();
         uni.showToast({
@@ -1464,7 +1460,7 @@ export default {
         console.error(`Error exporting ${framework} code:`, error);
       }
     },
-    
+
     handleFrameworkCodeWeb(responseData, framework, projectData) {
       try {
         // Use the imported JSZip and saveAs
@@ -1477,16 +1473,16 @@ export default {
           });
           return;
         }
-        
+
         const zip = new JSZip();
-        
+
         // Project name for zip file name
         const projectName = projectData.AIProjectName || 'ui_genius_project';
-        
+
         // Add README file with basic instructions
         const readmeContent = `# ${projectName}\n\n${projectData.AIProjectDescription || ''}\n\n## Generated by UI Genius\n\nThis code was automatically generated by UI Genius.`;
         zip.file('README.md', readmeContent);
-        
+
         // Add each file from the response
         if (Array.isArray(responseData.files)) {
           responseData.files.forEach(file => {
@@ -1496,9 +1492,9 @@ export default {
           // Fallback for single file response
           zip.file('index.js', responseData.code || 'No code generated');
         }
-        
+
         // Generate and save the zip
-        zip.generateAsync({type: "blob"}).then((content) => {
+        zip.generateAsync({ type: "blob" }).then((content) => {
           saveAs(content, `${projectName.toLowerCase().replace(/\s+/g, '-')}_${framework}.zip`);
           uni.showToast({
             title: `${framework.toUpperCase()} code exported!`,
@@ -1515,29 +1511,29 @@ export default {
         console.error('Error creating ZIP file:', error);
       }
     },
-    
+
     handleFrameworkCodeMobile(responseData, framework, projectData) {
       // For mobile platforms, save files to the app's storage
       const projectName = projectData.AIProjectName || 'ui_genius_project';
       const fs = uni.getFileSystemManager();
       const basePath = `${uni.env.USER_DATA_PATH}/${projectName}_${framework}`;
-      
+
       // Create project directory
       try {
         fs.mkdirSync(basePath, true);
       } catch (e) {
         // Directory might already exist
       }
-      
+
       // Add README file
       const readmeContent = `# ${projectName}\n\n${projectData.AIProjectDescription || ''}\n\n## Generated by UI Genius\n\nThis code was automatically generated by UI Genius.`;
       fs.writeFileSync(`${basePath}/README.md`, readmeContent, 'utf8');
-      
+
       // Write files
       if (Array.isArray(responseData.files)) {
         responseData.files.forEach(file => {
           const filePath = `${basePath}/${file.path}`;
-          
+
           // Create directory for file if needed
           const dirPath = filePath.substring(0, filePath.lastIndexOf('/'));
           try {
@@ -1545,7 +1541,7 @@ export default {
           } catch (e) {
             // Directory might already exist
           }
-          
+
           // Write the file
           fs.writeFileSync(filePath, file.content, 'utf8');
         });
@@ -1553,14 +1549,14 @@ export default {
         // Fallback for single file response
         fs.writeFileSync(`${basePath}/index.js`, responseData.code || 'No code generated', 'utf8');
       }
-      
+
       uni.showToast({
         title: `${framework.toUpperCase()} code saved`,
         icon: 'success',
         duration: 2000
       });
     },
-    
+
     selectDevice(device) {
       this.selectedDevice = device;
       // Save selected device to storage
@@ -1579,7 +1575,7 @@ export default {
             // Clear previous templates
             this.jsonTemplates = [];
             this.dynamicTemplateIds = [];
-            
+
             // Set new templates
             this.jsonTemplates = data.pages;
             // console.log(this.jsonTemplates);
@@ -1597,7 +1593,7 @@ export default {
 
             // Generate proposal templates
             this.proposalTemplates = this.getProposalTemplates();
-            
+
             // Force a re-render
             this.$forceUpdate();
           }
@@ -1630,7 +1626,7 @@ export default {
           console.log(`Template ${key} has changed, will regenerate image`);
         }
       });
-      
+
       // Always force regeneration after a UI generation
       const forceRegeneration = uni.getStorageSync('force_regeneration') === 'true';
       if (forceRegeneration) {
@@ -1645,7 +1641,7 @@ export default {
         Object.keys(this.templateLoadingStates).forEach(key => {
           this.$set(this.templateLoadingStates, key, true);
         });
-        
+
         // Set a short timeout to allow the DOM to update first
         setTimeout(() => {
           this.generatePreviewImages();
@@ -1680,19 +1676,19 @@ export default {
         if (!this.capturedImages[key]) {
           this.$set(this.capturedImages, key, '');
         }
-        
+
         // Set a timeout to turn off loading state after a delay - REDUCED TIME
         setTimeout(() => {
           this.$set(this.templateLoadingStates, key, false);
         }, 500 + (Math.random() * 300)); // Reduced from 1500-2500ms to 500-800ms
       });
-      
+
       // If we have proposal templates, update their loading states too
       if (this.activeProposalTemplates && this.activeProposalTemplates.length > 0) {
         this.activeProposalTemplates.forEach((template, index) => {
           const key = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
           this.$set(this.proposalLoadingStates, key, true);
-          
+
           // Set a timeout to turn off loading state after a delay - REDUCED TIME
           setTimeout(() => {
             this.$set(this.proposalLoadingStates, key, false);
@@ -1936,13 +1932,13 @@ export default {
         // Start progress bar
         this.isGenerating = true;
         this.generationProgress = 10; // Start at 10% instead of 5%
-        
+
         // Set up static progress simulation with faster progression
         const totalDuration = 600000; // 10 minutes instead of 2 minutes
         const progressInterval = 400; // Update every 400ms instead of 500ms
         const progressSteps = totalDuration / progressInterval;
         const progressIncrement = 85 / progressSteps; // Max 95% for simulation
-        
+
         // Start the progress simulation
         this.progressInterval = setInterval(() => {
           this.generationProgress += progressIncrement;
@@ -1955,7 +1951,7 @@ export default {
           // Get stored numPages
           const numPages = this.numPages || 1;
           const deviceType = this.selectedDevice || 'desktop';
-          
+
           // Use uni.request instead of XHR for the API call
           uni.request({
             url: `${API_BASE_URL}/generate-ui`,
@@ -1975,28 +1971,28 @@ export default {
                 clearInterval(this.progressInterval);
                 this.progressInterval = null;
               }
-              
+
               // Set progress to 100% when complete
               this.generationProgress = 100;
-              
+
               if (res.statusCode === 200 && res.data) {
                 try {
                   // Process the response data
                   let jsonContent;
                   const fullContent = res.data;
-                  
+
                   // If it's a string, parse it to ensure it's valid JSON
                   if (typeof fullContent === 'string') {
                     // Clean the content if needed
                     let cleanContent = fullContent.trim();
-                    
+
                     // Remove code block markers if present
                     if (cleanContent.startsWith('```json')) {
                       cleanContent = cleanContent.replace(/^```json\s*/, '').replace(/```\s*$/, '');
                     } else if (cleanContent.startsWith('```')) {
                       cleanContent = cleanContent.replace(/^```\s*/, '').replace(/```\s*$/, '');
                     }
-                    
+
                     // Parse and stringify to ensure valid JSON
                     const parsedContent = JSON.parse(cleanContent);
                     jsonContent = JSON.stringify(parsedContent);
@@ -2009,10 +2005,10 @@ export default {
                         jsonContent = JSON.stringify(parsedResponse);
                       } catch (e) {
                         // If it can't be parsed as JSON, use the raw response
-                        jsonContent = JSON.stringify({ 
-                          "pages": [{ 
-                            "name": "Generated Page", 
-                            "component": fullContent.response 
+                        jsonContent = JSON.stringify({
+                          "pages": [{
+                            "name": "Generated Page",
+                            "component": fullContent.response
                           }],
                           "AIProjectDescription": this.projectDescription,
                           "AIProjectName": "Generated Project",
@@ -2026,32 +2022,32 @@ export default {
                   } else {
                     throw new Error('Unexpected response format');
                   }
-                  
+
                   // Clear existing stored images before saving new content
                   this.clearStoredImages();
-                  
+
                   // Store the response in local storage
                   uni.setStorageSync('latest_7_overall_page', jsonContent);
                   uni.removeStorageSync('projectDescription');
                   uni.removeStorageSync('selectedDevice');
                   uni.removeStorageSync('numPages');
-                  
+
                   // Set flag to force regeneration of images
                   uni.setStorageSync('force_regeneration', 'true');
-                  
+
                   // Save to cloud database
                   this.saveProjectToCloud(jsonContent);
-                  
+
                   // Load the new templates and reset loading states
                   this.$nextTick(() => {
                     this.loadJsonTemplates();
                     this.updateLoadingStates();
-                    
+
                     // Force generation of new preview images
                     setTimeout(() => {
                       this.generatePreviewImages();
                     }, 100); // Reduced from 300ms
-                    
+
                     // Complete refresh after a delay to ensure everything is loaded
                     setTimeout(() => {
                       this.refreshTemplates();
@@ -2065,7 +2061,7 @@ export default {
                     duration: 3000
                   });
                 }
-                
+
                 // Hide progress bar after a short delay
                 setTimeout(() => {
                   this.isGenerating = false;
@@ -2086,7 +2082,7 @@ export default {
                 clearInterval(this.progressInterval);
                 this.progressInterval = null;
               }
-              
+
               this.isGenerating = false;
               this.errorMessage = 'Failed to generate page. Please try again.';
               uni.showToast({
@@ -2109,7 +2105,7 @@ export default {
             clearInterval(this.progressInterval);
             this.progressInterval = null;
           }
-          
+
           this.isGenerating = false;
           this.errorMessage = `Error initializing request: ${e.message}`;
           uni.showToast({
@@ -2134,7 +2130,7 @@ export default {
           this.previewColor = this.coolColors[0].hex;
         }
       }
-      
+
       // Show create new page dialog if plus nav item is clicked
       if (item === 'plus') {
         this.showCreatePageDialog = true;
@@ -2635,7 +2631,7 @@ export default {
         projectDescription: content.AIProjectDescription || 'No description',
         generated_overall_pages: content
       };
-      
+
       // Call the cloud function to save the project
       uniCloud.callFunction({
         name: 'user-project',
@@ -2656,27 +2652,27 @@ export default {
     // Add a new method to fully refresh templates
     refreshTemplates() {
       console.log('Refreshing templates completely');
-      
+
       // Reset all loading states
       this.templatesLoading = true;
       this.proposalsLoading = true;
-      
+
       // Reset all template loading states
       Object.keys(this.templateLoadingStates).forEach(key => {
         this.$set(this.templateLoadingStates, key, true);
       });
-      
+
       // Reset all proposal loading states
       Object.keys(this.proposalLoadingStates).forEach(key => {
         this.$set(this.proposalLoadingStates, key, true);
       });
-      
+
       // Reload JSON templates
       this.loadJsonTemplates();
-      
+
       // Generate new preview images
       this.generatePreviewImages();
-      
+
       // Start revealing templates with staggered timing - REDUCED TIMES
       const keys = Object.keys(this.templateLoadingStates);
       keys.forEach((key, index) => {
@@ -2687,7 +2683,7 @@ export default {
           }
         }, 500 + (index * 100)); // Reduced from 1500ms + 300ms per item
       });
-      
+
       // For proposals, reveal with staggered timing - REDUCED TIMES
       const proposalKeys = Object.keys(this.proposalLoadingStates);
       proposalKeys.forEach((key, index) => {
@@ -2710,21 +2706,21 @@ export default {
       const raw = window.atob(parts[1]);
       const rawLength = raw.length;
       const uInt8Array = new Uint8Array(rawLength);
-      
+
       for (let i = 0; i < rawLength; ++i) {
         uInt8Array[i] = raw.charCodeAt(i);
       }
-      
+
       return new Blob([uInt8Array], { type: contentType });
     },
-    
+
     exportHTML() {
       // Show loading toast
       uni.showLoading({
         title: 'Preparing HTML...',
         mask: true
       });
-      
+
       try {
         // Get project data from storage
         const jsonData = uni.getStorageSync('latest_7_overall_page');
@@ -2737,10 +2733,10 @@ export default {
           });
           return;
         }
-        
+
         // Parse the JSON data
         const projectData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
-        
+
         // Extract page components
         if (!projectData.pages || !projectData.pages.length) {
           uni.hideLoading();
@@ -2751,15 +2747,15 @@ export default {
           });
           return;
         }
-        
+
         // Create a zip file with HTML files
         const JSZip = require('jszip');
         const saveAs = require('file-saver');
         const zip = new JSZip();
-        
+
         // Project name for zip file name
         const projectName = projectData.AIProjectName || 'ui_genius_project';
-        
+
         // Basic HTML template
         const htmlTemplate = (title, content, cssStyles) => `
 <!DOCTYPE html>
@@ -2791,7 +2787,7 @@ export default {
   ${content}
 </body>
 </html>`;
-        
+
         // Create an index.html with links to all pages
         let indexContent = `
 <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
@@ -2799,17 +2795,17 @@ export default {
   <p style="margin-bottom: 20px;">${projectData.AIProjectDescription || ''}</p>
   <h2 style="margin-bottom: 15px;">Pages:</h2>
   <ul style="list-style: none;">`;
-        
+
         // Add each page to the zip and create link in index
         projectData.pages.forEach((page, index) => {
           const pageName = page.name.replace(/ Page/i, '');
           const fileName = pageName.toLowerCase().replace(/\s+/g, '-') + '.html';
-          
+
           // Create HTML file for the page
           const pageContent = page.component || '<div>No content available</div>';
           const fullHtml = htmlTemplate(pageName, pageContent);
           zip.file(fileName, fullHtml);
-          
+
           // Add link to index
           indexContent += `
     <li style="margin-bottom: 10px;">
@@ -2818,17 +2814,17 @@ export default {
       </a>
     </li>`;
         });
-        
+
         // Close the index HTML
         indexContent += `
   </ul>
 </div>`;
-        
+
         // Add index.html to zip
         zip.file('index.html', htmlTemplate(projectName, indexContent));
-        
+
         // Generate and save the zip
-        zip.generateAsync({type: "blob"}).then((content) => {
+        zip.generateAsync({ type: "blob" }).then((content) => {
           saveAs(content, `${projectName.toLowerCase().replace(/\s+/g, '-')}_html.zip`);
           uni.hideLoading();
           uni.showToast({
@@ -2837,7 +2833,7 @@ export default {
             duration: 2000
           });
         });
-        
+
       } catch (error) {
         uni.hideLoading();
         uni.showToast({
@@ -2848,14 +2844,14 @@ export default {
         console.error('Error exporting HTML:', error);
       }
     },
-    
+
     exportFrameworkCode(framework) {
       // Show loading toast
       uni.showLoading({
         title: `Preparing ${framework.toUpperCase()} code...`,
         mask: true
       });
-      
+
       try {
         // Get project data from storage
         const jsonData = uni.getStorageSync('latest_7_overall_page');
@@ -2868,10 +2864,10 @@ export default {
           });
           return;
         }
-        
+
         // Parse the JSON data if it's a string
         const projectData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
-        
+
         // Make API call to backend for code conversion
         uni.request({
           url: `${API_BASE_URL}/export-code`,
@@ -2885,20 +2881,20 @@ export default {
           },
           success: (res) => {
             uni.hideLoading();
-            
+
             if (res.statusCode === 200 && res.data) {
               // Save the converted code as a zip file
               const JSZip = require('jszip');
               const saveAs = require('file-saver');
               const zip = new JSZip();
-              
+
               // Project name for zip file name
               const projectName = projectData.AIProjectName || 'ui_genius_project';
-              
+
               // Add README file with basic instructions
               const readmeContent = `# ${projectName}\n\n${projectData.AIProjectDescription || ''}\n\n## Generated by UI Genius\n\nThis code was automatically generated by UI Genius.`;
               zip.file('README.md', readmeContent);
-              
+
               // Add each file from the response
               if (Array.isArray(res.data.files)) {
                 res.data.files.forEach(file => {
@@ -2908,9 +2904,9 @@ export default {
                 // Fallback for single file response
                 zip.file('index.js', res.data.code || 'No code generated');
               }
-              
+
               // Generate and save the zip
-              zip.generateAsync({type: "blob"}).then((content) => {
+              zip.generateAsync({ type: "blob" }).then((content) => {
                 saveAs(content, `${projectName.toLowerCase().replace(/\s+/g, '-')}_${framework}.zip`);
                 uni.showToast({
                   title: `${framework.toUpperCase()} code exported!`,
@@ -2935,7 +2931,7 @@ export default {
             });
           }
         });
-        
+
       } catch (error) {
         uni.hideLoading();
         uni.showToast({
@@ -2946,141 +2942,141 @@ export default {
         console.error(`Error exporting ${framework} code:`, error);
       }
     },
-         tryPageExample() {
-       this.pageDescription = this.examplePageDescription;
-     },
-         createPage() {
-       // Validate the page description
-       if (!this.pageDescription) {
-         this.errorMessage = 'Please enter a page description';
-         return;
-       }
-       
-       // Clear error message when validation passes
-       this.errorMessage = '';
-       
-       // Show generation progress overlay
-       this.isGenerating = true;
-       this.generationProgress = 0;
-       
-       // Set up progress interval
-       const progressInterval = setInterval(() => {
-         if (this.generationProgress < 90) {
-           this.generationProgress += 5;
-         }
-       }, 1000);
-       
-       // Get existing project data
-       const existingProjectData = uni.getStorageSync('latest_7_overall_page');
-       let projectData;
-       
-       if (existingProjectData) {
-         // Use existing project data if available
-         projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
-       } else {
-         // Create new project data structure if none exists
-         projectData = {
-           pages: [],
-           AIProjectDescription: 'My Project',
-           AIProjectName: 'UI Genius Project',
-           themeColor: '#F5CEC7'
-         };
-       }
-       
-               // Call the API to generate the new page
-       
-       // Prepare form data for uni.request
-       const formData = {
-         prompt: this.pageDescription,
-         device_type: uni.getStorageSync('selectedDevice') || 'desktop',
-       };
-       
-       // Make the API call using uni.request instead of fetch
-       uni.request({
-         url: `${API_BASE_URL}/api/generate-ui`,
-         method: 'POST',
-         data: formData,
-         success: (response) => {
-           // Stop the progress interval
-           clearInterval(progressInterval);
-           this.generationProgress = 100;
-           
-           // Handle successful response
-           if (response.statusCode !== 200) {
-             // Handle API error
-             this.isGenerating = false;
-             this.showCreatePageDialog = false;
-             uni.showToast({
-               title: 'API error: ' + response.statusCode,
-               icon: 'none',
-               duration: 2000
-             });
-             return;
-           }
-           
-           const data = response.data;
-         
-         // Process the generated page
-         if (data && data.pages && data.pages.length > 0) {
-           // Add the generated page to the existing project
-           const newPage = data.pages[0];
-           
-           // Rename the page if needed
-           if (!newPage.name.toLowerCase().includes('page')) {
-             newPage.name = newPage.name + ' Page';
-           }
-           
-           // Add the new page to the project
-           projectData.pages.push(newPage);
-           
-           // Save the updated project data
-           uni.setStorageSync('latest_7_overall_page', projectData);
-           
-           // Save project to the cloud if logged in
-           this.saveProjectToCloud(projectData);
-           
-           // Hide generation overlay
-           setTimeout(() => {
-             this.isGenerating = false;
-             this.showCreatePageDialog = false;
-             
-             // Refresh templates to show the new page
-             this.refreshTemplates();
-             
-             // Show success message
-             uni.showToast({
-               title: 'New page created successfully!',
-               icon: 'success',
-               duration: 2000
-             });
-           }, 1000);
-         } else {
-           // Handle error
-           this.isGenerating = false;
-           this.showCreatePageDialog = false;
-           uni.showToast({
-             title: 'Failed to generate page',
-             icon: 'none',
-             duration: 2000
-           });
-         }
-         },
-         fail: (error) => {
-           // Stop the progress interval
-           clearInterval(progressInterval);
-           
-           // Handle error
-           console.error('Error generating page:', error);
-           this.isGenerating = false;
-           this.showCreatePageDialog = false;
-           uni.showToast({
-             title: 'Error generating page',
-             icon: 'none',
-             duration: 2000
-           });
-         }
-       });
-     },
+    tryPageExample() {
+      this.pageDescription = this.examplePageDescription;
+    },
+    createPage() {
+      // Validate the page description
+      if (!this.pageDescription) {
+        this.errorMessage = 'Please enter a page description';
+        return;
+      }
+
+      // Clear error message when validation passes
+      this.errorMessage = '';
+
+      // Show generation progress overlay
+      this.isGenerating = true;
+      this.generationProgress = 0;
+
+      // Set up progress interval
+      const progressInterval = setInterval(() => {
+        if (this.generationProgress < 90) {
+          this.generationProgress += 5;
+        }
+      }, 1000);
+
+      // Get existing project data
+      const existingProjectData = uni.getStorageSync('latest_7_overall_page');
+      let projectData;
+
+      if (existingProjectData) {
+        // Use existing project data if available
+        projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
+      } else {
+        // Create new project data structure if none exists
+        projectData = {
+          pages: [],
+          AIProjectDescription: 'My Project',
+          AIProjectName: 'UI Genius Project',
+          themeColor: '#F5CEC7'
+        };
+      }
+
+      // Call the API to generate the new page
+
+      // Prepare form data for uni.request
+      const formData = {
+        prompt: this.pageDescription,
+        device_type: uni.getStorageSync('selectedDevice') || 'desktop',
+      };
+
+      // Make the API call using uni.request instead of fetch
+      uni.request({
+        url: `${API_BASE_URL}/api/generate-ui`,
+        method: 'POST',
+        data: formData,
+        success: (response) => {
+          // Stop the progress interval
+          clearInterval(progressInterval);
+          this.generationProgress = 100;
+
+          // Handle successful response
+          if (response.statusCode !== 200) {
+            // Handle API error
+            this.isGenerating = false;
+            this.showCreatePageDialog = false;
+            uni.showToast({
+              title: 'API error: ' + response.statusCode,
+              icon: 'none',
+              duration: 2000
+            });
+            return;
+          }
+
+          const data = response.data;
+
+          // Process the generated page
+          if (data && data.pages && data.pages.length > 0) {
+            // Add the generated page to the existing project
+            const newPage = data.pages[0];
+
+            // Rename the page if needed
+            if (!newPage.name.toLowerCase().includes('page')) {
+              newPage.name = newPage.name + ' Page';
+            }
+
+            // Add the new page to the project
+            projectData.pages.push(newPage);
+
+            // Save the updated project data
+            uni.setStorageSync('latest_7_overall_page', projectData);
+
+            // Save project to the cloud if logged in
+            this.saveProjectToCloud(projectData);
+
+            // Hide generation overlay
+            setTimeout(() => {
+              this.isGenerating = false;
+              this.showCreatePageDialog = false;
+
+              // Refresh templates to show the new page
+              this.refreshTemplates();
+
+              // Show success message
+              uni.showToast({
+                title: 'New page created successfully!',
+                icon: 'success',
+                duration: 2000
+              });
+            }, 1000);
+          } else {
+            // Handle error
+            this.isGenerating = false;
+            this.showCreatePageDialog = false;
+            uni.showToast({
+              title: 'Failed to generate page',
+              icon: 'none',
+              duration: 2000
+            });
+          }
+        },
+        fail: (error) => {
+          // Stop the progress interval
+          clearInterval(progressInterval);
+
+          // Handle error
+          console.error('Error generating page:', error);
+          this.isGenerating = false;
+          this.showCreatePageDialog = false;
+          uni.showToast({
+            title: 'Error generating page',
+            icon: 'none',
+            duration: 2000
+          });
+        }
+      });
+    },
     closeCreatePageDialog() {
       this.showCreatePageDialog = false;
     },
@@ -3943,7 +3939,7 @@ export default {
   font-size: 16px;
   color: #333;
   border-bottom: 1px solid #eee;
-  
+
   &:active {
     background-color: #f5f5f5;
   }
@@ -3955,7 +3951,7 @@ export default {
   font-size: 16px;
   color: #e53935;
   margin-top: 8px;
-  
+
   &:active {
     background-color: #f5f5f5;
   }
@@ -3965,6 +3961,7 @@ export default {
   from {
     transform: translateY(100%);
   }
+
   to {
     transform: translateY(0);
   }
