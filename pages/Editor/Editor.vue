@@ -5,7 +5,7 @@
   </template>
   
   <script>
-  import Editor from '../../component/Editor.vue';
+  import Editor from '../../component/VvvebJsEditor.vue';
   
   export default {
   name: 'App',
