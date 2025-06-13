@@ -283,7 +283,7 @@ export default {
       showCreateProjectDialog: false,
       selectedDevice: '',
       projectDescription: '',
-      numPages: 1,
+      numPages: 7,
       exampleDescription: 'Dating app for people with magical powers',
       errorMessage: '',
       projectLoadingStates: {
