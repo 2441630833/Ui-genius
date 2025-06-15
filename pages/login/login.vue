@@ -363,7 +363,7 @@ export default {
                   this.googleName = userRes.data.name;
                   this.googlePic = userRes.data.picture;
                   this.googleEmail = userRes.data.email;
-                  uni.setStorageSync('email', userInfo.email)
+                  uni.setStorageSync('email', userRes.data.email)
                   console.log('User Info:', userRes.data);
 
                   // Debug log to check exactly what's in userRes.data

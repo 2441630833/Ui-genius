@@ -567,11 +567,11 @@ export default {
 
       if (!userId) {
         console.log('No user ID found');
-        uni.showToast({
-          title: 'User ID not found',
-          icon: 'none',
-          duration: 2000
-        });
+        // uni.showToast({
+        //   title: 'User ID not found',
+        //   icon: 'none',
+        //   duration: 2000
+        // });
         return;
       }
 
