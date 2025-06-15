@@ -194,8 +194,8 @@ export default {
 
     },
     googleLoginSuccess(e) {
-      console.log('Google login successful', e)
-
+      // console.log('Google login successful', e)
+      uni.setStorageSync('uid', e.uid)
       // Store Google token with expiration
       setGoogleTokenWithExpiration(e)
 
