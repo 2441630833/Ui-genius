@@ -367,13 +367,13 @@ export default {
                   console.log('User Info:', userRes.data);
 
                   // Debug log to check exactly what's in userRes.data
-                  console.log('User ID:', userRes.data.id)
-                  console.log('User Email:', userRes.data.email)
-                  console.log('User Name:', userRes.data.name)
-                  console.log('User Picture:', userRes.data.picture)
-                  console.log('User Given Name:', userRes.data.given_name)
-                  console.log('User Family Name:', userRes.data.family_name)
-                  console.log('User Email Verified:', userRes.data.verified_email)
+                  // console.log('User ID:', userRes.data.id)
+                  // console.log('User Email:', userRes.data.email)
+                  // console.log('User Name:', userRes.data.name)
+                  // console.log('User Picture:', userRes.data.picture)
+                  // console.log('User Given Name:', userRes.data.given_name)
+                  // console.log('User Family Name:', userRes.data.family_name)
+                  // console.log('User Email Verified:', userRes.data.verified_email)
 
                   // Create Google info object
                   const googleInfo = {
@@ -386,10 +386,10 @@ export default {
                     verified_email: userRes.data.verified_email
                   }
 
-                  console.log('Google Info Object:', googleInfo)
+                  // console.log('Google Info Object:', googleInfo)
 
                   // Store Google user info to uni-id-co
-                  console.log('About to call loginByGoogle with direct params')
+                  // console.log('About to call loginByGoogle with direct params')
                   uniIdCo.loginByGoogle(googleInfo).then(result => {
                     console.log('Google login success:', result)
                     // Login success, store token
