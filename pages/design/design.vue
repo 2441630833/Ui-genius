@@ -205,7 +205,7 @@
     <view class="design-toolbar">
       <view class="logo-container">
         <image class="logo-icon"
-          src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Icon paint brush.png"></image>
+          src="../../static/logo.png"></image>
       </view>
 
       <view class="nav-links">

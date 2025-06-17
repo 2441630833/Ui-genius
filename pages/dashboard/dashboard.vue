@@ -5,7 +5,7 @@
       <view class="logo-container">
         <view class="logo">
           <image class="sidebar-icon"
-            src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Icon paint brush.png"></image>
+            src="../../static/logo.png"></image>
           <text class="logo-text">UiGenius</text>
         </view>
       </view>
