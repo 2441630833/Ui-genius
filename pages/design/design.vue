@@ -1147,8 +1147,6 @@ export default {
     /* Reset styles */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; line-height: 1.6; }
-    /* Theme color */
-    :root { --theme-color: ${projectData.themeColor || '#e53935'}; }
   </style>
 </head>
 <body>
@@ -1225,8 +1223,6 @@ export default {
     /* Reset styles */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; line-height: 1.6; }
-    /* Theme color */
-    :root { --theme-color: ${projectData.themeColor || '#e53935'}; }
     /* Navigation */
     .nav { background: var(--theme-color); padding: 10px; position: sticky; top: 0; z-index: 100; }
     .nav ul { display: flex; list-style: none; overflow-x: auto; white-space: nowrap; }
@@ -1317,8 +1313,6 @@ export default {
     /* Reset styles */
     * { margin: 0; padding: 0; box-sizing: border-box; }
     body { font-family: Arial, sans-serif; line-height: 1.6; }
-    /* Theme color */
-    :root { --theme-color: ${projectData.themeColor || '#e53935'}; }
     /* Navigation */
     .nav { background: var(--theme-color); padding: 10px; position: sticky; top: 0; z-index: 100; }
     .nav ul { display: flex; list-style: none; overflow-x: auto; white-space: nowrap; }
@@ -2012,7 +2006,6 @@ export default {
                           }],
                           "AIProjectDescription": this.projectDescription,
                           "AIProjectName": "Generated Project",
-                          "themeColor": "#F5CEC7"
                         });
                       }
                     } else {
@@ -2153,9 +2146,9 @@ export default {
       });
     },
     navigateToEditor() {
-      this.activeNavItem = 'grapes';
+      // this.activeNavItem = 'vvveb';
       uni.switchTab({
-        url: '/pages/Editor/Editor'
+        url: '/pages/editor/editor'
       });
     },
     getSimplifiedPreview(template) {
@@ -2775,10 +2768,6 @@ export default {
       font-family: Arial, sans-serif;
       line-height: 1.6;
     }
-    /* Theme color */
-    :root {
-      --theme-color: ${projectData.themeColor || '#e53935'};
-    }
     /* Additional styles */
     ${cssStyles || ''}
   </style>
@@ -2987,7 +2976,6 @@ export default {
           pages: [],
           AIProjectDescription: 'My Project',
           AIProjectName: 'UI Genius Project',
-          themeColor: '#F5CEC7'
         };
       }
 
@@ -3204,7 +3192,7 @@ export default {
   }
 }
 
-.grapes-nav-item {
+.vvveb-nav-item {
   flex-direction: column;
   height: auto;
   padding: 8px 5px;
