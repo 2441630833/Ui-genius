@@ -199,7 +199,6 @@ export default {
                                 ],
                                 "AIProjectDescription": "UI Genius项目",
                                 "AIProjectName": "我的项目",
-                                "themeColor": "#F5CEC7"
                             };
                         } else {
                             // 如果存在现有数据，更新第一个页面的component
@@ -221,7 +220,7 @@ export default {
                         
                         // 显示保存成功提示
                         uni.showToast({
-                            title: '页面已保存',
+                            title: 'page saved',
                             icon: 'success',
                             duration: 2000
                         });

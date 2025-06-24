@@ -283,7 +283,7 @@ export default {
       showCreateProjectDialog: false,
       selectedDevice: '',
       projectDescription: '',
-      numPages: 7,
+      numPages: 1,
       exampleDescription: 'Dating app for people with magical powers',
       errorMessage: '',
       projectLoadingStates: {
@@ -445,13 +445,13 @@ export default {
     },
     async createProject() {
       // temporary return and show toast the back end is constructing within 1 week, please wait
-      this.showCreateProjectDialog = false;
-      uni.showToast({
-        title: 'This feature is under construction, will be available within 1 week, please wait',
-        icon: 'none',
-        duration: 2000
-      });
-      return;
+      // this.showCreateProjectDialog = false;
+      // uni.showToast({
+      //   title: 'This feature is under construction, will be available within 1 week, please wait',
+      //   icon: 'none',
+      //   duration: 2000
+      // });
+      // return;
       // Hide any previous network error toast
       this.networkErrorVisible = false;
 

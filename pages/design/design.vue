@@ -1987,6 +1987,28 @@ export default {
                       cleanContent = cleanContent.replace(/^```\s*/, '').replace(/```\s*$/, '');
                     }
 
+                    // Parse the JSON to clean up component properties
+                    const parsedJson = JSON.parse(cleanContent);
+                    
+                    // Clean code block markers from component properties
+                    if (parsedJson && parsedJson.pages) {
+                      parsedJson.pages.forEach(page => {
+                        if (page.component) {
+                          // Clean component content
+                          if (typeof page.component === 'string') {
+                            if (page.component.startsWith('```json')) {
+                              page.component = page.component.replace(/^```json\s*/, '').replace(/```\s*$/, '');
+                            } else if (page.component.startsWith('```')) {
+                              page.component = page.component.replace(/^```\s*/, '').replace(/```\s*$/, '');
+                            }
+                          }
+                        }
+                      });
+                    }
+                    
+                    // Stringify back to JSON
+                    cleanContent = JSON.stringify(parsedJson);
+
                     // Parse and stringify to ensure valid JSON
                     const parsedContent = JSON.parse(cleanContent);
                     jsonContent = JSON.stringify(parsedContent);
@@ -2936,13 +2958,13 @@ export default {
     },
     createPage() {
       // temporary return and show toast the back end is constructing within 1 week, please wait
-      this.showCreatePageDialog = false;
-      uni.showToast({
-        title: 'This feature is under construction, will be available within 1 week, please wait',
-        icon: 'none',
-        duration: 2000
-      });
-      return;
+      // this.showCreatePageDialog = false;
+      // uni.showToast({
+      //   title: 'This feature is under construction, will be available within 1 week, please wait',
+      //   icon: 'none',
+      //   duration: 2000
+      // });
+      // return;
       // Validate the page description
       if (!this.pageDescription) {
         this.errorMessage = 'Please enter a page description';
@@ -2985,12 +3007,16 @@ export default {
       const formData = {
         prompt: this.pageDescription,
         device_type: uni.getStorageSync('selectedDevice') || 'desktop',
+        num_pages: 1 // 添加num_pages参数
       };
 
       // Make the API call using uni.request instead of fetch
       uni.request({
-        url: `${API_BASE_URL}/api/generate-ui`,
+        url: `${API_BASE_URL}/generate-ui`,
         method: 'POST',
+        header: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
         data: formData,
         success: (response) => {
           // Stop the progress interval
