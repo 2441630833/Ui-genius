@@ -944,6 +944,7 @@ export default {
     },
     onNumPagesChange(e) {
       this.numPages = e.detail.value;
+      uni.setStorageSync('numPages', this.numPages);
     }
   }
 }
