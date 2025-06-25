@@ -2957,17 +2957,13 @@ export default {
       this.pageDescription = this.examplePageDescription;
     },
     createPage() {
-      // temporary return and show toast the back end is constructing within 1 week, please wait
-      // this.showCreatePageDialog = false;
-      // uni.showToast({
-      //   title: 'This feature is under construction, will be available within 1 week, please wait',
-      //   icon: 'none',
-      //   duration: 2000
-      // });
-      // return;
+      // Close the dialog immediately to provide better UX
+      this.showCreatePageDialog = false;
+      
       // Validate the page description
       if (!this.pageDescription) {
         this.errorMessage = 'Please enter a page description';
+        this.showCreatePageDialog = true; // Re-open dialog if validation fails
         return;
       }
 
@@ -2978,12 +2974,14 @@ export default {
       this.isGenerating = true;
       this.generationProgress = 0;
 
-      // Set up progress interval
+      // Set up progress interval - slower progression for longer expected wait time
       const progressInterval = setInterval(() => {
-        if (this.generationProgress < 90) {
-          this.generationProgress += 5;
+        if (this.generationProgress < 95) {
+          // Slower increment for longer expected time (10+ minutes)
+          const increment = this.generationProgress < 70 ? 0.5 : 0.2;
+          this.generationProgress += increment;
         }
-      }, 1000);
+      }, 3000);
 
       // Get existing project data
       const existingProjectData = uni.getStorageSync('latest_7_overall_page');
@@ -3001,14 +2999,19 @@ export default {
         };
       }
 
-      // Call the API to generate the new page
-
       // Prepare form data for uni.request
       const formData = {
         prompt: this.pageDescription,
         device_type: uni.getStorageSync('selectedDevice') || 'desktop',
-        num_pages: 1 // 添加num_pages参数
+        num_pages: 1
       };
+
+      // Show a toast to indicate a long wait
+      uni.showToast({
+        title: 'Generating page, this may take 10+ minutes',
+        icon: 'none',
+        duration: 3000
+      });
 
       // Make the API call using uni.request instead of fetch
       uni.request({
@@ -3018,6 +3021,8 @@ export default {
           'Content-Type': 'application/x-www-form-urlencoded'
         },
         data: formData,
+        // Set a much longer timeout (20 minutes = 1,200,000ms)
+        timeout: 1200000,
         success: (response) => {
           // Stop the progress interval
           clearInterval(progressInterval);
@@ -3027,7 +3032,6 @@ export default {
           if (response.statusCode !== 200) {
             // Handle API error
             this.isGenerating = false;
-            this.showCreatePageDialog = false;
             uni.showToast({
               title: 'API error: ' + response.statusCode,
               icon: 'none',
@@ -3052,15 +3056,14 @@ export default {
             projectData.pages.push(newPage);
 
             // Save the updated project data
-            uni.setStorageSync('latest_7_overall_page', projectData);
+            uni.setStorageSync('latest_7_overall_page', projectData.data);
 
             // Save project to the cloud if logged in
-            this.saveProjectToCloud(projectData);
+            this.saveProjectToCloud(projectData.data);
 
             // Hide generation overlay
             setTimeout(() => {
               this.isGenerating = false;
-              this.showCreatePageDialog = false;
 
               // Refresh templates to show the new page
               this.refreshTemplates();
@@ -3075,7 +3078,6 @@ export default {
           } else {
             // Handle error
             this.isGenerating = false;
-            this.showCreatePageDialog = false;
             uni.showToast({
               title: 'Failed to generate page',
               icon: 'none',
@@ -3090,11 +3092,10 @@ export default {
           // Handle error
           console.error('Error generating page:', error);
           this.isGenerating = false;
-          this.showCreatePageDialog = false;
           uni.showToast({
-            title: 'Error generating page',
+            title: 'Error generating page: ' + (error.errMsg || 'Request failed'),
             icon: 'none',
-            duration: 2000
+            duration: 3000
           });
         }
       });
