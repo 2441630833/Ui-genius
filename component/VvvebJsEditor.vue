@@ -185,6 +185,9 @@ export default {
                             
                             // 移除可能导致问题的脚本标签
                             componentHtml = componentHtml.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+                            
+                            // 清理可能导致CSS选择器问题的类名
+                            componentHtml = this.sanitizeHtml(componentHtml);
                         } catch (sanitizeError) {
                             console.error('净化HTML内容时出错:', sanitizeError);
                         }
@@ -209,6 +212,46 @@ export default {
                 }
             } catch (error) {
                 console.error('获取或发送存储的HTML时出错:', error);
+            }
+        },
+        // 清理HTML内容，处理可能导致CSS选择器问题的类名
+        sanitizeHtml(html) {
+            try {
+                if (!html) return html;
+                
+                // 创建临时DOM元素来解析HTML
+                const parser = new DOMParser();
+                const doc = parser.parseFromString(html, 'text/html');
+                
+                // 处理所有元素的类名
+                const allElements = doc.querySelectorAll('*');
+                allElements.forEach(el => {
+                    if (el.className && typeof el.className === 'string') {
+                        // 替换类名中可能导致选择器问题的字符
+                        const safeClassName = el.className
+                            .split(' ')
+                            .map(cls => {
+                                // 处理包含特殊字符的类名
+                                if (cls.includes(':') || cls.includes('[') || cls.includes(']') || 
+                                    cls.includes('>') || cls.includes('.')) {
+                                    // 将特殊字符替换为下划线
+                                    return cls.replace(/[:[\]>\.]/g, '_');
+                                }
+                                return cls;
+                            })
+                            .join(' ');
+                        
+                        if (el.className !== safeClassName) {
+                            el.className = safeClassName;
+                        }
+                    }
+                });
+                
+                // 返回处理后的HTML
+                return doc.documentElement.outerHTML;
+            } catch (error) {
+                console.error('清理HTML内容时出错:', error);
+                return html; // 出错时返回原始HTML
             }
         },
         // vue获取iframe传递过来的信息
