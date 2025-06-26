@@ -173,6 +173,23 @@ export default {
                         console.log('存储的内容不是JSON格式，使用原始内容');
                     }
                     
+                    // 确保HTML内容是有效的
+                    if (componentHtml) {
+                        // 简单的HTML内容验证和修复
+                        try {
+                            // 确保HTML内容有一个根元素包裹
+                            if (!componentHtml.trim().startsWith('<div') && !componentHtml.trim().startsWith('<section')) {
+                                componentHtml = `<div class="container">${componentHtml}</div>`;
+                                console.log('已添加容器元素包裹HTML内容');
+                            }
+                            
+                            // 移除可能导致问题的脚本标签
+                            componentHtml = componentHtml.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+                        } catch (sanitizeError) {
+                            console.error('净化HTML内容时出错:', sanitizeError);
+                        }
+                    }
+                    
                     // 获取iframe窗口对象
                     const contentWindow = this.getIframeContentWindow();
                     if (contentWindow) {
