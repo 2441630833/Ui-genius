@@ -76,6 +76,14 @@ export default {
             clearInterval(this.checkInterval);
             this.checkInterval = null;
         }
+        
+        // 清除选中的模板ID
+        try {
+            uni.removeStorageSync('selectedTemplateId');
+            console.log('已清除选中的模板ID');
+        } catch (error) {
+            console.error('清除选中的模板ID时出错:', error);
+        }
     },
     methods: {
         // 处理iframe加载完成事件
@@ -130,13 +138,35 @@ export default {
                     
                     let componentHtml = storedHtml;
                     
+                    // 获取选中的模板ID
+                    const selectedTemplateId = uni.getStorageSync('selectedTemplateId');
+                    console.log('选中的模板ID:', selectedTemplateId);
+                    
                     // 尝试解析JSON格式，如果是JSON则提取component属性
                     try {
                         const jsonData = JSON.parse(storedHtml);
-                        if (jsonData.pages && jsonData.pages.length > 0 && jsonData.pages[0].component) {
-                            // 只提取第一个页面的component属性
-                            componentHtml = jsonData.pages[0].component;
-                            console.log('成功提取component属性');
+                        if (jsonData.pages && jsonData.pages.length > 0) {
+                            // 如果有选中的模板ID，则查找对应的页面
+                            if (selectedTemplateId) {
+                                // 查找名称匹配的页面
+                                const matchingPage = jsonData.pages.find(page => {
+                                    const pageId = page.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                                    return pageId === selectedTemplateId;
+                                });
+                                
+                                if (matchingPage && matchingPage.component) {
+                                    componentHtml = matchingPage.component;
+                                    console.log('成功加载选中的模板:', selectedTemplateId);
+                                } else {
+                                    // 如果找不到匹配的页面，使用第一个页面
+                                    componentHtml = jsonData.pages[0].component;
+                                    console.log('未找到选中的模板，使用第一个页面');
+                                }
+                            } else {
+                                // 如果没有选中的模板ID，使用第一个页面
+                                componentHtml = jsonData.pages[0].component;
+                                console.log('未指定模板ID，使用第一个页面');
+                            }
                         }
                     } catch (parseError) {
                         // 如果解析失败，则认为存储的内容不是JSON格式，直接使用原始内容
@@ -188,12 +218,15 @@ export default {
                             console.log('无法解析现有存储数据或不存在');
                         }
                         
+                        // 获取选中的模板ID
+                        const selectedTemplateId = uni.getStorageSync('selectedTemplateId');
+                        
                         // 如果没有现有数据或解析失败，创建新的数据结构
                         if (!storedData) {
                             storedData = {
                                 "pages": [
                                     {
-                                        "name": "Page 1",
+                                        "name": selectedTemplateId ? selectedTemplateId.charAt(0).toUpperCase() + selectedTemplateId.slice(1) + " Page" : "Page 1",
                                         "component": res.params.html
                                     }
                                 ],
@@ -201,14 +234,34 @@ export default {
                                 "AIProjectName": "我的项目",
                             };
                         } else {
-                            // 如果存在现有数据，更新第一个页面的component
+                            // 如果存在现有数据，更新对应页面的component
                             if (storedData.pages && storedData.pages.length > 0) {
-                                storedData.pages[0].component = res.params.html;
+                                if (selectedTemplateId) {
+                                    // 查找匹配的页面
+                                    const pageIndex = storedData.pages.findIndex(page => {
+                                        const pageId = page.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                                        return pageId === selectedTemplateId;
+                                    });
+                                    
+                                    if (pageIndex !== -1) {
+                                        // 如果找到匹配的页面，更新它
+                                        storedData.pages[pageIndex].component = res.params.html;
+                                        console.log('已更新页面:', selectedTemplateId);
+                                    } else {
+                                        // 如果没有找到匹配的页面，更新第一个页面
+                                        storedData.pages[0].component = res.params.html;
+                                        console.log('未找到匹配页面，已更新第一个页面');
+                                    }
+                                } else {
+                                    // 如果没有选中的模板ID，更新第一个页面
+                                    storedData.pages[0].component = res.params.html;
+                                    console.log('未指定模板ID，已更新第一个页面');
+                                }
                             } else {
                                 // 如果pages不存在或为空，创建新的pages数组
                                 storedData.pages = [
                                     {
-                                        "name": "Page 1",
+                                        "name": selectedTemplateId ? selectedTemplateId.charAt(0).toUpperCase() + selectedTemplateId.slice(1) + " Page" : "Page 1",
                                         "component": res.params.html
                                     }
                                 ];

@@ -305,7 +305,7 @@
             <!-- Filter to only show the 5 main templates -->
             <x-skeleton v-for="(template, index) in filteredTemplates" :key="index" type="banner"
               :loading="templateLoadingStates[template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')]">
-              <view class="template-item" @click="navigateToEditor()">
+              <view class="template-item" @click="navigateToEditor(template)">
                 <view class="template-preview"
                   :id="'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')">
                   <image class="template-image"
@@ -323,7 +323,7 @@
           <template v-else>
             <!-- Signup Template -->
             <x-skeleton type="banner" :loading="templateLoadingStates.signup">
-              <view class="template-item" @click="navigateToEditor()">
+              <view class="template-item" @click="navigateToEditor('signup')">
                 <view class="template-preview" id="template-signup">
                   <image class="template-image" :src="capturedImages.signup" mode="aspectFill"></image>
                 </view>
@@ -335,7 +335,7 @@
 
             <!-- Home Template -->
             <x-skeleton type="banner" :loading="templateLoadingStates.home">
-              <view class="template-item" @click="navigateToEditor()">
+              <view class="template-item" @click="navigateToEditor('home')">
                 <view class="template-preview" id="template-home">
                   <image class="template-image" :src="capturedImages.home" mode="aspectFill"></image>
                 </view>
@@ -347,7 +347,7 @@
 
             <!-- notification Template -->
             <x-skeleton type="banner" :loading="templateLoadingStates.notification">
-              <view class="template-item" @click="navigateToEditor()">
+              <view class="template-item" @click="navigateToEditor('notification')">
                 <view class="template-preview" id="template-notification">
                   <image class="template-image" :src="capturedImages.notification" mode="aspectFill"></image>
                 </view>
@@ -359,7 +359,7 @@
 
             <!-- Profile Template -->
             <x-skeleton type="banner" :loading="templateLoadingStates.profile">
-              <view class="template-item" @click="navigateToEditor()">
+              <view class="template-item" @click="navigateToEditor('profile')">
                 <view class="template-preview" id="template-profile">
                   <image class="template-image" :src="capturedImages.profile" mode="aspectFill"></image>
                 </view>
@@ -371,7 +371,7 @@
 
             <!-- Settings Template -->
             <x-skeleton type="banner" :loading="templateLoadingStates.settings">
-              <view class="template-item" @click="navigateToEditor()">
+              <view class="template-item" @click="navigateToEditor('settings')">
                 <view class="template-preview" id="template-settings">
                   <image class="template-image" :src="capturedImages.settings" mode="aspectFill"></image>
                 </view>
@@ -393,7 +393,7 @@
             <!-- Take a subset of templates to show as proposals (different layouts) -->
             <x-skeleton v-for="(template, index) in activeProposalTemplates" :key="index" type="banner"
               :loading="proposalLoadingStates[template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')]">
-              <view class="proposal-item" @click="navigateToEditor()">
+              <view class="proposal-item" @click="navigateToEditor(template)">
                 <view class="proposal-preview"
                   :id="'proposal-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')">
                   <image class="proposal-image"
@@ -411,7 +411,7 @@
           <template v-else>
             <!-- Login Screen -->
             <x-skeleton type="banner" :loading="proposalLoadingStates.login">
-              <view class="proposal-item" @click="navigateToEditor()">
+              <view class="proposal-item" @click="navigateToEditor('login')">
                 <view class="proposal-preview" id="proposal-login">
                   <image class="proposal-image" :src="capturedImages.login" mode="aspectFill"></image>
                 </view>
@@ -423,7 +423,7 @@
 
             <!-- Dashboard Screen -->
             <x-skeleton type="banner" :loading="proposalLoadingStates.dashboard">
-              <view class="proposal-item" @click="navigateToEditor()">
+              <view class="proposal-item" @click="navigateToEditor('dashboard')">
                 <view class="proposal-preview" id="proposal-dashboard">
                   <image class="proposal-image" :src="capturedImages.dashboard" mode="aspectFill"></image>
                 </view>
@@ -2167,10 +2167,26 @@ export default {
         icon: 'none'
       });
     },
-    navigateToEditor() {
-      // this.activeNavItem = 'vvveb';
+    navigateToEditor(template) {
+      // Get the template name or ID to pass to the editor
+      let templateId = '';
+      if (template) {
+        // If a template object is passed, get its name
+        if (typeof template === 'object' && template.name) {
+          templateId = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+        } else {
+          // If a string is passed, use it directly
+          templateId = String(template).toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+        }
+      }
+      
+      // Navigate to editor with the template ID as a parameter
       uni.switchTab({
-        url: '/pages/editor/editor'
+        url: '/pages/editor/editor',
+        success: () => {
+          // Store the selected template ID in storage for the editor to access
+          uni.setStorageSync('selectedTemplateId', templateId);
+        }
       });
     },
     getSimplifiedPreview(template) {
