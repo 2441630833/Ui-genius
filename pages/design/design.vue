@@ -3040,6 +3040,8 @@ export default {
         // Set a much longer timeout (20 minutes = 1,200,000ms)
         timeout: 1200000,
         success: (response) => {
+          console.log('API Response:', response);
+          
           // Stop the progress interval
           clearInterval(progressInterval);
           this.generationProgress = 100;
@@ -3057,32 +3059,81 @@ export default {
           }
 
           const data = response.data;
+          console.log('Generated page data:', data);
 
           // Process the generated page
+          let newPage;
+          
+          // Handle different response formats
           if (data && data.pages && data.pages.length > 0) {
-            // Add the generated page to the existing project
-            const newPage = data.pages[0];
-
+            // Standard format with pages array
+            newPage = data.pages[0];
+          } else if (data && data.response) {
+            // Format where the response is a string containing JSON
+            try {
+              // Try to parse the response as JSON
+              const parsedResponse = JSON.parse(data.response);
+              if (parsedResponse.pages && parsedResponse.pages.length > 0) {
+                newPage = parsedResponse.pages[0];
+              }
+            } catch (e) {
+              // If parsing fails, create a simple page object with the response as component
+              newPage = {
+                name: "New Page",
+                component: data.response
+              };
+            }
+          } else if (typeof data === 'string') {
+            // Direct string response
+            try {
+              const parsedData = JSON.parse(data);
+              if (parsedData.pages && parsedData.pages.length > 0) {
+                newPage = parsedData.pages[0];
+              }
+            } catch (e) {
+              newPage = {
+                name: "New Page",
+                component: data
+              };
+            }
+          }
+          
+          if (newPage) {
             // Rename the page if needed
             if (!newPage.name.toLowerCase().includes('page')) {
               newPage.name = newPage.name + ' Page';
             }
-
+            
             // Add the new page to the project
             projectData.pages.push(newPage);
-
+            
             // Save the updated project data
-            uni.setStorageSync('latest_7_overall_page', projectData.data);
+            const updatedProjectData = JSON.stringify(projectData);
+            uni.setStorageSync('latest_7_overall_page', updatedProjectData);
 
             // Save project to the cloud if logged in
-            this.saveProjectToCloud(projectData.data);
+            this.saveProjectToCloud(projectData);
+
+            // Set flag to force regeneration of images
+            uni.setStorageSync('force_regeneration', 'true');
 
             // Hide generation overlay
             setTimeout(() => {
               this.isGenerating = false;
 
               // Refresh templates to show the new page
-              this.refreshTemplates();
+              this.loadJsonTemplates();
+              this.updateLoadingStates();
+
+              // Force generation of new preview images
+              setTimeout(() => {
+                this.generatePreviewImages();
+              }, 100);
+
+              // Complete refresh after a delay
+              setTimeout(() => {
+                this.refreshTemplates();
+              }, 500);
 
               // Show success message
               uni.showToast({
@@ -3104,9 +3155,11 @@ export default {
         fail: (error) => {
           // Stop the progress interval
           clearInterval(progressInterval);
-
-          // Handle error
+          
+          // Log the error
           console.error('Error generating page:', error);
+          
+          // Handle error
           this.isGenerating = false;
           uni.showToast({
             title: 'Error generating page: ' + (error.errMsg || 'Request failed'),
