@@ -876,28 +876,56 @@ export default {
       });
 
       try {
-        // Define image keys to export
-        const imageKeys = [
-          'signup', 'home', 'notification', 'profile',
-          'settings', 'login', 'dashboard'
-        ];
-
-        // Check if we have any images in storage
-        let hasImages = false;
+        // Get all template IDs from both filtered templates and proposal templates
         const imagesToExport = [];
+        
+        // Add images from filtered templates
+        if (this.filteredTemplates && this.filteredTemplates.length > 0) {
+          this.filteredTemplates.forEach(template => {
+            const key = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+            const imageData = uni.getStorageSync(`uigenius_image_${key}`);
+            if (imageData) {
+              imagesToExport.push({
+                key: key,
+                data: imageData
+              });
+            }
+          });
+        }
+        
+        // Add images from proposal templates
+        if (this.activeProposalTemplates && this.activeProposalTemplates.length > 0) {
+          this.activeProposalTemplates.forEach(template => {
+            const key = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+            const imageData = uni.getStorageSync(`uigenius_image_${key}`);
+            if (imageData) {
+              imagesToExport.push({
+                key: key,
+                data: imageData
+              });
+            }
+          });
+        }
+        
+        // If no dynamic templates, fall back to default template keys
+        if (imagesToExport.length === 0) {
+          const defaultKeys = [
+            'signup', 'home', 'notification', 'profile',
+            'settings', 'login', 'dashboard'
+          ];
+          
+          defaultKeys.forEach(key => {
+            const imageData = uni.getStorageSync(`uigenius_image_${key}`);
+            if (imageData) {
+              imagesToExport.push({
+                key: key,
+                data: imageData
+              });
+            }
+          });
+        }
 
-        await imageKeys.forEach(async key => {
-          const imageData = uni.getStorageSync(`uigenius_image_${key}`);
-          if (imageData) {
-            hasImages = true;
-            imagesToExport.push({
-              key: key,
-              data: imageData
-            });
-          }
-        });
-
-        if (!hasImages) {
+        if (imagesToExport.length === 0) {
           uni.hideLoading();
           uni.showToast({
             title: 'No images available to export',
@@ -907,7 +935,10 @@ export default {
           this.isExporting = false;
           return;
         }
-        // console.log(imagesToExport);
+        
+
+        // console.log(`Found ${imagesToExport.length} images to export`);
+        
         // #ifdef H5 
         this.exportImagesWeb(imagesToExport);
         // #endif
@@ -921,7 +952,7 @@ export default {
           icon: 'none',
           duration: 2000
         });
-        console.error('Error exporting images:', error);
+        // console.error('Error exporting images:', error);
         this.isExporting = false;
       }
     },
@@ -963,13 +994,13 @@ export default {
                   saveNext(index + 1);
                 },
                 fail: (err) => {
-                  console.error(`Failed to save ${image.key}.png to photos:`, err);
+                  // console.error(`Failed to save ${image.key}.png to photos:`, err);
                   saveNext(index + 1);
                 }
               });
             },
             fail: (err) => {
-              console.error(`Failed to write ${image.key}.png:`, err);
+              // console.error(`Failed to write ${image.key}.png:`, err);
               saveNext(index + 1);
             }
           });
@@ -978,7 +1009,7 @@ export default {
         saveNext(0);
       } catch (error) {
         uni.hideLoading();
-        console.error('Error in exportImagesMobile:', error);
+        // console.error('Error in exportImagesMobile:', error);
         uni.showToast({
           title: 'Error exporting images',
           icon: 'none',
@@ -994,7 +1025,7 @@ export default {
         // If they're not available, show an error
         if (typeof JSZip !== 'function' || typeof saveAs !== 'function') {
           uni.hideLoading();
-          console.error('JSZip or saveAs is not available');
+          // console.error('JSZip or saveAs is not available');
           uni.showToast({
             title: 'Export libraries not available',
             icon: 'none',
@@ -1004,7 +1035,7 @@ export default {
           return;
         }
 
-        console.log(`Exporting ${images.length} images to a single zip file`);
+        // console.log(`Exporting ${images.length} images to a single zip file`);
 
         // Create a single zip file with all images
         const zip = new JSZip();
@@ -1027,16 +1058,14 @@ export default {
 
             const blob = new Blob([uInt8Array], { type: contentType });
             imagesFolder.file(`${image.key}.png`, blob);
-            console.log(`Added ${image.key}.png to zip (${i + 1}/${images.length})`);
+            // console.log(`Added ${image.key}.png to zip (${i + 1}/${images.length})`);
           } catch (error) {
-            console.error(`Error processing image ${image.key}:`, error);
+            // console.error(`Error processing image ${image.key}:`, error);
           }
         }
 
         // Generate and save the zip
-        // console.log('Generating zip file...');
         const content = await zip.generateAsync({ type: "blob" });
-        // console.log('Zip generated, saving file...');
         saveAs(content, "ui_genius_images.zip");
 
         uni.hideLoading();
@@ -1077,7 +1106,7 @@ export default {
           a.click();
           document.body.removeChild(a);
         } catch (e) {
-          console.error(`Failed to download ${image.key}.png`, e);
+          // console.error(`Failed to download ${image.key}.png`, e);
         }
       });
     },
@@ -3040,7 +3069,7 @@ export default {
         // Set a much longer timeout (20 minutes = 1,200,000ms)
         timeout: 1200000,
         success: (response) => {
-          console.log('API Response:', response);
+          // console.log('API Response:', response);
           
           // Stop the progress interval
           clearInterval(progressInterval);
@@ -3059,7 +3088,7 @@ export default {
           }
 
           const data = response.data;
-          console.log('Generated page data:', data);
+          // console.log('Generated page data:', data);
 
           // Process the generated page
           let newPage;
@@ -3183,7 +3212,7 @@ export default {
   mounted() {
     // Listen for capture-element events
     uni.$on('capture-element', this.captureElement);
-    console.log('Renderjs module mounted, html2canvas ready');
+    // console.log('Renderjs module mounted, html2canvas ready');
   },
   
   beforeDestroy() {
