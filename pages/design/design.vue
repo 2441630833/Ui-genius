@@ -219,10 +219,10 @@
           </image>
         </view> -->
 
-        <view class="nav-item" :class="{ active: activeNavItem === 'color' }" @click="navigateTo('color')">
+        <!-- <view class="nav-item" :class="{ active: activeNavItem === 'color' }" @click="navigateTo('color')">
           <image class="nav-icon" :src="activeNavItem === 'color' ? '/static/color_white.png' : '/static/color.png'">
           </image>
-        </view>
+        </view> -->
 
 
         <!-- <view class="nav-item" :class="{ active: activeNavItem === 'profile' }" @click="navigateTo('profile')">
