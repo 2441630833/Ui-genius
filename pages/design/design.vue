@@ -100,15 +100,7 @@
           <view class="preview-content" v-html="getSimplifiedPreview(template)"></view>
         </view>
 
-        <!-- Render proposal templates separately -->
-        <view v-for="(template, index) in activeProposalTemplates" :key="'proposal-' + index"
-          :id="'proposal-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')"
-          class="template-preview-content">
-          <!-- <view class="preview-header">
-            <text class="preview-title">{{ template.name.replace(/ Page/i, '') }}</text>
-          </view> -->
-          <view class="preview-content" v-html="getSimplifiedPreview(template)"></view>
-        </view>
+
       </template>
 
       <!-- Fallback Static Templates -->
@@ -173,31 +165,7 @@
           </view>
         </view>
 
-        <!-- Login Proposal Preview -->
-        <view id="proposal-login" class="template-preview-content">
-          <view class="preview-header">
-            <text class="preview-title">Login</text>
-          </view>
-          <view class="preview-form">
-            <view class="preview-input"></view>
-            <view class="preview-input"></view>
-            <view class="preview-button"></view>
-          </view>
-        </view>
 
-        <!-- Dashboard Proposal Preview -->
-        <view id="proposal-dashboard" class="template-preview-content">
-          <view class="preview-header">
-            <text class="preview-title">Dashboard</text>
-          </view>
-          <view class="preview-dashboard">
-            <view class="preview-chart"></view>
-            <view class="preview-stats">
-              <view class="preview-stat-item"></view>
-              <view class="preview-stat-item"></view>
-            </view>
-          </view>
-        </view>
       </template>
     </view>
 
@@ -384,57 +352,7 @@
         </view>
       </view>
 
-      <!-- Additional Design Proposals -->
-      <view class="section">
-        <text class="section-title">Additional Pages</text>
-        <view class="proposals-grid">
-          <!-- Dynamic Proposals from JSON -->
-          <template v-if="jsonTemplates.length > 0 && activeProposalTemplates.length > 0">
-            <!-- Take a subset of templates to show as proposals (different layouts) -->
-            <x-skeleton v-for="(template, index) in activeProposalTemplates" :key="index" type="banner"
-              :loading="proposalLoadingStates[template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')]">
-              <view class="proposal-item" @click="navigateToEditor(template)">
-                <view class="proposal-preview"
-                  :id="'proposal-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')">
-                  <image class="proposal-image"
-                    :src="capturedImages[template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')] || ''"
-                    mode="aspectFill"></image>
-                </view>
-                <view class="proposal-label">
-                  <text class="proposal-name">{{ template.name.replace(/ Page/i, '') }} Alternative</text>
-                </view>
-              </view>
-            </x-skeleton>
-          </template>
 
-          <!-- Fallback Static Proposals -->
-          <template v-else>
-            <!-- Login Screen -->
-            <x-skeleton type="banner" :loading="proposalLoadingStates.login">
-              <view class="proposal-item" @click="navigateToEditor('login')">
-                <view class="proposal-preview" id="proposal-login">
-                  <image class="proposal-image" :src="capturedImages.login" mode="aspectFill"></image>
-                </view>
-                <view class="proposal-label">
-                  <text class="proposal-name">Login Screen</text>
-                </view>
-              </view>
-            </x-skeleton>
-
-            <!-- Dashboard Screen -->
-            <x-skeleton type="banner" :loading="proposalLoadingStates.dashboard">
-              <view class="proposal-item" @click="navigateToEditor('dashboard')">
-                <view class="proposal-preview" id="proposal-dashboard">
-                  <image class="proposal-image" :src="capturedImages.dashboard" mode="aspectFill"></image>
-                </view>
-                <view class="proposal-label">
-                  <text class="proposal-name">Dashboard Screen</text>
-                </view>
-              </view>
-            </x-skeleton>
-          </template>
-        </view>
-      </view>
     </view>
 
     <!-- Custom Action Sheet Component -->
@@ -567,9 +485,7 @@ export default {
         home: '',
         notification: '',
         profile: '',
-        settings: '',
-        login: '',
-        dashboard: ''
+        settings: ''
       },
       // Add export related data properties
       showExportOptions: false,
@@ -580,11 +496,9 @@ export default {
       templateVersions: {},
       activeNavItem: 'home',
       selectedTemplate: null,
-      selectedProposal: null,
       projectDescription: '',
       project_id: '',
       templatesLoading: true,
-      proposalsLoading: true,
       isGenerating: false,
       generationProgress: 0,
       progressInterval: null,
@@ -595,13 +509,10 @@ export default {
         profile: true,
         settings: true
       },
-      proposalLoadingStates: {
-        login: true,
-        dashboard: true
-      },
+
       jsonTemplates: [],
       dynamicTemplateIds: [],
-      proposalTemplates: [],
+
       // Add a flag to track if we should generate UI
       shouldGenerateUI: false,
       // Add selectedDevice property with default value 'desktop'
@@ -661,10 +572,6 @@ export default {
   },
 
   computed: {
-    // Computed property for proposal templates to avoid infinite loop
-    activeProposalTemplates() {
-      return this.proposalTemplates;
-    },
     filteredTemplates() {
       // Only show the 5 main templates that match the fallback static templates
       if (!this.jsonTemplates || this.jsonTemplates.length === 0) {
@@ -751,15 +658,7 @@ export default {
       this.templatesLoading = false;
     }, 900); // Reduced from 2700ms
 
-    // Staggered loading for proposals
-    setTimeout(() => {
-      this.proposalLoadingStates.login = false;
-    }, 750); // Reduced from 2200ms
 
-    setTimeout(() => {
-      this.proposalLoadingStates.dashboard = false;
-      this.proposalsLoading = false;
-    }, 850); // Reduced from 2500ms
     // console.log(this.jsonTemplates);
   },
 
@@ -894,25 +793,13 @@ export default {
           });
         }
         
-        // Add images from proposal templates
-        if (this.activeProposalTemplates && this.activeProposalTemplates.length > 0) {
-          this.activeProposalTemplates.forEach(template => {
-            const key = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
-            const imageData = uni.getStorageSync(`uigenius_image_${key}`);
-            if (imageData) {
-              imagesToExport.push({
-                key: key,
-                data: imageData
-              });
-            }
-          });
-        }
+
         
         // If no dynamic templates, fall back to default template keys
         if (imagesToExport.length === 0) {
           const defaultKeys = [
             'signup', 'home', 'notification', 'profile',
-            'settings', 'login', 'dashboard'
+            'settings'
           ];
           
           defaultKeys.forEach(key => {
@@ -1445,9 +1332,6 @@ export default {
             // Update loading states for dynamic templates
             this.updateLoadingStates();
 
-            // Generate proposal templates
-            this.proposalTemplates = this.getProposalTemplates();
-
             // Force a re-render
             this.$forceUpdate();
           }
@@ -1537,18 +1421,7 @@ export default {
         }, 500 + (Math.random() * 300)); // Reduced from 1500-2500ms to 500-800ms
       });
 
-      // If we have proposal templates, update their loading states too
-      if (this.activeProposalTemplates && this.activeProposalTemplates.length > 0) {
-        this.activeProposalTemplates.forEach((template, index) => {
-          const key = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
-          this.$set(this.proposalLoadingStates, key, true);
 
-          // Set a timeout to turn off loading state after a delay - REDUCED TIME
-          setTimeout(() => {
-            this.$set(this.proposalLoadingStates, key, false);
-          }, 700 + (index * 100)); // Reduced from 2000ms to 700ms
-        });
-      }
     },
 
     refreshData() {
@@ -1557,7 +1430,6 @@ export default {
 
       // Reset all loading states
       this.templatesLoading = true;
-      this.proposalsLoading = true;
 
       // Load JSON templates if available
       this.loadJsonTemplates();
@@ -1575,9 +1447,7 @@ export default {
         this.templateLoadingStates.profile = true;
         this.templateLoadingStates.settings = true;
 
-        // Reset proposal loading states for static templates
-        this.proposalLoadingStates.login = true;
-        this.proposalLoadingStates.dashboard = true;
+
       }
 
       // Generate preview images first
@@ -1594,28 +1464,7 @@ export default {
         }, 1500 + (index * 300));
       });
 
-      // For static templates, use staggered loading for proposals
-      if (this.dynamicTemplateIds.length === 0) {
-        setTimeout(() => {
-          this.proposalLoadingStates.login = false;
-        }, 2200);
 
-        setTimeout(() => {
-          this.proposalLoadingStates.dashboard = false;
-          this.proposalsLoading = false;
-        }, 2500);
-      } else {
-        // For dynamic templates, reveal proposals with staggered timing
-        const proposalKeys = Object.keys(this.proposalLoadingStates);
-        proposalKeys.forEach((key, index) => {
-          setTimeout(() => {
-            this.$set(this.proposalLoadingStates, key, false);
-            if (index === proposalKeys.length - 1) {
-              this.proposalsLoading = false;
-            }
-          }, 2200 + (index * 300));
-        });
-      }
     },
 
     // Methods to handle HTML2Canvas
@@ -1645,9 +1494,7 @@ export default {
         'template-home': 'home',
         'template-notification': 'notification',
         'template-profile': 'profile',
-        'template-settings': 'settings',
-        'proposal-login': 'login',
-        'proposal-dashboard': 'dashboard'
+        'template-settings': 'settings'
       };
 
       // For dynamic templates, create mapping based on ID
@@ -1685,13 +1532,7 @@ export default {
           'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')
         );
 
-        // Add proposal template IDs
-        const proposalIds = this.activeProposalTemplates.map(template =>
-          'proposal-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')
-        );
 
-        // Combine template and proposal IDs
-        templateIds = [...templateIds, ...proposalIds];
 
         // Store the template IDs for later use
         this.dynamicTemplateIds = templateIds.filter(id => id.startsWith('template-'));
@@ -1704,9 +1545,7 @@ export default {
           'template-home',
           'template-notification',
           'template-profile',
-          'template-settings',
-          'proposal-login',
-          'proposal-dashboard'
+          'template-settings'
         ];
 
         // console.log('Using static template IDs:', templateIds);
@@ -2020,13 +1859,7 @@ export default {
         icon: 'none'
       });
     },
-    selectProposal(proposal) {
-      this.selectedProposal = proposal;
-      uni.showToast({
-        title: `Selected ${proposal} proposal`,
-        icon: 'none'
-      });
-    },
+
     navigateToEditor(template) {
       // Get the template name or ID to pass to the editor
       let templateId = '';
@@ -2064,64 +1897,7 @@ export default {
         return '<div class="preview-placeholder">Error rendering preview</div>';
       }
     },
-    getProposalTemplates() {
-      // Select a subset of templates to use as proposals with alternative layouts
-      if (!this.jsonTemplates || this.jsonTemplates.length === 0) {
-        return [];
-      }
 
-      // Prioritize certain page types for proposals
-      const priorityTypes = ['login', 'dashboard'];
-      const proposals = [];
-
-      // First try to find pages matching our priority types
-      for (const type of priorityTypes) {
-        const match = this.jsonTemplates.find(template =>
-          template.name.toLowerCase().includes(type)
-        );
-
-        if (match && !proposals.includes(match)) {
-          proposals.push(match);
-        }
-      }
-
-      // If we don't have enough, add other templates
-      if (proposals.length < 2) {
-        for (const template of this.jsonTemplates) {
-          if (!proposals.includes(template)) {
-            proposals.push(template);
-            if (proposals.length >= 2) break;
-          }
-        }
-      }
-
-      // Create a copy of the proposals array to avoid reactivity issues
-      const proposalsToReturn = proposals.slice(0, 2); // Limit to 2 proposals
-
-      // Update proposal loading states - do this separately to avoid infinite loop
-      this.$nextTick(() => {
-        this.updateProposalLoadingStates(proposalsToReturn);
-      });
-
-      return proposalsToReturn;
-    },
-
-    updateProposalLoadingStates(proposals) {
-      // Reset proposal loading states
-      this.proposalLoadingStates = {};
-
-      // Create loading states for each proposal
-      proposals.forEach(template => {
-        const key = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
-        this.$set(this.proposalLoadingStates, key, true);
-
-        // Also prepare capturedImages object for proposals
-        const altKey = 'alt-' + key;
-        if (!this.capturedImages[altKey]) {
-          this.$set(this.capturedImages, altKey, '');
-        }
-      });
-    },
     loadImagesFromStorage() {
       // console.log('Loading images from local storage');
 
@@ -2134,15 +1910,8 @@ export default {
         'settings'
       ];
 
-      // Define proposal keys
-      const proposalKeys = [
-        'login',
-        'dashboard'
-      ];
-
       // Try to load each image from storage
       let mainLoadedCount = 0;
-      let proposalLoadedCount = 0;
 
       // Create a temporary object to hold all image data
       const tempImages = {};
@@ -2171,26 +1940,7 @@ export default {
         }
       }
 
-      // Load proposal images
-      for (const key of proposalKeys) {
-        try {
-          const imageData = uni.getStorageSync(`uigenius_image_${key}`);
-          if (imageData) {
-            // Store in temp object
-            tempImages[key] = imageData;
-            proposalLoadedCount++;
 
-            // Set the loading state to false for this proposal
-            if (this.proposalLoadingStates[key]) {
-              this.$set(this.proposalLoadingStates, key, false);
-            }
-
-            // console.log(`Loaded proposal image for ${key} from local storage`);
-          }
-        } catch (e) {
-          // console.error(`Failed to load image data for ${key} from local storage:`, e);
-        }
-      }
 
       // Wait for next tick then update all images at once to ensure reactivity
       this.$nextTick(() => {
@@ -2202,19 +1952,13 @@ export default {
         // Force update after all images are set
         this.$forceUpdate();
 
-        // console.log(`Loaded ${mainLoadedCount}/${mainTemplateKeys.length} main templates and ${proposalLoadedCount}/${proposalKeys.length} proposals from local storage`);
+        // console.log(`Loaded ${mainLoadedCount}/${mainTemplateKeys.length} main templates from local storage`);
       });
 
       // If we loaded all needed main templates, we can skip the loading states
       if (mainLoadedCount >= mainTemplateKeys.length) {
         this.templatesLoading = false;
         // console.log('All required main templates loaded from storage');
-
-        // If we also loaded all proposals, we can skip proposal loading states
-        if (proposalLoadedCount >= proposalKeys.length) {
-          this.proposalsLoading = false;
-          // console.log('All proposals loaded from storage');
-        }
 
         return true;
       }
@@ -2266,12 +2010,7 @@ export default {
         this.$set(this.templateLoadingStates, key, false);
       });
 
-      Object.keys(this.proposalLoadingStates).forEach(key => {
-        this.$set(this.proposalLoadingStates, key, false);
-      });
-
       this.templatesLoading = false;
-      this.proposalsLoading = false;
     },
 
     needsImageGeneration() {
@@ -2348,14 +2087,8 @@ export default {
         'settings'
       ];
 
-      // Define proposal keys
-      const proposalKeys = [
-        'login',
-        'dashboard'
-      ];
-
-      // Combine all keys
-      const allKeys = [...mainTemplateKeys, ...proposalKeys];
+      // Use main template keys
+      const allKeys = [...mainTemplateKeys];
 
       // Clear each image from storage
       for (const key of allKeys) {
@@ -2375,9 +2108,7 @@ export default {
         home: '',
         notification: '',
         profile: '',
-        settings: '',
-        login: '',
-        dashboard: ''
+        settings: ''
       };
 
       // Also reset template versions
@@ -2546,16 +2277,10 @@ export default {
 
       // Reset all loading states
       this.templatesLoading = true;
-      this.proposalsLoading = true;
 
       // Reset all template loading states
       Object.keys(this.templateLoadingStates).forEach(key => {
         this.$set(this.templateLoadingStates, key, true);
-      });
-
-      // Reset all proposal loading states
-      Object.keys(this.proposalLoadingStates).forEach(key => {
-        this.$set(this.proposalLoadingStates, key, true);
       });
 
       // Reload JSON templates
@@ -2575,16 +2300,7 @@ export default {
         }, 500 + (index * 100)); // Reduced from 1500ms + 300ms per item
       });
 
-      // For proposals, reveal with staggered timing - REDUCED TIMES
-      const proposalKeys = Object.keys(this.proposalLoadingStates);
-      proposalKeys.forEach((key, index) => {
-        setTimeout(() => {
-          this.$set(this.proposalLoadingStates, key, false);
-          if (index === proposalKeys.length - 1) {
-            this.proposalsLoading = false;
-          }
-        }, 700 + (index * 100)); // Reduced from 2200ms + 300ms per item
-      });
+
     },
     exportProject() {
       // Show custom action sheet instead of uni.showActionSheet
@@ -3340,43 +3056,7 @@ export default {
   }
 }
 
-/* Proposals Grid */
-.proposals-grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: 25px;
-}
 
-.proposal-item {
-  background-color: #fff;
-  border-radius: 10px;
-  overflow: hidden;
-  box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
-  transition: transform 0.3s ease, box-shadow 0.3s ease;
-  cursor: pointer;
-
-  &:hover {
-    transform: translateY(-3px);
-    box-shadow: 0 6px 14px rgba(0, 0, 0, 0.1);
-  }
-
-  .proposal-image {
-    width: 100%;
-    height: 150px;
-    object-fit: cover;
-    border-bottom: 1px solid #f0f0f0;
-  }
-
-  .proposal-label {
-    padding: 12px 15px;
-
-    .proposal-name {
-      font-size: 15px;
-      font-weight: 500;
-      color: #333;
-    }
-  }
-}
 
 /* Responsive adjustments */
 @media (max-width: 1280px) {
@@ -3407,16 +3087,14 @@ export default {
     justify-content: flex-start;
   }
 
-  .templates-grid,
-  .proposals-grid {
+  .templates-grid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
 
 @media (max-width: 640px) {
 
-  .templates-grid,
-  .proposals-grid {
+  .templates-grid {
     grid-template-columns: 1fr;
   }
 }
