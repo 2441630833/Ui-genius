@@ -655,6 +655,7 @@ export default {
       actionSheetOptions: ['Export as Images', 'Export as HTML', 'Export as Vue 2', 'Export as Vue 3', 'Export as React'],
       showCreatePageDialog: false,
       pageDescription: '',
+      // examplePageDescription: 'a simple page just includes one heading',
       examplePageDescription: 'A modern contact page with a form and interactive map, including name, email, and message fields',
     }
   },
@@ -2919,66 +2920,90 @@ export default {
           }
 
           const data = response.data;
-          console.log('Generated page data:', data);
-
-          // Process the generated page
-          let newPage;
-
-          console.log('newPage', newPage);
-          return;
+          // console.log('Generated page data:', data);
           
-          
-          if (newPage) {
-            // Rename the page if needed
-            if (!newPage.name.toLowerCase().includes('page')) {
-              newPage.name = newPage.name + ' Page';
+          try {
+            // Process the response data - handle both string and object formats
+            let responseData = data;
+            
+            // If it's an object with a response property, extract it
+            if (typeof data === 'object' && data.response) {
+              responseData = data.response;
             }
             
-            // Add the new page to the project
-            projectData.pages.push(newPage);
-            
-            // Save the updated project data
-            const updatedProjectData = JSON.stringify(projectData);
-            uni.setStorageSync('latest_7_overall_page', updatedProjectData);
-
-            // Save project to the cloud if logged in
-            this.saveProjectToCloud(projectData);
-
-            // Set flag to force regeneration of images
-            uni.setStorageSync('force_regeneration', 'true');
-
-            // Hide generation overlay
-            setTimeout(() => {
-              this.isGenerating = false;
-
-              // Refresh templates to show the new page
-              this.loadJsonTemplates();
-              this.updateLoadingStates();
-
-              // Force generation of new preview images
-              setTimeout(() => {
-                this.generatePreviewImages();
-              }, 100);
-
-              // Complete refresh after a delay
-              setTimeout(() => {
-                this.refreshTemplates();
-              }, 500);
-
-              // Show success message
-              uni.showToast({
-                title: 'New page created successfully!',
-                icon: 'success',
-                duration: 2000
+            // Clean up the response string - replace backticks with properly escaped quotes
+            if (typeof responseData === 'string') {
+              // Replace backtick-wrapped strings with properly escaped JSON strings
+              responseData = responseData.replace(/`([\s\S]*?)`/g, function(match, p1) {
+                // Escape any double quotes and newlines in the content
+                return JSON.stringify(p1.replace(/\n\s*/g, ' ').trim());
               });
-            }, 1000);
-          } else {
+            }
+            
+            // Now parse the cleaned JSON
+            const parsedResponse = JSON.parse(responseData);
+            // console.log(parsedResponse)
+            
+            // Extract the page data
+            if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
+              const newPage = parsedResponse.pages[0];
+              // console.log(newPage)
+              
+              // Rename the page if needed
+              if (!newPage.name.toLowerCase().includes('page')) {
+                newPage.name = newPage.name + ' Page';
+              }
+              
+              // Add the new page to the project
+              projectData.pages.push(newPage);
+              
+              // Save the updated project data
+              const updatedProjectData = JSON.stringify(projectData);
+              uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+              
+              // Save project to the cloud if logged in
+              this.saveProjectToCloud(projectData);
+              
+              // Set flag to force regeneration of images
+              uni.setStorageSync('force_regeneration', 'true');
+              
+              // Hide generation overlay
+              setTimeout(() => {
+                this.isGenerating = false;
+                
+                // Refresh templates to show the new page
+                this.loadJsonTemplates();
+                this.updateLoadingStates();
+                
+                // Force generation of new preview images
+                setTimeout(() => {
+                  this.generatePreviewImages();
+                }, 100);
+                
+                // Complete refresh after a delay
+                setTimeout(() => {
+                  this.refreshTemplates();
+                }, 500);
+                
+                // Show success message
+                uni.showToast({
+                  title: 'New page created successfully!',
+                  icon: 'success',
+                  duration: 2000
+                });
+              }, 1000);
+            } else {
+              throw new Error('No valid page data found in response');
+            }
+          } catch (error) {
+            console.error('Error processing page data:', error);
+            
             // Handle error
             this.isGenerating = false;
             uni.showToast({
-              title: 'Failed to generate page',
+              title: 'Failed to process page data: ' + error.message,
               icon: 'none',
-              duration: 2000
+              duration: 3000
             });
           }
         },
