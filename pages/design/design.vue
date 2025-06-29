@@ -655,8 +655,8 @@ export default {
       actionSheetOptions: ['Export as Images', 'Export as HTML', 'Export as Vue 2', 'Export as Vue 3', 'Export as React'],
       showCreatePageDialog: false,
       pageDescription: '',
-      // examplePageDescription: 'a simple page just includes one heading',
-      examplePageDescription: 'A modern contact page with a form and interactive map, including name, email, and message fields',
+      examplePageDescription: 'a simple page just includes one heading',
+      // examplePageDescription: 'A modern contact page with a form and interactive map, including name, email, and message fields',
     }
   },
 
