@@ -155,22 +155,41 @@ export default {
                                 });
                                 
                                 if (matchingPage && matchingPage.component) {
-                                    componentHtml = matchingPage.component;
+                                    console.log('提取前的组件内容类型:', typeof matchingPage.component);
+                                    console.log('提取前的组件内容前30个字符:', matchingPage.component.substring(0, 30));
+                                    
+                                    componentHtml = this.extractSafeHtmlContent(matchingPage.component);
                                     console.log('成功加载选中的模板:', selectedTemplateId);
+                                    
+                                    console.log('提取后的组件内容类型:', typeof componentHtml);
+                                    console.log('提取后的组件内容前30个字符:', componentHtml.substring(0, 30));
                                 } else {
                                     // 如果找不到匹配的页面，使用第一个页面
-                                    componentHtml = jsonData.pages[0].component;
+                                    console.log('提取前的组件内容类型:', typeof jsonData.pages[0].component);
+                                    console.log('提取前的组件内容前30个字符:', jsonData.pages[0].component.substring(0, 30));
+                                    
+                                    componentHtml = this.extractSafeHtmlContent(jsonData.pages[0].component);
                                     console.log('未找到选中的模板，使用第一个页面');
+                                    
+                                    console.log('提取后的组件内容类型:', typeof componentHtml);
+                                    console.log('提取后的组件内容前30个字符:', componentHtml.substring(0, 30));
                                 }
                             } else {
                                 // 如果没有选中的模板ID，使用第一个页面
-                                componentHtml = jsonData.pages[0].component;
+                                console.log('提取前的组件内容类型:', typeof jsonData.pages[0].component);
+                                console.log('提取前的组件内容前30个字符:', jsonData.pages[0].component.substring(0, 30));
+                                
+                                componentHtml = this.extractSafeHtmlContent(jsonData.pages[0].component);
                                 console.log('未指定模板ID，使用第一个页面');
+                                
+                                console.log('提取后的组件内容类型:', typeof componentHtml);
+                                console.log('提取后的组件内容前30个字符:', componentHtml.substring(0, 30));
                             }
                         }
                     } catch (parseError) {
                         // 如果解析失败，则认为存储的内容不是JSON格式，直接使用原始内容
                         console.log('存储的内容不是JSON格式，使用原始内容');
+                        console.error('解析错误:', parseError);
                     }
                     
                     // 确保HTML内容是有效的
@@ -212,6 +231,51 @@ export default {
                 }
             } catch (error) {
                 console.error('获取或发送存储的HTML时出错:', error);
+            }
+        },
+        
+        // 安全地提取HTML内容，处理可能的嵌套JSON和反引号包裹的内容
+        extractSafeHtmlContent(componentData) {
+            try {
+                if (!componentData) return '';
+                
+                // 直接使用正则表达式提取反引号之间的内容
+                // 这将匹配最外层的反引号包裹的内容
+                const backtickMatch = /`([\s\S]*)`/m.exec(componentData);
+                if (backtickMatch && backtickMatch[1]) {
+                    console.log('使用正则表达式从反引号中提取了HTML内容');
+                    return backtickMatch[1];
+                }
+                
+                // 如果没有找到反引号，尝试解析JSON
+                try {
+                    // 检查是否是JSON字符串
+                    const parsedData = JSON.parse(componentData);
+                    
+                    // 检查是否有嵌套的pages结构
+                    if (parsedData.pages && parsedData.pages.length > 0 && parsedData.pages[0].component) {
+                        // 递归处理嵌套的component
+                        console.log('发现嵌套JSON结构，递归提取HTML');
+                        return this.extractSafeHtmlContent(parsedData.pages[0].component);
+                    }
+                    
+                    // 如果没有嵌套结构但有component属性
+                    if (parsedData.component) {
+                        return this.extractSafeHtmlContent(parsedData.component);
+                    }
+                } catch (jsonError) {
+                    // 不是JSON格式，检查是否已经是HTML内容
+                    if (componentData.includes('<div') || componentData.includes('<section')) {
+                        console.log('已找到HTML内容');
+                        return componentData;
+                    }
+                }
+                
+                // 如果以上方法都无法提取，返回原始内容
+                return componentData;
+            } catch (error) {
+                console.error('提取HTML内容时出错:', error);
+                return componentData || '';
             }
         },
         // 清理HTML内容，处理可能导致CSS选择器问题的类名
