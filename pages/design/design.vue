@@ -2919,44 +2919,14 @@ export default {
           }
 
           const data = response.data;
-          // console.log('Generated page data:', data);
+          console.log('Generated page data:', data);
 
           // Process the generated page
           let newPage;
+
+          console.log('newPage', newPage);
+          return;
           
-          // Handle different response formats
-          if (data && data.pages && data.pages.length > 0) {
-            // Standard format with pages array
-            newPage = data.pages[0];
-          } else if (data && data.response) {
-            // Format where the response is a string containing JSON
-            try {
-              // Try to parse the response as JSON
-              const parsedResponse = JSON.parse(data.response);
-              if (parsedResponse.pages && parsedResponse.pages.length > 0) {
-                newPage = parsedResponse.pages[0];
-              }
-            } catch (e) {
-              // If parsing fails, create a simple page object with the response as component
-              newPage = {
-                name: "New Page",
-                component: data.response
-              };
-            }
-          } else if (typeof data === 'string') {
-            // Direct string response
-            try {
-              const parsedData = JSON.parse(data);
-              if (parsedData.pages && parsedData.pages.length > 0) {
-                newPage = parsedData.pages[0];
-              }
-            } catch (e) {
-              newPage = {
-                name: "New Page",
-                component: data
-              };
-            }
-          }
           
           if (newPage) {
             // Rename the page if needed
