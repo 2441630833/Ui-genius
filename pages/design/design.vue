@@ -90,8 +90,8 @@
     <view class="hidden-templates">
       <!-- Dynamic Templates from JSON -->
       <template v-if="jsonTemplates.length > 0">
-        <!-- Only render the filtered templates -->
-        <view v-for="(template, index) in filteredTemplates" :key="index"
+        <!-- Render all templates -->
+        <view v-for="(template, index) in jsonTemplates" :key="index"
           :id="'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')"
           class="template-preview-content">
           <!-- <view class="preview-header">
@@ -266,8 +266,9 @@
 
       <!-- Templates Grid -->
       <view class="section">
-        <text class="section-title">Basic Prototype</text>
-        <view class="templates-grid">
+        <text class="section-title">Project Prototypes <span class="template-count">({{ jsonTemplates.length }} pages)</span></text>
+        <view class="templates-grid-container">
+          <view class="templates-grid">
           <!-- Dynamic Templates from JSON -->
           <template v-if="jsonTemplates.length > 0">
             <!-- Filter to only show the 5 main templates -->
@@ -285,6 +286,16 @@
                 </view>
               </view>
             </x-skeleton>
+            
+            <!-- Add New Page Button -->
+            <view class="template-item add-template-item" @click="navigateTo('plus')">
+              <view class="template-preview add-template-preview">
+                <view class="add-icon">+</view>
+              </view>
+              <view class="template-label">
+                <text class="template-name">Add New Page</text>
+              </view>
+            </view>
           </template>
 
           <!-- Fallback Static Templates -->
@@ -349,6 +360,7 @@
               </view>
             </x-skeleton>
           </template>
+        </view>
         </view>
       </view>
 
@@ -573,37 +585,13 @@ export default {
 
   computed: {
     filteredTemplates() {
-      // Only show the 5 main templates that match the fallback static templates
+      // Return all templates from jsonTemplates
       if (!this.jsonTemplates || this.jsonTemplates.length === 0) {
         return [];
       }
-
-      // Define the template types we want to show
-      const desiredTypes = ['home', 'signup', 'notification', 'profile', 'settings'];
-      const filteredTemplates = [];
-
-      // First try to find templates matching our desired types
-      for (const type of desiredTypes) {
-        const match = this.jsonTemplates.find(template =>
-          template.name.toLowerCase().includes(type)
-        );
-
-        if (match) {
-          filteredTemplates.push(match);
-        }
-      }
-
-      // If we don't have 5 templates yet, add others until we reach 5
-      if (filteredTemplates.length < 5) {
-        for (const template of this.jsonTemplates) {
-          if (!filteredTemplates.includes(template)) {
-            filteredTemplates.push(template);
-            if (filteredTemplates.length >= 5) break;
-          }
-        }
-      }
-
-      return filteredTemplates;
+      
+      // Return all templates
+      return this.jsonTemplates;
     }
   },
 
@@ -1405,23 +1393,40 @@ export default {
       // Reset loading states
       this.templateLoadingStates = {};
 
-      // Create loading states for each template
-      this.dynamicTemplateIds.forEach(id => {
-        const key = id.replace('template-', '');
-        this.$set(this.templateLoadingStates, key, true);
-
-        // Also prepare capturedImages object
-        if (!this.capturedImages[key]) {
-          this.$set(this.capturedImages, key, '');
-        }
-
-        // Set a timeout to turn off loading state after a delay - REDUCED TIME
-        setTimeout(() => {
-          this.$set(this.templateLoadingStates, key, false);
-        }, 500 + (Math.random() * 300)); // Reduced from 1500-2500ms to 500-800ms
-      });
-
-
+      // If we have dynamic templates
+      if (this.jsonTemplates && this.jsonTemplates.length > 0) {
+        // Create loading states for all templates from jsonTemplates
+        this.jsonTemplates.forEach(template => {
+          const key = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+          this.$set(this.templateLoadingStates, key, true);
+          
+          // Also prepare capturedImages object
+          if (!this.capturedImages[key]) {
+            this.$set(this.capturedImages, key, '');
+          }
+          
+          // Set a timeout to turn off loading state after a delay - REDUCED TIME
+          setTimeout(() => {
+            this.$set(this.templateLoadingStates, key, false);
+          }, 500 + (Math.random() * 300)); // Reduced from 1500-2500ms to 500-800ms
+        });
+      } else {
+        // Create loading states for each template from dynamicTemplateIds
+        this.dynamicTemplateIds.forEach(id => {
+          const key = id.replace('template-', '');
+          this.$set(this.templateLoadingStates, key, true);
+  
+          // Also prepare capturedImages object
+          if (!this.capturedImages[key]) {
+            this.$set(this.capturedImages, key, '');
+          }
+  
+          // Set a timeout to turn off loading state after a delay - REDUCED TIME
+          setTimeout(() => {
+            this.$set(this.templateLoadingStates, key, false);
+          }, 500 + (Math.random() * 300)); // Reduced from 1500-2500ms to 500-800ms
+        });
+      }
     },
 
     refreshData() {
@@ -1527,12 +1532,10 @@ export default {
       let templateIds = [];
 
       if (this.jsonTemplates.length > 0) {
-        // Only use template IDs for the filtered templates
-        templateIds = this.filteredTemplates.map(template =>
+        // Use template IDs for all templates
+        templateIds = this.jsonTemplates.map(template =>
           'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')
         );
-
-
 
         // Store the template IDs for later use
         this.dynamicTemplateIds = templateIds.filter(id => id.startsWith('template-'));
@@ -1910,8 +1913,20 @@ export default {
         'settings'
       ];
 
+      // Get dynamic template keys if available
+      const dynamicKeys = [];
+      if (this.jsonTemplates && this.jsonTemplates.length > 0) {
+        this.jsonTemplates.forEach(template => {
+          const key = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+          if (!mainTemplateKeys.includes(key)) {
+            dynamicKeys.push(key);
+          }
+        });
+      }
+
       // Try to load each image from storage
       let mainLoadedCount = 0;
+      let dynamicLoadedCount = 0;
 
       // Create a temporary object to hold all image data
       const tempImages = {};
@@ -1939,6 +1954,27 @@ export default {
           // console.error(`Failed to load image data for ${key} from local storage:`, e);
         }
       }
+      
+      // Load dynamic template images
+      for (const key of dynamicKeys) {
+        try {
+          const imageData = uni.getStorageSync(`uigenius_image_${key}`);
+          if (imageData) {
+            // Store in temp object
+            tempImages[key] = imageData;
+            dynamicLoadedCount++;
+
+            // Immediately set the loading state to false for this template
+            if (this.templateLoadingStates[key]) {
+              this.$set(this.templateLoadingStates, key, false);
+            }
+
+            // console.log(`Loaded dynamic template image for ${key} from local storage`);
+          }
+        } catch (e) {
+          // console.error(`Failed to load image data for ${key} from local storage:`, e);
+        }
+      }
 
 
 
@@ -1952,14 +1988,18 @@ export default {
         // Force update after all images are set
         this.$forceUpdate();
 
-        // console.log(`Loaded ${mainLoadedCount}/${mainTemplateKeys.length} main templates from local storage`);
+        // console.log(`Loaded ${mainLoadedCount}/${mainTemplateKeys.length} main templates and ${dynamicLoadedCount}/${dynamicKeys.length} dynamic templates from local storage`);
       });
 
-      // If we loaded all needed main templates, we can skip the loading states
-      if (mainLoadedCount >= mainTemplateKeys.length) {
+      // Determine if we have enough templates loaded to skip loading states
+      const hasAllMainTemplates = mainLoadedCount >= mainTemplateKeys.length;
+      const hasAllDynamicTemplates = dynamicKeys.length > 0 && dynamicLoadedCount >= dynamicKeys.length;
+      
+      // If we're using dynamic templates and have them all, or we have all main templates when not using dynamic ones
+      if ((dynamicKeys.length > 0 && hasAllDynamicTemplates) || 
+          (dynamicKeys.length === 0 && hasAllMainTemplates)) {
         this.templatesLoading = false;
-        // console.log('All required main templates loaded from storage');
-
+        // console.log('All required templates loaded from storage');
         return true;
       }
 
@@ -3017,10 +3057,22 @@ export default {
   display: block;
 }
 
+.template-count {
+  font-size: 16px;
+  font-weight: 400;
+  color: #666;
+}
+
 /* Templates Grid */
+.templates-grid-container {
+  max-height: 70vh;
+  overflow-y: auto;
+  padding-right: 10px;
+}
+
 .templates-grid {
   display: grid;
-  grid-template-columns: repeat(5, 1fr);
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
   gap: 20px;
   margin-bottom: 30px;
 }
@@ -3053,6 +3105,35 @@ export default {
       font-weight: 500;
       color: #333;
     }
+  }
+}
+
+.add-template-item {
+  border: 2px dashed #ddd;
+  background-color: #f9f9f9;
+  
+  &:hover {
+    border-color: #e53935;
+    background-color: #fff;
+  }
+}
+
+.add-template-preview {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 120px;
+  background-color: transparent;
+}
+
+.add-icon {
+  font-size: 40px;
+  color: #aaa;
+  font-weight: 300;
+  transition: color 0.3s ease;
+  
+  .add-template-item:hover & {
+    color: #e53935;
   }
 }
 
