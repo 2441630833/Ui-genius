@@ -3065,14 +3065,15 @@ export default {
 
 /* Templates Grid */
 .templates-grid-container {
-  max-height: 70vh;
+  max-height: 75vh;
   overflow-y: auto;
-  padding-right: 10px;
+  padding-right: 15px;
+  padding-bottom: 20px;
 }
 
 .templates-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  grid-template-columns: repeat(5, 1fr);
   gap: 20px;
   margin-bottom: 30px;
 }
@@ -3084,6 +3085,7 @@ export default {
   box-shadow: 0 3px 10px rgba(0, 0, 0, 0.07);
   transition: transform 0.3s ease, box-shadow 0.3s ease;
   cursor: pointer;
+  min-width: 200px;
 
   &:hover {
     transform: translateY(-3px);
@@ -3092,7 +3094,7 @@ export default {
 
   .template-image {
     width: 100%;
-    height: 120px;
+    height: 150px;
     object-fit: cover;
     border-bottom: 1px solid #f0f0f0;
   }
@@ -3122,7 +3124,7 @@ export default {
   display: flex;
   align-items: center;
   justify-content: center;
-  height: 120px;
+  height: 150px;
   background-color: transparent;
 }
 
@@ -3140,7 +3142,13 @@ export default {
 
 
 /* Responsive adjustments */
-@media (max-width: 1280px) {
+@media (max-width: 1400px) {
+  .templates-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+@media (max-width: 1100px) {
   .templates-grid {
     grid-template-columns: repeat(3, 1fr);
   }
@@ -3174,7 +3182,6 @@ export default {
 }
 
 @media (max-width: 640px) {
-
   .templates-grid {
     grid-template-columns: 1fr;
   }
