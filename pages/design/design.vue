@@ -571,7 +571,7 @@ export default {
       customColor: '',
       previewColor: '#86E3CE', // Change default color to mint
       colorPaletteError: '',
-      numPages: 1,
+      numPages: 3,
       // Add export related data properties
       showExportOptions: false,
       exportType: '',
@@ -616,16 +616,16 @@ export default {
     }
 
     // Retrieve stored numPages or use default
-    const storedNumPages = uni.getStorageSync('numPages');
-    if (storedNumPages) {
-      // Handle case where numPages is returned as an object with type and data properties
-      if (typeof storedNumPages === 'object' && storedNumPages.type === 'number' && 'data' in storedNumPages) {
-        this.numPages = storedNumPages.data;
-      } else {
-        // Handle case where it's a simple value
-        this.numPages = parseInt(storedNumPages, 10);
-      }
-    }
+    // const storedNumPages = uni.getStorageSync('numPages');
+    // if (storedNumPages) {
+    //   // Handle case where numPages is returned as an object with type and data properties
+    //   if (typeof storedNumPages === 'object' && storedNumPages.type === 'number' && 'data' in storedNumPages) {
+    //     this.numPages = storedNumPages.data;
+    //   } else {
+    //     // Handle case where it's a simple value
+    //     this.numPages = parseInt(storedNumPages, 10);
+    //   }
+    // }
 
     // Listen for image capture events from renderjs
     uni.$on('image-captured', this.receiveImageData);
@@ -1680,7 +1680,7 @@ export default {
 
         try {
           // Get stored numPages
-          const numPages = this.numPages || 1;
+          const numPages = this.numPages;
           const deviceType = this.selectedDevice || 'desktop';
 
           // Use uni.request instead of XHR for the API call

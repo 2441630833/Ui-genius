@@ -246,11 +246,11 @@
           </view>
 
           <!-- Number of Pages Selector -->
-          <view class="pages-selector-container">
+          <!-- <view class="pages-selector-container">
             <text class="pages-selector-label">Number of Pages: {{ numPages }}</text>
             <slider class="pages-selector" min="1" max="7" step="1" show-value 
               :value="numPages" @change="onNumPagesChange" />
-          </view>
+          </view> -->
 
           <button class="continue-btn" @click="createProject">Continue</button>
         </view>
