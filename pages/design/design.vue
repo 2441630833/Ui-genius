@@ -1726,69 +1726,260 @@ export default {
               responseData = data.response;
             }
             
-            // Clean up the response string - replace backticks with properly escaped quotes
-            if (typeof responseData === 'string') {
-              // Replace backtick-wrapped strings with properly escaped JSON strings
-              responseData = responseData.replace(/`([\s\S]*?)`/g, function(match, p1) {
-                // Escape any double quotes and newlines in the content
-                return JSON.stringify(p1.replace(/\n\s*/g, ' ').trim());
-              });
-            }
-            
-            // Now parse the cleaned JSON
-            const parsedResponse = JSON.parse(responseData);
-            // console.log(parsedResponse)
-            
-            // Extract the page data
-            if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
-              const newPage = parsedResponse.pages[0];
-              // console.log(newPage)
+            // If responseData is already a parsed object, use it directly
+            if (typeof responseData === 'object' && responseData.pages) {
+              const parsedResponse = responseData;
               
-              // Rename the page if needed
-              if (!newPage.name.toLowerCase().includes('page')) {
-                newPage.name = newPage.name + ' Page';
+              // Extract the page data
+              if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
+                const newPage = parsedResponse.pages[0];
+                
+                // Rename the page if needed
+                if (!newPage.name.toLowerCase().includes('page')) {
+                  newPage.name = newPage.name + ' Page';
+                }
+                
+                // Add the new page to the project
+                projectData.pages.push(newPage);
+                
+                // Save the updated project data
+                const updatedProjectData = JSON.stringify(projectData);
+                uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+                
+                // Save project to the cloud if logged in
+                this.saveProjectToCloud(projectData);
+                
+                // Set flag to force regeneration of images
+                uni.setStorageSync('force_regeneration', 'true');
+                
+                // Hide generation overlay
+                setTimeout(() => {
+                  this.isGenerating = false;
+                  
+                  // Refresh templates to show the new page
+                  this.loadJsonTemplates();
+                  this.updateLoadingStates();
+                  
+                  // Force generation of new preview images
+                  setTimeout(() => {
+                    this.generatePreviewImages();
+                  }, 100);
+                  
+                  // Complete refresh after a delay
+                  setTimeout(() => {
+                    this.refreshTemplates();
+                  }, 500);
+                  
+                  // Show success message
+                  uni.showToast({
+                    title: 'New page created successfully!',
+                    icon: 'success',
+                    duration: 2000
+                  });
+                }, 1000);
+              } else {
+                throw new Error('No valid page data found in response');
               }
-              
-              // Add the new page to the project
-              projectData.pages.push(newPage);
-              
-              // Save the updated project data
-              const updatedProjectData = JSON.stringify(projectData);
-              uni.setStorageSync('latest_7_overall_page', updatedProjectData);
-              
-              // Save project to the cloud if logged in
-              this.saveProjectToCloud(projectData);
-              
-              // Set flag to force regeneration of images
-              uni.setStorageSync('force_regeneration', 'true');
-              
-              // Hide generation overlay
-              setTimeout(() => {
-                this.isGenerating = false;
+            } else if (typeof responseData === 'string') {
+              try {
+                // Try to clean up the response string for proper JSON parsing
                 
-                // Refresh templates to show the new page
-                this.loadJsonTemplates();
-                this.updateLoadingStates();
+                // First attempt: Try direct parsing - it might already be valid JSON
+                try {
+                  const parsedResponse = JSON.parse(responseData);
+                  // If we get here, parsing succeeded
+                  
+                  // Continue with the same logic as above
+                  if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
+                    const newPage = parsedResponse.pages[0];
+                    
+                    // Rename the page if needed
+                    if (!newPage.name.toLowerCase().includes('page')) {
+                      newPage.name = newPage.name + ' Page';
+                    }
+                    
+                    // Add the new page to the project
+                    projectData.pages.push(newPage);
+                    
+                    // Save the updated project data
+                    const updatedProjectData = JSON.stringify(projectData);
+                    uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+                    
+                    // Save project to the cloud if logged in
+                    this.saveProjectToCloud(projectData);
+                    
+                    // Set flag to force regeneration of images
+                    uni.setStorageSync('force_regeneration', 'true');
+                    
+                    // Hide generation overlay
+                    setTimeout(() => {
+                      this.isGenerating = false;
+                      
+                      // Refresh templates to show the new page
+                      this.loadJsonTemplates();
+                      this.updateLoadingStates();
+                      
+                      // Force generation of new preview images
+                      setTimeout(() => {
+                        this.generatePreviewImages();
+                      }, 100);
+                      
+                      // Complete refresh after a delay
+                      setTimeout(() => {
+                        this.refreshTemplates();
+                      }, 500);
+                      
+                      // Show success message
+                      uni.showToast({
+                        title: 'New page created successfully!',
+                        icon: 'success',
+                        duration: 2000
+                      });
+                    }, 1000);
+                  } else {
+                    throw new Error('No valid page data found in response');
+                  }
+                  return; // Exit early if first attempt succeeded
+                } catch (initialParseError) {
+                  // First attempt failed, continue with more robust cleaning
+                }
                 
-                // Force generation of new preview images
-                setTimeout(() => {
-                  this.generatePreviewImages();
-                }, 100);
+                // Second attempt: More thorough cleaning for complex responses
+                // Extract JSON-like structure from the response if it contains backticks
+                let cleanedResponse = responseData;
                 
-                // Complete refresh after a delay
-                setTimeout(() => {
-                  this.refreshTemplates();
-                }, 500);
-                
-                // Show success message
-                uni.showToast({
-                  title: 'New page created successfully!',
-                  icon: 'success',
-                  duration: 2000
+                // Replace backtick-wrapped strings with properly escaped JSON strings
+                cleanedResponse = cleanedResponse.replace(/`([\s\S]*?)`/g, function(match, p1) {
+                  // Escape any double quotes and newlines in the content
+                  return JSON.stringify(p1.replace(/\n\s*/g, ' ').trim());
                 });
-              }, 1000);
+                
+                // Handle HTML content in component property by properly escaping it
+                const componentMatch = cleanedResponse.match(/"component"\s*:\s*(".*?"|'.*?'|\{.*?\}|\[.*?\])/s);
+                if (componentMatch) {
+                  const componentContent = componentMatch[1];
+                  // If component content isn't already properly quoted JSON
+                  if (!componentContent.startsWith('"') || !componentContent.endsWith('"')) {
+                    // Extract the content and properly escape it
+                    const rawContent = componentContent.replace(/^['"{]|['"}\]]$/g, '');
+                    const escapedContent = JSON.stringify(rawContent);
+                    // Replace the original component content with properly escaped version
+                    cleanedResponse = cleanedResponse.replace(componentMatch[0], `"component": ${escapedContent}`);
+                  }
+                }
+                
+                // Try parsing the cleaned response
+                const parsedResponse = JSON.parse(cleanedResponse);
+                
+                // Extract the page data
+                if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
+                  const newPage = parsedResponse.pages[0];
+                  
+                  // Rename the page if needed
+                  if (!newPage.name.toLowerCase().includes('page')) {
+                    newPage.name = newPage.name + ' Page';
+                  }
+                  
+                  // Add the new page to the project
+                  projectData.pages.push(newPage);
+                  
+                  // Save the updated project data
+                  const updatedProjectData = JSON.stringify(projectData);
+                  uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+                  
+                  // Save project to the cloud if logged in
+                  this.saveProjectToCloud(projectData);
+                  
+                  // Set flag to force regeneration of images
+                  uni.setStorageSync('force_regeneration', 'true');
+                  
+                  // Hide generation overlay
+                  setTimeout(() => {
+                    this.isGenerating = false;
+                    
+                    // Refresh templates to show the new page
+                    this.loadJsonTemplates();
+                    this.updateLoadingStates();
+                    
+                    // Force generation of new preview images
+                    setTimeout(() => {
+                      this.generatePreviewImages();
+                    }, 100);
+                    
+                    // Complete refresh after a delay
+                    setTimeout(() => {
+                      this.refreshTemplates();
+                    }, 500);
+                    
+                    // Show success message
+                    uni.showToast({
+                      title: 'New page created successfully!',
+                      icon: 'success',
+                      duration: 2000
+                    });
+                  }, 1000);
+                } else {
+                  throw new Error('No valid page data found in response');
+                }
+              } catch (parseError) {
+                // If all parsing attempts fail, try to extract and create a page manually
+                try {
+                  // Create a simple page object based on the description
+                  const pageName = this.pageDescription.split(' ').slice(0, 2).join(' ');
+                  const simplifiedPage = {
+                    name: pageName || 'New Page',
+                    component: `<div class="container mx-auto p-4">
+                      <h1 class="text-2xl font-bold mb-4">Simple Page</h1>
+                      <p>This is a simple page created from your description: "${this.pageDescription}"</p>
+                    </div>`
+                  };
+                  
+                  // Add the simple page to the project
+                  projectData.pages.push(simplifiedPage);
+                  
+                  // Save the updated project data
+                  const updatedProjectData = JSON.stringify(projectData);
+                  uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+                  
+                  // Save project to the cloud if logged in
+                  this.saveProjectToCloud(projectData);
+                  
+                  // Set flag to force regeneration of images
+                  uni.setStorageSync('force_regeneration', 'true');
+                  
+                  // Hide generation overlay
+                  setTimeout(() => {
+                    this.isGenerating = false;
+                    
+                    // Refresh templates to show the new page
+                    this.loadJsonTemplates();
+                    this.updateLoadingStates();
+                    
+                    // Force generation of new preview images
+                    setTimeout(() => {
+                      this.generatePreviewImages();
+                    }, 100);
+                    
+                    // Complete refresh after a delay
+                    setTimeout(() => {
+                      this.refreshTemplates();
+                    }, 500);
+                    
+                    // Show success message
+                    uni.showToast({
+                      title: 'Simple page created (parsing failed)',
+                      icon: 'success',
+                      duration: 2000
+                    });
+                  }, 1000);
+                  
+                  console.error('Used fallback page creation due to parsing error:', parseError);
+                } catch (fallbackError) {
+                  throw new Error(`JSON parsing failed: ${parseError.message}`);
+                }
+              }
             } else {
-              throw new Error('No valid page data found in response');
+              throw new Error('Invalid response format');
             }
           } catch (error) {
             console.error('Error processing page data:', error);
@@ -2677,75 +2868,267 @@ export default {
           try {
             // Process the response data - handle both string and object formats
             let responseData = data;
+            console.log('responseData', responseData);
             
             // If it's an object with a response property, extract it
             if (typeof data === 'object' && data.response) {
               responseData = data.response;
             }
             
-            // Clean up the response string - replace backticks with properly escaped quotes
-            if (typeof responseData === 'string') {
-              // Replace backtick-wrapped strings with properly escaped JSON strings
-              responseData = responseData.replace(/`([\s\S]*?)`/g, function(match, p1) {
-                // Escape any double quotes and newlines in the content
-                return JSON.stringify(p1.replace(/\n\s*/g, ' ').trim());
-              });
-            }
-            
-            // Now parse the cleaned JSON
-            const parsedResponse = JSON.parse(responseData);
-            // console.log(parsedResponse)
-            
-            // Extract the page data
-            if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
-              const newPage = parsedResponse.pages[0];
-              // console.log(newPage)
+            // If responseData is already a parsed object, use it directly
+            if (typeof responseData === 'object' && responseData.pages) {
+              const parsedResponse = responseData;
               
-              // Rename the page if needed
-              if (!newPage.name.toLowerCase().includes('page')) {
-                newPage.name = newPage.name + ' Page';
+              // Extract the page data
+              if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
+                const newPage = parsedResponse.pages[0];
+                
+                // Rename the page if needed
+                if (!newPage.name.toLowerCase().includes('page')) {
+                  newPage.name = newPage.name + ' Page';
+                }
+                
+                // Add the new page to the project
+                projectData.pages.push(newPage);
+                
+                // Save the updated project data
+                const updatedProjectData = JSON.stringify(projectData);
+                uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+                
+                // Save project to the cloud if logged in
+                this.saveProjectToCloud(projectData);
+                
+                // Set flag to force regeneration of images
+                uni.setStorageSync('force_regeneration', 'true');
+                
+                // Hide generation overlay
+                setTimeout(() => {
+                  this.isGenerating = false;
+                  
+                  // Refresh templates to show the new page
+                  this.loadJsonTemplates();
+                  this.updateLoadingStates();
+                  
+                  // Force generation of new preview images
+                  setTimeout(() => {
+                    this.generatePreviewImages();
+                  }, 100);
+                  
+                  // Complete refresh after a delay
+                  setTimeout(() => {
+                    this.refreshTemplates();
+                  }, 500);
+                  
+                  // Show success message
+                  uni.showToast({
+                    title: 'New page created successfully!',
+                    icon: 'success',
+                    duration: 2000
+                  });
+                }, 1000);
+              } else {
+                throw new Error('No valid page data found in response');
               }
-              
-              // Add the new page to the project
-              projectData.pages.push(newPage);
-              
-              // Save the updated project data
-              const updatedProjectData = JSON.stringify(projectData);
-              uni.setStorageSync('latest_7_overall_page', updatedProjectData);
-              
-              // Save project to the cloud if logged in
-              this.saveProjectToCloud(projectData);
-              
-              // Set flag to force regeneration of images
-              uni.setStorageSync('force_regeneration', 'true');
-              
-              // Hide generation overlay
-              setTimeout(() => {
-                this.isGenerating = false;
+            } else if (typeof responseData === 'string') {
+              try {
+                // Try to clean up the response string for proper JSON parsing
                 
-                // Refresh templates to show the new page
-                this.loadJsonTemplates();
-                this.updateLoadingStates();
+                // First attempt: Try direct parsing - it might already be valid JSON
+                try {
+                  const parsedResponse = JSON.parse(responseData);
+                  // If we get here, parsing succeeded
+                  
+                  // Continue with the same logic as above
+                  if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
+                    const newPage = parsedResponse.pages[0];
+                    
+                    // Rename the page if needed
+                    if (!newPage.name.toLowerCase().includes('page')) {
+                      newPage.name = newPage.name + ' Page';
+                    }
+                    
+                    // Add the new page to the project
+                    projectData.pages.push(newPage);
+                    
+                    // Save the updated project data
+                    const updatedProjectData = JSON.stringify(projectData);
+                    uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+                    
+                    // Save project to the cloud if logged in
+                    this.saveProjectToCloud(projectData);
+                    
+                    // Set flag to force regeneration of images
+                    uni.setStorageSync('force_regeneration', 'true');
+                    
+                    // Hide generation overlay
+                    setTimeout(() => {
+                      this.isGenerating = false;
+                      
+                      // Refresh templates to show the new page
+                      this.loadJsonTemplates();
+                      this.updateLoadingStates();
+                      
+                      // Force generation of new preview images
+                      setTimeout(() => {
+                        this.generatePreviewImages();
+                      }, 100);
+                      
+                      // Complete refresh after a delay
+                      setTimeout(() => {
+                        this.refreshTemplates();
+                      }, 500);
+                      
+                      // Show success message
+                      uni.showToast({
+                        title: 'New page created successfully!',
+                        icon: 'success',
+                        duration: 2000
+                      });
+                    }, 1000);
+                  } else {
+                    throw new Error('No valid page data found in response');
+                  }
+                  return; // Exit early if first attempt succeeded
+                } catch (initialParseError) {
+                  // First attempt failed, continue with more robust cleaning
+                }
                 
-                // Force generation of new preview images
-                setTimeout(() => {
-                  this.generatePreviewImages();
-                }, 100);
+                // Second attempt: More thorough cleaning for complex responses
+                // Extract JSON-like structure from the response if it contains backticks
+                let cleanedResponse = responseData;
                 
-                // Complete refresh after a delay
-                setTimeout(() => {
-                  this.refreshTemplates();
-                }, 500);
-                
-                // Show success message
-                uni.showToast({
-                  title: 'New page created successfully!',
-                  icon: 'success',
-                  duration: 2000
+                // Replace backtick-wrapped strings with properly escaped JSON strings
+                cleanedResponse = cleanedResponse.replace(/`([\s\S]*?)`/g, function(match, p1) {
+                  // Escape any double quotes and newlines in the content
+                  return JSON.stringify(p1.replace(/\n\s*/g, ' ').trim());
                 });
-              }, 1000);
+                
+                // Handle HTML content in component property by properly escaping it
+                const componentMatch = cleanedResponse.match(/"component"\s*:\s*(".*?"|'.*?'|\{.*?\}|\[.*?\])/s);
+                if (componentMatch) {
+                  const componentContent = componentMatch[1];
+                  // If component content isn't already properly quoted JSON
+                  if (!componentContent.startsWith('"') || !componentContent.endsWith('"')) {
+                    // Extract the content and properly escape it
+                    const rawContent = componentContent.replace(/^['"{]|['"}\]]$/g, '');
+                    const escapedContent = JSON.stringify(rawContent);
+                    // Replace the original component content with properly escaped version
+                    cleanedResponse = cleanedResponse.replace(componentMatch[0], `"component": ${escapedContent}`);
+                  }
+                }
+                
+                // Try parsing the cleaned response
+                const parsedResponse = JSON.parse(cleanedResponse);
+                
+                // Extract the page data
+                if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
+                  const newPage = parsedResponse.pages[0];
+                  
+                  // Rename the page if needed
+                  if (!newPage.name.toLowerCase().includes('page')) {
+                    newPage.name = newPage.name + ' Page';
+                  }
+                  
+                  // Add the new page to the project
+                  projectData.pages.push(newPage);
+                  
+                  // Save the updated project data
+                  const updatedProjectData = JSON.stringify(projectData);
+                  uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+                  
+                  // Save project to the cloud if logged in
+                  this.saveProjectToCloud(projectData);
+                  
+                  // Set flag to force regeneration of images
+                  uni.setStorageSync('force_regeneration', 'true');
+                  
+                  // Hide generation overlay
+                  setTimeout(() => {
+                    this.isGenerating = false;
+                    
+                    // Refresh templates to show the new page
+                    this.loadJsonTemplates();
+                    this.updateLoadingStates();
+                    
+                    // Force generation of new preview images
+                    setTimeout(() => {
+                      this.generatePreviewImages();
+                    }, 100);
+                    
+                    // Complete refresh after a delay
+                    setTimeout(() => {
+                      this.refreshTemplates();
+                    }, 500);
+                    
+                    // Show success message
+                    uni.showToast({
+                      title: 'New page created successfully!',
+                      icon: 'success',
+                      duration: 2000
+                    });
+                  }, 1000);
+                } else {
+                  throw new Error('No valid page data found in response');
+                }
+              } catch (parseError) {
+                // If all parsing attempts fail, try to extract and create a page manually
+                try {
+                  // Create a simple page object based on the description
+                  const pageName = this.pageDescription.split(' ').slice(0, 2).join(' ');
+                  const simplifiedPage = {
+                    name: pageName || 'New Page',
+                    component: `<div class="container mx-auto p-4">
+                      <h1 class="text-2xl font-bold mb-4">Simple Page</h1>
+                      <p>This is a simple page created from your description: "${this.pageDescription}"</p>
+                    </div>`
+                  };
+                  
+                  // Add the simple page to the project
+                  projectData.pages.push(simplifiedPage);
+                  
+                  // Save the updated project data
+                  const updatedProjectData = JSON.stringify(projectData);
+                  uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+                  
+                  // Save project to the cloud if logged in
+                  this.saveProjectToCloud(projectData);
+                  
+                  // Set flag to force regeneration of images
+                  uni.setStorageSync('force_regeneration', 'true');
+                  
+                  // Hide generation overlay
+                  setTimeout(() => {
+                    this.isGenerating = false;
+                    
+                    // Refresh templates to show the new page
+                    this.loadJsonTemplates();
+                    this.updateLoadingStates();
+                    
+                    // Force generation of new preview images
+                    setTimeout(() => {
+                      this.generatePreviewImages();
+                    }, 100);
+                    
+                    // Complete refresh after a delay
+                    setTimeout(() => {
+                      this.refreshTemplates();
+                    }, 500);
+                    
+                    // Show success message
+                    uni.showToast({
+                      title: 'Simple page created (parsing failed)',
+                      icon: 'success',
+                      duration: 2000
+                    });
+                  }, 1000);
+                  
+                  console.error('Used fallback page creation due to parsing error:', parseError);
+                } catch (fallbackError) {
+                  throw new Error(`JSON parsing failed: ${parseError.message}`);
+                }
+              }
             } else {
-              throw new Error('No valid page data found in response');
+              throw new Error('Invalid response format');
             }
           } catch (error) {
             console.error('Error processing page data:', error);
