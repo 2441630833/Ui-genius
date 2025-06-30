@@ -571,7 +571,7 @@ export default {
       customColor: '',
       previewColor: '#86E3CE', // Change default color to mint
       colorPaletteError: '',
-      numPages: 3,
+      numPages: 1,
       // Add export related data properties
       showExportOptions: false,
       exportType: '',
@@ -614,18 +614,6 @@ export default {
     if (selectedDevice) {
       this.selectedDevice = selectedDevice;
     }
-
-    // Retrieve stored numPages or use default
-    // const storedNumPages = uni.getStorageSync('numPages');
-    // if (storedNumPages) {
-    //   // Handle case where numPages is returned as an object with type and data properties
-    //   if (typeof storedNumPages === 'object' && storedNumPages.type === 'number' && 'data' in storedNumPages) {
-    //     this.numPages = storedNumPages.data;
-    //   } else {
-    //     // Handle case where it's a simple value
-    //     this.numPages = parseInt(storedNumPages, 10);
-    //   }
-    // }
 
     // Listen for image capture events from renderjs
     uni.$on('image-captured', this.receiveImageData);
@@ -1654,221 +1642,182 @@ export default {
       if (this.isGenerating) {
         return;
       }
+      // Show generation progress overlay
+      this.isGenerating = true;
+      this.generationProgress = 0;
 
-      // Clear any previous error message
-      this.errorMessage = '';
+      // Set up progress interval - slower progression for longer expected wait time
+      const progressInterval = setInterval(() => {
+        if (this.generationProgress < 95) {
+          // Slower increment for longer expected time (10+ minutes)
+          const increment = this.generationProgress < 70 ? 0.5 : 0.2;
+          this.generationProgress += increment;
+        }
+      }, 3000);
 
-      this.projectDescription = uni.getStorageSync('projectDescription');
-      if (this.projectDescription) {
-        // Start progress bar
-        this.isGenerating = true;
-        this.generationProgress = 10; // Start at 10% instead of 5%
+      // Get existing project data
+      const existingProjectData = uni.getStorageSync('latest_7_overall_page');
+      let projectData;
 
-        // Set up static progress simulation with faster progression
-        const totalDuration = 600000; // 10 minutes instead of 2 minutes
-        const progressInterval = 400; // Update every 400ms instead of 500ms
-        const progressSteps = totalDuration / progressInterval;
-        const progressIncrement = 85 / progressSteps; // Max 95% for simulation
+      if (existingProjectData) {
+        // Use existing project data if available
+        projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
+      } else {
+        // Create new project data structure if none exists
+        projectData = {
+          pages: [],
+          AIProjectDescription: 'My Project',
+          AIProjectName: 'UI Genius Project',
+        };
+      }
 
-        // Start the progress simulation
-        this.progressInterval = setInterval(() => {
-          this.generationProgress += progressIncrement;
-          if (this.generationProgress > 95) {
-            this.generationProgress = 95;
+      // Prepare form data for uni.request
+      const formData = {
+        prompt: uni.getStorageSync('projectDescription') || this.projectDescription,
+        device_type: uni.getStorageSync('selectedDevice') || 'desktop',
+        num_pages: 1
+      };
+
+      // Show a toast to indicate a long wait
+      uni.showToast({
+        title: 'Generating page, this may take 10+ minutes',
+        icon: 'none',
+        duration: 3000
+      });
+
+      // Make the API call using uni.request instead of fetch
+      uni.request({
+        url: `${API_BASE_URL}/generate-ui`,
+        method: 'POST',
+        header: {
+          'Content-Type': 'application/x-www-form-urlencoded'
+        },
+        data: formData,
+        // Set a much longer timeout (20 minutes = 1,200,000ms)
+        timeout: 1200000,
+        success: (response) => {
+          // console.log('API Response:', response);
+          
+          // Stop the progress interval
+          clearInterval(progressInterval);
+          this.generationProgress = 100;
+
+          // Handle successful response
+          if (response.statusCode !== 200) {
+            // Handle API error
+            this.isGenerating = false;
+            uni.showToast({
+              title: 'API error: ' + response.statusCode,
+              icon: 'none',
+              duration: 2000
+            });
+            return;
           }
-        }, progressInterval);
 
-        try {
-          // Get stored numPages
-          const numPages = this.numPages;
-          const deviceType = this.selectedDevice || 'desktop';
-
-          // Use uni.request instead of XHR for the API call
-          uni.request({
-            url: `${API_BASE_URL}/generate-ui`,
-            method: 'POST',
-            header: {
-              'Content-Type': 'application/x-www-form-urlencoded'
-            },
-            data: {
-              prompt: this.projectDescription,
-              device_type: deviceType,
-              num_pages: numPages
-            },
-            timeout: 600000, // 10 minutes timeout instead of 5 minutes
-            success: (res) => {
-              // Clear any remaining interval
-              if (this.progressInterval) {
-                clearInterval(this.progressInterval);
-                this.progressInterval = null;
-              }
-
-              // Set progress to 100% when complete
-              this.generationProgress = 100;
-
-              if (res.statusCode === 200 && res.data) {
-                try {
-                  // Process the response data
-                  let jsonContent;
-                  const fullContent = res.data;
-
-                  // If it's a string, parse it to ensure it's valid JSON
-                  if (typeof fullContent === 'string') {
-                    // Clean the content if needed
-                    let cleanContent = fullContent.trim();
-
-                    // Remove code block markers if present
-                    if (cleanContent.startsWith('```json')) {
-                      cleanContent = cleanContent.replace(/^```json\s*/, '').replace(/```\s*$/, '');
-                    } else if (cleanContent.startsWith('```')) {
-                      cleanContent = cleanContent.replace(/^```\s*/, '').replace(/```\s*$/, '');
-                    }
-
-                    // Parse the JSON to clean up component properties
-                    const parsedJson = JSON.parse(cleanContent);
-                    
-                    // Clean code block markers from component properties
-                    if (parsedJson && parsedJson.pages) {
-                      parsedJson.pages.forEach(page => {
-                        if (page.component) {
-                          // Clean component content
-                          if (typeof page.component === 'string') {
-                            if (page.component.startsWith('```json')) {
-                              page.component = page.component.replace(/^```json\s*/, '').replace(/```\s*$/, '');
-                            } else if (page.component.startsWith('```')) {
-                              page.component = page.component.replace(/^```\s*/, '').replace(/```\s*$/, '');
-                            }
-                          }
-                        }
-                      });
-                    }
-                    
-                    // Stringify back to JSON
-                    cleanContent = JSON.stringify(parsedJson);
-
-                    // Parse and stringify to ensure valid JSON
-                    const parsedContent = JSON.parse(cleanContent);
-                    jsonContent = JSON.stringify(parsedContent);
-                  } else if (typeof fullContent === 'object') {
-                    // If it's already an object, check if it's the direct response or wrapped
-                    if (fullContent.response && typeof fullContent.response === 'string') {
-                      // Try to parse the response as JSON
-                      try {
-                        const parsedResponse = JSON.parse(fullContent.response);
-                        jsonContent = JSON.stringify(parsedResponse);
-                      } catch (e) {
-                        // If it can't be parsed as JSON, use the raw response
-                        jsonContent = JSON.stringify({
-                          "pages": [{
-                            "name": "Generated Page",
-                            "component": fullContent.response
-                          }],
-                          "AIProjectDescription": this.projectDescription,
-                          "AIProjectName": "Generated Project",
-                        });
-                      }
-                    } else {
-                      // It's a direct object response
-                      jsonContent = JSON.stringify(fullContent);
-                    }
-                  } else {
-                    throw new Error('Unexpected response format');
-                  }
-
-                  // Clear existing stored images before saving new content
-                  this.clearStoredImages();
-
-                  // Store the response in local storage
-                  uni.setStorageSync('latest_7_overall_page', jsonContent);
-                  uni.removeStorageSync('projectDescription');
-                  uni.removeStorageSync('selectedDevice');
-                  uni.removeStorageSync('numPages');
-
-                  // Set flag to force regeneration of images
-                  uni.setStorageSync('force_regeneration', 'true');
-
-                  // Save to cloud database
-                  this.saveProjectToCloud(jsonContent);
-
-                  // Load the new templates and reset loading states
-                  this.$nextTick(() => {
-                    this.loadJsonTemplates();
-                    this.updateLoadingStates();
-
-                    // Force generation of new preview images
-                    setTimeout(() => {
-                      this.generatePreviewImages();
-                    }, 100); // Reduced from 300ms
-
-                    // Complete refresh after a delay to ensure everything is loaded
-                    setTimeout(() => {
-                      this.refreshTemplates();
-                    }, 500); // Reduced from 1000ms
-                  });
-                } catch (e) {
-                  this.errorMessage = 'Failed to process generated page data';
-                  uni.showToast({
-                    title: this.errorMessage,
-                    icon: 'none',
-                    duration: 3000
-                  });
-                }
-
-                // Hide progress bar after a short delay
-                setTimeout(() => {
-                  this.isGenerating = false;
-                }, 500);
-              } else {
-                this.isGenerating = false;
-                this.errorMessage = `Request failed with status: ${res.statusCode}`;
-                uni.showToast({
-                  title: this.errorMessage,
-                  icon: 'none',
-                  duration: 3000
-                });
-              }
-            },
-            fail: (err) => {
-              // Clear any remaining interval
-              if (this.progressInterval) {
-                clearInterval(this.progressInterval);
-                this.progressInterval = null;
-              }
-
-              this.isGenerating = false;
-              this.errorMessage = 'Failed to generate page. Please try again.';
-              uni.showToast({
-                title: this.errorMessage,
-                icon: 'none',
-                duration: 3000
-              });
-            },
-            complete: () => {
-              // Ensure interval is cleared in all cases
-              if (this.progressInterval) {
-                clearInterval(this.progressInterval);
-                this.progressInterval = null;
-              }
+          const data = response.data;
+          // console.log('Generated page data:', data);
+          
+          try {
+            // Process the response data - handle both string and object formats
+            let responseData = data;
+            
+            // If it's an object with a response property, extract it
+            if (typeof data === 'object' && data.response) {
+              responseData = data.response;
             }
-          });
-        } catch (e) {
-          // Clear any remaining interval
-          if (this.progressInterval) {
-            clearInterval(this.progressInterval);
-            this.progressInterval = null;
+            
+            // Clean up the response string - replace backticks with properly escaped quotes
+            if (typeof responseData === 'string') {
+              // Replace backtick-wrapped strings with properly escaped JSON strings
+              responseData = responseData.replace(/`([\s\S]*?)`/g, function(match, p1) {
+                // Escape any double quotes and newlines in the content
+                return JSON.stringify(p1.replace(/\n\s*/g, ' ').trim());
+              });
+            }
+            
+            // Now parse the cleaned JSON
+            const parsedResponse = JSON.parse(responseData);
+            // console.log(parsedResponse)
+            
+            // Extract the page data
+            if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
+              const newPage = parsedResponse.pages[0];
+              // console.log(newPage)
+              
+              // Rename the page if needed
+              if (!newPage.name.toLowerCase().includes('page')) {
+                newPage.name = newPage.name + ' Page';
+              }
+              
+              // Add the new page to the project
+              projectData.pages.push(newPage);
+              
+              // Save the updated project data
+              const updatedProjectData = JSON.stringify(projectData);
+              uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+              
+              // Save project to the cloud if logged in
+              this.saveProjectToCloud(projectData);
+              
+              // Set flag to force regeneration of images
+              uni.setStorageSync('force_regeneration', 'true');
+              
+              // Hide generation overlay
+              setTimeout(() => {
+                this.isGenerating = false;
+                
+                // Refresh templates to show the new page
+                this.loadJsonTemplates();
+                this.updateLoadingStates();
+                
+                // Force generation of new preview images
+                setTimeout(() => {
+                  this.generatePreviewImages();
+                }, 100);
+                
+                // Complete refresh after a delay
+                setTimeout(() => {
+                  this.refreshTemplates();
+                }, 500);
+                
+                // Show success message
+                uni.showToast({
+                  title: 'New page created successfully!',
+                  icon: 'success',
+                  duration: 2000
+                });
+              }, 1000);
+            } else {
+              throw new Error('No valid page data found in response');
+            }
+          } catch (error) {
+            console.error('Error processing page data:', error);
+            
+            // Handle error
+            this.isGenerating = false;
+            uni.showToast({
+              title: 'Failed to process page data: ' + error.message,
+              icon: 'none',
+              duration: 3000
+            });
           }
-
+        },
+        fail: (error) => {
+          // Stop the progress interval
+          clearInterval(progressInterval);
+          
+          // Log the error
+          console.error('Error generating page:', error);
+          
+          // Handle error
           this.isGenerating = false;
-          this.errorMessage = `Error initializing request: ${e.message}`;
           uni.showToast({
-            title: this.errorMessage,
+            title: 'Error generating page: ' + (error.errMsg || 'Request failed'),
             icon: 'none',
             duration: 3000
           });
         }
-      } else {
-        // No project description available
-      }
+      });
     },
     navigateTo(item) {
       this.activeNavItem = item;
