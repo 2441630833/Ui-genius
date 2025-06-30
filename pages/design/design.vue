@@ -94,13 +94,11 @@
         <view v-for="(template, index) in jsonTemplates" :key="index"
           :id="'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')"
           class="template-preview-content">
-          <!-- <view class="preview-header">
+          <view class="preview-header">
             <text class="preview-title">{{ template.name.replace(/ Page/i, '') }}</text>
-          </view> -->
+          </view>
           <view class="preview-content" v-html="getSimplifiedPreview(template)"></view>
         </view>
-
-
       </template>
 
       <!-- Fallback Static Templates -->
@@ -164,9 +162,17 @@
             <view class="preview-settings-item"></view>
           </view>
         </view>
-
-
       </template>
+      
+      <!-- Always include a simple template for testing -->
+      <view id="template-simple" class="template-preview-content">
+        <view class="preview-header">
+          <text class="preview-title">Simple</text>
+        </view>
+        <view class="preview-content">
+          <view class="preview-card"></view>
+        </view>
+      </view>
     </view>
 
     <!-- Design Toolbar -->
@@ -619,6 +625,7 @@ export default {
     uni.$on('image-captured', this.receiveImageData);
     uni.$on('capture-error', (data) => {
       this._errAlert(`Error capturing image: ${data.error}`);
+      this.handleCaptureError(data);
     });
 
     // Load images from storage on initial mount to avoid display issues
@@ -651,7 +658,7 @@ export default {
   },
 
   onShow() {
-    // Load images from local storage first and wait for a tick to ensure reactivity
+    // Load images from local storage first
     this.loadImagesFromStorage();
 
     // Load selectedDevice from storage if available
@@ -660,16 +667,11 @@ export default {
       this.selectedDevice = storedDevice;
     }
 
-    // Use nextTick to ensure the previous operation completes
-    this.$nextTick(() => {
-      // Load JSON templates if available
-      this.loadJsonTemplates();
+    // Load JSON templates if available
+    this.loadJsonTemplates();
 
-      // Generate preview images first (only if we don't have them in storage)
-      if (this.needsImageGeneration()) {
-        this.generatePreviewImages();
-      }
-
+    // Use a timeout to ensure DOM is fully rendered before capturing
+    setTimeout(() => {
       // Check if we should generate UI based on the flag from createProject
       this.shouldGenerateUI = uni.getStorageSync('shouldGenerateUI') === 'true';
 
@@ -680,10 +682,15 @@ export default {
         this.generateUI();
         uni.setStorageSync('shouldGenerateUI', 'false');
       } else {
-        // If we already have JSON data, load it
-        this.loadJsonTemplates();
+        // Generate preview images only if we need them
+        if (this.needsImageGeneration()) {
+          // Use a timeout to ensure DOM is ready
+          setTimeout(() => {
+            this.generatePreviewImages();
+          }, 300);
+        }
       }
-    });
+    }, 500);
   },
 
   beforeDestroy() {
@@ -1582,19 +1589,41 @@ export default {
       // Show loading indicator
       this._showLoading(`Generating ${templatesToGenerate.length} images...`);
 
+      // First check if elements exist in DOM before trying to capture
+      const elementsToCapture = [];
+      for (let i = 0; i < templatesToGenerate.length; i++) {
+        const id = templatesToGenerate[i];
+        // Check if element exists in DOM
+        if (document.getElementById(id)) {
+          elementsToCapture.push(id);
+        } else {
+          console.warn(`Element not found in DOM: ${id}, skipping capture`);
+        }
+      }
+
+      if (elementsToCapture.length === 0) {
+        uni.hideLoading();
+        uni.showToast({
+          title: 'No elements found to capture',
+          icon: 'none',
+          duration: 2000
+        });
+        return;
+      }
+
       // Capture elements sequentially with a shorter delay
       const captureSequentially = (index) => {
-        if (index >= templatesToGenerate.length) {
+        if (index >= elementsToCapture.length) {
           uni.hideLoading();
           return;
         }
 
-        const id = templatesToGenerate[index];
+        const id = elementsToCapture[index];
 
-        // Check if element exists before trying to capture it
+        // Double check if element exists before trying to capture it
         const element = document.getElementById(id);
         if (!element) {
-          // console.warn(`Element not found: ${id}, skipping capture`);
+          console.warn(`Element disappeared: ${id}, skipping capture`);
           // Move to next element
           setTimeout(() => {
             captureSequentially(index + 1);
@@ -1886,15 +1915,27 @@ export default {
       });
     },
     getSimplifiedPreview(template) {
-      // console.log(template);  
       // Return the component property as a string
       if (!template || !template.component) {
         return '<div class="preview-placeholder">No preview available</div>';
       }
 
       try {
-        // The component is already a string, so just return it
-        return template.component;
+        // Make sure the component is a string
+        if (typeof template.component !== 'string') {
+          // If it's not a string, try to stringify it
+          return JSON.stringify(template.component);
+        }
+        
+        // Clean up the component string if needed
+        let component = template.component;
+        
+        // Remove code block markers if present
+        if (component.startsWith('```')) {
+          component = component.replace(/^```(?:html|vue)?\s*/, '').replace(/```\s*$/, '');
+        }
+        
+        return component;
       } catch (e) {
         console.error('Error rendering component:', e);
         return '<div class="preview-placeholder">Error rendering preview</div>';
@@ -2783,6 +2824,39 @@ export default {
     closeCreatePageDialog() {
       this.showCreatePageDialog = false;
     },
+    handleCaptureError(data) {
+      // Extract the template name from the element ID
+      const templateName = data.element.replace('template-', '');
+      
+      // Set the loading state to false for this template
+      if (this.templateLoadingStates[templateName]) {
+        this.$set(this.templateLoadingStates, templateName, false);
+      }
+      
+      // Create a fallback image for the missing template
+      if (data.error.includes('not found')) {
+        console.log(`Creating fallback image for missing template: ${templateName}`);
+        
+        // Set a placeholder image in capturedImages
+        this.$set(this.capturedImages, templateName, '');
+        
+        // Mark template as not loading
+        this.$set(this.templateLoadingStates, templateName, false);
+        
+        // If the template is in jsonTemplates but missing in DOM, try to fix it
+        if (this.jsonTemplates.length > 0) {
+          const missingTemplate = this.jsonTemplates.find(t => 
+            t.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-') === templateName
+          );
+          
+          if (missingTemplate) {
+            console.log(`Found missing template in jsonTemplates: ${missingTemplate.name}`);
+            // Force a re-render
+            this.$forceUpdate();
+          }
+        }
+      }
+    },
   }
 }
 </script>
@@ -2806,36 +2880,48 @@ export default {
     captureElement(data) {
       const { elementId } = data;
       setTimeout(() => {
-        const dom = document.getElementById(elementId);
-        if (!dom) {
-          console.error(`Element not found: ${elementId}`);   
-          uni.$emit('capture-error', { element: elementId, error: 'Element not found' });
-          return;
+        try {
+          const dom = document.getElementById(elementId);
+          if (!dom) {
+            console.error(`Element not found: ${elementId}`);   
+            uni.$emit('capture-error', { element: elementId, error: 'Element not found' });
+            return;
+          }
+          
+          // Check if element has size
+          if (dom.clientWidth <= 0 || dom.clientHeight <= 0) {
+            console.error(`Element has no size: ${elementId}`);
+            uni.$emit('capture-error', { element: elementId, error: 'Element has no size' });
+            return;
+          }
+          
+          console.log(`Capturing element: ${elementId}`);
+          
+          html2canvas(dom, {
+            width: dom.clientWidth,
+            height: dom.clientHeight,
+            scrollY: 0,
+            scrollX: 0,
+            useCORS: true,
+            scale: 1.5, // Reduced from 2 for faster rendering
+            logging: false, // Disable logging for performance
+            backgroundColor: null, // Transparent background
+            imageTimeout: 0, // No timeout for images
+            allowTaint: true, // Allow tainted canvas for better performance
+            removeContainer: true // Clean up after rendering
+          }).then((canvas) => {
+            const imageData = canvas.toDataURL('image/png', 0.85); // Added compression for faster processing
+            // Send the image data back to the Vue component
+            uni.$emit('image-captured', { element: elementId, imageData });
+            console.log(`Successfully captured ${elementId}`);
+          }).catch(err => {
+            console.error(`Failed to generate image for ${elementId}:`, err);
+            uni.$emit('capture-error', { element: elementId, error: err.toString() });
+          });
+        } catch (err) {
+          console.error(`Exception while capturing ${elementId}:`, err);
+          uni.$emit('capture-error', { element: elementId, error: `Exception: ${err.toString()}` });
         }
-        
-        console.log(`Capturing element: ${elementId}`);
-        
-        html2canvas(dom, {
-          width: dom.clientWidth,
-          height: dom.clientHeight,
-          scrollY: 0,
-          scrollX: 0,
-          useCORS: true,
-          scale: 1.5, // Reduced from 2 for faster rendering
-          logging: false, // Disable logging for performance
-          backgroundColor: null, // Transparent background
-          imageTimeout: 0, // No timeout for images
-          allowTaint: true, // Allow tainted canvas for better performance
-          removeContainer: true // Clean up after rendering
-        }).then((canvas) => {
-          const imageData = canvas.toDataURL('image/png', 0.85); // Added compression for faster processing
-          // Send the image data back to the Vue component
-          uni.$emit('image-captured', { element: elementId, imageData });
-          console.log(`Successfully captured ${elementId}`);
-        }).catch(err => {
-          console.error(`Failed to generate image for ${elementId}:`, err);
-          uni.$emit('capture-error', { element: elementId, error: err.toString() });
-        });
       }, 50); // Reduced from 100ms
     }
   }
