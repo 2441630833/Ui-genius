@@ -40,7 +40,7 @@ export default {
     },
     onShow() {
         // 当组件显示时，检查iframe是否已加载
-        console.log('组件显示，iframe加载状态:', this.iframeLoaded);
+        // console.log('组件显示，iframe加载状态:', this.iframeLoaded);
         
         // 使用箭头函数确保this指向正确
         const vm = this;
@@ -49,7 +49,7 @@ export default {
             // 如果iframe已加载，立即发送准备消息
             vm.sendPrepareMessage();
         } else {
-            console.log('iframe尚未加载完成，将等待加载事件');
+            // console.log('iframe尚未加载完成，将等待加载事件');
             
             // 延迟检查iframe状态，确保组件已完全挂载
             setTimeout(function() {
@@ -59,7 +59,7 @@ export default {
                             vm.handleIframeLoaded();
                         };
                     } else {
-                        console.log('无法访问iframe引用');
+                        // console.log('无法访问iframe引用');
                     }
                 } catch (error) {
                     console.error('onShow延迟检查iframe时出错:', error);
@@ -80,7 +80,7 @@ export default {
         // 清除选中的模板ID
         try {
             uni.removeStorageSync('selectedTemplateId');
-            console.log('已清除选中的模板ID');
+            // console.log('已清除选中的模板ID');
         } catch (error) {
             console.error('清除选中的模板ID时出错:', error);
         }
@@ -88,7 +88,7 @@ export default {
     methods: {
         // 处理iframe加载完成事件
         handleIframeLoaded() {
-            console.log('iframe已加载完成');
+            // console.log('iframe已加载完成');
             this.iframeLoaded = true;
             
             // 延迟一段时间后尝试发送准备加载HTML的消息
@@ -114,13 +114,13 @@ export default {
             try {
                 const contentWindow = this.getIframeContentWindow();
                 if (contentWindow) {
-                    console.log('发送准备加载HTML消息');
+                    // console.log('发送准备加载HTML消息');
                     contentWindow.postMessage({
                         cmd: 'prepareLoadHtml',
                         params: {}
                     }, '*');
                 } else {
-                    console.log('无法发送准备消息：iframe未就绪');
+                    // console.log('无法发送准备消息：iframe未就绪');
                 }
             } catch (error) {
                 console.error('发送准备消息时出错:', error);
@@ -134,13 +134,13 @@ export default {
                 const storedHtml = uni.getStorageSync('latest_7_overall_page');
                 
                 if (storedHtml) {
-                    console.log('找到存储的HTML，长度:', storedHtml.length);
+                    // console.log('找到存储的HTML，长度:', storedHtml.length);
                     
                     let componentHtml = storedHtml;
                     
                     // 获取选中的模板ID
                     const selectedTemplateId = uni.getStorageSync('selectedTemplateId');
-                    console.log('选中的模板ID:', selectedTemplateId);
+                    // console.log('选中的模板ID:', selectedTemplateId);
                     
                     // 尝试解析JSON格式，如果是JSON则提取component属性
                     try {
@@ -155,40 +155,40 @@ export default {
                                 });
                                 
                                 if (matchingPage && matchingPage.component) {
-                                    console.log('提取前的组件内容类型:', typeof matchingPage.component);
-                                    console.log('提取前的组件内容前30个字符:', matchingPage.component.substring(0, 30));
+                                    // console.log('提取前的组件内容类型:', typeof matchingPage.component);
+                                    // console.log('提取前的组件内容前30个字符:', matchingPage.component.substring(0, 30));
                                     
                                     componentHtml = this.extractSafeHtmlContent(matchingPage.component);
-                                    console.log('成功加载选中的模板:', selectedTemplateId);
+                                    // console.log('成功加载选中的模板:', selectedTemplateId);
                                     
-                                    console.log('提取后的组件内容类型:', typeof componentHtml);
-                                    console.log('提取后的组件内容前30个字符:', componentHtml.substring(0, 30));
+                                    // console.log('提取后的组件内容类型:', typeof componentHtml);
+                                    // console.log('提取后的组件内容前30个字符:', componentHtml.substring(0, 30));
                                 } else {
                                     // 如果找不到匹配的页面，使用第一个页面
-                                    console.log('提取前的组件内容类型:', typeof jsonData.pages[0].component);
-                                    console.log('提取前的组件内容前30个字符:', jsonData.pages[0].component.substring(0, 30));
+                                    // console.log('提取前的组件内容类型:', typeof jsonData.pages[0].component);
+                                    // console.log('提取前的组件内容前30个字符:', jsonData.pages[0].component.substring(0, 30));
                                     
                                     componentHtml = this.extractSafeHtmlContent(jsonData.pages[0].component);
-                                    console.log('未找到选中的模板，使用第一个页面');
+                                    // console.log('未找到选中的模板，使用第一个页面');
                                     
-                                    console.log('提取后的组件内容类型:', typeof componentHtml);
-                                    console.log('提取后的组件内容前30个字符:', componentHtml.substring(0, 30));
+                                    // console.log('提取后的组件内容类型:', typeof componentHtml);
+                                    // console.log('提取后的组件内容前30个字符:', componentHtml.substring(0, 30));
                                 }
                             } else {
                                 // 如果没有选中的模板ID，使用第一个页面
-                                console.log('提取前的组件内容类型:', typeof jsonData.pages[0].component);
-                                console.log('提取前的组件内容前30个字符:', jsonData.pages[0].component.substring(0, 30));
+                                // console.log('提取前的组件内容类型:', typeof jsonData.pages[0].component);
+                                // console.log('提取前的组件内容前30个字符:', jsonData.pages[0].component.substring(0, 30));
                                 
                                 componentHtml = this.extractSafeHtmlContent(jsonData.pages[0].component);
-                                console.log('未指定模板ID，使用第一个页面');
+                                // console.log('未指定模板ID，使用第一个页面');
                                 
-                                console.log('提取后的组件内容类型:', typeof componentHtml);
-                                console.log('提取后的组件内容前30个字符:', componentHtml.substring(0, 30));
+                                // console.log('提取后的组件内容类型:', typeof componentHtml);
+                                // console.log('提取后的组件内容前30个字符:', componentHtml.substring(0, 30));
                             }
                         }
                     } catch (parseError) {
                         // 如果解析失败，则认为存储的内容不是JSON格式，直接使用原始内容
-                        console.log('存储的内容不是JSON格式，使用原始内容');
+                        // console.log('存储的内容不是JSON格式，使用原始内容');
                         console.error('解析错误:', parseError);
                     }
                     
@@ -199,7 +199,7 @@ export default {
                             // 确保HTML内容有一个根元素包裹
                             if (!componentHtml.trim().startsWith('<div') && !componentHtml.trim().startsWith('<section')) {
                                 componentHtml = `<div class="container">${componentHtml}</div>`;
-                                console.log('已添加容器元素包裹HTML内容');
+                                // console.log('已添加容器元素包裹HTML内容');
                             }
                             
                             // 移除可能导致问题的脚本标签
@@ -216,7 +216,7 @@ export default {
                     const contentWindow = this.getIframeContentWindow();
                     if (contentWindow) {
                         // 发送HTML内容到iframe
-                        console.log('发送HTML内容到iframe');
+                        // console.log('发送HTML内容到iframe');
                         contentWindow.postMessage({
                             cmd: 'loadStoredHtml',
                             params: {
@@ -227,7 +227,7 @@ export default {
                         console.error('iframe未就绪，无法发送HTML内容');
                     }
                 } else {
-                    console.log('未找到存储的HTML内容');
+                    // console.log('未找到存储的HTML内容');
                 }
             } catch (error) {
                 console.error('获取或发送存储的HTML时出错:', error);
@@ -243,7 +243,7 @@ export default {
                 // 这将匹配最外层的反引号包裹的内容
                 const backtickMatch = /`([\s\S]*)`/m.exec(componentData);
                 if (backtickMatch && backtickMatch[1]) {
-                    console.log('使用正则表达式从反引号中提取了HTML内容');
+                    // console.log('使用正则表达式从反引号中提取了HTML内容');
                     return backtickMatch[1];
                 }
                 
@@ -255,7 +255,7 @@ export default {
                     // 检查是否有嵌套的pages结构
                     if (parsedData.pages && parsedData.pages.length > 0 && parsedData.pages[0].component) {
                         // 递归处理嵌套的component
-                        console.log('发现嵌套JSON结构，递归提取HTML');
+                        // console.log('发现嵌套JSON结构，递归提取HTML');
                         return this.extractSafeHtmlContent(parsedData.pages[0].component);
                     }
                     
@@ -266,7 +266,7 @@ export default {
                 } catch (jsonError) {
                     // 不是JSON格式，检查是否已经是HTML内容
                     if (componentData.includes('<div') || componentData.includes('<section')) {
-                        console.log('已找到HTML内容');
+                        // console.log('已找到HTML内容');
                         return componentData;
                     }
                 }
@@ -323,13 +323,13 @@ export default {
                 const res = event.data;
                 if (!res || !res.cmd) return;
                 
-                console.log('收到iframe消息:', res.cmd);
+                // console.log('收到iframe消息:', res.cmd);
                 
                 if (res.cmd == 'myIframe') {
-                    console.log(res);
+                    // console.log(res);
                 } else if (res.cmd == 'htmlSaved') {
                     // 处理iframe保存HTML的消息
-                    console.log('HTML已保存，长度:', res.params.html?.length);
+                    // console.log('HTML已保存，长度:', res.params.html?.length);
                     if (res.params.html) {
                         // 检查是否已有存储的数据
                         let storedData = null;
@@ -339,7 +339,7 @@ export default {
                                 storedData = JSON.parse(existingData);
                             }
                         } catch (error) {
-                            console.log('无法解析现有存储数据或不存在');
+                            // console.log('无法解析现有存储数据或不存在');
                         }
                         
                         // 获取选中的模板ID
@@ -370,16 +370,16 @@ export default {
                                     if (pageIndex !== -1) {
                                         // 如果找到匹配的页面，更新它
                                         storedData.pages[pageIndex].component = res.params.html;
-                                        console.log('已更新页面:', selectedTemplateId);
+                                        // console.log('已更新页面:', selectedTemplateId);
                                     } else {
                                         // 如果没有找到匹配的页面，更新第一个页面
                                         storedData.pages[0].component = res.params.html;
-                                        console.log('未找到匹配页面，已更新第一个页面');
+                                        // console.log('未找到匹配页面，已更新第一个页面');
                                     }
                                 } else {
                                     // 如果没有选中的模板ID，更新第一个页面
                                     storedData.pages[0].component = res.params.html;
-                                    console.log('未指定模板ID，已更新第一个页面');
+                                    // console.log('未指定模板ID，已更新第一个页面');
                                 }
                             } else {
                                 // 如果pages不存在或为空，创建新的pages数组
@@ -406,13 +406,13 @@ export default {
                     }
                 } else if (res.cmd == 'editorReady') {
                     // 编辑器已准备好，可以发送HTML内容
-                    console.log('编辑器已准备好，发送存储的HTML内容');
+                    // console.log('编辑器已准备好，发送存储的HTML内容');
                     
                     // 如果定期检查计时器还在运行，停止它
                     if (this.checkInterval) {
                         clearInterval(this.checkInterval);
                         this.checkInterval = null;
-                        console.log('已停止定期检查');
+                        // console.log('已停止定期检查');
                     }
                     
                     // 发送存储的HTML内容
