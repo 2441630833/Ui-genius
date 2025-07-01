@@ -48,7 +48,7 @@
           <view class="user-actions">
             <!-- <button class="refresh-btn" @click="refreshProjects">Refresh Projects</button> -->
             <image class="bell-icon" src="../../static/bell.png"></image>
-            <image class="avatar" :src="userInfo.picture ? userInfo.picture : '../../static/avatar1.png'"></image>
+            <image class="avatar" :src="userInfo.picture || userInfo.avatar || '../../static/avatar1.png'"></image>
           </view>
         </view>
 
@@ -143,9 +143,11 @@
           <view class="form-group">
             <text class="form-label">Profile photo</text>
             <view class="profile-photo-container">
-              <view class="profile-photo">
-                <image class="upload-icon" src="../../static/account.png"></image>
+              <view class="profile-photo" @click="chooseProfilePhoto">
+                <image v-if="accountSettings.photoUrl" class="profile-photo-image" :src="accountSettings.photoUrl"></image>
+                <image v-else class="upload-icon" src="../../static/account.png"></image>
               </view>
+              <text class="photo-hint">Click to upload a photo</text>
             </view>
           </view>
 
@@ -300,7 +302,8 @@ export default {
         lastName: '',
         email: '',
         newPassword: '',
-        confirmPassword: ''
+        confirmPassword: '',
+        photoUrl: ''
       },
       passwordStrength: 0,
       passwordStrengthText: ''
@@ -338,6 +341,7 @@ export default {
       this.accountSettings.firstName = userInfo.given_name || '';
       this.accountSettings.lastName = userInfo.family_name || '';
       this.accountSettings.email = userInfo.email || '';
+      this.accountSettings.photoUrl = userInfo.picture || userInfo.avatar || '';
     },
     refreshProjects() {
       // Reset all project loading states
@@ -768,25 +772,74 @@ export default {
         title: 'Saving changes...'
       });
 
-      // Simulate API call with timeout
-      setTimeout(() => {
-        // Update local storage with new values
-        const userInfo = uni.getStorageSync('googleUserInfo') || {};
-        userInfo.given_name = this.accountSettings.firstName;
-        userInfo.family_name = this.accountSettings.lastName;
-        uni.setStorageSync('googleUserInfo', userInfo);
-
-        // Update the current userInfo object
-        this.userInfo = userInfo;
-
-        // Hide loading and show success message
+      // Get user ID from storage
+      const userId = uni.getStorageSync('uid');
+      if (!userId) {
         uni.hideLoading();
         uni.showToast({
-          title: 'Profile updated successfully',
-          icon: 'success',
+          title: 'User not logged in',
+          icon: 'none',
           duration: 2000
         });
-      }, 1000);
+        return;
+      }
+      
+      // Check if in test mode
+      if (userId === '123bcbfeqqaeabfaf5a') {
+        uni.hideLoading();
+        uni.showToast({
+          title: 'You are in test mode, profile update skipped',
+          icon: 'none',
+          duration: 2000
+        });
+        return;
+      }
+
+      // Call cloud function to update profile
+      uniCloud.callFunction({
+        name: 'updateUserInfo',
+        data: {
+          action: 'updateProfile',
+          userId: userId,
+          data: {
+            firstName: this.accountSettings.firstName,
+            lastName: this.accountSettings.lastName
+          }
+        }
+      }).then(res => {
+        uni.hideLoading();
+        
+        if (res.result && res.result.success) {
+          // Update local storage with new values
+          const userInfo = uni.getStorageSync('googleUserInfo') || {};
+          userInfo.given_name = this.accountSettings.firstName;
+          userInfo.family_name = this.accountSettings.lastName;
+          uni.setStorageSync('googleUserInfo', userInfo);
+
+          // Update the current userInfo object
+          this.userInfo = userInfo;
+
+          uni.showToast({
+            title: 'Profile updated successfully',
+            icon: 'success',
+            duration: 2000
+          });
+        } else {
+          uni.showToast({
+            title: res.result.message || 'Failed to update profile',
+            icon: 'none',
+            duration: 2000
+          });
+        }
+      }).catch(err => {
+        uni.hideLoading();
+        console.error('Error updating profile:', err);
+        uni.showToast({
+          title: 'Error updating profile',
+          icon: 'none',
+          duration: 2000
+        });
+      });
     },
     changeEmail() {
       // Validate email
@@ -805,24 +858,72 @@ export default {
         title: 'Updating email...'
       });
 
-      // Simulate API call with timeout
-      setTimeout(() => {
-        // Update local storage with new email
-        const userInfo = uni.getStorageSync('googleUserInfo') || {};
-        userInfo.email = this.accountSettings.email;
-        uni.setStorageSync('googleUserInfo', userInfo);
-
-        // Update the current userInfo object
-        this.userInfo = userInfo;
-
-        // Hide loading and show success message
+      // Get user ID from storage
+      const userId = uni.getStorageSync('uid');
+      if (!userId) {
         uni.hideLoading();
         uni.showToast({
-          title: 'Email updated successfully',
-          icon: 'success',
+          title: 'User not logged in',
+          icon: 'none',
           duration: 2000
         });
-      }, 1000);
+        return;
+      }
+      
+      // Check if in test mode
+      if (userId === '123bcbfeqqaeabfaf5a') {
+        uni.hideLoading();
+        uni.showToast({
+          title: 'You are in test mode, email update skipped',
+          icon: 'none',
+          duration: 2000
+        });
+        return;
+      }
+
+      // Call cloud function to update email
+      uniCloud.callFunction({
+        name: 'updateUserInfo',
+        data: {
+          action: 'updateEmail',
+          userId: userId,
+          data: {
+            email: this.accountSettings.email
+          }
+        }
+      }).then(res => {
+        uni.hideLoading();
+        
+        if (res.result && res.result.success) {
+          // Update local storage with new email
+          const userInfo = uni.getStorageSync('googleUserInfo') || {};
+          userInfo.email = this.accountSettings.email;
+          uni.setStorageSync('googleUserInfo', userInfo);
+
+          // Update the current userInfo object
+          this.userInfo = userInfo;
+
+          uni.showToast({
+            title: 'Email updated successfully',
+            icon: 'success',
+            duration: 2000
+          });
+        } else {
+          uni.showToast({
+            title: res.result.message || 'Failed to update email',
+            icon: 'none',
+            duration: 2000
+          });
+        }
+      }).catch(err => {
+        uni.hideLoading();
+        console.error('Error updating email:', err);
+        uni.showToast({
+          title: 'Error updating email',
+          icon: 'none',
+          duration: 2000
+        });
+      });
     },
     changePassword() {
       // Validate password
@@ -850,24 +951,76 @@ export default {
         title: 'Updating password...'
       });
 
-      // Simulate API call with timeout
-      setTimeout(() => {
-        // In a real app, you would call an API to update the password
-
+      // Get user ID from storage
+      const userId = uni.getStorageSync('uid');
+      if (!userId) {
+        uni.hideLoading();
+        uni.showToast({
+          title: 'User not logged in',
+          icon: 'none',
+          duration: 2000
+        });
+        return;
+      }
+      
+      // Check if in test mode
+      if (userId === '123bcbfeqqaeabfaf5a') {
+        uni.hideLoading();
         // Clear password fields
         this.accountSettings.newPassword = '';
         this.accountSettings.confirmPassword = '';
         this.passwordStrength = 0;
         this.passwordStrengthText = '';
-
-        // Hide loading and show success message
-        uni.hideLoading();
+        
         uni.showToast({
-          title: 'Password updated successfully',
-          icon: 'success',
+          title: 'You are in test mode, password update skipped',
+          icon: 'none',
           duration: 2000
         });
-      }, 1000);
+        return;
+      }
+
+      // Call cloud function to update password
+      uniCloud.callFunction({
+        name: 'updateUserInfo',
+        data: {
+          action: 'updatePassword',
+          userId: userId,
+          data: {
+            password: this.accountSettings.newPassword
+          }
+        }
+      }).then(res => {
+        uni.hideLoading();
+        
+        if (res.result && res.result.success) {
+          // Clear password fields
+          this.accountSettings.newPassword = '';
+          this.accountSettings.confirmPassword = '';
+          this.passwordStrength = 0;
+          this.passwordStrengthText = '';
+
+          uni.showToast({
+            title: 'Password updated successfully',
+            icon: 'success',
+            duration: 2000
+          });
+        } else {
+          uni.showToast({
+            title: res.result.message || 'Failed to update password',
+            icon: 'none',
+            duration: 2000
+          });
+        }
+      }).catch(err => {
+        uni.hideLoading();
+        console.error('Error updating password:', err);
+        uni.showToast({
+          title: 'Error updating password',
+          icon: 'none',
+          duration: 2000
+        });
+      });
     },
     // Watch for password changes to calculate strength
     updatePasswordStrength() {
@@ -945,6 +1098,127 @@ export default {
     onNumPagesChange(e) {
       this.numPages = e.detail.value;
       uni.setStorageSync('numPages', this.numPages);
+    },
+    chooseProfilePhoto() {
+      // Open the file picker to select an image
+      uni.chooseImage({
+        count: 1, // Allow only one image to be selected
+        sizeType: ['compressed'], // Compressed images
+        sourceType: ['album', 'camera'], // Allow selection from album or camera
+        success: (res) => {
+          const tempFilePath = res.tempFilePaths[0];
+          
+          // Show loading indicator
+          uni.showLoading({
+            title: 'Uploading photo...'
+          });
+          
+          // Get user ID from storage
+          const userId = uni.getStorageSync('uid');
+          if (!userId) {
+            uni.hideLoading();
+            uni.showToast({
+              title: 'User not logged in',
+              icon: 'none',
+              duration: 2000
+            });
+            return;
+          }
+          
+          // Check if in test mode
+          if (userId === '123bcbfeqqaeabfaf5a') {
+            uni.hideLoading();
+            // Update local state only for test mode
+            this.accountSettings.photoUrl = tempFilePath;
+            
+            // Update local storage with new values
+            const userInfo = uni.getStorageSync('googleUserInfo') || {};
+            userInfo.picture = tempFilePath;
+            uni.setStorageSync('googleUserInfo', userInfo);
+            
+            // Update the current userInfo object
+            this.userInfo = userInfo;
+            
+            uni.showToast({
+              title: 'You are in test mode, photo update is local only',
+              icon: 'none',
+              duration: 2000
+            });
+            return;
+          }
+          
+          // Upload the image to cloud storage
+          uniCloud.uploadFile({
+            filePath: tempFilePath,
+            cloudPath: `profile-photos/${userId}-${Date.now()}.jpg`,
+            onUploadProgress: (progressEvent) => {
+              console.log('Upload progress:', progressEvent);
+            },
+            success: (uploadRes) => {
+              console.log('Upload success:', uploadRes);
+              
+              // Get the file URL from the upload response
+              const fileURL = uploadRes.fileID;
+              
+              // Update the user's profile photo URL in the database
+              uniCloud.callFunction({
+                name: 'updateUserInfo',
+                data: {
+                  action: 'updateProfilePhoto',
+                  userId: userId,
+                  data: {
+                    photoUrl: fileURL
+                  }
+                }
+              }).then(res => {
+                uni.hideLoading();
+                
+                if (res.result && res.result.success) {
+                  // Update local state and storage
+                  this.accountSettings.photoUrl = fileURL;
+                  
+                  // Update local storage with new values
+                  const userInfo = uni.getStorageSync('googleUserInfo') || {};
+                  userInfo.picture = fileURL;
+                  uni.setStorageSync('googleUserInfo', userInfo);
+                  
+                  // Update the current userInfo object
+                  this.userInfo = userInfo;
+                  
+                  uni.showToast({
+                    title: 'Profile photo updated',
+                    icon: 'success',
+                    duration: 2000
+                  });
+                } else {
+                  uni.showToast({
+                    title: res.result.message || 'Failed to update profile photo',
+                    icon: 'none',
+                    duration: 2000
+                  });
+                }
+              }).catch(err => {
+                uni.hideLoading();
+                console.error('Error updating profile photo:', err);
+                uni.showToast({
+                  title: 'Error updating profile photo',
+                  icon: 'none',
+                  duration: 2000
+                });
+              });
+            },
+            fail: (err) => {
+              uni.hideLoading();
+              console.error('Upload failed:', err);
+              uni.showToast({
+                title: 'Failed to upload photo',
+                icon: 'none',
+                duration: 2000
+              });
+            }
+          });
+        }
+      });
     }
   }
 }
@@ -1504,12 +1778,16 @@ export default {
 .profile-photo-container {
   margin-top: 10px;
   margin-bottom: 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 8px;
 }
 
 .profile-photo {
-  width: 80px;
-  height: 80px;
-  border-radius: 5px;
+  width: 100px;
+  height: 100px;
+  border-radius: 50%;
   overflow: hidden;
   background-color: #f8f8f8;
   border: 1px dashed #ccc;
@@ -1517,11 +1795,25 @@ export default {
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.2s;
+  transition: all 0.2s;
 
   &:hover {
     background-color: #f0f0f0;
+    border-color: #e53935;
+    transform: scale(1.05);
   }
+}
+
+.profile-photo-image {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.photo-hint {
+  color: #666;
+  font-size: 12px;
+  margin-top: 5px;
 }
 
 .upload-icon {

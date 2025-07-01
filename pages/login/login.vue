@@ -125,15 +125,19 @@ export default {
       else {
         uni.setStorageSync('isSkipLogin', true)
         setTokenWithExpiration(this.fakeToken)
-        // Navigate to dashboard after successful login
-        uni.switchTab({
-          url: '/pages/dashboard/dashboard'
-        })
-
+        
+        // Show success toast first
         uni.showToast({
           title: 'Login successful',
           icon: 'success'
         })
+        
+        // Navigate to dashboard after successful login with a timeout
+        setTimeout(() => {
+          uni.switchTab({
+            url: '/pages/dashboard/dashboard'
+          })
+        }, 1500) // 1.5 second delay
       }
 
     },
@@ -180,17 +184,18 @@ export default {
       // Store token with expiration
       setTokenWithExpiration(e)
 
-
-
-      // Navigate to dashboard after successful login
-      uni.switchTab({
-        url: '/pages/dashboard/dashboard'
-      })
-
+      // Show success toast first
       uni.showToast({
         title: 'Login successful',
         icon: 'success'
       })
+
+      // Navigate to dashboard after successful login with a timeout
+      setTimeout(() => {
+        uni.switchTab({
+          url: '/pages/dashboard/dashboard'
+        })
+      }, 1500) // 1.5 second delay
 
     },
     googleLoginSuccess(e) {
@@ -199,17 +204,18 @@ export default {
       // Store Google token with expiration
       setGoogleTokenWithExpiration(e)
 
-
-
-      // Navigate to dashboard after successful login
-      uni.switchTab({
-        url: '/pages/dashboard/dashboard'
-      })
-
+      // Show success toast first
       uni.showToast({
         title: 'Google login successful',
         icon: 'success'
       })
+
+      // Navigate to dashboard after successful login with a timeout
+      setTimeout(() => {
+        uni.switchTab({
+          url: '/pages/dashboard/dashboard'
+        })
+      }, 1500) // 1.5 second delay
     },
     pwdLogin() {
       if (!this.user.password.length) {

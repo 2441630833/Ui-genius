@@ -3,9 +3,9 @@
     <view class="login-bg">
         <view class="login-card">
             <match-media :min-width="690">
-                <view class="login-logo">
+                <!-- <view class="login-logo">
                     <image :src="logo"></image>
-                </view>
+                </view> -->
                 <!-- Top text -->
                 <text class="login-title">Sign Up</text>
             </match-media>
