@@ -10,7 +10,7 @@
 export default {
     data() {
         return {
-            pageUrl: '../static/VvvebJs/editor.html', // 指向静态文件夹中的 HTML 文件
+            pageUrl: '../static/editor/editor.html', // 指向静态文件夹中的 HTML 文件
             iframeLoaded: false, // 记录iframe是否已加载完成
             checkInterval: null // 用于定期检查iframe状态
         };

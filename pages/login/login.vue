@@ -137,7 +137,7 @@ export default {
           uni.switchTab({
             url: '/pages/dashboard/dashboard'
           })
-        }, 1500) // 1.5 second delay
+        }, 1000) // 1.5 second delay
       }
 
     },
