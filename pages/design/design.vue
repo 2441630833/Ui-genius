@@ -745,7 +745,6 @@ export default {
     },
 
     async exportImages() {
-
       // Debounce protection
       if (this.isExporting) {
         uni.showToast({
@@ -765,63 +764,125 @@ export default {
       });
 
       try {
-        // Get all template IDs from both filtered templates and proposal templates
-        const imagesToExport = [];
-        
-        // Add images from filtered templates
-        if (this.filteredTemplates && this.filteredTemplates.length > 0) {
-          this.filteredTemplates.forEach(template => {
-            const key = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
-            const imageData = uni.getStorageSync(`uigenius_image_${key}`);
-            if (imageData) {
-              imagesToExport.push({
-                key: key,
-                data: imageData
-              });
-            }
-          });
-        }
-        
-
-        
-        // If no dynamic templates, fall back to default template keys
-        if (imagesToExport.length === 0) {
-          const defaultKeys = [
-            'signup', 'home', 'notification', 'profile',
-            'settings'
-          ];
-          
-          defaultKeys.forEach(key => {
-            const imageData = uni.getStorageSync(`uigenius_image_${key}`);
-            if (imageData) {
-              imagesToExport.push({
-                key: key,
-                data: imageData
-              });
-            }
-          });
-        }
-
-        if (imagesToExport.length === 0) {
+        // Get the project data from storage
+        const jsonData = uni.getStorageSync('latest_7_overall_page');
+        if (!jsonData) {
           uni.hideLoading();
           uni.showToast({
-            title: 'No images available to export',
+            title: 'No project data found',
             icon: 'none',
             duration: 2000
           });
           this.isExporting = false;
           return;
         }
-        
 
-        // console.log(`Found ${imagesToExport.length} images to export`);
+        // Parse the JSON data
+        const projectData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+
+        // Check if we have pages
+        if (!projectData.pages || !projectData.pages.length) {
+          uni.hideLoading();
+          uni.showToast({
+            title: 'No pages found in project',
+            icon: 'none',
+            duration: 2000
+          });
+          this.isExporting = false;
+          return;
+        }
+
+        // Create temporary HTML elements for screenshots
+        const container = document.createElement('div');
+        container.style.position = 'absolute';
+        container.style.left = '-9999px';
+        container.style.top = '-9999px';
+        container.style.width = 'auto'; // Standard website width
+        container.style.height = 'auto'; // Auto height to accommodate content
+        document.body.appendChild(container);
+
+        const images = [];
+        const renderPage = async (index) => {
+          if (index >= projectData.pages.length) {
+            // Clean up the temporary container
+            document.body.removeChild(container);
+            
+            // Export the images
+            // #ifdef H5 
+            this.exportImagesWeb(images);
+            // #endif
+            // #ifdef APP-PLUS
+            this.exportImagesMobile(images);
+            // #endif
+            return;
+          }
+
+          const page = projectData.pages[index];
+          const pageName = page.name.replace(/ Page/i, '');
+          const pageKey = pageName.toLowerCase().replace(/\s+/g, '-');
+          
+          // Create a div for this page
+          container.innerHTML = '';
+          const pageElement = document.createElement('div');
+          pageElement.style.padding = '20px';
+          pageElement.style.backgroundColor = '#ffffff';
+          pageElement.style.fontFamily = 'Arial, sans-serif';
+          pageElement.style.color = '#333333';
+          pageElement.style.width = '100%';
+          pageElement.style.maxWidth = 'auto';
+          pageElement.style.margin = '0 auto';
+          
+          // Add page title
+          const titleElement = document.createElement('h1');
+          titleElement.style.fontSize = '24px';
+          titleElement.style.fontWeight = 'bold';
+          titleElement.style.marginBottom = '20px';
+          titleElement.textContent = pageName;
+          pageElement.appendChild(titleElement);
+          
+          // Add page content
+          const contentElement = document.createElement('div');
+          contentElement.innerHTML = page.component || '<div>No content available</div>';
+          pageElement.appendChild(contentElement);
+          
+          container.appendChild(pageElement);
+          
+          // Wait for any images to load
+          await new Promise(resolve => setTimeout(resolve, 100));
+          
+          // Capture screenshot
+          try {
+            // Let content determine its natural dimensions
+            const contentHeight = pageElement.scrollHeight;
+            const contentWidth = pageElement.scrollWidth;
+            
+            const canvas = await html2canvas(pageElement, {
+              width: contentWidth,
+              height: contentHeight,
+              scale: 2, // Higher scale for better quality
+              useCORS: true,
+              logging: false,
+              backgroundColor: '#ffffff',
+              allowTaint: true // Allow cross-origin images
+            });
+            
+            const imageData = canvas.toDataURL('image/png');
+            images.push({
+              key: pageKey,
+              data: imageData
+            });
+            
+            // Move to next page
+            renderPage(index + 1);
+          } catch (error) {
+            console.error(`Error capturing screenshot for ${pageName}:`, error);
+            // Move to next page even if there's an error
+            renderPage(index + 1);
+          }
+        };
         
-        // #ifdef H5 
-        this.exportImagesWeb(imagesToExport);
-        // #endif
-        // #ifdef APP-PLUS
-        this.exportImagesMobile(imagesToExport);
-        // #endif
+        // Start rendering pages
+        renderPage(0);
       } catch (error) {
         uni.hideLoading();
         uni.showToast({
@@ -829,8 +890,14 @@ export default {
           icon: 'none',
           duration: 2000
         });
-        // console.error('Error exporting images:', error);
+        console.error('Error exporting images:', error);
         this.isExporting = false;
+        
+        // Clean up any temporary elements
+        const container = document.querySelector('div[style*="-9999px"]');
+        if (container) {
+          document.body.removeChild(container);
+        }
       }
     },
 
