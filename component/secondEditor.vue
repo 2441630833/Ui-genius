@@ -131,59 +131,45 @@ export default {
         sendStoredHtmlToIframe() {
             try {
                 // 获取存储的HTML内容
-                const storedHtml = uni.getStorageSync('latest_7_overall_page');
-                
-                if (storedHtml) {
-                    // console.log('找到存储的HTML，长度:', storedHtml.length);
-                    
-                    let componentHtml = storedHtml;
-                    
-                    // 获取选中的模板ID
-                    const selectedTemplateId = uni.getStorageSync('selectedTemplateId');
-                    // console.log('选中的模板ID:', selectedTemplateId);
-                    
-                    // 尝试解析JSON格式，如果是JSON则提取component属性
+                const storedData = uni.getStorageSync('latest_7_overall_page');
+                if (storedData) {
+                    let componentHtml = '';
+                    let componentStyles = '';
+
                     try {
-                        const jsonData = JSON.parse(storedHtml);
+                        // 解析存储的JSON数据
+                        const jsonData = JSON.parse(storedData);
+                        
                         if (jsonData.pages && jsonData.pages.length > 0) {
-                            // 如果有选中的模板ID，则查找对应的页面
+                            // 获取选中的模板ID
+                            const selectedTemplateId = uni.getStorageSync('selectedTemplateId');
+                            
                             if (selectedTemplateId) {
-                                // 查找名称匹配的页面
+                                // 查找匹配的页面
                                 const matchingPage = jsonData.pages.find(page => {
                                     const pageId = page.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
                                     return pageId === selectedTemplateId;
                                 });
                                 
-                                if (matchingPage && matchingPage.component) {
-                                    // console.log('提取前的组件内容类型:', typeof matchingPage.component);
-                                    // console.log('提取前的组件内容前30个字符:', matchingPage.component.substring(0, 30));
-                                    
-                                    componentHtml = this.extractSafeHtmlContent(matchingPage.component);
+                                if (matchingPage) {
+                                    // 提取HTML和CSS
+                                    const extractedContent = this.extractHtmlAndStyles(matchingPage.component);
+                                    componentHtml = extractedContent.html;
+                                    componentStyles = extractedContent.styles;
                                     // console.log('成功加载选中的模板:', selectedTemplateId);
-                                    
-                                    // console.log('提取后的组件内容类型:', typeof componentHtml);
-                                    // console.log('提取后的组件内容前30个字符:', componentHtml.substring(0, 30));
                                 } else {
                                     // 如果找不到匹配的页面，使用第一个页面
-                                    // console.log('提取前的组件内容类型:', typeof jsonData.pages[0].component);
-                                    // console.log('提取前的组件内容前30个字符:', jsonData.pages[0].component.substring(0, 30));
-                                    
-                                    componentHtml = this.extractSafeHtmlContent(jsonData.pages[0].component);
+                                    const extractedContent = this.extractHtmlAndStyles(jsonData.pages[0].component);
+                                    componentHtml = extractedContent.html;
+                                    componentStyles = extractedContent.styles;
                                     // console.log('未找到选中的模板，使用第一个页面');
-                                    
-                                    // console.log('提取后的组件内容类型:', typeof componentHtml);
-                                    // console.log('提取后的组件内容前30个字符:', componentHtml.substring(0, 30));
                                 }
                             } else {
                                 // 如果没有选中的模板ID，使用第一个页面
-                                // console.log('提取前的组件内容类型:', typeof jsonData.pages[0].component);
-                                // console.log('提取前的组件内容前30个字符:', jsonData.pages[0].component.substring(0, 30));
-                                
-                                componentHtml = this.extractSafeHtmlContent(jsonData.pages[0].component);
+                                const extractedContent = this.extractHtmlAndStyles(jsonData.pages[0].component);
+                                componentHtml = extractedContent.html;
+                                componentStyles = extractedContent.styles;
                                 // console.log('未指定模板ID，使用第一个页面');
-                                
-                                // console.log('提取后的组件内容类型:', typeof componentHtml);
-                                // console.log('提取后的组件内容前30个字符:', componentHtml.substring(0, 30));
                             }
                         }
                     } catch (parseError) {
@@ -215,12 +201,13 @@ export default {
                     // 获取iframe窗口对象
                     const contentWindow = this.getIframeContentWindow();
                     if (contentWindow) {
-                        // 发送HTML内容到iframe
-                        // console.log('发送HTML内容到iframe');
+                        // 发送HTML内容和样式到iframe
+                        // console.log('发送HTML内容和样式到iframe');
                         contentWindow.postMessage({
                             cmd: 'loadStoredHtml',
                             params: {
-                                htmlContent: componentHtml
+                                htmlContent: componentHtml,
+                                stylesContent: componentStyles
                             }
                         }, '*');
                     } else {
@@ -231,6 +218,50 @@ export default {
                 }
             } catch (error) {
                 console.error('获取或发送存储的HTML时出错:', error);
+            }
+        },
+        
+        // 从存储的内容中提取HTML和CSS样式
+        extractHtmlAndStyles(componentData) {
+            try {
+                if (!componentData) return { html: '', styles: '' };
+                
+                // 使用全局正则表达式匹配所有样式标签
+                const styleRegex = /<style[^>]*>([\s\S]*?)<\/style>/gi;
+                let styles = '';
+                let html = componentData;
+                let match;
+                
+                // 收集所有样式标签
+                const styleMatches = [];
+                while ((match = styleRegex.exec(componentData)) !== null) {
+                    styleMatches.push(match[0]);
+                }
+                
+                if (styleMatches.length > 0) {
+                    // 合并所有样式标签
+                    styles = styleMatches.join('\n');
+                    
+                    // 从HTML中移除所有样式标签
+                    html = componentData;
+                    for (const styleTag of styleMatches) {
+                        html = html.replace(styleTag, '');
+                    }
+                    html = html.trim();
+                    
+                    console.log('成功提取了' + styleMatches.length + '个样式标签');
+                }
+                
+                // 处理可能嵌套的内容
+                const extracted = this.extractSafeHtmlContent(html);
+                
+                return {
+                    html: extracted,
+                    styles: styles
+                };
+            } catch (error) {
+                console.error('提取HTML和样式时出错:', error);
+                return { html: componentData, styles: '' };
             }
         },
         
@@ -320,130 +351,140 @@ export default {
         },
         // vue获取iframe传递过来的信息
         getiframeMsg(event) {
-                const res = event.data;
-                if (!res || !res.cmd) return;
-                
-                // console.log('收到iframe消息:', res.cmd);
-                
-                if (res.cmd == 'myIframe') {
-                    // console.log(res);
-                } else if (res.cmd == 'htmlSaved') {
-                    // 处理iframe保存HTML的消息
-                    // console.log('HTML已保存，长度:', res.params.html?.length);
-                    if (res.params.html) {
-                        // 检查是否已有存储的数据
-                        let storedData = null;
-                        try {
-                            const existingData = uni.getStorageSync('latest_7_overall_page');
-                            if (existingData) {
-                                storedData = JSON.parse(existingData);
-                            }
-                        } catch (error) {
-                            // console.log('无法解析现有存储数据或不存在');
+            const res = event.data;
+            if (!res || !res.cmd) return;
+            
+            // console.log('收到iframe消息:', res.cmd);
+            
+            if (res.cmd == 'myIframe') {
+                // console.log(res);
+            } else if (res.cmd == 'htmlSaved') {
+                // 处理iframe保存HTML的消息
+                // console.log('HTML已保存，长度:', res.params.html?.length);
+                if (res.params.html) {
+                    // 检查是否已有存储的数据
+                    let storedData = null;
+                    try {
+                        const existingData = uni.getStorageSync('latest_7_overall_page');
+                        if (existingData) {
+                            storedData = JSON.parse(existingData);
                         }
-                        
-                        // 获取选中的模板ID
-                        const selectedTemplateId = uni.getStorageSync('selectedTemplateId');
-                        
-                        // 如果没有现有数据或解析失败，创建新的数据结构
-                        if (!storedData) {
-                            storedData = {
-                                "pages": [
-                                    {
-                                        "name": selectedTemplateId ? selectedTemplateId.charAt(0).toUpperCase() + selectedTemplateId.slice(1) + " Page" : "Page 1",
-                                        "component": res.params.html
-                                    }
-                                ],
-                                "AIProjectDescription": "UI Genius项目",
-                                "AIProjectName": "我的项目",
-                            };
-                        } else {
-                            // 如果存在现有数据，更新对应页面的component
-                            if (storedData.pages && storedData.pages.length > 0) {
-                                if (selectedTemplateId) {
-                                    // 查找匹配的页面
-                                    const pageIndex = storedData.pages.findIndex(page => {
-                                        const pageId = page.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
-                                        return pageId === selectedTemplateId;
-                                    });
-                                    
-                                    if (pageIndex !== -1) {
-                                        // 如果找到匹配的页面，更新它
-                                        storedData.pages[pageIndex].component = res.params.html;
-                                        // console.log('已更新页面:', selectedTemplateId);
-                                    } else {
-                                        // 如果没有找到匹配的页面，更新第一个页面
-                                        storedData.pages[0].component = res.params.html;
-                                        // console.log('未找到匹配页面，已更新第一个页面');
-                                    }
+                    } catch (error) {
+                        // console.log('无法解析现有存储数据或不存在');
+                    }
+                    
+                    // 获取选中的模板ID
+                    const selectedTemplateId = uni.getStorageSync('selectedTemplateId');
+                    
+                    // 包装HTML和CSS
+                    let componentContent = '';
+                    
+                    // 如果有样式，添加到组件内容中
+                    if (res.params.styles) {
+                        componentContent = `${res.params.styles}\n${res.params.html}`;
+                    } else {
+                        componentContent = res.params.html;
+                    }
+                    
+                    // 如果没有现有数据或解析失败，创建新的数据结构
+                    if (!storedData) {
+                        storedData = {
+                            "pages": [
+                                {
+                                    "name": selectedTemplateId ? selectedTemplateId.charAt(0).toUpperCase() + selectedTemplateId.slice(1) + " Page" : "Page 1",
+                                    "component": componentContent
+                                }
+                            ],
+                            "AIProjectDescription": "UI Genius project",
+                            "AIProjectName": "My project",
+                        };
+                    } else {
+                        // 如果存在现有数据，更新对应页面的component
+                        if (storedData.pages && storedData.pages.length > 0) {
+                            if (selectedTemplateId) {
+                                // 查找匹配的页面
+                                const pageIndex = storedData.pages.findIndex(page => {
+                                    const pageId = page.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                                    return pageId === selectedTemplateId;
+                                });
+                                
+                                if (pageIndex !== -1) {
+                                    // 如果找到匹配的页面，更新它
+                                    storedData.pages[pageIndex].component = componentContent;
+                                    // console.log('已更新页面:', selectedTemplateId);
                                 } else {
-                                    // 如果没有选中的模板ID，更新第一个页面
-                                    storedData.pages[0].component = res.params.html;
-                                    // console.log('未指定模板ID，已更新第一个页面');
+                                    // 如果没有找到匹配的页面，更新第一个页面
+                                    storedData.pages[0].component = componentContent;
+                                    // console.log('未找到匹配页面，已更新第一个页面');
                                 }
                             } else {
-                                // 如果pages不存在或为空，创建新的pages数组
-                                storedData.pages = [
-                                    {
-                                        "name": selectedTemplateId ? selectedTemplateId.charAt(0).toUpperCase() + selectedTemplateId.slice(1) + " Page" : "Page 1",
-                                        "component": res.params.html
-                                    }
-                                ];
+                                // 如果没有选中的模板ID，更新第一个页面
+                                storedData.pages[0].component = componentContent;
+                                // console.log('未指定模板ID，已更新第一个页面');
                             }
+                        } else {
+                            // 如果pages不存在或为空，创建新的pages数组
+                            storedData.pages = [
+                                {
+                                    "name": selectedTemplateId ? selectedTemplateId.charAt(0).toUpperCase() + selectedTemplateId.slice(1) + " Page" : "Page 1",
+                                    "component": componentContent
+                                }
+                            ];
                         }
-                        
-                        // 将更新后的数据保存到storage
-                        uni.setStorageSync('latest_7_overall_page', JSON.stringify(storedData));
-                        
-                        // 显示保存成功提示
-                        uni.showToast({
-                            title: 'page saved',
-                            icon: 'success',
-                            duration: 2000
-                        });
-                    } else {
-                        console.error('接收到的HTML内容为空');
-                    }
-                } else if (res.cmd == 'editorReady') {
-                    // 编辑器已准备好，可以发送HTML内容
-                    // console.log('编辑器已准备好，发送存储的HTML内容');
-                    
-                    // 如果定期检查计时器还在运行，停止它
-                    if (this.checkInterval) {
-                        clearInterval(this.checkInterval);
-                        this.checkInterval = null;
-                        // console.log('已停止定期检查');
                     }
                     
-                    // 发送存储的HTML内容
-                    setTimeout(() => {
-                        this.sendStoredHtmlToIframe();
-                    }, 300); // 短暂延迟确保编辑器已完全准备好
-                }
-            },
-            // vue向iframe传递信息
-            vueSendMsg() {
-                const contentWindow = this.getIframeContentWindow();
-                if (contentWindow) {
-                    contentWindow.postMessage({
-                        cmd: 'myVue',
-                        params: {
-                            info: 'Vue向iframe传递的消息',
-                        }
-                    }, '*');
+                    // 将更新后的数据保存到storage
+                    uni.setStorageSync('latest_7_overall_page', JSON.stringify(storedData));
+                    
+                    // 显示保存成功提示
+                    uni.showToast({
+                        title: 'page saved',
+                        icon: 'success',
+                        duration: 2000
+                    });
                 } else {
-                    console.error('无法发送消息：iframe未就绪');
+                    console.error('接收到的HTML内容为空');
                 }
-            },
-            // 触发iframe中的方法
-            iframeMethods() {
-                const contentWindow = this.getIframeContentWindow();
-                if (contentWindow) {
-                    contentWindow.triggerByVue('通过Vue触发iframe中的方法');
-                } else {
-                    console.error('无法触发iframe方法：iframe未就绪');
+            } else if (res.cmd == 'editorReady') {
+                // 编辑器已准备好，可以发送HTML内容
+                // console.log('编辑器已准备好，发送存储的HTML内容');
+                
+                // 如果定期检查计时器还在运行，停止它
+                if (this.checkInterval) {
+                    clearInterval(this.checkInterval);
+                    this.checkInterval = null;
+                    // console.log('已停止定期检查');
                 }
-            },
+                
+                // 发送存储的HTML内容
+                setTimeout(() => {
+                    this.sendStoredHtmlToIframe();
+                }, 300); // 短暂延迟确保编辑器已完全准备好
+            }
+        },
+        // vue向iframe传递信息
+        vueSendMsg() {
+            const contentWindow = this.getIframeContentWindow();
+            if (contentWindow) {
+                contentWindow.postMessage({
+                    cmd: 'myVue',
+                    params: {
+                        info: 'Vue向iframe传递的消息',
+                    }
+                }, '*');
+            } else {
+                console.error('无法发送消息：iframe未就绪');
+            }
+        },
+        // 触发iframe中的方法
+        iframeMethods() {
+            const contentWindow = this.getIframeContentWindow();
+            if (contentWindow) {
+                contentWindow.triggerByVue('通过Vue触发iframe中的方法');
+            } else {
+                console.error('无法触发iframe方法：iframe未就绪');
+            }
+        },
 
     }
 };
