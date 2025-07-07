@@ -188,6 +188,11 @@
           </image>
         </view>
 
+        <view class="nav-item" :class="{ active: activeNavItem === 'delete' }" @click="navigateTo('delete')">
+          <image class="nav-icon" :src="activeNavItem === 'delete' ? '/static/delete_white.png' : '/static/delete.png'">
+          </image>
+        </view>
+
         <!-- <view class="nav-item" :class="{ active: activeNavItem === 'magic' }" @click="navigateTo('magic')">
           <image class="nav-icon" :src="activeNavItem === 'magic' ? '/static/magic_white.png' : '/static/magic.png'">
           </image>
@@ -411,6 +416,47 @@
       </view>
     </view>
 
+    <!-- Delete Pages Dialog -->
+    <view class="dialog-overlay" v-if="showDeleteDialog" @click="closeDeleteDialog">
+      <view class="dialog-container" @click.stop>
+        <view class="dialog-content">
+          <text class="dialog-title">Delete Pages</text>
+          
+          <!-- Error notification -->
+          <view class="error-notification" v-if="errorMessage">
+            <text>{{ errorMessage }}</text>
+          </view>
+          
+          <!-- Select All Option -->
+          <view class="select-all-container" v-if="jsonTemplates.length > 0">
+            <!-- Custom checkbox implementation -->
+            <view class="checkbox-wrapper" @click="toggleSelectAll">
+              <view class="checkbox-custom" :class="{ 'checked': isAllSelected }"></view>
+              <text class="select-all-text">Select All</text>
+            </view>
+          </view>
+          
+          <view class="delete-pages-list" v-if="jsonTemplates.length > 0">
+            <view class="delete-page-item" v-for="(template, index) in jsonTemplates" :key="index">
+              <!-- Custom checkbox implementation -->
+              <view class="checkbox-wrapper" @click="togglePageSelection(index)">
+                <view class="checkbox-custom" :class="{ 'checked': pagesToDelete.includes(index) }"></view>
+                <text class="delete-page-name">{{ template.name.replace(/ Page/i, '') }}</text>
+              </view>
+            </view>
+          </view>
+          <view class="empty-state" v-else>
+            <text>No pages available to delete</text>
+          </view>
+          
+          <view class="delete-actions">
+            <button class="delete-btn" :disabled="pagesToDelete.length === 0" @click="deleteSelectedPages">Delete Selected</button>
+            <button class="cancel-btn" @click="closeDeleteDialog">Cancel</button>
+          </view>
+        </view>
+      </view>
+    </view>
+
     <!-- Color Palette Overlay -->
     <view v-if="showColorPalette" class="color-palette-overlay">
       <view class="color-palette-container">
@@ -586,6 +632,8 @@ export default {
       pageDescription: '',
       examplePageDescription: 'a simple page just includes one heading',
       // examplePageDescription: 'A modern contact page with a form and interactive map, including name, email, and message fields',
+      showDeleteDialog: false,
+      pagesToDelete: [],
     }
   },
 
@@ -598,6 +646,11 @@ export default {
       
       // Return all templates
       return this.jsonTemplates;
+    },
+    
+    isAllSelected() {
+      // Check if all pages are selected
+      return this.jsonTemplates.length > 0 && this.pagesToDelete.length === this.jsonTemplates.length;
     }
   },
 
@@ -2096,6 +2149,13 @@ export default {
         this.pageDescription = '';
         this.errorMessage = '';
       }
+      
+      // Show delete pages dialog if delete nav item is clicked
+      if (item === 'delete') {
+        this.showDeleteDialog = true;
+        this.pagesToDelete = [];
+        this.errorMessage = '';
+      }
     },
     selectTemplate(template) {
       this.selectedTemplate = template;
@@ -3281,6 +3341,99 @@ export default {
     closeCreatePageDialog() {
       this.showCreatePageDialog = false;
     },
+    
+    closeDeleteDialog() {
+      this.showDeleteDialog = false;
+      this.pagesToDelete = [];
+      this.errorMessage = '';
+    },
+    
+    togglePageSelection(index) {
+      const position = this.pagesToDelete.indexOf(index);
+      if (position === -1) {
+        // Add to selection
+        this.pagesToDelete.push(index);
+      } else {
+        // Remove from selection
+        this.pagesToDelete.splice(position, 1);
+      }
+    },
+    
+    toggleSelectAll() {
+      if (this.isAllSelected) {
+        // If all are selected, deselect all
+        this.pagesToDelete = [];
+      } else {
+        // If not all selected, select all
+        this.pagesToDelete = this.jsonTemplates.map((_, index) => index);
+      }
+    },
+    
+    deleteSelectedPages() {
+      // Check if we have pages to delete
+      if (this.pagesToDelete.length === 0) {
+        this.errorMessage = 'Please select at least one page to delete';
+        return;
+      }
+      
+      // Get existing project data
+      const existingProjectData = uni.getStorageSync('latest_7_overall_page');
+      if (!existingProjectData) {
+        this.errorMessage = 'No project data found';
+        return;
+      }
+      
+      // Parse the project data
+      const projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
+      
+      // Prevent deleting all pages
+      if (this.pagesToDelete.length >= projectData.pages.length) {
+        this.errorMessage = 'You must keep at least one page in your project';
+        return;
+      }
+      
+      // Sort indices in descending order to avoid index shifting when removing items
+      const sortedIndices = [...this.pagesToDelete].sort((a, b) => b - a);
+      
+      // Remove pages from the project data
+      sortedIndices.forEach(index => {
+        projectData.pages.splice(index, 1);
+      });
+      
+      // Save the updated project data
+      const updatedProjectData = JSON.stringify(projectData);
+      uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+      
+      // Save project to the cloud if logged in
+      this.saveProjectToCloud(projectData);
+      
+      // Set flag to force regeneration of images
+      uni.setStorageSync('force_regeneration', 'true');
+      
+      // Close the dialog
+      this.closeDeleteDialog();
+      
+      // Refresh templates to show the updated pages
+      this.loadJsonTemplates();
+      this.updateLoadingStates();
+      
+      // Force generation of new preview images
+      setTimeout(() => {
+        this.generatePreviewImages();
+      }, 100);
+      
+      // Complete refresh after a delay
+      setTimeout(() => {
+        this.refreshTemplates();
+      }, 500);
+      
+      // Show success message
+      uni.showToast({
+        title: 'Pages deleted successfully!',
+        icon: 'success',
+        duration: 2000
+      });
+    },
     handleCaptureError(data) {
       // Extract the template name from the element ID
       const templateName = data.element.replace('template-', '');
@@ -4328,5 +4481,158 @@ export default {
   &:hover {
     background-color: #d32f2f;
   }
+}
+
+/* Delete Pages Dialog Styles */
+.select-all-container {
+  display: flex;
+  align-items: center;
+  padding: 10px 0;
+  margin-bottom: 10px;
+  border-bottom: 1px solid #e0e0e0;
+}
+
+.select-all-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+}
+
+.delete-pages-list {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 20px;
+  border: 1px solid #e0e0e0;
+  border-radius: 4px;
+  padding: 10px;
+}
+
+.delete-page-item {
+  display: flex;
+  align-items: center;
+  padding: 10px;
+  border-bottom: 1px solid #f0f0f0;
+  
+  &:last-child {
+    border-bottom: none;
+  }
+}
+
+.delete-page-name {
+  margin-left: 10px;
+  font-size: 16px;
+  color: #333;
+}
+
+.empty-state {
+  padding: 20px;
+  text-align: center;
+  color: #999;
+}
+
+.delete-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 20px;
+}
+
+.delete-btn, .cancel-btn {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 10px;
+  font-size: 16px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.delete-btn {
+  background-color: #e53935;
+  color: #fff;
+  
+  &:hover {
+    background-color: #d32f2f;
+  }
+  
+  &:disabled {
+    background-color: #ffcdd2;
+    cursor: not-allowed;
+  }
+}
+
+.cancel-btn {
+  background-color: #f5f5f5;
+  color: #333;
+  
+  &:hover {
+    background-color: #e0e0e0;
+  }
+}
+
+/* Custom Checkbox Styles */
+.custom-checkbox {
+  /* Override default checkbox styles */
+  /deep/ .uni-checkbox-input {
+    border-color: #e0e0e0;
+    
+    &.uni-checkbox-input-checked {
+      background-color: #e53935 !important;
+      border-color: #e53935 !important;
+    }
+  }
+}
+
+/* Alternative deep selector for better compatibility */
+::v-deep .custom-checkbox .uni-checkbox-input {
+  border-color: #e0e0e0;
+}
+
+::v-deep .custom-checkbox .uni-checkbox-input.uni-checkbox-input-checked {
+  background-color: #e53935 !important;
+  border-color: #e53935 !important;
+}
+
+/* For newer Vue versions */
+:deep(.custom-checkbox .uni-checkbox-input) {
+  border-color: #e0e0e0;
+}
+
+:deep(.custom-checkbox .uni-checkbox-input.uni-checkbox-input-checked) {
+  background-color: #e53935 !important;
+  border-color: #e53935 !important;
+}
+
+/* Custom checkbox with red color */
+.checkbox-wrapper {
+  display: inline-flex;
+  align-items: center;
+  position: relative;
+  cursor: pointer;
+}
+
+.checkbox-custom {
+  width: 18px;
+  height: 18px;
+  border: 2px solid #e0e0e0;
+  border-radius: 3px;
+  position: relative;
+  margin-right: 10px;
+  transition: all 0.2s;
+}
+
+.checkbox-custom.checked {
+  background-color: #e53935;
+  border-color: #e53935;
+}
+
+.checkbox-custom.checked:after {
+  content: '';
+  position: absolute;
+  left: 5px;
+  top: 1px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
 }
 </style>
