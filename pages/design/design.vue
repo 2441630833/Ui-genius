@@ -1766,14 +1766,14 @@ export default {
       this.isGenerating = true;
       this.generationProgress = 0;
 
-      // Set up progress interval - slower progression for longer expected wait time
+      // Set up progress interval - faster progression for better user experience
       const progressInterval = setInterval(() => {
         if (this.generationProgress < 95) {
-          // Slower increment for longer expected time (10+ minutes)
-          const increment = this.generationProgress < 70 ? 0.5 : 0.2;
+          // Faster increment values to show quicker progress
+          const increment = this.generationProgress < 70 ? 1.2 : 0.8;
           this.generationProgress += increment;
         }
-      }, 3000);
+      }, 1000);
 
       // Get existing project data
       const existingProjectData = uni.getStorageSync('latest_7_overall_page');
@@ -2973,14 +2973,14 @@ export default {
       this.isGenerating = true;
       this.generationProgress = 0;
 
-      // Set up progress interval - slower progression for longer expected wait time
+      // Set up progress interval - faster progression for better user experience
       const progressInterval = setInterval(() => {
         if (this.generationProgress < 95) {
-          // Slower increment for longer expected time (10+ minutes)
-          const increment = this.generationProgress < 70 ? 0.5 : 0.2;
+          // Faster increment values to show quicker progress
+          const increment = this.generationProgress < 70 ? 1.2 : 0.8;
           this.generationProgress += increment;
         }
-      }, 3000);
+      }, 1000);
 
       // Get existing project data
       const existingProjectData = uni.getStorageSync('latest_7_overall_page');
