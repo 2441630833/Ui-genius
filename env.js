@@ -1,2 +1,2 @@
 // Backend API configuration
-export const API_BASE_URL = 'http://aiback.uigenius.top/api'; 
+export const API_BASE_URL = 'https://aiback.uigenius.top/api'; 

@@ -481,7 +481,7 @@ export default {
             setTimeout(() => reject(new Error('Timeout')), 1000)
           );
 
-          const fetchPromise = fetch(`http://aiback.uigenius.top`, {
+          const fetchPromise = fetch(`https://aiback.uigenius.top`, {
             method: 'HEAD',
             cache: 'no-cache'
           });
