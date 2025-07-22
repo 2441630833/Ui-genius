@@ -481,7 +481,7 @@ export default {
             setTimeout(() => reject(new Error('Timeout')), 1000)
           );
 
-          const fetchPromise = fetch(`${API_BASE_URL}/generate-ui`, {
+          const fetchPromise = fetch(`http://aiback.uigenius.top`, {
             method: 'HEAD',
             cache: 'no-cache'
           });
@@ -490,7 +490,8 @@ export default {
           const response = await Promise.race([fetchPromise, timeoutPromise]);
 
           if (!response.ok) {
-            throw new Error('API server error');
+            console.error('API health check failed:', response.status, response.statusText);
+            throw new Error(`API server error: ${response.status} ${response.statusText}`);
           }
 
           return true;
