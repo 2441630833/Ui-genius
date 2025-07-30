@@ -478,7 +478,7 @@ export default {
         try {
           // Race between fetch and timeout for faster response
           const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Timeout')), 1000)
+            setTimeout(() => reject(new Error('Timeout')), 10000)
           );
 
           const fetchPromise = fetch(`https://aiback.uigenius.top`, {
