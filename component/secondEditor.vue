@@ -229,7 +229,7 @@ export default {
             if (res.cmd == 'myIframe') {
                 // console.log(res);
             } else if (res.cmd == 'htmlSaved') {
-                // 处理iframe保存HTML的消息
+                                    // 处理iframe保存HTML的消息
                 // console.log('HTML已保存，长度:', res.params.html?.length);
                 if (res.params.html) {
                     // 检查是否已有存储的数据
@@ -246,7 +246,7 @@ export default {
                     // 获取选中的模板ID
                     const selectedTemplateId = uni.getStorageSync('selectedTemplateId');
                     
-                    // 直接使用HTML内容作为组件内容
+                    // 直接使用完整的HTML内容作为组件内容
                     const componentContent = res.params.html;
                     
                     // 如果没有现有数据或解析失败，创建新的数据结构
