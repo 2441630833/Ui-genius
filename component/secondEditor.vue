@@ -152,23 +152,20 @@ export default {
                                 });
                                 
                                 if (matchingPage) {
-                                    // 提取HTML和CSS
-                                    const extractedContent = this.extractHtmlAndStyles(matchingPage.component);
-                                    componentHtml = extractedContent.html;
-                                    componentStyles = extractedContent.styles;
+                                    // 直接使用matchingPage.component，不进行提取
+                                    componentHtml = matchingPage.component;
+                                    componentStyles = '';
                                     // console.log('成功加载选中的模板:', selectedTemplateId);
                                 } else {
                                     // 如果找不到匹配的页面，使用第一个页面
-                                    const extractedContent = this.extractHtmlAndStyles(jsonData.pages[0].component);
-                                    componentHtml = extractedContent.html;
-                                    componentStyles = extractedContent.styles;
+                                    componentHtml = jsonData.pages[0].component;
+                                    componentStyles = '';
                                     // console.log('未找到选中的模板，使用第一个页面');
                                 }
                             } else {
                                 // 如果没有选中的模板ID，使用第一个页面
-                                const extractedContent = this.extractHtmlAndStyles(jsonData.pages[0].component);
-                                componentHtml = extractedContent.html;
-                                componentStyles = extractedContent.styles;
+                                componentHtml = jsonData.pages[0].component;
+                                componentStyles = '';
                                 // console.log('未指定模板ID，使用第一个页面');
                             }
                         }
@@ -190,9 +187,6 @@ export default {
                             
                             // 移除可能导致问题的脚本标签
                             componentHtml = componentHtml.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
-                            
-                            // 清理可能导致CSS选择器问题的类名
-                            componentHtml = this.sanitizeHtml(componentHtml);
                         } catch (sanitizeError) {
                             console.error('净化HTML内容时出错:', sanitizeError);
                         }
@@ -221,134 +215,10 @@ export default {
             }
         },
         
-        // 从存储的内容中提取HTML和CSS样式
-        extractHtmlAndStyles(componentData) {
-            try {
-                if (!componentData) return { html: '', styles: '' };
-                
-                // 使用全局正则表达式匹配所有样式标签
-                const styleRegex = /<style[^>]*>([\s\S]*?)<\/style>/gi;
-                let styles = '';
-                let html = componentData;
-                let match;
-                
-                // 收集所有样式标签
-                const styleMatches = [];
-                while ((match = styleRegex.exec(componentData)) !== null) {
-                    styleMatches.push(match[0]);
-                }
-                
-                if (styleMatches.length > 0) {
-                    // 合并所有样式标签
-                    styles = styleMatches.join('\n');
-                    
-                    // 从HTML中移除所有样式标签
-                    html = componentData;
-                    for (const styleTag of styleMatches) {
-                        html = html.replace(styleTag, '');
-                    }
-                    html = html.trim();
-                    
-                    console.log('成功提取了' + styleMatches.length + '个样式标签');
-                }
-                
-                // 处理可能嵌套的内容
-                const extracted = this.extractSafeHtmlContent(html);
-                
-                return {
-                    html: extracted,
-                    styles: styles
-                };
-            } catch (error) {
-                console.error('提取HTML和样式时出错:', error);
-                return { html: componentData, styles: '' };
-            }
-        },
+        // 不再需要提取HTML和CSS样式的方法，因为我们直接传递组件数据
         
-        // 安全地提取HTML内容，处理可能的嵌套JSON和反引号包裹的内容
-        extractSafeHtmlContent(componentData) {
-            try {
-                if (!componentData) return '';
-                
-                // 直接使用正则表达式提取反引号之间的内容
-                // 这将匹配最外层的反引号包裹的内容
-                const backtickMatch = /`([\s\S]*)`/m.exec(componentData);
-                if (backtickMatch && backtickMatch[1]) {
-                    // console.log('使用正则表达式从反引号中提取了HTML内容');
-                    return backtickMatch[1];
-                }
-                
-                // 如果没有找到反引号，尝试解析JSON
-                try {
-                    // 检查是否是JSON字符串
-                    const parsedData = JSON.parse(componentData);
-                    
-                    // 检查是否有嵌套的pages结构
-                    if (parsedData.pages && parsedData.pages.length > 0 && parsedData.pages[0].component) {
-                        // 递归处理嵌套的component
-                        // console.log('发现嵌套JSON结构，递归提取HTML');
-                        return this.extractSafeHtmlContent(parsedData.pages[0].component);
-                    }
-                    
-                    // 如果没有嵌套结构但有component属性
-                    if (parsedData.component) {
-                        return this.extractSafeHtmlContent(parsedData.component);
-                    }
-                } catch (jsonError) {
-                    // 不是JSON格式，检查是否已经是HTML内容
-                    if (componentData.includes('<div') || componentData.includes('<section')) {
-                        // console.log('已找到HTML内容');
-                        return componentData;
-                    }
-                }
-                
-                // 如果以上方法都无法提取，返回原始内容
-                return componentData;
-            } catch (error) {
-                console.error('提取HTML内容时出错:', error);
-                return componentData || '';
-            }
-        },
-        // 清理HTML内容，处理可能导致CSS选择器问题的类名
-        sanitizeHtml(html) {
-            try {
-                if (!html) return html;
-                
-                // 创建临时DOM元素来解析HTML
-                const parser = new DOMParser();
-                const doc = parser.parseFromString(html, 'text/html');
-                
-                // 处理所有元素的类名
-                const allElements = doc.querySelectorAll('*');
-                allElements.forEach(el => {
-                    if (el.className && typeof el.className === 'string') {
-                        // 替换类名中可能导致选择器问题的字符
-                        const safeClassName = el.className
-                            .split(' ')
-                            .map(cls => {
-                                // 处理包含特殊字符的类名
-                                if (cls.includes(':') || cls.includes('[') || cls.includes(']') || 
-                                    cls.includes('>') || cls.includes('.')) {
-                                    // 将特殊字符替换为下划线
-                                    return cls.replace(/[:[\]>\.]/g, '_');
-                                }
-                                return cls;
-                            })
-                            .join(' ');
-                        
-                        if (el.className !== safeClassName) {
-                            el.className = safeClassName;
-                        }
-                    }
-                });
-                
-                // 返回处理后的HTML
-                return doc.documentElement.outerHTML;
-            } catch (error) {
-                console.error('清理HTML内容时出错:', error);
-                return html; // 出错时返回原始HTML
-            }
-        },
+        // 不再需要提取HTML内容的方法，因为我们直接传递组件数据
+        // 不再需要清理HTML内容的方法，因为我们直接传递组件数据
         // vue获取iframe传递过来的信息
         getiframeMsg(event) {
             const res = event.data;
@@ -376,15 +246,8 @@ export default {
                     // 获取选中的模板ID
                     const selectedTemplateId = uni.getStorageSync('selectedTemplateId');
                     
-                    // 包装HTML和CSS
-                    let componentContent = '';
-                    
-                    // 如果有样式，添加到组件内容中
-                    if (res.params.styles) {
-                        componentContent = `${res.params.styles}\n${res.params.html}`;
-                    } else {
-                        componentContent = res.params.html;
-                    }
+                    // 直接使用HTML内容作为组件内容
+                    const componentContent = res.params.html;
                     
                     // 如果没有现有数据或解析失败，创建新的数据结构
                     if (!storedData) {
