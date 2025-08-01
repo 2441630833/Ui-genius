@@ -2209,6 +2209,10 @@ export default {
           component = component.replace(/^```(?:html|vue)?\s*/, '').replace(/```\s*$/, '');
         }
         
+        // Fix row bar issue by removing problematic HTML elements and styles
+        // Remove any style tags that might be causing the black bars
+        component = component.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+        
         return component;
       } catch (e) {
         console.error('Error rendering component:', e);
