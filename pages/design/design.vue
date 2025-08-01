@@ -1766,11 +1766,12 @@ export default {
       this.isGenerating = true;
       this.generationProgress = 0;
 
-      // Set up progress interval - faster progression for better user experience
+      // Set up progress interval - evenly distributed over 8 minutes (480 seconds)
       const progressInterval = setInterval(() => {
-        if (this.generationProgress < 95) {
-          // Faster increment values to show quicker progress
-          const increment = this.generationProgress < 70 ? 1.2 : 0.8;
+        if (this.generationProgress < 98) {
+          // Calculate increment to reach 98% in approximately 8 minutes
+          // 98% over 480 seconds = ~0.2% per second
+          const increment = 0.2;
           this.generationProgress += increment;
         }
       }, 1000);
@@ -2973,11 +2974,12 @@ export default {
       this.isGenerating = true;
       this.generationProgress = 0;
 
-      // Set up progress interval - faster progression for better user experience
+      // Set up progress interval - evenly distributed over 8 minutes (480 seconds)
       const progressInterval = setInterval(() => {
-        if (this.generationProgress < 95) {
-          // Faster increment values to show quicker progress
-          const increment = this.generationProgress < 70 ? 1.2 : 0.8;
+        if (this.generationProgress < 98) {
+          // Calculate increment to reach 98% in approximately 8 minutes
+          // 98% over 480 seconds = ~0.2% per second
+          const increment = 0.2;
           this.generationProgress += increment;
         }
       }, 1000);
