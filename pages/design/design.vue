@@ -1803,12 +1803,12 @@ export default {
       this.isGenerating = true;
       this.generationProgress = 0;
 
-      // Set up progress interval - evenly distributed over 8 minutes (480 seconds)
-      const progressInterval = setInterval(() => {
+        // Set up progress interval - evenly distributed over 5 minutes (300 seconds)
+        const progressInterval = setInterval(() => {
         if (this.generationProgress < 98) {
-          // Calculate increment to reach 98% in approximately 8 minutes
-          // 98% over 480 seconds = ~0.2% per second
-          const increment = 0.2;
+          // Calculate increment to reach 98% in approximately 5 minutes
+          // 98% over 300 seconds = ~0.33% per second
+          const increment = 0.33;
           this.generationProgress += increment;
         }
       }, 1000);
@@ -3031,12 +3031,12 @@ export default {
       this.isGenerating = true;
       this.generationProgress = 0;
 
-      // Set up progress interval - evenly distributed over 8 minutes (480 seconds)
+      // Set up progress interval - evenly distributed over 5 minutes (300 seconds)
       const progressInterval = setInterval(() => {
         if (this.generationProgress < 98) {
-          // Calculate increment to reach 98% in approximately 8 minutes
-          // 98% over 480 seconds = ~0.2% per second
-          const increment = 0.2;
+          // Calculate increment to reach 98% in approximately 5 minutes
+          // 98% over 300 seconds = ~0.33% per second
+          const increment = 0.33;
           this.generationProgress += increment;
         }
       }, 1000);
