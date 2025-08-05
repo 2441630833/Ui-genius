@@ -237,6 +237,19 @@
             </view>
           </view>
 
+          <!-- Model Selection -->
+          <view class="model-selection-container">
+            <text class="model-selection-label">Select AI Model</text>
+            <view class="model-selector">
+              <uni-data-select
+                :localdata="modelOptions"
+                placeholder="please select your AI model"
+                @change="onModelChange"
+                :value="selectedModel"
+              ></uni-data-select>
+            </view>
+          </view>
+
           <view class="try-example-container">
             <text class="description-label">Describe your project in plain English</text>
             <button class="try-example-btn" @click="tryExample">Try example</button>
@@ -306,7 +319,20 @@ export default {
         photoUrl: ''
       },
       passwordStrength: 0,
-      passwordStrengthText: ''
+      passwordStrengthText: '',
+      // Model selection
+      modelOptions: [
+        { value: 'gimini2.5', text: 'gimini2.5' },
+        { value: 'uigenius4:latest', text: 'uigenius4:latest' },
+        { value: 'uigenius4:fast', text: 'uigenius4:fast' },
+        { value: 'uigenius3:latest', text: 'uigenius3:latest' },
+        { value: 'uigenius3:fast', text: 'uigenius3:fast' },
+        { value: 'uigenius2:latest', text: 'uigenius2:latest' },
+        { value: 'uigenius2:fast', text: 'uigenius2:fast' },
+        { value: 'uigenius1:latest', text: 'uigenius1:latest' },
+        { value: 'uigenius1:fast', text: 'uigenius1:fast' },
+      ],
+      selectedModel: 'gimini2.5'
     }
   },
   watch: {
@@ -517,6 +543,7 @@ export default {
       await uni.removeStorageSync('latest_7_overall_page');
       await uni.removeStorageSync('projectDescription');
       await uni.removeStorageSync('selectedDevice');
+      await uni.removeStorageSync('selectedModel');
       await uni.removeStorageSync('shouldGenerateUI');
       await uni.removeStorageSync('uigenius_image_dashboard');
       await uni.removeStorageSync('uigenius_image_generated');
@@ -529,6 +556,7 @@ export default {
 
       await uni.setStorageSync('projectDescription', this.projectDescription);
       await uni.setStorageSync('selectedDevice', this.selectedDevice);
+      await uni.setStorageSync('selectedModel', this.selectedModel);
       await uni.setStorageSync('numPages', this.numPages);
       // Set flag to indicate we should generate UI when design page loads
       await uni.setStorageSync('shouldGenerateUI', 'true');
@@ -1220,6 +1248,11 @@ export default {
           });
         }
       });
+    },
+    // Handle model selection change
+    onModelChange(e) {
+      this.selectedModel = e;
+      console.log('Selected model:', this.selectedModel);
     }
   }
 }
@@ -1915,5 +1948,38 @@ export default {
 
 .pages-selector {
   width: 100%;
+}
+
+/* Model Selection styles */
+.model-selection-container {
+  margin-bottom: 20px;
+}
+
+.model-selection-label {
+  color: #333;
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.model-selector {
+  width: 100%;
+}
+
+/* Override uni-data-select styles */
+:deep(.uni-data-select) {
+  width: 100%;
+}
+
+::v-deep(.uni-data-select .uni-select__input-box) {
+  height: 90px;
+  border-radius: 10px;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+}
+
+::v-deep .uni-select__input-text {
+  font-size: 16px !important;
 }
 </style>

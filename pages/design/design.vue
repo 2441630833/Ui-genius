@@ -400,6 +400,33 @@
           <view class="error-notification" v-if="errorMessage">
             <text>{{ errorMessage }}</text>
           </view>
+          
+          <view class="device-options">
+            <view class="device-option" :class="{ 'selected': selectedDevice === 'mobile' }"
+              @click="selectDevice('mobile')">
+              <image class="device-icon" src="../../static/mobile.png"></image>
+              <text>Mobile</text>
+            </view>
+
+            <view class="device-option" :class="{ 'selected': selectedDevice === 'desktop' }"
+              @click="selectDevice('desktop')">
+              <image class="device-icon" src="../../static/desktop.png"></image>
+              <text>Desktop</text>
+            </view>
+          </view>
+          
+          <!-- Model Selection -->
+          <view class="model-selection-container">
+            <text class="model-selection-label">Select AI Model</text>
+            <view class="model-selector">
+              <uni-data-select
+                :localdata="modelOptions"
+                placeholder="please select your AI model"
+                @change="onPageModelChange"
+                :value="selectedPageModel"
+              ></uni-data-select>
+            </view>
+          </view>
 
           <view class="try-example-container">
             <text class="description-label">Describe your page in plain English</text>
@@ -634,6 +661,16 @@ export default {
       // examplePageDescription: 'A modern contact page with a form and interactive map, including name, email, and message fields',
       showDeleteDialog: false,
       pagesToDelete: [],
+      
+      // Model selection for Create New Page dialog
+      modelOptions: [
+        { value: 'gimini2.5', text: 'gimini2.5' },
+        { value: 'uigenius4:latest', text: 'uigenius4:latest' },
+        { value: 'uigenius4:fast', text: 'uigenius4:fast' },
+        { value: 'uigenius3:latest', text: 'uigenius3:latest' },
+        { value: 'uigenius3:fast', text: 'uigenius3:fast' },
+      ],
+      selectedPageModel: 'gimini2.5'
     }
   },
 
@@ -1796,6 +1833,7 @@ export default {
       const formData = {
         prompt: uni.getStorageSync('projectDescription') || this.projectDescription,
         device_type: uni.getStorageSync('selectedDevice') || 'desktop',
+        model: uni.getStorageSync('selectedModel') || 'gimini2.5',
         num_pages: 1
       };
 
@@ -2149,6 +2187,14 @@ export default {
         this.showCreatePageDialog = true;
         this.pageDescription = '';
         this.errorMessage = '';
+        
+        // Initialize model selection from storage or default to uigenius3
+        const storedModel = uni.getStorageSync('selectedModel');
+        if (storedModel) {
+          this.selectedPageModel = storedModel;
+        } else {
+          this.selectedPageModel = 'gimini2.5';
+        }
       }
       
       // Show delete pages dialog if delete nav item is clicked
@@ -2834,6 +2880,7 @@ export default {
           method: 'POST',
           data: {
             templateData: JSON.stringify(projectData),
+            model: 'gimini2.5',
             framework: framework
           },
           header: {
@@ -2960,6 +3007,12 @@ export default {
     tryPageExample() {
       this.pageDescription = this.examplePageDescription;
     },
+    
+    // Handle model selection for new page
+    onPageModelChange(e) {
+      this.selectedPageModel = e;
+      console.log('Selected page model:', this.selectedPageModel);
+    },
     createPage() {
       // Close the dialog immediately to provide better UX
       this.showCreatePageDialog = false;
@@ -3007,7 +3060,8 @@ export default {
       // Prepare form data for uni.request
       const formData = {
         prompt: this.pageDescription,
-        device_type: uni.getStorageSync('selectedDevice') || 'desktop',
+        device_type: this.selectedDevice,
+        model: this.selectedPageModel,
         num_pages: 1
       };
 
@@ -4413,6 +4467,81 @@ export default {
   margin-bottom: 20px;
 }
 
+/* Device options styles */
+.device-options {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 20px;
+  margin-bottom: 20px;
+}
+
+.device-option {
+  padding: 15px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  background-color: #f8f8f8;
+  border-radius: 10px;
+  cursor: pointer;
+  transition: all 0.2s;
+  border: 2px solid transparent;
+}
+
+.device-option:hover {
+  background-color: #f0f0f0;
+}
+
+.device-option.selected {
+  border-color: #e53935;
+  background-color: rgba(229, 57, 53, 0.1);
+}
+
+.device-option text {
+  color: #333;
+  font-size: 16px;
+}
+
+.device-icon {
+  width: 24px;
+  height: 24px;
+  object-fit: contain;
+}
+
+/* Model Selection styles */
+.model-selection-container {
+  margin-bottom: 20px;
+}
+
+.model-selection-label {
+  color: #333;
+  font-size: 20px;
+  font-weight: 500;
+  margin-bottom: 10px;
+  display: block;
+}
+
+.model-selector {
+  width: 100%;
+}
+
+/* Override uni-data-select styles */
+:deep(.uni-data-select) {
+  width: 100%;
+}
+
+::v-deep(.uni-data-select .uni-select__input-box) {
+  height: 90px;
+  border-radius: 10px;
+  border: 1px solid #eaeaea;
+  background-color: #f8f8f8;
+}
+
+::v-deep .uni-select__input-text {
+  font-size: 16px !important;
+}
+
 .error-notification {
   background-color: #ffebee;
   border-radius: 8px;
@@ -4449,7 +4578,7 @@ export default {
 }
 
 .description-label {
-  font-size: 14px;
+  font-size: 20px;
   color: #333;
   margin-right: 10px;
 }
