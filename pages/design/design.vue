@@ -664,11 +664,11 @@ export default {
       
       // Model selection for Create New Page dialog
       modelOptions: [
-        { value: 'gimini2.5', text: 'gimini2.5' },
-        { value: 'uigenius4:latest', text: 'uigenius4:latest' },
-        { value: 'uigenius4:fast', text: 'uigenius4:fast' },
-        { value: 'uigenius3:latest', text: 'uigenius3:latest' },
-        { value: 'uigenius3:fast', text: 'uigenius3:fast' },
+        { value: 'gimini2.5', text: 'gimini2.5 (recommended 1 minute)' },
+        { value: 'uigenius4:latest', text: 'uigenius4:latest (3 minutes)'},
+        { value: 'uigenius4:fast', text: 'uigenius4:fast (3 minutes)' },
+        { value: 'uigenius3:latest', text: 'uigenius3:latest (4 minutes)' },
+        { value: 'uigenius3:fast', text: 'uigenius3:fast (2 minutes)' },
       ],
       selectedPageModel: 'gimini2.5'
     }

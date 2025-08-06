@@ -322,15 +322,11 @@ export default {
       passwordStrengthText: '',
       // Model selection
       modelOptions: [
-        { value: 'gimini2.5', text: 'gimini2.5' },
-        { value: 'uigenius4:latest', text: 'uigenius4:latest' },
-        { value: 'uigenius4:fast', text: 'uigenius4:fast' },
-        { value: 'uigenius3:latest', text: 'uigenius3:latest' },
-        { value: 'uigenius3:fast', text: 'uigenius3:fast' },
-        { value: 'uigenius2:latest', text: 'uigenius2:latest' },
-        { value: 'uigenius2:fast', text: 'uigenius2:fast' },
-        { value: 'uigenius1:latest', text: 'uigenius1:latest' },
-        { value: 'uigenius1:fast', text: 'uigenius1:fast' },
+        { value: 'gimini2.5', text: 'gimini2.5 (recommended 1 minute)' },
+        { value: 'uigenius4:latest', text: 'uigenius4:latest (3 minutes)'},
+        { value: 'uigenius4:fast', text: 'uigenius4:fast (3 minutes)' },
+        { value: 'uigenius3:latest', text: 'uigenius3:latest (4 minutes)' },
+        { value: 'uigenius3:fast', text: 'uigenius3:fast (2 minutes)' },
       ],
       selectedModel: 'gimini2.5'
     }
