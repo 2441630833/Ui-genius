@@ -419,12 +419,26 @@
           <view class="model-selection-container">
             <text class="model-selection-label">Select AI Model</text>
             <view class="model-selector">
-              <uni-data-select
-                :localdata="modelOptions"
-                placeholder="please select your AI model"
-                @change="onPageModelChange"
-                :value="selectedPageModel"
-              ></uni-data-select>
+              <view class="custom-dropdown" @click="toggleModelDropdown">
+                <view class="dropdown-display">
+                  <text class="dropdown-text">{{ getSelectedModelText() }}</text>
+                  <view class="dropdown-arrow" :class="{ 'rotated': showModelDropdown }">▼</view>
+                </view>
+                <view class="dropdown-options" v-if="showModelDropdown">
+                  <view 
+                    v-for="option in modelOptions" 
+                    :key="option.value"
+                    class="dropdown-option"
+                    :class="{ 'selected': selectedPageModel === option.value }"
+                    @click.stop="selectModel(option.value)"
+                  >
+                    <view class="option-content">
+                      <text class="option-text">{{ option.text }}</text>
+                      <view v-if="option.isPro" class="pro-badge">PRO</view>
+                    </view>
+                  </view>
+                </view>
+              </view>
             </view>
           </view>
 
@@ -664,13 +678,14 @@ export default {
       
       // Model selection for Create New Page dialog
       modelOptions: [
-        { value: 'gimini2.5', text: 'gimini2.5 (recommended 1 minute)' },
-        { value: 'uigenius4:latest', text: 'uigenius4:latest (3 minutes)'},
-        { value: 'uigenius4:fast', text: 'uigenius4:fast (3 minutes)' },
-        { value: 'uigenius3:latest', text: 'uigenius3:latest (4 minutes)' },
-        { value: 'uigenius3:fast', text: 'uigenius3:fast (2 minutes)' },
+        { value: 'gimini2.5', text: 'gimini2.5 (recommended 1 minute)', isPro: true },
+        { value: 'uigenius4:latest', text: 'uigenius4:latest (3 minutes)', isPro: true},
+        { value: 'uigenius4:fast', text: 'uigenius4:fast (3 minutes)', isPro: false },
+        { value: 'uigenius3:latest', text: 'uigenius3:latest (4 minutes)', isPro: false },
+        { value: 'uigenius3:fast', text: 'uigenius3:fast (2 minutes)', isPro: false },
       ],
-      selectedPageModel: 'gimini2.5'
+      selectedPageModel: 'gimini2.5',
+      showModelDropdown: false
     }
   },
 
@@ -739,6 +754,14 @@ export default {
 
 
     // console.log(this.jsonTemplates);
+    
+    // Add click outside listener for dropdown
+    document.addEventListener('click', this.handleClickOutside);
+  },
+  
+  beforeUnmount() {
+    // Remove click outside listener
+    document.removeEventListener('click', this.handleClickOutside);
   },
 
   onShow() {
@@ -3013,6 +3036,32 @@ export default {
       this.selectedPageModel = e;
       console.log('Selected page model:', this.selectedPageModel);
     },
+    
+    // Custom dropdown methods
+    toggleModelDropdown() {
+      this.showModelDropdown = !this.showModelDropdown;
+    },
+    
+    selectModel(value) {
+      this.selectedPageModel = value;
+      this.showModelDropdown = false;
+      console.log('Selected page model:', this.selectedPageModel);
+    },
+    
+    getSelectedModelText() {
+      const selectedOption = this.modelOptions.find(option => option.value === this.selectedPageModel);
+      return selectedOption ? selectedOption.text : 'please select your AI model';
+    },
+    
+    handleClickOutside(event) {
+      // Close dropdown if clicking outside
+      if (this.showModelDropdown) {
+        const dropdown = event.target.closest('.custom-dropdown');
+        if (!dropdown) {
+          this.showModelDropdown = false;
+        }
+      }
+    },
     createPage() {
       // Close the dialog immediately to provide better UX
       this.showCreatePageDialog = false;
@@ -4769,5 +4818,115 @@ export default {
   border: solid white;
   border-width: 0 2px 2px 0;
   transform: rotate(45deg);
+}
+
+/* Custom Dropdown styles */
+.custom-dropdown {
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+}
+
+.dropdown-display {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 12px 15px;
+  background-color: #f8f8f8;
+  border: 1px solid #eaeaea;
+  border-radius: 10px;
+  min-height: 15px;
+  transition: border-color 0.2s;
+}
+
+.dropdown-display:hover {
+  border-color: #e53935;
+}
+
+.dropdown-text {
+  color: #333;
+  font-size: 15px;
+  flex: 1;
+}
+
+.dropdown-arrow {
+  font-size: 12px;
+  color: #666;
+  transition: transform 0.2s;
+  margin-left: 10px;
+}
+
+.dropdown-arrow.rotated {
+  transform: rotate(180deg);
+}
+
+.dropdown-options {
+  position: absolute;
+  top: 100%;
+  left: 0;
+  right: 0;
+  background-color: #fff;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+  z-index: 1000;
+  max-height: 300px;
+  overflow-y: auto;
+  margin-top: 2px;
+}
+
+.dropdown-option {
+  padding: 12px 15px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.dropdown-option:last-child {
+  border-bottom: none;
+}
+
+.dropdown-option:hover {
+  background-color: #f8f8f8;
+}
+
+.dropdown-option.selected {
+  background-color: rgba(229, 57, 53, 0.1);
+  color: #e53935;
+}
+
+.option-content {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 10px;
+}
+
+.option-text {
+  flex: 1;
+  font-size: 15px;
+  color: #333;
+}
+
+.pro-badge {
+  background: linear-gradient(135deg, #ff6b35, #f7931e);
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(255, 107, 53, 0.3);
+  animation: pro-glow 2s ease-in-out infinite alternate;
+}
+
+@keyframes pro-glow {
+  0% {
+    box-shadow: 0 2px 4px rgba(255, 107, 53, 0.3);
+  }
+  100% {
+    box-shadow: 0 2px 8px rgba(255, 107, 53, 0.6);
+  }
 }
 </style>
