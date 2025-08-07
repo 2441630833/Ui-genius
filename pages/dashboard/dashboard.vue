@@ -257,6 +257,7 @@
                     <view class="option-content">
                       <text class="option-text">{{ option.text }}</text>
                       <view v-if="option.isPro" class="pro-badge">PRO</view>
+                      <view v-else class="free-badge">FREE</view>
                     </view>
                   </view>
                 </view>
@@ -313,7 +314,7 @@ export default {
       selectedDevice: '',
       projectDescription: '',
       numPages: 1,
-      exampleDescription: 'Dating app for people with magical powers',
+      exampleDescription: 'Sign up page for a dating app',
       errorMessage: '',
       projectLoadingStates: {
         alpha: true,
@@ -337,10 +338,8 @@ export default {
       // Model selection
       modelOptions: [
         { value: 'gimini2.5', text: 'gimini2.5 (recommended 1 minute)', isPro: true },
-        { value: 'uigenius4:latest', text: 'uigenius4:latest (3 minutes)', isPro: true},
-        { value: 'uigenius4:fast', text: 'uigenius4:fast (3 minutes)', isPro: false },
-        { value: 'uigenius3:latest', text: 'uigenius3:latest (4 minutes)', isPro: false },
-        { value: 'uigenius3:fast', text: 'uigenius3:fast (2 minutes)', isPro: false },
+        { value: 'uigenius5:latest', text: 'uigenius5:latest (recommended 3 minutes, most powerful model)', isPro: true },
+        { value: 'uigenius3:basic', text: 'uigenius3:basic (free basic model, 3 minutes)', isPro: false},
       ],
       selectedModel: 'gimini2.5',
       showModelDropdown: false
@@ -2120,6 +2119,18 @@ export default {
   100% {
     box-shadow: 0 2px 8px rgba(255, 107, 53, 0.6);
   }
+}
+
+.free-badge {
+  background: linear-gradient(135deg, #9e9e9e, #757575);
+  color: white;
+  font-size: 10px;
+  font-weight: bold;
+  padding: 2px 6px;
+  border-radius: 10px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  box-shadow: 0 2px 4px rgba(158, 158, 158, 0.3);
 }
 
 /* Override uni-data-select styles */
