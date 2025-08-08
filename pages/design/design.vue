@@ -506,7 +506,7 @@
 
     <!-- Import File Dialog -->
     <view class="dialog-overlay" v-if="showImportDialog" @click="closeImportDialog">
-      <view class="dialog-container" @click.stop>
+      <view class="dialog-container import-dialog" @click.stop>
         <view class="dialog-content">
           <text class="dialog-title">Import Project</text>
           
@@ -549,7 +549,13 @@
               @delete="onImportFileDelete"
             >
               <view class="upload-placeholder">
-                <image class="upload-icon" src="/static/import.png"></image>
+                <view class="upload-icon">
+                  <view class="folder-icon">
+                    <view class="folder-body"></view>
+                    <view class="folder-tab"></view>
+                  </view>
+                  <view class="upload-arrow">↑</view>
+                </view>
                 <text class="upload-text">Click to select file{{ selectedImportType === 'image' ? 's' : '' }}</text>
                 <text class="upload-hint">Allowed: {{ allowedExtensions.join(', ') }}</text>
               </view>
@@ -5449,4 +5455,194 @@ export default {
   border-radius: 6px;
   font-size: 14px;
 }
+
+/* File Upload Container and Placeholder Styles */
+.file-upload-container {
+  margin: 20px 0;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  border: 2px dashed #e0e0e0;
+  border-radius: 12px;
+  background-color: #fafafa;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  min-height: 200px;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+.upload-placeholder:hover {
+  border-color: #e53935;
+  background-color: #fff5f5;
+}
+
+.upload-icon {
+  position: relative;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.folder-icon {
+  position: relative;
+  width: 60px;
+  height: 45px;
+  margin-right: 15px;
+}
+
+.folder-body {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 35px;
+  background: linear-gradient(135deg, #9e9e9e, #757575);
+  border-radius: 0 4px 4px 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.folder-tab {
+  position: absolute;
+  top: 0;
+  left: 8px;
+  width: 25px;
+  height: 12px;
+  background: linear-gradient(135deg, #bdbdbd, #9e9e9e);
+  border-radius: 4px 4px 0 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.upload-arrow {
+  font-size: 24px;
+  color: #e53935;
+  font-weight: bold;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% {
+    transform: translateY(0);
+  }
+  40% {
+    transform: translateY(-8px);
+  }
+  60% {
+    transform: translateY(-4px);
+  }
+}
+
+.upload-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.upload-hint {
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.import-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+  margin-top: 20px;
+}
+
+.import-btn, .cancel-btn {
+  padding: 12px 24px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  min-width: 100px;
+}
+
+.import-btn {
+  background-color: #e53935;
+  color: white;
+}
+
+.import-btn:hover:not(:disabled) {
+  background-color: #d32f2f;
+  transform: translateY(-1px);
+}
+
+.import-btn:disabled {
+  background-color: #ccc;
+  cursor: not-allowed;
+  transform: none;
+}
+
+.cancel-btn {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.cancel-btn:hover {
+  background-color: #e0e0e0;
+}
+
+/* Consistent sizing for Import dialog across types */
+.import-dialog {
+  min-height: 520px;
+}
+
+.import-dialog .dialog-content {
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
+
+.import-dialog .file-upload-container {
+  flex: 1;
+}
+
+/* Keep description height consistent even if text length differs */
+.import-description {
+  min-height: 20px;
+}
+
+/* Cap the file list area so it doesn't grow when selecting many images */
+:deep(.uni-file-picker__container) {
+  max-height: 240px !important;
+}
+
+:deep(.uni-file-picker__lists) {
+  max-height: 240px !important;
+  overflow-y: auto !important;
+}
+
+/* Ensure consistent placeholder centering and area sizing */
+.import-dialog .file-upload-container {
+  min-height: 260px;
+  display: flex;
+  align-items: center;
+}
+
+.import-dialog .upload-placeholder {
+  height: 100%;
+}
+
+/* Keep the action buttons at a consistent bottom position */
+.import-dialog .import-actions {
+  margin-top: auto;
+  padding-top: 16px;
+}
+
 </style>
