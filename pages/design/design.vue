@@ -549,11 +549,10 @@
           <view class="file-upload-container">
             <uni-file-picker 
               v-model="importFileList"
-              :fileMediatype="selectedImportType === 'all'"
+              fileMediatype="all"
               mode="grid"
               :limit="selectedImportType === 'image' ? 10 : 1"
               :file-extname="allowedExtensions"
-              @select="onImportFileSelect"
               @delete="onImportFileDelete"
             >
               <view class="upload-placeholder">
@@ -3722,35 +3721,6 @@ export default {
       this.importError = '';
     },
     
-    onImportFileSelect(e) {
-      console.log('File selected:', e);
-      this.importError = '';
-      
-      // Read file content for text files
-      if (e && e.tempFiles && e.tempFiles.length > 0) {
-        e.tempFiles.forEach((file, index) => {
-          // For text files (HTML, Vue, React), read the content
-          if (this.selectedImportType !== 'image') {
-            uni.getFileSystemManager().readFile({
-              filePath: file.path,
-              encoding: 'utf8',
-              success: (res) => {
-                // Update the file object with content
-                if (this.importFileList[index]) {
-                  this.importFileList[index].content = res.data;
-                }
-                console.log('File content read successfully:', file.name);
-              },
-              fail: (err) => {
-                console.error('Failed to read file content:', err);
-                // Still allow the file to be imported even if content reading fails
-              }
-            });
-          }
-        });
-      }
-    },
-    
     onImportFileDelete(e) {
       console.log('File deleted:', e);
       // Remove only the specific item that was deleted
@@ -3790,6 +3760,12 @@ export default {
           this.importProgress += increment;
         }
       }, 1000);
+      
+      // Check if import type is HTML - handle directly
+      if (this.selectedImportType === 'html') {
+        this.handleHtmlImport(progressInterval);
+        return;
+      }
       
       // Prepare files data for backend
       const filesData = this.importFileList.map(file => {
@@ -4223,6 +4199,92 @@ export default {
           return 'react';
         default:
           return 'unknown';
+      }
+    },
+    
+    handleHtmlImport(progressInterval) {
+      try {
+        // Stop the progress interval
+        clearInterval(progressInterval);
+        this.importProgress = 100;
+        
+        // Process each HTML file
+        this.importFileList.forEach((file, index) => {
+          if (file.content) {
+            // Create a new page object for each HTML file
+            const newPage = {
+              name: this.getFileNameWithoutExt(file.name) || `Imported HTML ${index + 1}`,
+              component: file.content
+            };
+            
+            // Get existing project data
+            const existingProjectData = uni.getStorageSync('latest_7_overall_page');
+            let projectData;
+            
+            if (existingProjectData) {
+              projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
+            } else {
+              projectData = {
+                pages: [],
+                AIProjectDescription: 'My Project',
+                AIProjectName: 'UI Genius Project',
+              };
+            }
+            
+            // Add the new page to the project
+            projectData.pages.push(newPage);
+            
+            // Save the updated project data
+            const updatedProjectData = JSON.stringify(projectData);
+            uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+            
+            // Save project to the cloud if logged in
+            this.saveProjectToCloud(projectData);
+          }
+        });
+        
+        // Set flag to force regeneration of images
+        uni.setStorageSync('force_regeneration', 'true');
+        
+        // Hide import overlay
+        setTimeout(() => {
+          this.isImporting = false;
+          
+          // Close import dialog
+          this.closeImportDialog();
+          
+          // Refresh templates to show the new page
+          this.loadJsonTemplates();
+          this.updateLoadingStates();
+          
+          // Force generation of new preview images
+          setTimeout(() => {
+            this.generatePreviewImages();
+          }, 100);
+          
+          // Complete refresh after a delay
+          setTimeout(() => {
+            this.refreshTemplates();
+          }, 500);
+          
+          // Show success message
+          uni.showToast({
+            title: 'HTML files imported successfully!',
+            icon: 'success',
+            duration: 2000
+          });
+        }, 1000);
+        
+      } catch (error) {
+        console.error('Error processing HTML import:', error);
+        
+        // Handle error
+        this.isImporting = false;
+        uni.showToast({
+          title: 'Failed to process HTML import: ' + error.message,
+          icon: 'none',
+          duration: 3000
+        });
       }
     }
   }
