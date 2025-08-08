@@ -532,16 +532,12 @@
             <text>{{ importDescription }}</text>
           </view>
           
-          <!-- Optional page name for page-type imports -->
-          <view v-if="isPageImport" class="import-name-container">
-            <text class="import-name-label">Page name</text>
-            <input class="import-name-input" type="text" v-model="importPageName" placeholder="Enter page name" />
-          </view>
+
           
           <view class="file-upload-container">
             <uni-file-picker 
               v-model="importFileList"
-              :fileMediatype="selectedImportType === 'image' ? 'image' : 'all'"
+              :fileMediatype="selectedImportType === 'all'"
               mode="grid"
               :limit="selectedImportType === 'image' ? 10 : 1"
               :file-extname="allowedExtensions"
@@ -565,7 +561,7 @@
           <view class="import-actions">
             <button 
               class="import-btn" 
-              :disabled="!importFileList.length || (isPageImport && !importPageName)" 
+              :disabled="!importFileList.length" 
               @click="importProject"
             >
               Import
@@ -774,7 +770,6 @@ export default {
         { value: 'react', label: 'React' }
       ],
       selectedImportType: 'image',
-      importPageName: '',
     }
   },
 
@@ -794,10 +789,7 @@ export default {
       return this.jsonTemplates.length > 0 && this.pagesToDelete.length === this.jsonTemplates.length;
     },
     
-    // Import dialog computeds
-    isPageImport() {
-      return ['html', 'vue', 'react'].includes(this.selectedImportType);
-    },
+
     allowedExtensions() {
       switch (this.selectedImportType) {
         case 'image':
@@ -2349,7 +2341,6 @@ export default {
         this.importFileList = [];
         this.importError = '';
         this.selectedImportType = 'image';
-        this.importPageName = '';
       }
     },
     selectTemplate(template) {
@@ -3707,25 +3698,17 @@ export default {
       this.importFileList = [];
       this.importError = '';
       this.selectedImportType = 'image';
-      this.importPageName = '';
     },
     
     selectImportType(type) {
       this.selectedImportType = type;
       this.importFileList = [];
       this.importError = '';
-      this.importPageName = '';
     },
     
     onImportFileSelect(e) {
       console.log('File selected:', e);
       this.importError = '';
-      // Auto-fill page name from the first selected file if needed
-      if (this.isPageImport && this.importFileList && this.importFileList.length > 0) {
-        const first = this.importFileList[0];
-        const name = this.getFileNameWithoutExt(first.name || first.fileName || first.path || first.url || 'New Page');
-        if (!this.importPageName) this.importPageName = name;
-      }
     },
     
     onImportFileDelete(e) {
@@ -3739,162 +3722,6 @@ export default {
         return;
       }
       
-      // Route by import type
-      if (this.selectedImportType === 'image') {
-        this.importImages();
-      } else if (this.selectedImportType === 'html') {
-        this.importHtmlPage();
-      } else if (this.selectedImportType === 'vue') {
-        this.importVuePage();
-      } else if (this.selectedImportType === 'react') {
-        this.importReactPage();
-      } else {
-        this.importError = 'Unsupported import type';
-      }
-    },
-    
-
-    
-    importImages() {
-      uni.showLoading({ title: 'Importing images...', mask: true });
-      const fs = uni.getFileSystemManager();
-      const assetsKey = 'imported_assets';
-      const existing = uni.getStorageSync(assetsKey) || [];
-      let importedCount = 0;
-      const tasks = this.importFileList.map(item => new Promise((resolve) => {
-        const filePath = item.path || item.url;
-        const name = item.name || item.fileName || this.getFileNameWithoutExt(filePath);
-        const ext = (name.split('.').pop() || '').toLowerCase();
-        const mime = this.mimeTypeFromExt(ext);
-        fs.readFile({
-          filePath,
-          encoding: 'base64',
-          success: (res) => {
-            const dataUri = `data:${mime};base64,${res.data}`;
-            existing.push({ name, dataUri, ext, importedAt: Date.now() });
-            importedCount += 1;
-            resolve();
-          },
-          fail: () => resolve()
-        });
-      }));
-      
-      Promise.all(tasks).then(() => {
-        uni.setStorageSync(assetsKey, existing);
-        uni.hideLoading();
-        this.closeImportDialog();
-        uni.showToast({ title: `Imported ${importedCount} image(s)`, icon: 'success', duration: 2000 });
-      });
-    },
-    
-    importHtmlPage() {
-      const file = this.importFileList[0];
-      const filePath = file.path || file.url;
-      const pageName = (this.importPageName || this.getFileNameWithoutExt(file.name || file.fileName || filePath) || 'Imported Page').trim();
-      uni.showLoading({ title: 'Importing HTML...', mask: true });
-      uni.getFileSystemManager().readFile({
-        filePath,
-        encoding: 'utf8',
-        success: (res) => {
-          const componentHtml = res.data;
-          this.mergePageIntoProject(pageName, componentHtml);
-          uni.hideLoading();
-          this.closeImportDialog();
-          uni.showToast({ title: 'HTML page imported', icon: 'success', duration: 2000 });
-        },
-        fail: (error) => {
-          uni.hideLoading();
-          this.importError = `Error reading HTML: ${error.errMsg || 'Unknown error'}`;
-        }
-      });
-    },
-    
-    importVuePage() {
-      const file = this.importFileList[0];
-      const filePath = file.path || file.url;
-      const pageName = (this.importPageName || this.getFileNameWithoutExt(file.name || file.fileName || filePath) || 'Imported Vue Page').trim();
-      uni.showLoading({ title: 'Importing Vue...', mask: true });
-      uni.getFileSystemManager().readFile({
-        filePath,
-        encoding: 'utf8',
-        success: (res) => {
-          const content = res.data || '';
-          const templateMatch = content.match(/<template[^>]*>([\s\S]*?)<\/template>/i);
-          const componentHtml = templateMatch ? templateMatch[1].trim() : content;
-          this.mergePageIntoProject(pageName, componentHtml);
-          uni.hideLoading();
-          this.closeImportDialog();
-          uni.showToast({ title: 'Vue page imported', icon: 'success', duration: 2000 });
-        },
-        fail: (error) => {
-          uni.hideLoading();
-          this.importError = `Error reading Vue file: ${error.errMsg || 'Unknown error'}`;
-        }
-      });
-    },
-    
-    importReactPage() {
-      const file = this.importFileList[0];
-      const filePath = file.path || file.url;
-      const pageName = (this.importPageName || this.getFileNameWithoutExt(file.name || file.fileName || filePath) || 'Imported React Page').trim();
-      uni.showLoading({ title: 'Importing React...', mask: true });
-      uni.getFileSystemManager().readFile({
-        filePath,
-        encoding: 'utf8',
-        success: (res) => {
-          const content = res.data || '';
-          let extracted = '';
-          const returnMatch = content.match(/return\s*\(([\s\S]*?)\);/m);
-          if (returnMatch) {
-            extracted = returnMatch[1].trim();
-          } else {
-            extracted = `<pre style="white-space: pre-wrap; font-family: monospace;">${this.escapeHtml(content)}</pre>`;
-          }
-          this.mergePageIntoProject(pageName, extracted);
-          uni.hideLoading();
-          this.closeImportDialog();
-          uni.showToast({ title: 'React file imported', icon: 'success', duration: 2000 });
-        },
-        fail: (error) => {
-          uni.hideLoading();
-          this.importError = `Error reading React file: ${error.errMsg || 'Unknown error'}`;
-        }
-      });
-    },
-    
-    mergePageIntoProject(pageName, componentHtml) {
-      // Ensure page has proper naming
-      let normalizedName = pageName;
-      if (!normalizedName.toLowerCase().includes('page')) {
-        normalizedName = `${normalizedName} Page`;
-      }
-      
-      // Get current project data
-      const currentProjectData = uni.getStorageSync('latest_7_overall_page');
-      let projectData;
-      if (currentProjectData) {
-        projectData = typeof currentProjectData === 'string' ? JSON.parse(currentProjectData) : currentProjectData;
-      } else {
-        projectData = { pages: [], AIProjectDescription: 'My Project', AIProjectName: 'UI Genius Project' };
-      }
-      
-      const newPage = { name: normalizedName, component: componentHtml };
-      const existingIndex = projectData.pages.findIndex(p => p.name.toLowerCase() === normalizedName.toLowerCase());
-      if (existingIndex >= 0) {
-        projectData.pages[existingIndex] = newPage;
-      } else {
-        projectData.pages.push(newPage);
-      }
-      
-      uni.setStorageSync('latest_7_overall_page', JSON.stringify(projectData));
-      this.saveProjectToCloud(projectData);
-      uni.setStorageSync('force_regeneration', 'true');
-      
-      // Refresh lists
-      this.loadJsonTemplates();
-      this.updateLoadingStates();
-      setTimeout(() => { this.generatePreviewImages(); }, 100);
-      setTimeout(() => { this.refreshTemplates(); }, 500);
     },
     
     getFileNameWithoutExt(pathStr) {
