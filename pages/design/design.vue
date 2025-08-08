@@ -193,6 +193,11 @@
           </image>
         </view>
 
+        <view class="nav-item" :class="{ active: activeNavItem === 'import' }" @click="navigateTo('import')">
+          <image class="nav-icon" :src="activeNavItem === 'import' ? '/static/import_white.png' : '/static/import.png'">
+          </image>
+        </view>
+
         <!-- <view class="nav-item" :class="{ active: activeNavItem === 'magic' }" @click="navigateTo('magic')">
           <image class="nav-icon" :src="activeNavItem === 'magic' ? '/static/magic_white.png' : '/static/magic.png'">
           </image>
@@ -499,6 +504,72 @@
       </view>
     </view>
 
+    <!-- Import File Dialog -->
+    <view class="dialog-overlay" v-if="showImportDialog" @click="closeImportDialog">
+      <view class="dialog-container" @click.stop>
+        <view class="dialog-content">
+          <text class="dialog-title">Import Project</text>
+          
+          <!-- Error notification -->
+          <view class="error-notification" v-if="importError">
+            <text>{{ importError }}</text>
+          </view>
+          
+          <!-- Import type tabs -->
+          <view class="import-type-tabs">
+            <view 
+              v-for="type in importTypeOptions" 
+              :key="type.value" 
+              class="import-type-tab" 
+              :class="{ active: selectedImportType === type.value }"
+              @click="selectImportType(type.value)"
+            >
+              {{ type.label }}
+            </view>
+          </view>
+          
+          <view class="import-description">
+            <text>{{ importDescription }}</text>
+          </view>
+          
+          <!-- Optional page name for page-type imports -->
+          <view v-if="isPageImport" class="import-name-container">
+            <text class="import-name-label">Page name</text>
+            <input class="import-name-input" type="text" v-model="importPageName" placeholder="Enter page name" />
+          </view>
+          
+          <view class="file-upload-container">
+            <uni-file-picker 
+              v-model="importFileList"
+              :fileMediatype="selectedImportType === 'image' ? 'image' : 'all'"
+              mode="grid"
+              :limit="selectedImportType === 'image' ? 10 : 1"
+              :file-extname="allowedExtensions"
+              @select="onImportFileSelect"
+              @delete="onImportFileDelete"
+            >
+              <view class="upload-placeholder">
+                <image class="upload-icon" src="/static/import.png"></image>
+                <text class="upload-text">Click to select file{{ selectedImportType === 'image' ? 's' : '' }}</text>
+                <text class="upload-hint">Allowed: {{ allowedExtensions.join(', ') }}</text>
+              </view>
+            </uni-file-picker>
+          </view>
+          
+          <view class="import-actions">
+            <button 
+              class="import-btn" 
+              :disabled="!importFileList.length || (isPageImport && !importPageName)" 
+              @click="importProject"
+            >
+              Import
+            </button>
+            <button class="cancel-btn" @click="closeImportDialog">Cancel</button>
+          </view>
+        </view>
+      </view>
+    </view>
+
     <!-- Color Palette Overlay -->
     <view v-if="showColorPalette" class="color-palette-overlay">
       <view class="color-palette-container">
@@ -684,7 +755,20 @@ export default {
         { value: 'uigenius3:basic', text: 'uigenius3:basic (free basic model, 3 minutes)', isPro: false},
       ],
       selectedPageModel: 'gimini2.5',
-      showModelDropdown: false
+      showModelDropdown: false,
+      
+      // Import dialog properties
+      showImportDialog: false,
+      importFileList: [],
+      importError: '',
+      importTypeOptions: [
+        { value: 'image', label: 'Image' },
+        { value: 'html', label: 'HTML' },
+        { value: 'vue', label: 'Vue' },
+        { value: 'react', label: 'React' }
+      ],
+      selectedImportType: 'image',
+      importPageName: '',
     }
   },
 
@@ -702,6 +786,39 @@ export default {
     isAllSelected() {
       // Check if all pages are selected
       return this.jsonTemplates.length > 0 && this.pagesToDelete.length === this.jsonTemplates.length;
+    },
+    
+    // Import dialog computeds
+    isPageImport() {
+      return ['html', 'vue', 'react'].includes(this.selectedImportType);
+    },
+    allowedExtensions() {
+      switch (this.selectedImportType) {
+        case 'image':
+          return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'];
+        case 'html':
+          return ['html', 'htm'];
+        case 'vue':
+          return ['vue'];
+        case 'react':
+          return ['jsx', 'tsx'];
+        default:
+          return ['*'];
+      }
+    },
+    importDescription() {
+      switch (this.selectedImportType) {
+        case 'image':
+          return 'Upload one or more images to your project assets. Supported formats: PNG, JPG, JPEG, GIF, WEBP, SVG.';
+        case 'html':
+          return 'Upload an HTML file. A new page will be created from its content.';
+        case 'vue':
+          return 'Upload a Vue Single File Component (.vue). The <template> content will be used to create a new page.';
+        case 'react':
+          return 'Upload a React component file (.jsx/.tsx). We will try to extract returned JSX; otherwise the code will be embedded for later editing.';
+        default:
+          return '';
+      }
     }
   },
 
@@ -2219,6 +2336,15 @@ export default {
         this.pagesToDelete = [];
         this.errorMessage = '';
       }
+      
+      // Show import dialog if import nav item is clicked
+      if (item === 'import') {
+        this.showImportDialog = true;
+        this.importFileList = [];
+        this.importError = '';
+        this.selectedImportType = 'image';
+        this.importPageName = '';
+      }
     },
     selectTemplate(template) {
       this.selectedTemplate = template;
@@ -3569,6 +3695,232 @@ export default {
         }
       }
     },
+    // Import dialog methods
+    closeImportDialog() {
+      this.showImportDialog = false;
+      this.importFileList = [];
+      this.importError = '';
+      this.selectedImportType = 'image';
+      this.importPageName = '';
+    },
+    
+    selectImportType(type) {
+      this.selectedImportType = type;
+      this.importFileList = [];
+      this.importError = '';
+      this.importPageName = '';
+    },
+    
+    onImportFileSelect(e) {
+      console.log('File selected:', e);
+      this.importError = '';
+      // Auto-fill page name from the first selected file if needed
+      if (this.isPageImport && this.importFileList && this.importFileList.length > 0) {
+        const first = this.importFileList[0];
+        const name = this.getFileNameWithoutExt(first.name || first.fileName || first.path || first.url || 'New Page');
+        if (!this.importPageName) this.importPageName = name;
+      }
+    },
+    
+    onImportFileDelete(e) {
+      console.log('File deleted:', e);
+      this.importFileList = [];
+    },
+    
+    importProject() {
+      if (!this.importFileList.length) {
+        this.importError = 'Please select a file to import';
+        return;
+      }
+      
+      // Route by import type
+      if (this.selectedImportType === 'image') {
+        this.importImages();
+      } else if (this.selectedImportType === 'html') {
+        this.importHtmlPage();
+      } else if (this.selectedImportType === 'vue') {
+        this.importVuePage();
+      } else if (this.selectedImportType === 'react') {
+        this.importReactPage();
+      } else {
+        this.importError = 'Unsupported import type';
+      }
+    },
+    
+
+    
+    importImages() {
+      uni.showLoading({ title: 'Importing images...', mask: true });
+      const fs = uni.getFileSystemManager();
+      const assetsKey = 'imported_assets';
+      const existing = uni.getStorageSync(assetsKey) || [];
+      let importedCount = 0;
+      const tasks = this.importFileList.map(item => new Promise((resolve) => {
+        const filePath = item.path || item.url;
+        const name = item.name || item.fileName || this.getFileNameWithoutExt(filePath);
+        const ext = (name.split('.').pop() || '').toLowerCase();
+        const mime = this.mimeTypeFromExt(ext);
+        fs.readFile({
+          filePath,
+          encoding: 'base64',
+          success: (res) => {
+            const dataUri = `data:${mime};base64,${res.data}`;
+            existing.push({ name, dataUri, ext, importedAt: Date.now() });
+            importedCount += 1;
+            resolve();
+          },
+          fail: () => resolve()
+        });
+      }));
+      
+      Promise.all(tasks).then(() => {
+        uni.setStorageSync(assetsKey, existing);
+        uni.hideLoading();
+        this.closeImportDialog();
+        uni.showToast({ title: `Imported ${importedCount} image(s)`, icon: 'success', duration: 2000 });
+      });
+    },
+    
+    importHtmlPage() {
+      const file = this.importFileList[0];
+      const filePath = file.path || file.url;
+      const pageName = (this.importPageName || this.getFileNameWithoutExt(file.name || file.fileName || filePath) || 'Imported Page').trim();
+      uni.showLoading({ title: 'Importing HTML...', mask: true });
+      uni.getFileSystemManager().readFile({
+        filePath,
+        encoding: 'utf8',
+        success: (res) => {
+          const componentHtml = res.data;
+          this.mergePageIntoProject(pageName, componentHtml);
+          uni.hideLoading();
+          this.closeImportDialog();
+          uni.showToast({ title: 'HTML page imported', icon: 'success', duration: 2000 });
+        },
+        fail: (error) => {
+          uni.hideLoading();
+          this.importError = `Error reading HTML: ${error.errMsg || 'Unknown error'}`;
+        }
+      });
+    },
+    
+    importVuePage() {
+      const file = this.importFileList[0];
+      const filePath = file.path || file.url;
+      const pageName = (this.importPageName || this.getFileNameWithoutExt(file.name || file.fileName || filePath) || 'Imported Vue Page').trim();
+      uni.showLoading({ title: 'Importing Vue...', mask: true });
+      uni.getFileSystemManager().readFile({
+        filePath,
+        encoding: 'utf8',
+        success: (res) => {
+          const content = res.data || '';
+          const templateMatch = content.match(/<template[^>]*>([\s\S]*?)<\/template>/i);
+          const componentHtml = templateMatch ? templateMatch[1].trim() : content;
+          this.mergePageIntoProject(pageName, componentHtml);
+          uni.hideLoading();
+          this.closeImportDialog();
+          uni.showToast({ title: 'Vue page imported', icon: 'success', duration: 2000 });
+        },
+        fail: (error) => {
+          uni.hideLoading();
+          this.importError = `Error reading Vue file: ${error.errMsg || 'Unknown error'}`;
+        }
+      });
+    },
+    
+    importReactPage() {
+      const file = this.importFileList[0];
+      const filePath = file.path || file.url;
+      const pageName = (this.importPageName || this.getFileNameWithoutExt(file.name || file.fileName || filePath) || 'Imported React Page').trim();
+      uni.showLoading({ title: 'Importing React...', mask: true });
+      uni.getFileSystemManager().readFile({
+        filePath,
+        encoding: 'utf8',
+        success: (res) => {
+          const content = res.data || '';
+          let extracted = '';
+          const returnMatch = content.match(/return\s*\(([\s\S]*?)\);/m);
+          if (returnMatch) {
+            extracted = returnMatch[1].trim();
+          } else {
+            extracted = `<pre style="white-space: pre-wrap; font-family: monospace;">${this.escapeHtml(content)}</pre>`;
+          }
+          this.mergePageIntoProject(pageName, extracted);
+          uni.hideLoading();
+          this.closeImportDialog();
+          uni.showToast({ title: 'React file imported', icon: 'success', duration: 2000 });
+        },
+        fail: (error) => {
+          uni.hideLoading();
+          this.importError = `Error reading React file: ${error.errMsg || 'Unknown error'}`;
+        }
+      });
+    },
+    
+    mergePageIntoProject(pageName, componentHtml) {
+      // Ensure page has proper naming
+      let normalizedName = pageName;
+      if (!normalizedName.toLowerCase().includes('page')) {
+        normalizedName = `${normalizedName} Page`;
+      }
+      
+      // Get current project data
+      const currentProjectData = uni.getStorageSync('latest_7_overall_page');
+      let projectData;
+      if (currentProjectData) {
+        projectData = typeof currentProjectData === 'string' ? JSON.parse(currentProjectData) : currentProjectData;
+      } else {
+        projectData = { pages: [], AIProjectDescription: 'My Project', AIProjectName: 'UI Genius Project' };
+      }
+      
+      const newPage = { name: normalizedName, component: componentHtml };
+      const existingIndex = projectData.pages.findIndex(p => p.name.toLowerCase() === normalizedName.toLowerCase());
+      if (existingIndex >= 0) {
+        projectData.pages[existingIndex] = newPage;
+      } else {
+        projectData.pages.push(newPage);
+      }
+      
+      uni.setStorageSync('latest_7_overall_page', JSON.stringify(projectData));
+      this.saveProjectToCloud(projectData);
+      uni.setStorageSync('force_regeneration', 'true');
+      
+      // Refresh lists
+      this.loadJsonTemplates();
+      this.updateLoadingStates();
+      setTimeout(() => { this.generatePreviewImages(); }, 100);
+      setTimeout(() => { this.refreshTemplates(); }, 500);
+    },
+    
+    getFileNameWithoutExt(pathStr) {
+      try {
+        const parts = String(pathStr).split(/[\\/]/);
+        const filename = parts[parts.length - 1];
+        return filename.replace(/\.[^.]+$/, '');
+      } catch (_) {
+        return 'Imported';
+      }
+    },
+    
+    mimeTypeFromExt(ext) {
+      switch (ext) {
+        case 'png': return 'image/png';
+        case 'jpg':
+        case 'jpeg': return 'image/jpeg';
+        case 'gif': return 'image/gif';
+        case 'webp': return 'image/webp';
+        case 'svg': return 'image/svg+xml';
+        default: return 'application/octet-stream';
+      }
+    },
+    
+    escapeHtml(str) {
+      return String(str)
+        .replace(/&/g, '&amp;')
+        .replace(/</g, '&lt;')
+        .replace(/>/g, '&gt;')
+        .replace(/"/g, '&quot;')
+        .replace(/'/g, '&#039;');
+    }
   }
 }
 </script>
@@ -3635,6 +3987,134 @@ export default {
           uni.$emit('capture-error', { element: elementId, error: `Exception: ${err.toString()}` });
         }
       }, 50); // Reduced from 100ms
+    },
+    
+    // Import dialog methods
+    closeImportDialog() {
+      this.showImportDialog = false;
+      this.importFileList = [];
+      this.importError = '';
+    },
+    
+    onImportFileSelect(e) {
+      console.log('File selected:', e);
+      this.importError = '';
+    },
+    
+    onImportFileDelete(e) {
+      console.log('File deleted:', e);
+      this.importFileList = [];
+    },
+    
+    importProject() {
+      if (!this.importFileList.length) {
+        this.importError = 'Please select a file to import';
+        return;
+      }
+      
+      const file = this.importFileList[0];
+      
+      // Show loading
+      uni.showLoading({
+        title: 'Importing project...',
+        mask: true
+      });
+      
+      // Read the file
+      uni.getFileSystemManager().readFile({
+        filePath: file.path || file.url,
+        encoding: 'utf8',
+        success: (res) => {
+          try {
+            // Parse the JSON data
+            const importedData = JSON.parse(res.data);
+            
+            // Validate the imported data structure
+            if (!importedData || !importedData.pages || !Array.isArray(importedData.pages)) {
+              throw new Error('Invalid project file format. File must contain a "pages" array.');
+            }
+            
+            // Get current project data
+            const currentProjectData = uni.getStorageSync('latest_7_overall_page');
+            let projectData;
+            
+            if (currentProjectData) {
+              // Merge with existing project
+              projectData = typeof currentProjectData === 'string' ? JSON.parse(currentProjectData) : currentProjectData;
+              
+              // Add imported pages to existing project
+              importedData.pages.forEach(page => {
+                // Check if page with same name already exists
+                const existingPageIndex = projectData.pages.findIndex(p => 
+                  p.name.toLowerCase() === page.name.toLowerCase()
+                );
+                
+                if (existingPageIndex >= 0) {
+                  // Update existing page
+                  projectData.pages[existingPageIndex] = page;
+                } else {
+                  // Add new page
+                  projectData.pages.push(page);
+                }
+              });
+              
+              // Update project metadata if available
+              if (importedData.AIProjectName) {
+                projectData.AIProjectName = importedData.AIProjectName;
+              }
+              if (importedData.AIProjectDescription) {
+                projectData.AIProjectDescription = importedData.AIProjectDescription;
+              }
+            } else {
+              // Create new project with imported data
+              projectData = importedData;
+            }
+            
+            // Save the merged project data
+            uni.setStorageSync('latest_7_overall_page', JSON.stringify(projectData));
+            
+            // Save to cloud if logged in
+            this.saveProjectToCloud(projectData);
+            
+            // Set flag to force regeneration of images
+            uni.setStorageSync('force_regeneration', 'true');
+            
+            // Close dialog and refresh
+            this.closeImportDialog();
+            
+            // Refresh templates to show imported pages
+            this.loadJsonTemplates();
+            this.updateLoadingStates();
+            
+            // Force generation of new preview images
+            setTimeout(() => {
+              this.generatePreviewImages();
+            }, 100);
+            
+            // Complete refresh after a delay
+            setTimeout(() => {
+              this.refreshTemplates();
+            }, 500);
+            
+            uni.hideLoading();
+            uni.showToast({
+              title: `Successfully imported ${importedData.pages.length} page(s)`,
+              icon: 'success',
+              duration: 2000
+            });
+            
+          } catch (error) {
+            uni.hideLoading();
+            this.importError = `Error parsing file: ${error.message}`;
+            console.error('Import error:', error);
+          }
+        },
+        fail: (error) => {
+          uni.hideLoading();
+          this.importError = `Error reading file: ${error.errMsg || 'Unknown error'}`;
+          console.error('File read error:', error);
+        }
+      });
     }
   }
 }
@@ -4933,5 +5413,40 @@ export default {
   text-transform: uppercase;
   letter-spacing: 0.5px;
   box-shadow: 0 2px 4px rgba(158, 158, 158, 0.3);
+}
+
+.import-type-tabs {
+  display: flex;
+  gap: 8px;
+  margin: 8px 0 12px;
+}
+.import-type-tab {
+  padding: 6px 10px;
+  border-radius: 6px;
+  background: #f2f2f2;
+  color: #333;
+  font-size: 12px;
+}
+.import-type-tab.active {
+  background: #e53935;
+  color: #fff;
+}
+.import-name-container {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  margin-bottom: 10px;
+}
+.import-name-label {
+  width: 90px;
+  font-size: 12px;
+  color: #555;
+}
+.import-name-input {
+  flex: 1;
+  padding: 8px 10px;
+  border: 1px solid #e0e0e0;
+  border-radius: 6px;
+  font-size: 14px;
 }
 </style>
