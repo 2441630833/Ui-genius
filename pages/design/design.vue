@@ -809,11 +809,11 @@ export default {
         case 'image':
           return 'Upload one or more images to your project assets. Supported formats: PNG, JPG, JPEG, GIF, WEBP, SVG.';
         case 'html':
-          return 'Upload an HTML file. A new page will be created from its content.';
+          return 'Upload an HTML file.';
         case 'vue':
-          return 'Upload a Vue Single File Component (.vue). The <template> content will be used to create a new page.';
+          return 'Upload a Vue Single File Component (.vue).';
         case 'react':
-          return 'Upload a React component file (.jsx/.tsx). We will try to extract returned JSX; otherwise the code will be embedded for later editing.';
+          return 'Upload a React component file (.jsx/.tsx).';
         default:
           return '';
       }
@@ -3713,7 +3713,22 @@ export default {
     
     onImportFileDelete(e) {
       console.log('File deleted:', e);
-      this.importFileList = [];
+      // Remove only the specific item that was deleted
+      if (e && e.index !== undefined) {
+        // If the event provides an index, remove that specific item
+        this.importFileList.splice(e.index, 1);
+      } else if (e && e.tempFilePaths) {
+        // If the event provides tempFilePaths, find and remove the matching item
+        const deletedPaths = Array.isArray(e.tempFilePaths) ? e.tempFilePaths : [e.tempFilePaths];
+        this.importFileList = this.importFileList.filter(item => {
+          const itemPath = item.path || item.url || item.name;
+          return !deletedPaths.includes(itemPath);
+        });
+      } else {
+        // Fallback: if we can't determine which item was deleted, clear the list
+        // This should rarely happen with uni-file-picker
+        this.importFileList = [];
+      }
     },
     
     importProject() {
@@ -3820,134 +3835,6 @@ export default {
           uni.$emit('capture-error', { element: elementId, error: `Exception: ${err.toString()}` });
         }
       }, 50); // Reduced from 100ms
-    },
-    
-    // Import dialog methods
-    closeImportDialog() {
-      this.showImportDialog = false;
-      this.importFileList = [];
-      this.importError = '';
-    },
-    
-    onImportFileSelect(e) {
-      console.log('File selected:', e);
-      this.importError = '';
-    },
-    
-    onImportFileDelete(e) {
-      console.log('File deleted:', e);
-      this.importFileList = [];
-    },
-    
-    importProject() {
-      if (!this.importFileList.length) {
-        this.importError = 'Please select a file to import';
-        return;
-      }
-      
-      const file = this.importFileList[0];
-      
-      // Show loading
-      uni.showLoading({
-        title: 'Importing project...',
-        mask: true
-      });
-      
-      // Read the file
-      uni.getFileSystemManager().readFile({
-        filePath: file.path || file.url,
-        encoding: 'utf8',
-        success: (res) => {
-          try {
-            // Parse the JSON data
-            const importedData = JSON.parse(res.data);
-            
-            // Validate the imported data structure
-            if (!importedData || !importedData.pages || !Array.isArray(importedData.pages)) {
-              throw new Error('Invalid project file format. File must contain a "pages" array.');
-            }
-            
-            // Get current project data
-            const currentProjectData = uni.getStorageSync('latest_7_overall_page');
-            let projectData;
-            
-            if (currentProjectData) {
-              // Merge with existing project
-              projectData = typeof currentProjectData === 'string' ? JSON.parse(currentProjectData) : currentProjectData;
-              
-              // Add imported pages to existing project
-              importedData.pages.forEach(page => {
-                // Check if page with same name already exists
-                const existingPageIndex = projectData.pages.findIndex(p => 
-                  p.name.toLowerCase() === page.name.toLowerCase()
-                );
-                
-                if (existingPageIndex >= 0) {
-                  // Update existing page
-                  projectData.pages[existingPageIndex] = page;
-                } else {
-                  // Add new page
-                  projectData.pages.push(page);
-                }
-              });
-              
-              // Update project metadata if available
-              if (importedData.AIProjectName) {
-                projectData.AIProjectName = importedData.AIProjectName;
-              }
-              if (importedData.AIProjectDescription) {
-                projectData.AIProjectDescription = importedData.AIProjectDescription;
-              }
-            } else {
-              // Create new project with imported data
-              projectData = importedData;
-            }
-            
-            // Save the merged project data
-            uni.setStorageSync('latest_7_overall_page', JSON.stringify(projectData));
-            
-            // Save to cloud if logged in
-            this.saveProjectToCloud(projectData);
-            
-            // Set flag to force regeneration of images
-            uni.setStorageSync('force_regeneration', 'true');
-            
-            // Close dialog and refresh
-            this.closeImportDialog();
-            
-            // Refresh templates to show imported pages
-            this.loadJsonTemplates();
-            this.updateLoadingStates();
-            
-            // Force generation of new preview images
-            setTimeout(() => {
-              this.generatePreviewImages();
-            }, 100);
-            
-            // Complete refresh after a delay
-            setTimeout(() => {
-              this.refreshTemplates();
-            }, 500);
-            
-            uni.hideLoading();
-            uni.showToast({
-              title: `Successfully imported ${importedData.pages.length} page(s)`,
-              icon: 'success',
-              duration: 2000
-            });
-            
-          } catch (error) {
-            uni.hideLoading();
-            this.importError = `Error parsing file: ${error.message}`;
-            console.error('Import error:', error);
-          }
-        },
-        fail: (error) => {
-          uni.hideLoading();
-          this.importError = `Error reading file: ${error.errMsg || 'Unknown error'}`;
-          console.error('File read error:', error);
-        }
-      });
     }
   }
 }
