@@ -12,6 +12,18 @@
       </view>
     </view>
 
+    <!-- Import Progress Bar Overlay -->
+    <view v-if="isImporting" class="progress-overlay">
+      <view class="progress-container">
+        <text class="progress-title">Importing Files</text>
+        <view class="progress-bar-container">
+          <view class="progress-bar" :style="{ width: importProgress + '%' }"></view>
+        </view>
+        <text class="progress-percentage">{{ Math.floor(importProgress) }}%</text>
+        <text class="progress-message">Processing imported files, please wait...</text>
+      </view>
+    </view>
+
     <!-- Update the color palette component -->
     <view v-if="showColorPalette" class="color-palette-overlay">
       <view class="color-palette-container">
@@ -770,6 +782,10 @@ export default {
         { value: 'react', label: 'React' }
       ],
       selectedImportType: 'image',
+      
+      // Import progress properties
+      isImporting: false,
+      importProgress: 0,
     }
   },
 
@@ -3709,6 +3725,30 @@ export default {
     onImportFileSelect(e) {
       console.log('File selected:', e);
       this.importError = '';
+      
+      // Read file content for text files
+      if (e && e.tempFiles && e.tempFiles.length > 0) {
+        e.tempFiles.forEach((file, index) => {
+          // For text files (HTML, Vue, React), read the content
+          if (this.selectedImportType !== 'image') {
+            uni.getFileSystemManager().readFile({
+              filePath: file.path,
+              encoding: 'utf8',
+              success: (res) => {
+                // Update the file object with content
+                if (this.importFileList[index]) {
+                  this.importFileList[index].content = res.data;
+                }
+                console.log('File content read successfully:', file.name);
+              },
+              fail: (err) => {
+                console.error('Failed to read file content:', err);
+                // Still allow the file to be imported even if content reading fails
+              }
+            });
+          }
+        });
+      }
     },
     
     onImportFileDelete(e) {
@@ -3736,7 +3776,399 @@ export default {
         this.importError = 'Please select a file to import';
         return;
       }
+      this.showImportDialog = false;
+      // Show import progress overlay
+      this.isImporting = true;
+      this.importProgress = 0;
       
+      // Set up progress interval - evenly distributed over 3 minutes (180 seconds)
+      const progressInterval = setInterval(() => {
+        if (this.importProgress < 98) {
+          // Calculate increment to reach 98% in approximately 3 minutes
+          // 98% over 180 seconds = ~0.54% per second
+          const increment = 0.54;
+          this.importProgress += increment;
+        }
+      }, 1000);
+      
+      // Prepare files data for backend
+      const filesData = this.importFileList.map(file => {
+        return {
+          name: file.name,
+          type: file.type || this.getFileTypeFromName(file.name),
+          content: file.content || '' // For text files, content will be available
+        };
+      });
+      
+      // Prepare request data
+      const requestData = {
+        files: filesData,
+        importType: this.selectedImportType
+      };
+      
+      // Show a toast to indicate processing
+      uni.showToast({
+        title: 'Processing imported files...',
+        icon: 'none',
+        duration: 3000
+      });
+      
+      // Make the API call
+      uni.request({
+        url: `${API_BASE_URL}/import-project`,
+        method: 'POST',
+        header: {
+          'Content-Type': 'application/json'
+        },
+        data: requestData,
+        timeout: 600000, // 10 minutes timeout
+        success: (response) => {
+          // Stop the progress interval
+          clearInterval(progressInterval);
+          this.importProgress = 100;
+          
+          const data = response.data;
+          
+          try {
+            // Process the response data - handle both string and object formats
+            let responseData = data;
+            
+            // If it's an object with a response property, extract it
+            if (typeof data === 'object' && data.response) {
+              responseData = data.response;
+            }
+            
+            // If responseData is already a parsed object, use it directly
+            if (typeof responseData === 'object' && responseData.pages) {
+              const parsedResponse = responseData;
+              
+              // Extract the page data
+              if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
+                const newPage = parsedResponse.pages[0];
+                
+                // Get existing project data
+                const existingProjectData = uni.getStorageSync('latest_7_overall_page');
+                let projectData;
+                
+                if (existingProjectData) {
+                  projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
+                } else {
+                  projectData = {
+                    pages: [],
+                    AIProjectDescription: 'My Project',
+                    AIProjectName: 'UI Genius Project',
+                  };
+                }
+                
+                // Add the new page to the project
+                projectData.pages.push(newPage);
+                
+                // Save the updated project data
+                const updatedProjectData = JSON.stringify(projectData);
+                uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+                
+                // Save project to the cloud if logged in
+                this.saveProjectToCloud(projectData);
+                
+                // Set flag to force regeneration of images
+                uni.setStorageSync('force_regeneration', 'true');
+                
+                // Hide import overlay
+                setTimeout(() => {
+                  this.isImporting = false;
+                  
+                  // Close import dialog
+                  this.closeImportDialog();
+                  
+                  // Refresh templates to show the new page
+                  this.loadJsonTemplates();
+                  this.updateLoadingStates();
+                  
+                  // Force generation of new preview images
+                  setTimeout(() => {
+                    this.generatePreviewImages();
+                  }, 100);
+                  
+                  // Complete refresh after a delay
+                  setTimeout(() => {
+                    this.refreshTemplates();
+                  }, 500);
+                  
+                  // Show success message
+                  uni.showToast({
+                    title: 'Files imported successfully!',
+                    icon: 'success',
+                    duration: 2000
+                  });
+                }, 1000);
+              } else {
+                throw new Error('No valid page data found in response');
+              }
+            } else if (typeof responseData === 'string') {
+              try {
+                // Try to clean up the response string for proper JSON parsing
+                
+                // First attempt: Try direct parsing - it might already be valid JSON
+                try {
+                  const parsedResponse = JSON.parse(responseData);
+                  
+                  // Continue with the same logic as above
+                  if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
+                    const newPage = parsedResponse.pages[0];
+                    
+                    // Get existing project data
+                    const existingProjectData = uni.getStorageSync('latest_7_overall_page');
+                    let projectData;
+                    
+                    if (existingProjectData) {
+                      projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
+                    } else {
+                      projectData = {
+                        pages: [],
+                        AIProjectDescription: 'My Project',
+                        AIProjectName: 'UI Genius Project',
+                      };
+                    }
+                    
+                    // Add the new page to the project
+                    projectData.pages.push(newPage);
+                    
+                    // Save the updated project data
+                    const updatedProjectData = JSON.stringify(projectData);
+                    uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+                    
+                    // Save project to the cloud if logged in
+                    this.saveProjectToCloud(projectData);
+                    
+                    // Set flag to force regeneration of images
+                    uni.setStorageSync('force_regeneration', 'true');
+                    
+                    // Hide import overlay
+                    setTimeout(() => {
+                      this.isImporting = false;
+                      
+                      // Close import dialog
+                      this.closeImportDialog();
+                      
+                      // Refresh templates to show the new page
+                      this.loadJsonTemplates();
+                      this.updateLoadingStates();
+                      
+                      // Force generation of new preview images
+                      setTimeout(() => {
+                        this.generatePreviewImages();
+                      }, 100);
+                      
+                      // Complete refresh after a delay
+                      setTimeout(() => {
+                        this.refreshTemplates();
+                      }, 500);
+                      
+                      // Show success message
+                      uni.showToast({
+                        title: 'Files imported successfully!',
+                        icon: 'success',
+                        duration: 2000
+                      });
+                    }, 1000);
+                  } else {
+                    throw new Error('No valid page data found in response');
+                  }
+                  return; // Exit early if first attempt succeeded
+                } catch (initialParseError) {
+                  // First attempt failed, continue with more robust cleaning
+                }
+                
+                // Second attempt: More thorough cleaning for complex responses
+                let cleanedResponse = responseData;
+                
+                // Replace backtick-wrapped strings with properly escaped JSON strings
+                cleanedResponse = cleanedResponse.replace(/`([\s\S]*?)`/g, function(match, p1) {
+                  return JSON.stringify(p1.replace(/\n\s*/g, ' ').trim());
+                });
+                
+                // Handle HTML content in component property by properly escaping it
+                const componentMatch = cleanedResponse.match(/"component"\s*:\s*(".*?"|'.*?'|\{.*?\}|\[.*?\])/s);
+                if (componentMatch) {
+                  const componentContent = componentMatch[1];
+                  if (!componentContent.startsWith('"') || !componentContent.endsWith('"')) {
+                    const rawContent = componentContent.replace(/^['"{]|['"}\]]$/g, '');
+                    const escapedContent = JSON.stringify(rawContent);
+                    cleanedResponse = cleanedResponse.replace(componentMatch[0], `"component": ${escapedContent}`);
+                  }
+                }
+                
+                // Try parsing the cleaned response
+                const parsedResponse = JSON.parse(cleanedResponse);
+                
+                // Extract the page data
+                if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
+                  const newPage = parsedResponse.pages[0];
+                  
+                  // Get existing project data
+                  const existingProjectData = uni.getStorageSync('latest_7_overall_page');
+                  let projectData;
+                  
+                  if (existingProjectData) {
+                    projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
+                  } else {
+                    projectData = {
+                      pages: [],
+                      AIProjectDescription: 'My Project',
+                      AIProjectName: 'UI Genius Project',
+                    };
+                  }
+                  
+                  // Add the new page to the project
+                  projectData.pages.push(newPage);
+                  
+                  // Save the updated project data
+                  const updatedProjectData = JSON.stringify(projectData);
+                  uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+                  
+                  // Save project to the cloud if logged in
+                  this.saveProjectToCloud(projectData);
+                  
+                  // Set flag to force regeneration of images
+                  uni.setStorageSync('force_regeneration', 'true');
+                  
+                  // Hide import overlay
+                  setTimeout(() => {
+                    this.isImporting = false;
+                    
+                    // Close import dialog
+                    this.closeImportDialog();
+                    
+                    // Refresh templates to show the new page
+                    this.loadJsonTemplates();
+                    this.updateLoadingStates();
+                    
+                    // Force generation of new preview images
+                    setTimeout(() => {
+                      this.generatePreviewImages();
+                    }, 100);
+                    
+                    // Complete refresh after a delay
+                    setTimeout(() => {
+                      this.refreshTemplates();
+                    }, 500);
+                    
+                    // Show success message
+                    uni.showToast({
+                      title: 'Files imported successfully!',
+                      icon: 'success',
+                      duration: 2000
+                    });
+                  }, 1000);
+                } else {
+                  throw new Error('No valid page data found in response');
+                }
+              } catch (parseError) {
+                // If all parsing attempts fail, try to extract and create a page manually
+                try {
+                  // Create a simple page object based on the imported files
+                  const pageName = `Imported ${this.selectedImportType} ${new Date().toLocaleDateString()}`;
+                  const simplifiedPage = {
+                    name: pageName,
+                    component: `<div class="container mx-auto p-4">
+                      <h1 class="text-2xl font-bold mb-4">Imported Content</h1>
+                      <p>This page was created from imported ${this.selectedImportType} files.</p>
+                      <p>Files imported: ${this.importFileList.map(f => f.name).join(', ')}</p>
+                    </div>`
+                  };
+                  
+                  // Get existing project data
+                  const existingProjectData = uni.getStorageSync('latest_7_overall_page');
+                  let projectData;
+                  
+                  if (existingProjectData) {
+                    projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
+                  } else {
+                    projectData = {
+                      pages: [],
+                      AIProjectDescription: 'My Project',
+                      AIProjectName: 'UI Genius Project',
+                    };
+                  }
+                  
+                  // Add the simple page to the project
+                  projectData.pages.push(simplifiedPage);
+                  
+                  // Save the updated project data
+                  const updatedProjectData = JSON.stringify(projectData);
+                  uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+                  
+                  // Save project to the cloud if logged in
+                  this.saveProjectToCloud(projectData);
+                  
+                  // Set flag to force regeneration of images
+                  uni.setStorageSync('force_regeneration', 'true');
+                  
+                  // Hide import overlay
+                  setTimeout(() => {
+                    this.isImporting = false;
+                    
+                    // Close import dialog
+                    this.closeImportDialog();
+                    
+                    // Refresh templates to show the new page
+                    this.loadJsonTemplates();
+                    this.updateLoadingStates();
+                    
+                    // Force generation of new preview images
+                    setTimeout(() => {
+                      this.generatePreviewImages();
+                    }, 100);
+                    
+                    // Complete refresh after a delay
+                    setTimeout(() => {
+                      this.refreshTemplates();
+                    }, 500);
+                    
+                    // Show success message
+                    uni.showToast({
+                      title: 'Simple page created (parsing failed)',
+                      icon: 'success',
+                      duration: 2000
+                    });
+                  }, 1000);
+                  
+                  console.error('Used fallback page creation due to parsing error:', parseError);
+                } catch (fallbackError) {
+                  throw new Error(`JSON parsing failed: ${parseError.message}`);
+                }
+              }
+            } else {
+              throw new Error('Invalid response format');
+            }
+          } catch (error) {
+            console.error('Error processing import data:', error);
+            
+            // Handle error
+            this.isImporting = false;
+            uni.showToast({
+              title: 'Failed to process import data: ' + error.message,
+              icon: 'none',
+              duration: 3000
+            });
+          }
+        },
+        fail: (error) => {
+          // Stop the progress interval
+          clearInterval(progressInterval);
+          
+          // Log the error
+          console.error('Error importing files:', error);
+          
+          // Handle error
+          this.isImporting = false;
+          uni.showToast({
+            title: 'Error importing files: ' + (error.errMsg || 'Request failed'),
+            icon: 'none',
+            duration: 3000
+          });
+        }
+      });
     },
     
     getFileNameWithoutExt(pathStr) {
@@ -3768,6 +4200,30 @@ export default {
         .replace(/>/g, '&gt;')
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
+    },
+    
+    getFileTypeFromName(filename) {
+      if (!filename) return 'unknown';
+      const ext = filename.split('.').pop().toLowerCase();
+      switch (ext) {
+        case 'png':
+        case 'jpg':
+        case 'jpeg':
+        case 'gif':
+        case 'webp':
+        case 'svg':
+          return 'image';
+        case 'html':
+        case 'htm':
+          return 'html';
+        case 'vue':
+          return 'vue';
+        case 'jsx':
+        case 'tsx':
+          return 'react';
+        default:
+          return 'unknown';
+      }
     }
   }
 }
