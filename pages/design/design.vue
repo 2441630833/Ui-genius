@@ -520,7 +520,7 @@
     <view class="dialog-overlay" v-if="showImportDialog" @click="closeImportDialog">
       <view class="dialog-container import-dialog" @click.stop>
         <view class="dialog-content">
-          <text class="dialog-title">Import Project</text>
+          <text class="dialog-title">Import File</text>
           
           <!-- Error notification -->
           <view class="error-notification" v-if="importError">
@@ -547,12 +547,34 @@
 
           
           <view class="file-upload-container">
+            <!-- HTML file picker -->
+            <view v-if="selectedImportType === 'html'" class="html-file-picker">
+              <view class="upload-placeholder" @click="chooseHtmlFile">
+                <view class="upload-icon">
+                  <view class="folder-icon">
+                    <view class="folder-body"></view>
+                    <view class="folder-tab"></view>
+                  </view>
+                  <view class="upload-arrow">↑</view>
+                </view>
+                <text class="upload-text">Click to select HTML file</text>
+                <text class="upload-hint">Allowed: .html</text>
+              </view>
+              <view v-if="htmlFileContent" class="html-file-info">
+                <text class="file-info-text">HTML file loaded successfully: {{ htmlFileName }}</text>
+                <text class="file-content-preview">{{ htmlFileContent.substring(0, 100) }}...</text>
+              </view>
+            </view>
+            
+            <!-- Regular file picker for other types -->
             <uni-file-picker 
+              v-else
               v-model="importFileList"
               fileMediatype="all"
               mode="grid"
               :limit="selectedImportType === 'image' ? 10 : 1"
               :file-extname="allowedExtensions"
+              @success="successUploadFiles" 
               @delete="onImportFileDelete"
             >
               <view class="upload-placeholder">
@@ -572,7 +594,7 @@
           <view class="import-actions">
             <button 
               class="import-btn" 
-              :disabled="!importFileList.length" 
+              :disabled="selectedImportType === 'html' ? !htmlFileContent : !importFileList.length" 
               @click="importProject"
             >
               Import
@@ -781,6 +803,10 @@ export default {
         { value: 'react', label: 'React' }
       ],
       selectedImportType: 'image',
+      
+      // HTML file content
+      htmlFileContent: '',
+      htmlFileName: '',
       
       // Import progress properties
       isImporting: false,
@@ -3711,6 +3737,8 @@ export default {
     closeImportDialog() {
       this.showImportDialog = false;
       this.importFileList = [];
+      this.htmlFileContent = '';
+      this.htmlFileName = '';
       this.importError = '';
       this.selectedImportType = 'image';
     },
@@ -3718,6 +3746,8 @@ export default {
     selectImportType(type) {
       this.selectedImportType = type;
       this.importFileList = [];
+      this.htmlFileContent = '';
+      this.htmlFileName = '';
       this.importError = '';
     },
     
@@ -3742,9 +3772,16 @@ export default {
     },
     
     importProject() {
-      if (!this.importFileList.length) {
-        this.importError = 'Please select a file to import';
-        return;
+      if (this.selectedImportType === 'html') {
+        if (!this.htmlFileContent) {
+          this.importError = 'Please select an HTML file to import';
+          return;
+        }
+      } else {
+        if (!this.importFileList.length) {
+          this.importError = 'Please select a file to import';
+          return;
+        }
       }
       this.showImportDialog = false;
       // Show import progress overlay
@@ -4201,47 +4238,51 @@ export default {
           return 'unknown';
       }
     },
-    
+    successUploadFiles(){
+      console.log('successUploadFiles',this.importFileList);
+    },
     handleHtmlImport(progressInterval) {
       try {
         // Stop the progress interval
         clearInterval(progressInterval);
         this.importProgress = 100;
         
-        // Process each HTML file
-        this.importFileList.forEach((file, index) => {
-          if (file.content) {
-            // Create a new page object for each HTML file
-            const newPage = {
-              name: this.getFileNameWithoutExt(file.name) || `Imported HTML ${index + 1}`,
-              component: file.content
-            };
-            
-            // Get existing project data
-            const existingProjectData = uni.getStorageSync('latest_7_overall_page');
-            let projectData;
-            
-            if (existingProjectData) {
-              projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
-            } else {
-              projectData = {
-                pages: [],
-                AIProjectDescription: 'My Project',
-                AIProjectName: 'UI Genius Project',
-              };
-            }
-            
-            // Add the new page to the project
-            projectData.pages.push(newPage);
-            
-            // Save the updated project data
-            const updatedProjectData = JSON.stringify(projectData);
-            uni.setStorageSync('latest_7_overall_page', updatedProjectData);
-            
-            // Save project to the cloud if logged in
-            this.saveProjectToCloud(projectData);
-          }
-        });
+        console.log('Importing HTML content, length:', this.htmlFileContent.length);
+        console.log('HTML content preview:', this.htmlFileContent.substring(0, 200));
+        
+        // Create a new page from the HTML content
+        // const timestamp = new Date().toLocaleString();
+        const pageName = this.htmlFileName 
+          ? `Imported ${this.htmlFileName}`
+          : `Imported HTML ${timestamp}`;
+        const newPage = {
+          name: pageName,
+          component: this.htmlFileContent
+        };
+        
+        // Get existing project data
+        const existingProjectData = uni.getStorageSync('latest_7_overall_page');
+        let projectData;
+        
+        if (existingProjectData) {
+          projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
+        } else {
+          projectData = {
+            pages: [],
+            AIProjectDescription: 'My Project',
+            AIProjectName: 'UI Genius Project',
+          };
+        }
+        
+        // Add the new page to the project
+        projectData.pages.push(newPage);
+        
+        // Save the updated project data
+        const updatedProjectData = JSON.stringify(projectData);
+        uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+        
+        // Save project to the cloud if logged in
+        this.saveProjectToCloud(projectData);
         
         // Set flag to force regeneration of images
         uni.setStorageSync('force_regeneration', 'true');
@@ -4269,7 +4310,7 @@ export default {
           
           // Show success message
           uni.showToast({
-            title: 'HTML files imported successfully!',
+            title: 'HTML file imported successfully!',
             icon: 'success',
             duration: 2000
           });
@@ -4286,6 +4327,70 @@ export default {
           duration: 3000
         });
       }
+    },
+    
+    // Choose HTML file using FileReader API (H5 compatible)
+    chooseHtmlFile() {
+      // Clear previous HTML content first
+      this.htmlFileContent = '';
+      this.htmlFileName = '';
+      
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.html'; // 限制为HTML文件
+      input.onchange = (e) => {
+        const file = e.target.files[0];
+        if (file) {
+          this.readFileContent(file);
+        }
+        // Clear the input value to allow selecting the same file again
+        input.value = '';
+      };
+      input.click();
+    },
+    
+    // Read HTML file content using FileReader
+    readFileContent(file) {
+      console.log('Reading file:', file.name, 'Size:', file.size);
+      
+      const reader = new FileReader();
+      reader.onload = (event) => {
+        const content = event.target.result;
+        this.htmlFileContent = content;
+        this.htmlFileName = file.name; // Store the filename
+        console.log('HTML file content loaded:', file.name);
+        console.log('Content length:', this.htmlFileContent.length);
+        console.log('First 100 characters:', this.htmlFileContent.substring(0, 100));
+        
+        // Validate that it's actually HTML content
+        if (this.htmlFileContent && this.htmlFileContent.trim()) {
+          uni.showToast({
+            title: `HTML file "${file.name}" loaded successfully`,
+            icon: 'success',
+            duration: 2000
+          });
+        } else {
+          this.htmlFileContent = '';
+          this.htmlFileName = '';
+          uni.showToast({
+            title: 'Invalid HTML file content',
+            icon: 'none',
+            duration: 2000
+          });
+        }
+      };
+      
+      reader.onerror = () => {
+        console.error('读取文件失败');
+        this.htmlFileContent = '';
+        uni.showToast({
+          title: 'Failed to read file',
+          icon: 'none',
+          duration: 2000
+        });
+      };
+      
+      reader.readAsText(file, 'UTF-8'); // 以文本形式读取
     }
   }
 }
@@ -5785,6 +5890,41 @@ export default {
   color: #666;
   text-align: center;
   line-height: 1.4;
+}
+
+/* HTML file picker styles */
+.html-file-picker {
+  width: 100%;
+}
+
+.html-file-info {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f0f8ff;
+  border: 1px solid #b3d9ff;
+  border-radius: 8px;
+}
+
+.file-info-text {
+  display: block;
+  font-size: 14px;
+  color: #0066cc;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.file-content-preview {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  font-family: 'Courier New', monospace;
+  background-color: #f5f5f5;
+  padding: 8px;
+  border-radius: 4px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 100px;
+  overflow: hidden;
 }
 
 .import-actions {
