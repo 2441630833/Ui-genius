@@ -3807,12 +3807,9 @@ export default {
       // Prepare files data for backend
       const filesData = this.importFileList.map(file => {
         return {
-          name: file.name,
-          type: file.type || this.getFileTypeFromName(file.name),
-          content: file.content || '' // For text files, content will be available
+          url: file.url,
         };
-      });
-      
+      });      
       // Prepare request data
       const requestData = {
         files: filesData,
