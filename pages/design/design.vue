@@ -200,13 +200,13 @@
           </image>
         </view>
 
-        <view class="nav-item" :class="{ active: activeNavItem === 'delete' }" @click="navigateTo('delete')">
-          <image class="nav-icon" :src="activeNavItem === 'delete' ? '/static/delete_white.png' : '/static/delete.png'">
+        <view class="nav-item" :class="{ active: activeNavItem === 'import' }" @click="navigateTo('import')">
+          <image class="nav-icon" :src="activeNavItem === 'import' ? '/static/import_white.png' : '/static/import.png'">
           </image>
         </view>
 
-        <view class="nav-item" :class="{ active: activeNavItem === 'import' }" @click="navigateTo('import')">
-          <image class="nav-icon" :src="activeNavItem === 'import' ? '/static/import_white.png' : '/static/import.png'">
+        <view class="nav-item" :class="{ active: activeNavItem === 'delete' }" @click="navigateTo('delete')">
+          <image class="nav-icon" :src="activeNavItem === 'delete' ? '/static/delete_white.png' : '/static/delete.png'">
           </image>
         </view>
 
@@ -798,9 +798,9 @@ export default {
       importError: '',
       importTypeOptions: [
         { value: 'image', label: 'Image' },
-        { value: 'html', label: 'HTML' },
-        { value: 'vue', label: 'Vue' },
-        { value: 'react', label: 'React' }
+        { value: 'html', label: 'HTML' }
+        //{ value: 'vue', label: 'Vue' },
+        //{ value: 'react', label: 'React' }
       ],
       selectedImportType: 'image',
       
