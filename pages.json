@@ -40,6 +40,13 @@
             "style": {
                 "navigationBarTitleText": "%index.signup%"
             }
+        },
+        {
+            "path": "pages/intro/intro",
+            "style": {
+                "navigationBarTitleText": "%index.intro%",
+                "enablePullDownRefresh": false
+            }
         }
     ],
     "tabBar": {
@@ -48,6 +55,10 @@
         "borderStyle": "white",
         "backgroundColor": "#FFFFFF",
         "list": [
+            {
+                "pagePath": "pages/intro/intro",
+                "text": "%index.intro%"
+            },
             {
                 "pagePath": "pages/login/login",
                 "text": "%index.login%"
