@@ -30,5 +30,6 @@
   "index.about": "アバウト",
   "index.signup": "サインアップ",
   "index.dashboard": "ダッシュボード",
-  "index.login": "ログイン"
+  "index.login": "ログイン",
+  "index.intro": "ホーム"
 }

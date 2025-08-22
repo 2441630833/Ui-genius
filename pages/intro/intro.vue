@@ -16,7 +16,7 @@
                         <li><a href="#pricing">PRICING</a></li>
                         <li><a href="#contact">CONTACT</a></li>
                     </ul>
-                    <div class="try-free">
+                    <div class="try-free" @click="goToLogin">
                         <span>Try</span>
                         <span>Free</span>
                     </div>
@@ -29,7 +29,7 @@
         <section id="home" class="hero">
             <div class="container hero-content">
                 <h1>AI-powered UX/UI Design Tool<br> For Rapid Prototyping</h1>
-                <a href="#" class="btn btn-primary">Try Uigenius Now</a>
+                <a href="#" class="btn btn-primary" @click.prevent="goToLogin">Try Uigenius Now</a>
             </div>
             <div class="hero-illustration"></div>
             <div class="scroll-to-top" @click="scrollToTop">
@@ -76,7 +76,7 @@
         </section>
 
         <section id="why-choose" class="why-choose">
-            <div class="container">
+            <div class="why-choose-container">
                 <h2 class="section-title text-center mb-6">Why Choose Uigenius</h2>
                 <div class="why-choose-grid">
                     <div class="why-choose-item">
@@ -144,8 +144,8 @@
                         </ul>
                         <a href="#" class="btn btn-primary">Contact Sales</a>
                     </div><div class="pricing-card" style="margin-right: 25px; width: 450px;">
-                        <div class="label">PRo</div>
-                        <span class="price">$19<span>/ Month</span></span>
+                        <div class="label">PRO</div>
+                        <span class="price">$9<span>/ Month</span></span>
                         <ul>
                             <li>100 UI generation&nbsp;request</li>
                             <li>20 screenshot convertion</li><li>Pro AI model</li>
@@ -155,7 +155,7 @@
                         <a href="#" class="btn btn-primary">Contact Sales</a>
                     </div><div class="pricing-card" style="width: 450px;">
                         <div class="label">ENTERPRISE</div>
-                        <span class="price">$39<span>/ Month</span></span>
+                        <span class="price">$19<span>/ Month</span></span>
                         <ul>
                             <li>Unlimited&nbsp;UI generation&nbsp;request</li>
                             <li>Unlimited screenshot convertion</li><li>Unlimited prompt limatation&nbsp;</li><li>Pro AI model</li>
@@ -198,19 +198,20 @@
                 <form class="contact-form">
                     <div class="form-row">
                         <div class="form-group">
-                            <input type="text" id="name" name="name" placeholder="Name" required="">
+                            <!-- <input name="test" style="border: solid 1px #999999;height: 40px;" type="text" @input="onInput" :value="value" /> -->
+                            <input type="text" id="name" name="name" placeholder="Name" v-model="form.name" :disabled="submitting" required>
                         </div>
                         <div class="form-group">
-                            <input type="email" id="email" name="email" placeholder="Email" required="">
+                            <input type="email" id="email" name="email" placeholder="Email" v-model="form.email" :disabled="submitting" required>
                         </div>
                     </div>
                     <div class="form-group">
-                        <input type="text" id="subject" name="subject" placeholder="Subject" required="">
+                        <input type="text" id="subject" name="subject" placeholder="Subject" v-model="form.subject" :disabled="submitting" required>
                     </div>
                     <div class="form-group">
-                        <textarea id="message" name="message" rows="6" placeholder="Message"></textarea>
+                        <textarea id="message" name="message" rows="6" placeholder="Message" v-model="form.message" :disabled="submitting"></textarea>
                     </div>
-                    <button type="submit" class="btn btn-primary">Send Message</button>
+                    <button type="button" class="btn btn-primary" :disabled="submitting" @click="submitForm">{{ submitting ? 'Sending...' : 'Send Message' }}</button>
                 </form>
             </div>
         </section>
@@ -260,9 +261,66 @@
 <script>
 export default {
   name: 'UigeniusLandingPage',
+  data() {
+    return {
+      form: {
+        name: '',
+        email: '',
+        subject: '',
+        message: ''
+      },
+      submitting: false
+    }
+  },
   methods: {
     scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    goToLogin() {
+      // If login is a tabBar page, switchTab is required; otherwise navigateTo works.
+      // Try switchTab first; if it fails, fallback to navigateTo.
+      uni.switchTab({
+        url: '/pages/login/login',
+        fail: () => {
+          uni.navigateTo({ url: '/pages/login/login' })
+        }
+      })
+    },
+    async submitForm() {
+      if (this.submitting) return;
+      if (!this.form.name || !this.form.email || !this.form.subject || !this.form.message) {
+        uni.showToast({ title: 'Please fill all fields', icon: 'none' });
+        return;
+      }
+      const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.form.email);
+      if (!emailValid) {
+        uni.showToast({ title: 'Invalid email', icon: 'none' });
+        return;
+      }
+      try {
+        this.submitting = true;
+        const res = await uniCloud.callFunction({
+          name: 'contact-us',
+          data: {
+            name: this.form.name,
+            email: this.form.email,
+            subject: this.form.subject,
+            message: this.form.message
+          }
+        });
+        if (res && res.result && res.result.code === 0) {
+          uni.showToast({ title: 'Message received. Thank you!', icon: 'success' });
+          this.form = { name: '', email: '', subject: '', message: '' };
+        } else {
+          const msg = (res && res.result && res.result.msg) || 'Send failed';
+          uni.showToast({ title: msg, icon: 'none' });
+        }
+      } catch (error) {
+        console.error(error);
+        uni.showToast({ title: 'Send failed', icon: 'none' });
+      } finally {
+        this.submitting = false;
+      }
     }
   }
 };
@@ -313,8 +371,14 @@ export default {
     margin: 0 auto;
     padding: 0 20px;
 }
+.why-choose-container {
+    max-height: 650px;
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
 
-a {
+ a {
     text-decoration: none;
     color: inherit;
 }
@@ -858,7 +922,16 @@ ul {
     color: var(--dark-text);
 }
 
-.form-group input,
+.form-group input {
+    height: 40px;
+    padding: 12px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    font-family: 'Poppins', sans-serif;
+    font-size: 16px;
+    color: var(--dark-text);
+    background-color: var(--light-gray-bg);
+}
 .form-group textarea {
     width: 100%;
     padding: 12px 15px;

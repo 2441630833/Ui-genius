@@ -31,5 +31,6 @@
   "index.settings": "Settings",
   "index.help": "Help",
   "index.about": "About",
-  "index.signup": "Sign Up"
+  "index.signup": "Sign Up",
+  "index.intro": "Home"
 }

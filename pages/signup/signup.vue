@@ -196,7 +196,10 @@ export default {
         },
         navigateBack() {
             uni.switchTab({
-                url: '/pages/login/login'
+                url: '/pages/login/login',
+                fail: () => {
+                    uni.navigateTo({ url: '/pages/login/login' })
+                }
             })
         },
         toLogin() {

@@ -786,7 +786,7 @@ export default {
       // Model selection for Create New Page dialog
       modelOptions: [
         { value: 'gimini2.5', text: 'gimini2.5 (recommended 1 minute)', isPro: true },
-        { value: 'uigenius5:latest', text: 'uigenius5:latest (recommended 3 minutes, most powerful model)', isPro: true },
+        { value: 'uigenius5:latest', text: 'uigenius5:latest (recommended 3 minutes)', isPro: true },
         { value: 'uigenius3:basic', text: 'uigenius3:basic (free basic model, 3 minutes)', isPro: false},
       ],
       selectedPageModel: 'gimini2.5',
@@ -3069,8 +3069,9 @@ export default {
           // Set a much longer timeout (15 minutes)
           timeout: 900000,
           success: (res) => {
-            uni.hideLoading();
 
+            uni.hideLoading();
+            console.log('res', res);
             if (res.data) {
               console.log('res.data', res.data);
               // Save the converted code as a zip file
