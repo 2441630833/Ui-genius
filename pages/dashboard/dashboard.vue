@@ -271,8 +271,8 @@
           </view>
           <view class="description-container">
             <textarea class="project-description-input" placeholder="Enter your project description"
-              v-model="projectDescription" maxlength="300"></textarea>
-            <text class="char-count">{{ projectDescription.length }}/300</text>
+              v-model="projectDescription" maxlength="700"></textarea>
+            <text class="char-count">{{ projectDescription.length }}/700</text>
           </view>
 
           <!-- Number of Pages Selector -->

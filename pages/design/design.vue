@@ -466,8 +466,8 @@
           </view>
           <view class="description-container">
             <textarea class="project-description-input" placeholder="Enter your page description"
-              v-model="pageDescription" maxlength="300"></textarea>
-            <text class="char-count">{{ pageDescription.length }}/300</text>
+              v-model="pageDescription" maxlength="700"></textarea>
+            <text class="char-count">{{ pageDescription.length }}/700</text>
           </view>
 
           <button class="continue-btn" @click="createPage">Continue</button>
