@@ -49,6 +49,11 @@
             }
         }
     ],
+    "easycom": {
+        "custom": {
+            "^longze-guide": "@/component/longze-guide.vue"
+        }
+    },
     "tabBar": {
         "color": "#7A7E83",
         "selectedColor": "#e53935",

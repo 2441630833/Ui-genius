@@ -52,6 +52,12 @@
           </view>
         </view>
 
+        <!-- Smart Step Guide Test Elements -->
+        <view class="guide-test-section">
+          <view class="guide-step1">第一步引导的目标 - 创建项目按钮</view>
+          <view class="guide-step2">第二步引导的目标 - 项目卡片</view>
+        </view>
+
         <view class="projects-grid">
           <!-- User Projects -->
           <template v-if="Array.isArray(userProjects) && userProjects.length > 0">
@@ -299,6 +305,16 @@
         </view>
       </view>
     </view>
+
+    <!-- Smart Step Guide Component -->
+    <smart-step-guide
+      ref="guide"
+      :steps="guideSteps"
+      :theme="guideTheme"
+      :skip-enabled="true"
+      @complete="onGuideComplete"
+      @skip="onGuideSkip"
+    />
   </view>
 </template>
 
@@ -342,7 +358,23 @@ export default {
         { value: 'uigenius3:basic', text: 'uigenius3:basic (free basic model, 3 minutes)', isPro: false},
       ],
       selectedModel: 'gimini2.5',
-      showModelDropdown: false
+      showModelDropdown: false,
+      // Smart Step Guide
+      guideTheme: 'light',
+      guideSteps: [
+        {
+          target: '.guide-step1',
+          title: '第一步',
+          content: '这是第一步的引导说明 - 点击这里创建新项目',
+          position: 'bottom'
+        },
+        {
+          target: '.guide-step2',
+          title: '第二步',
+          content: '这是第二步的引导说明 - 查看您的项目',
+          position: 'right'
+        }
+      ]
     }
   },
   watch: {
@@ -372,6 +404,11 @@ export default {
     
     // Add click outside listener for dropdown
     document.addEventListener('click', this.handleClickOutside);
+    
+    // Start guide after page loads
+    setTimeout(() => {
+      this.startGuide();
+    }, 1000);
   },
   
   beforeUnmount() {
@@ -1297,6 +1334,28 @@ export default {
           this.showModelDropdown = false;
         }
       }
+    },
+    
+    // Smart Step Guide methods
+    startGuide() {
+      const guide = this.$refs.guide;
+      if (guide) {
+        guide.start();
+      }
+    },
+
+    onGuideComplete() {
+      uni.showToast({
+        title: '引导完成！',
+        icon: 'success'
+      });
+    },
+
+    onGuideSkip() {
+      uni.showToast({
+        title: '已跳过引导',
+        icon: 'none'
+      });
     }
   }
 }
@@ -2147,5 +2206,44 @@ export default {
 
 ::v-deep .uni-select__input-text {
   font-size: 16px !important;
+}
+
+/* Guide Test Section styles */
+.guide-test-section {
+  margin-bottom: 30px;
+  padding: 20px;
+  background-color: #f8f8f8;
+  border-radius: 10px;
+}
+
+.guide-step1 {
+  padding: 15px;
+  background-color: #e53935;
+  color: white;
+  border-radius: 8px;
+  margin-bottom: 15px;
+  text-align: center;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.guide-step1:hover {
+  background-color: #d32f2f;
+}
+
+.guide-step2 {
+  padding: 15px;
+  background-color: #2196f3;
+  color: white;
+  border-radius: 8px;
+  text-align: center;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.guide-step2:hover {
+  background-color: #1976d2;
 }
 </style>
