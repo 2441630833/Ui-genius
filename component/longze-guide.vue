@@ -125,29 +125,70 @@ export default {
       if (!this.currentStep) return {};
       
       const position = this.currentStep.position || 'bottom';
-      const offset = 20;
+      const offset = 15; // Increased offset for better spacing
+      const left_offset = 45;
+      const top_offset = 70;
+      const guideBoxWidth = 300; // Fixed width of guide box
+      const guideBoxHeight = 120; // Approximate height of guide box
+      
       let left, top;
       
+      // Calculate initial position with proper margins and centering
       switch (position) {
         case 'top':
-          left = this.targetPosition.left;
-          top = this.targetPosition.top - offset - 120;
+          // Position above the target with margin, center horizontally
+          left = this.targetPosition.left + (this.targetPosition.width / 2) - (guideBoxWidth / 2);
+          top = this.targetPosition.top - top_offset - guideBoxHeight;
           break;
         case 'bottom':
-          left = this.targetPosition.left;
+          // Position below the target with margin, center horizontally
+          left = this.targetPosition.left + (this.targetPosition.width / 2) - (guideBoxWidth / 2);
           top = this.targetPosition.top + this.targetPosition.height + offset;
           break;
         case 'left':
-          left = this.targetPosition.left - offset - 300;
-          top = this.targetPosition.top;
+          // Position to the left of the target with margin, center vertically
+          left = this.targetPosition.left - left_offset - guideBoxWidth;
+          top = this.targetPosition.top + (this.targetPosition.height / 2) - (guideBoxHeight / 2);
           break;
         case 'right':
+          // Position to the right of the target with margin, center vertically
           left = this.targetPosition.left + this.targetPosition.width + offset;
-          top = this.targetPosition.top;
+          top = this.targetPosition.top + (this.targetPosition.height / 2) - (guideBoxHeight / 2);
           break;
         default:
-          left = this.targetPosition.left;
+          left = this.targetPosition.left + (this.targetPosition.width / 2) - (guideBoxWidth / 2);
           top = this.targetPosition.top + this.targetPosition.height + offset;
+      }
+      
+      // Get viewport dimensions
+      const viewportWidth = window.innerWidth || document.documentElement.clientWidth;
+      const viewportHeight = window.innerHeight || document.documentElement.clientHeight;
+      
+      // Adjust position to keep guide box within viewport
+      if (position === 'left' && left < 10) {
+        // If left position would go off-screen, switch to right
+        left = this.targetPosition.left + this.targetPosition.width + offset;
+      } else if (position === 'right' && left + guideBoxWidth > viewportWidth - 10) {
+        // If right position would go off-screen, switch to left
+        left = this.targetPosition.left - offset - guideBoxWidth;
+      } else if (position === 'top' && top < 10) {
+        // If top position would go off-screen, switch to bottom
+        top = this.targetPosition.top + this.targetPosition.height + offset;
+      } else if (position === 'bottom' && top + guideBoxHeight > viewportHeight - 10) {
+        // If bottom position would go off-screen, switch to top
+        top = this.targetPosition.top - offset - guideBoxHeight;
+      }
+      
+      // Ensure guide box doesn't go off-screen horizontally
+      if (left < 10) left = 10;
+      if (left + guideBoxWidth > viewportWidth - 10) {
+        left = viewportWidth - guideBoxWidth - 10;
+      }
+      
+      // Ensure guide box doesn't go off-screen vertically
+      if (top < 10) top = 10;
+      if (top + guideBoxHeight > viewportHeight - 10) {
+        top = viewportHeight - guideBoxHeight - 10;
       }
       
       return {
@@ -158,7 +199,8 @@ export default {
     
     guideBoxClass() {
       if (!this.currentStep) return '';
-      return `position-${this.currentStep.position || 'bottom'}`;
+      // Remove position classes as we're handling positioning in JavaScript
+      return '';
     },
     
     cssVars() {
@@ -169,6 +211,16 @@ export default {
         '--lg-highlight-shadow': this.hexToRgba(this.highlightColor, this.highlightShadowOpacity)
       }
     }
+  },
+  
+  mounted() {
+    // Add window resize listener for guide positioning
+    window.addEventListener('resize', this.handleResize);
+  },
+  
+  beforeUnmount() {
+    // Remove window resize listener
+    window.removeEventListener('resize', this.handleResize);
   },
   
   methods: {
@@ -224,6 +276,13 @@ export default {
           };
         }
       });
+    },
+    
+    handleResize() {
+      // Update target position when window is resized
+      if (this.visible) {
+        this.updateTargetPosition();
+      }
     },
     
     hexToRgba(hex, alpha = 1) {
@@ -375,20 +434,5 @@ export default {
   color: #999;
 }
 
-/* Position classes */
-.position-top {
-  transform: translateY(-100%);
-}
-
-.position-bottom {
-  transform: translateY(0);
-}
-
-.position-left {
-  transform: translateX(-100%);
-}
-
-.position-right {
-  transform: translateX(0);
-}
+/* Position classes - removed as positioning is now handled in JavaScript */
 </style> 
