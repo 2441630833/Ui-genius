@@ -11,7 +11,7 @@
       </view>
 
       <view class="nav-links">
-        <view class="nav-item" :class="{ active: activeNavItem === 'plus' }" @click="openCreateProjectDialog">
+        <view class="nav-item create-project-btn" :class="{ active: activeNavItem === 'plus' }" @click="openCreateProjectDialog">
           <image class="sidebar-icon"
             :src="activeNavItem === 'plus' ? '../../static/plus_white.png' : '../../static/plus.png'"></image>
           <text class="nav-text">Create Project</text>
@@ -50,12 +50,6 @@
             <image class="bell-icon" src="../../static/bell.png"></image>
             <image class="avatar" :src="userInfo.picture || userInfo.avatar || '../../static/avatar1.png'"></image>
           </view>
-        </view>
-
-        <!-- Smart Step Guide Test Elements -->
-        <view class="guide-test-section">
-          <view class="guide-step1">第一步引导的目标 - 创建项目按钮</view>
-          <view class="guide-step2">第二步引导的目标 - 项目卡片</view>
         </view>
 
         <view class="projects-grid">
@@ -270,7 +264,8 @@
               </view>
             </view>
           </view>
-
+          
+          <div class="description-container-overall">
           <view class="try-example-container">
             <text class="description-label">Describe your project in plain English</text>
             <button class="try-example-btn" @click="tryExample">Try example</button>
@@ -280,6 +275,7 @@
               v-model="projectDescription" maxlength="700"></textarea>
             <text class="char-count">{{ projectDescription.length }}/700</text>
           </view>
+          </div>
 
           <!-- Number of Pages Selector -->
           <!-- <view class="pages-selector-container">
@@ -306,14 +302,26 @@
       </view>
     </view>
 
-    <!-- Smart Step Guide Component -->
-    <smart-step-guide
+    <!-- Custom Toast Overlay -->
+    <view class="toast-overlay" v-if="customToastVisible" @click="customToastVisible = false">
+      <view class="custom-toast" @click.stop>
+        <image class="device-icon" :src="customToastType === 'success' ? '../../static/success.png' : '../../static/skip.png'"></image>
+        <text class="custom-toast-message">{{ customToastMessage }}</text>
+      </view>
+    </view>
+
+    <!-- Longze Guide Component -->
+    <longze-guide
       ref="guide"
       :steps="guideSteps"
       :theme="guideTheme"
+      :primaryColor="'#e53935'"
+      :primaryHoverColor="'#d32f2f'"
+      :highlightColor="'#e53935'"
       :skip-enabled="true"
       @complete="onGuideComplete"
       @skip="onGuideSkip"
+      @step-change="onGuideStepChange"
     />
   </view>
 </template>
@@ -339,6 +347,9 @@ export default {
       },
       networkErrorVisible: false,
       networkErrorMessage: '',
+      customToastVisible: false,
+      customToastMessage: '',
+      customToastType: 'success',
       userProjects: [],
       userInfo: uni.getStorageSync('googleUserInfo'),
       accountSettings: {
@@ -359,19 +370,37 @@ export default {
       ],
       selectedModel: 'gimini2.5',
       showModelDropdown: false,
-      // Smart Step Guide
-      guideTheme: 'light',
+      // Longze Guide
+      guideTheme: 'dark',
       guideSteps: [
         {
-          target: '.guide-step1',
-          title: '第一步',
-          content: '这是第一步的引导说明 - 点击这里创建新项目',
+          target: '.create-project-btn',
+          title: 'First Step',
+          content: 'This is the first step of the guide - click here to create a new project',
           position: 'bottom'
         },
         {
-          target: '.guide-step2',
-          title: '第二步',
-          content: '这是第二步的引导说明 - 查看您的项目',
+          target: '.device-options',
+          title: 'Second Step',
+          content: 'This is the second step of the guide - select the device type you are designing for',
+          position: 'right'
+        },
+        {
+          target: '.model-selection-container',
+          title: 'Third Step',
+          content: 'This is the third step of the guide - select the AI model you want to use',
+          position: 'right'
+        },
+        {
+          target: '.description-container-overall',
+          title: 'Fourth Step',
+          content: 'This is the fourth step of the guide - enter your project description',
+          position: 'right'
+        },
+        {
+          target: '.continue-btn',
+          title: 'Final Step',
+          content: 'This is the final step of the guide - click the continue button to start generating your project',
           position: 'right'
         }
       ]
@@ -644,6 +673,17 @@ export default {
       setTimeout(() => {
         this.createProject();
       }, 100);
+    },
+
+    showCustomToast(message, type = 'success') {
+      this.customToastMessage = message;
+      this.customToastType = type;
+      this.customToastVisible = true;
+
+      // Auto-hide after 3 seconds
+      setTimeout(() => {
+        this.customToastVisible = false;
+      }, 3000);
     },
     loadProjectsByUid() {
       // Check if user is logged in
@@ -1336,7 +1376,7 @@ export default {
       }
     },
     
-    // Smart Step Guide methods
+    // Longze Guide methods
     startGuide() {
       const guide = this.$refs.guide;
       if (guide) {
@@ -1345,17 +1385,20 @@ export default {
     },
 
     onGuideComplete() {
-      uni.showToast({
-        title: '引导完成！',
-        icon: 'success'
-      });
+      this.showCustomToast('Finish Guide！', 'success');
     },
 
     onGuideSkip() {
-      uni.showToast({
-        title: '已跳过引导',
-        icon: 'none'
-      });
+      this.showCustomToast('Already Skip Guide', 'none');
+    },
+    onGuideStepChange(index) {
+      // When moving from step 0 to step 1 (i.e., after first Next click), open the dialog
+      if (index === 1) {
+        this.openCreateProjectDialog();
+      }
+      else if (index === 2) {
+        this.selectDevice('desktop');
+      }
     }
   }
 }
@@ -1754,7 +1797,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 1000;
+  z-index: 2000;
   pointer-events: none;
   /* Allow clicks to pass through except on the toast itself */
 }
@@ -1772,7 +1815,7 @@ export default {
   align-items: center;
   gap: 10px;
   box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
-  z-index: 1001;
+  z-index: 2001;
   animation: toast-in 0.15s ease-out forwards; // Faster animation
   pointer-events: auto;
   /* Ensure the toast itself captures clicks */
@@ -1837,6 +1880,45 @@ export default {
     max-width: 300px;
 
     .toast-message {
+      font-size: 13px;
+    }
+  }
+}
+
+/* Custom Toast styles */
+.custom-toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  border-radius: 8px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 2001;
+  animation: toast-in 0.15s ease-out forwards;
+  pointer-events: auto;
+  will-change: transform, opacity;
+
+  .custom-toast-icon {
+    font-size: 20px;
+    color: #fff;
+  }
+
+  .custom-toast-message {
+    color: #fff;
+    font-size: 14px;
+    flex: 1;
+  }
+
+  @media (max-width: 480px) {
+    width: 80%;
+    max-width: 300px;
+
+    .custom-toast-message {
       font-size: 13px;
     }
   }
