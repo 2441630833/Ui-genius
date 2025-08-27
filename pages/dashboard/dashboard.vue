@@ -36,6 +36,12 @@
           </image>
           <text class="nav-text">Settings</text>
         </view>
+        <!-- Newly added Guide nav item -->
+        <view class="nav-item" :class="{ active: activeNavItem === 'guide' }" @click="startGuide()">
+          <image class="sidebar-icon"
+            :src="activeNavItem === 'guide' ? '../../static/guide_white.png' : '../../static/guide.png'"></image>
+          <text class="nav-text">Guide</text>
+        </view>
       </view>
     </view>
 
@@ -411,6 +417,9 @@ export default {
       this.updatePasswordStrength();
     }
   },
+  onLoad() {
+    this.checkAndStartGuide();
+  },
   mounted() {
     // Staggered loading for projects
     setTimeout(() => {
@@ -433,11 +442,6 @@ export default {
     
     // Add click outside listener for dropdown
     document.addEventListener('click', this.handleClickOutside);
-    
-    // Start guide after page loads
-    setTimeout(() => {
-      this.startGuide();
-    }, 1000);
   },
   
   beforeUnmount() {
@@ -445,6 +449,15 @@ export default {
     document.removeEventListener('click', this.handleClickOutside);
   },
   methods: {
+    checkAndStartGuide() {
+      const hasGuideShown = uni.getStorageSync('hasUserGuideShown'); // 或 localStorage.getItem('hasUserGuideShown')
+      if (!hasGuideShown) {
+        setTimeout(() => {
+          this.startGuide(); 
+          uni.setStorageSync('hasUserGuideShown', true); 
+        }, 1000); 
+      }
+    },
     // Initialize account settings from stored user info
     initializeAccountSettings() {
       const userInfo = uni.getStorageSync('googleUserInfo') || {};
@@ -1400,7 +1413,7 @@ export default {
         this.selectDevice('desktop');
       }
       else if (index === 3) {
-        this.selectModel('uigenius5:latest')
+        this.selectModel('gimini2.5')
       }
       else if (index === 4) {
         this.tryExample();
