@@ -2113,6 +2113,16 @@ export default {
                     icon: 'success',
                     duration: 2000
                   });
+                  
+                  // Navigate to editor with the new template ID
+                  const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                  uni.setStorageSync('selectedTemplateId', newTemplateId);
+                  
+                  setTimeout(() => {
+                    uni.switchTab({
+                      url: '/pages/editor/editor'
+                    });
+                  }, 500);
                 }, 1000);
               } else {
                 throw new Error('No valid page data found in response');
@@ -2166,13 +2176,23 @@ export default {
                         this.refreshTemplates();
                       }, 500);
                       
-                      // Show success message
-                      uni.showToast({
-                        title: 'New page created successfully!',
-                        icon: 'success',
-                        duration: 2000
-                      });
-                    }, 1000);
+                                        // Show success message
+                  uni.showToast({
+                    title: 'New page created successfully!',
+                    icon: 'success',
+                    duration: 2000
+                  });
+                  
+                  // Navigate to editor with the new template ID
+                  const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                  uni.setStorageSync('selectedTemplateId', newTemplateId);
+                  
+                  setTimeout(() => {
+                    uni.switchTab({
+                      url: '/pages/editor/editor'
+                    });
+                  }, 500);
+                }, 1000);
                   } else {
                     throw new Error('No valid page data found in response');
                   }
@@ -2254,6 +2274,16 @@ export default {
                       icon: 'success',
                       duration: 2000
                     });
+                    
+                    // Navigate to editor with the new template ID
+                    const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                    uni.setStorageSync('selectedTemplateId', newTemplateId);
+                    
+                    setTimeout(() => {
+                      uni.switchTab({
+                        url: '/pages/editor/editor'
+                      });
+                    }, 500);
                   }, 1000);
                 } else {
                   throw new Error('No valid page data found in response');
@@ -2308,6 +2338,16 @@ export default {
                       icon: 'success',
                       duration: 2000
                     });
+                    
+                    // Navigate to editor with the new template ID
+                    const newTemplateId = simplifiedPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                    uni.setStorageSync('selectedTemplateId', newTemplateId);
+                    
+                    setTimeout(() => {
+                      uni.switchTab({
+                        url: '/pages/editor/editor'
+                      });
+                    }, 500);
                   }, 1000);
                   
                   console.error('Used fallback page creation due to parsing error:', parseError);
@@ -2329,6 +2369,8 @@ export default {
               duration: 3000
             });
           }
+
+          // Remove the automatic navigation since we're handling it in success cases
         },
         fail: (error) => {
           // Stop the progress interval
@@ -3371,6 +3413,16 @@ export default {
                     icon: 'success',
                     duration: 2000
                   });
+                  
+                  // Navigate to editor with the new template ID
+                  const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                  uni.setStorageSync('selectedTemplateId', newTemplateId);
+                  
+                  setTimeout(() => {
+                    uni.switchTab({
+                      url: '/pages/editor/editor'
+                    });
+                  }, 500);
                 }, 1000);
               } else {
                 throw new Error('No valid page data found in response');
@@ -3430,6 +3482,16 @@ export default {
                         icon: 'success',
                         duration: 2000
                       });
+                      
+                      // Navigate to editor with the new template ID
+                      const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                      uni.setStorageSync('selectedTemplateId', newTemplateId);
+                      
+                      setTimeout(() => {
+                        uni.switchTab({
+                          url: '/pages/editor/editor'
+                        });
+                      }, 500);
                     }, 1000);
                   } else {
                     throw new Error('No valid page data found in response');
@@ -3493,26 +3555,36 @@ export default {
                     this.isGenerating = false;
                     
                     // Refresh templates to show the new page
-                    this.loadJsonTemplates();
-                    this.updateLoadingStates();
-                    
-                    // Force generation of new preview images
-                    setTimeout(() => {
-                      this.generatePreviewImages();
-                    }, 100);
-                    
-                    // Complete refresh after a delay
-                    setTimeout(() => {
-                      this.refreshTemplates();
-                    }, 500);
-                    
-                    // Show success message
-                    uni.showToast({
-                      title: 'New page created successfully!',
-                      icon: 'success',
-                      duration: 2000
-                    });
-                  }, 1000);
+                      this.loadJsonTemplates();
+                      this.updateLoadingStates();
+                      
+                      // Force generation of new preview images
+                      setTimeout(() => {
+                        this.generatePreviewImages();
+                      }, 100);
+                      
+                      // Complete refresh after a delay
+                      setTimeout(() => {
+                        this.refreshTemplates();
+                      }, 500);
+                      
+                      // Show success message
+                      uni.showToast({
+                        title: 'New page created successfully!',
+                        icon: 'success',
+                        duration: 2000
+                      });
+                      
+                      // Navigate to editor with the new template ID
+                      const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                      uni.setStorageSync('selectedTemplateId', newTemplateId);
+                      
+                      setTimeout(() => {
+                        uni.switchTab({
+                          url: '/pages/editor/editor'
+                        });
+                      }, 500);
+                    }, 1000);
                 } else {
                   throw new Error('No valid page data found in response');
                 }
@@ -3566,6 +3638,16 @@ export default {
                       icon: 'success',
                       duration: 2000
                     });
+                    
+                    // Navigate to editor with the new template ID
+                    const newTemplateId = simplifiedPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                    uni.setStorageSync('selectedTemplateId', newTemplateId);
+                    
+                    setTimeout(() => {
+                      uni.switchTab({
+                        url: '/pages/editor/editor'
+                      });
+                    }, 500);
                   }, 1000);
                   
                   console.error('Used fallback page creation due to parsing error:', parseError);
@@ -3587,6 +3669,8 @@ export default {
               duration: 3000
             });
           }
+
+          // Remove the automatic navigation since we're handling it in success cases
         },
         fail: (error) => {
           // Stop the progress interval
@@ -4416,15 +4500,15 @@ export default {
         try {
           const dom = document.getElementById(elementId);
           if (!dom) {
-            console.error(`Element not found: ${elementId}`);   
-            uni.$emit('capture-error', { element: elementId, error: 'Element not found' });
+            // console.error(`Element not found: ${elementId}`);   
+            // uni.$emit('capture-error', { element: elementId, error: 'Element not found' });
             return;
           }
           
           // Check if element has size
           if (dom.clientWidth <= 0 || dom.clientHeight <= 0) {
-            console.error(`Element has no size: ${elementId}`);
-            uni.$emit('capture-error', { element: elementId, error: 'Element has no size' });
+            // console.error(`Element has no size: ${elementId}`);
+            // uni.$emit('capture-error', { element: elementId, error: 'Element has no size' });
             return;
           }
           
