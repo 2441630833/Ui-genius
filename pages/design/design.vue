@@ -1932,11 +1932,11 @@ export default {
 
       if (elementsToCapture.length === 0) {
         uni.hideLoading();
-        uni.showToast({
-          title: 'No elements found to capture',
-          icon: 'none',
-          duration: 2000
-        });
+        // uni.showToast({
+        //   title: 'No elements found to capture',
+        //   icon: 'none',
+        //   duration: 2000
+        // });
         return;
       }
 
