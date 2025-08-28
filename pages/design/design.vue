@@ -2108,11 +2108,11 @@ export default {
                   }, 500);
                   
                   // Show success message
-                  uni.showToast({
-                    title: 'New page created successfully!',
-                    icon: 'success',
-                    duration: 2000
-                  });
+                  // uni.showToast({
+                  //   title: 'New page created successfully!',
+                  //   icon: 'success',
+                  //   duration: 2000
+                  // });
                   
                   // Navigate to editor with the new template ID
                   const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
@@ -2175,14 +2175,14 @@ export default {
                       setTimeout(() => {
                         this.refreshTemplates();
                       }, 500);
-                      
-                                        // Show success message
-                  uni.showToast({
-                    title: 'New page created successfully!',
-                    icon: 'success',
-                    duration: 2000
-                  });
-                  
+
+                      // Show success message
+                      // uni.showToast({
+                      //   title: 'New page created successfully!',
+                      //   icon: 'success',
+                      //   duration: 2000
+                      // });
+
                   // Navigate to editor with the new template ID
                   const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
                   uni.setStorageSync('selectedTemplateId', newTemplateId);
@@ -2269,11 +2269,11 @@ export default {
                     }, 500);
                     
                     // Show success message
-                    uni.showToast({
-                      title: 'New page created successfully!',
-                      icon: 'success',
-                      duration: 2000
-                    });
+                    // uni.showToast({
+                    //   title: 'New page created successfully!',
+                    //   icon: 'success',
+                    //   duration: 2000
+                    // });
                     
                     // Navigate to editor with the new template ID
                     const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
@@ -3408,11 +3408,11 @@ export default {
                   }, 500);
                   
                   // Show success message
-                  uni.showToast({
-                    title: 'New page created successfully!',
-                    icon: 'success',
-                    duration: 2000
-                  });
+                  // uni.showToast({
+                  //   title: 'New page created successfully!',
+                  //   icon: 'success',
+                  //   duration: 2000
+                  // });
                   
                   // Navigate to editor with the new template ID
                   const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
@@ -3477,11 +3477,11 @@ export default {
                       }, 500);
                       
                       // Show success message
-                      uni.showToast({
-                        title: 'New page created successfully!',
-                        icon: 'success',
-                        duration: 2000
-                      });
+                      // uni.showToast({
+                      //   title: 'New page created successfully!',
+                      //   icon: 'success',
+                      //   duration: 2000
+                      // });
                       
                       // Navigate to editor with the new template ID
                       const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
@@ -3569,11 +3569,11 @@ export default {
                       }, 500);
                       
                       // Show success message
-                      uni.showToast({
-                        title: 'New page created successfully!',
-                        icon: 'success',
-                        duration: 2000
-                      });
+                      // uni.showToast({
+                      //   title: 'New page created successfully!',
+                      //   icon: 'success',
+                      //   duration: 2000
+                      // });
                       
                       // Navigate to editor with the new template ID
                       const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
@@ -3990,11 +3990,21 @@ export default {
                   }, 500);
                   
                   // Show success message
-                  uni.showToast({
-                    title: 'Files imported successfully!',
-                    icon: 'success',
-                    duration: 2000
-                  });
+                  // uni.showToast({
+                  //   title: 'Files imported successfully!',
+                  //   icon: 'success',
+                  //   duration: 2000
+                  // });
+                  
+                  // Navigate to editor with the new template ID
+                  const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                  uni.setStorageSync('selectedTemplateId', newTemplateId);
+                  
+                  setTimeout(() => {
+                    uni.switchTab({
+                      url: '/pages/editor/editor'
+                    });
+                  }, 500);
                 }, 1000);
               } else {
                 throw new Error('No valid page data found in response');
@@ -4059,17 +4069,27 @@ export default {
                         this.refreshTemplates();
                       }, 500);
                       
-                      // Show success message
-                      uni.showToast({
-                        title: 'Files imported successfully!',
-                        icon: 'success',
-                        duration: 2000
-                      });
-                    }, 1000);
-                  } else {
-                    throw new Error('No valid page data found in response');
-                  }
-                  return; // Exit early if first attempt succeeded
+                                        // Show success message
+                  // uni.showToast({
+                  //   title: 'Files imported successfully!',
+                  //   icon: 'success',
+                  //   duration: 2000
+                  // });
+                  
+                  // Navigate to editor with the new template ID
+                  const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                  uni.setStorageSync('selectedTemplateId', newTemplateId);
+                  
+                  setTimeout(() => {
+                    uni.switchTab({
+                      url: '/pages/editor/editor'
+                    });
+                  }, 500);
+                }, 1000);
+              } else {
+                throw new Error('No valid page data found in response');
+              }
+              return; // Exit early if first attempt succeeded
                 } catch (initialParseError) {
                   // First attempt failed, continue with more robust cleaning
                 }
@@ -4148,17 +4168,27 @@ export default {
                       this.refreshTemplates();
                     }, 500);
                     
-                    // Show success message
-                    uni.showToast({
-                      title: 'Files imported successfully!',
-                      icon: 'success',
-                      duration: 2000
+                                      // Show success message
+                  // uni.showToast({
+                  //   title: 'Files imported successfully!',
+                  //   icon: 'success',
+                  //   duration: 2000
+                  // });
+                  
+                  // Navigate to editor with the new template ID
+                  const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                  uni.setStorageSync('selectedTemplateId', newTemplateId);
+                  
+                  setTimeout(() => {
+                    uni.switchTab({
+                      url: '/pages/editor/editor'
                     });
-                  }, 1000);
-                } else {
-                  throw new Error('No valid page data found in response');
-                }
-              } catch (parseError) {
+                  }, 500);
+                }, 1000);
+              } else {
+                throw new Error('No valid page data found in response');
+              }
+            } catch (parseError) {
                 // If all parsing attempts fail, try to extract and create a page manually
                 try {
                   // Create a simple page object based on the imported files
@@ -4220,15 +4250,25 @@ export default {
                       this.refreshTemplates();
                     }, 500);
                     
-                    // Show success message
-                    uni.showToast({
-                      title: 'Simple page created (parsing failed)',
-                      icon: 'success',
-                      duration: 2000
-                    });
-                  }, 1000);
+                                      // Show success message
+                  uni.showToast({
+                    title: 'Simple page created (parsing failed)',
+                    icon: 'success',
+                    duration: 2000
+                  });
                   
-                  console.error('Used fallback page creation due to parsing error:', parseError);
+                  // Navigate to editor with the new template ID
+                  const newTemplateId = simplifiedPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                  uni.setStorageSync('selectedTemplateId', newTemplateId);
+                  
+                  setTimeout(() => {
+                    uni.switchTab({
+                      url: '/pages/editor/editor'
+                    });
+                  }, 500);
+                }, 1000);
+                
+                console.error('Used fallback page creation due to parsing error:', parseError);
                 } catch (fallbackError) {
                   throw new Error(`JSON parsing failed: ${parseError.message}`);
                 }
@@ -4384,21 +4424,31 @@ export default {
           setTimeout(() => {
             this.generatePreviewImages();
           }, 100);
-          
+
           // Complete refresh after a delay
           setTimeout(() => {
             this.refreshTemplates();
           }, 500);
-          
+
           // Show success message
-          uni.showToast({
-            title: 'HTML file imported successfully!',
-            icon: 'success',
-            duration: 2000
-          });
+          // uni.showToast({
+          //   title: 'HTML file imported successfully!',
+          //   icon: 'success',
+          //   duration: 2000
+          // });
+
+          // Navigate to editor with the new template ID
+          const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+          uni.setStorageSync('selectedTemplateId', newTemplateId);
+
+          setTimeout(() => {
+            uni.switchTab({
+              url: '/pages/editor/editor'
+            });
+          }, 500);
         }, 1000);
-        
-      } catch (error) {
+
+        } catch (error) {
         console.error('Error processing HTML import:', error);
         
         // Handle error
