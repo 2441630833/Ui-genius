@@ -472,7 +472,8 @@ export default {
 <style scoped>
 .login-bg {
   min-height: 100vh;
-  background: #fcfbfb;
+  background: url('https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/login_background.png') no-repeat center center;
+  background-size: cover;
   display: flex;
   align-items: center;
   justify-content: center;

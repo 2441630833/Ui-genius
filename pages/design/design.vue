@@ -1195,21 +1195,36 @@ export default {
           return;
         }
 
-        // Create temporary HTML elements for screenshots
-        const container = document.createElement('div');
-        container.style.position = 'absolute';
-        container.style.left = '-9999px';
-        container.style.top = '-9999px';
-        container.style.width = 'auto'; // Standard website width
-        container.style.height = 'auto'; // Auto height to accommodate content
-        document.body.appendChild(container);
+        // Create a hidden iframe to isolate rendering from the main page
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.left = '-9999px';
+        iframe.style.top = '-9999px';
+        iframe.style.width = '1440px';
+        iframe.style.height = '2000px';
+        iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
+        document.body.appendChild(iframe);
+
+        // Initialize iframe document with minimal HTML and base styles
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        iframeDoc.open();
+        iframeDoc.write(`<!DOCTYPE html>
+<html><head><meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<style>
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #ffffff; font-family: Arial, sans-serif; color: #333333; }
+  .page-root { padding: 20px; max-width: 1200px; margin: 0 auto; }
+  h1 { font-size: 24px; font-weight: bold; margin: 0 0 20px; }
+</style>
+</head><body></body></html>`);
+        iframeDoc.close();
 
         const images = [];
         const renderPage = async (index) => {
           if (index >= projectData.pages.length) {
-            // Clean up the temporary container
-            document.body.removeChild(container);
-            
+            // Clean up the iframe
+            document.body.removeChild(iframe);
             // Export the images
             // #ifdef H5 
             this.exportImagesWeb(images);
@@ -1223,67 +1238,53 @@ export default {
           const page = projectData.pages[index];
           const pageName = page.name.replace(/ Page/i, '');
           const pageKey = pageName.toLowerCase().replace(/\s+/g, '-');
-          
-          // Create a div for this page
-          container.innerHTML = '';
-          const pageElement = document.createElement('div');
-          pageElement.style.padding = '20px';
-          pageElement.style.backgroundColor = '#ffffff';
-          pageElement.style.fontFamily = 'Arial, sans-serif';
-          pageElement.style.color = '#333333';
-          pageElement.style.width = '100%';
-          pageElement.style.maxWidth = 'auto';
-          pageElement.style.margin = '0 auto';
-          
-          // Add page title
-          const titleElement = document.createElement('h1');
-          titleElement.style.fontSize = '24px';
-          titleElement.style.fontWeight = 'bold';
-          titleElement.style.marginBottom = '20px';
-          titleElement.textContent = pageName;
-          pageElement.appendChild(titleElement);
-          
-          // Add page content
-          const contentElement = document.createElement('div');
-          contentElement.innerHTML = page.component || '<div>No content available</div>';
-          pageElement.appendChild(contentElement);
-          
-          container.appendChild(pageElement);
-          
-          // Wait for any images to load
-          await new Promise(resolve => setTimeout(resolve, 100));
-          
-          // Capture screenshot
+
+          // Reset iframe body content for this page
+          iframeDoc.body.innerHTML = '';
+
+          // Build the page markup inside the iframe document
+          const root = iframeDoc.createElement('div');
+          root.className = 'page-root';
+
+          const titleEl = iframeDoc.createElement('h1');
+          titleEl.textContent = pageName;
+          root.appendChild(titleEl);
+
+          const contentEl = iframeDoc.createElement('div');
+          contentEl.innerHTML = page.component || '<div>No content available</div>';
+          root.appendChild(contentEl);
+
+          iframeDoc.body.appendChild(root);
+
+          // Wait a moment for images/fonts inside iframe to layout
+          await new Promise(resolve => setTimeout(resolve, 120));
+
           try {
-            // Let content determine its natural dimensions
-            const contentHeight = pageElement.scrollHeight;
-            const contentWidth = pageElement.scrollWidth;
-            
-            const canvas = await html2canvas(pageElement, {
+            const contentHeight = root.scrollHeight;
+            const contentWidth = root.scrollWidth;
+
+            const canvas = await html2canvas(root, {
               width: contentWidth,
               height: contentHeight,
-              scale: 2, // Higher scale for better quality
+              scale: 2,
               useCORS: true,
               logging: false,
               backgroundColor: '#ffffff',
-              allowTaint: true // Allow cross-origin images
+              allowTaint: true
             });
-            
+
             const imageData = canvas.toDataURL('image/png');
-            images.push({
-              key: pageKey,
-              data: imageData
-            });
-            
-            // Move to next page
+            images.push({ key: pageKey, data: imageData });
+
+            // Next page
             renderPage(index + 1);
           } catch (error) {
             console.error(`Error capturing screenshot for ${pageName}:`, error);
-            // Move to next page even if there's an error
+            // Continue with next page even on error
             renderPage(index + 1);
           }
         };
-        
+
         // Start rendering pages
         renderPage(0);
       } catch (error) {
@@ -1295,12 +1296,13 @@ export default {
         });
         console.error('Error exporting images:', error);
         this.isExporting = false;
-        
+
         // Clean up any temporary elements
-        const container = document.querySelector('div[style*="-9999px"]');
-        if (container) {
-          document.body.removeChild(container);
-        }
+        const orphanIframes = Array.from(document.querySelectorAll('iframe'))
+          .filter(f => f.style && f.style.left === '-9999px' && f.style.top === '-9999px');
+        orphanIframes.forEach(f => {
+          try { document.body.removeChild(f); } catch (_) {}
+        });
       }
     },
 
