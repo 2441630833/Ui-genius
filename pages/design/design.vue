@@ -175,7 +175,7 @@
           </view>
         </view>
       </template>
-      
+
       <!-- Always include a simple template for testing -->
       <view id="template-simple" class="template-preview-content">
         <view class="preview-header">
@@ -190,23 +190,27 @@
     <!-- Design Toolbar -->
     <view class="design-toolbar">
       <view class="logo-container">
-        <image class="logo-icon"
-          src="../../static/logo.png"></image>
+        <image class="logo-icon" src="../../static/logo.png"></image>
       </view>
 
       <view class="nav-links">
-        <view class="nav-item" :class="{ active: activeNavItem === 'plus' }" @click="navigateTo('plus')">
+        <view class="nav-item plus_guide" :class="{ active: activeNavItem === 'plus' }" @click="navigateTo('plus')">
           <image class="nav-icon" :src="activeNavItem === 'plus' ? '/static/plus_white.png' : '/static/plus.png'">
           </image>
         </view>
 
-        <view class="nav-item" :class="{ active: activeNavItem === 'import' }" @click="navigateTo('import')">
+        <view class="nav-item import_guide" :class="{ active: activeNavItem === 'import' }" @click="navigateTo('import')">
           <image class="nav-icon" :src="activeNavItem === 'import' ? '/static/import_white.png' : '/static/import.png'">
           </image>
         </view>
 
-        <view class="nav-item" :class="{ active: activeNavItem === 'delete' }" @click="navigateTo('delete')">
+        <view class="nav-item delete_guide" :class="{ active: activeNavItem === 'delete' }" @click="navigateTo('delete')">
           <image class="nav-icon" :src="activeNavItem === 'delete' ? '/static/delete_white.png' : '/static/delete.png'">
+          </image>
+        </view>
+
+        <view class="nav-item guide_guide" :class="{ active: activeNavItem === 'guide' }" @click="navigateTo('guide')">
+          <image class="nav-icon" :src="activeNavItem === 'guide' ? '/static/guide_white.png' : '/static/guide.png'">
           </image>
         </view>
 
@@ -273,7 +277,7 @@
           <!-- <view class="tool-button">
             <text class="button-text">Comments</text>
           </view> -->
-          <view class="tool-button">
+          <view class="tool-button share-button" @click="shareProject">
             <text class="button-text" @click="shareProject">Share</text>
           </view>
           <!-- <view class="tool-button">
@@ -281,11 +285,11 @@
           </view> -->
 
           <!-- Refresh Button -->
-          <view class="tool-button" @click="refreshData">
+          <view class="tool-button refresh-button" @click="refreshData">
             <text class="button-text">Refresh</text>
           </view>
 
-          <view class="preview-button" @click="exportProject">
+          <view class="preview-button export-button" @click="exportProject">
             <image class="icon" src="/static/export_white.png"></image>
             <text class="preview-text">Export</text>
           </view>
@@ -294,101 +298,102 @@
 
       <!-- Templates Grid -->
       <view class="section">
-        <text class="section-title">Project Prototypes <span class="template-count">({{ jsonTemplates.length }} pages)</span></text>
+        <text class="section-title">Project Prototypes <span class="template-count">({{ jsonTemplates.length }}
+            pages)</span></text>
         <view class="templates-grid-container">
           <view class="templates-grid">
-          <!-- Dynamic Templates from JSON -->
-          <template v-if="jsonTemplates.length > 0">
-            <!-- Filter to only show the 5 main templates -->
-            <x-skeleton v-for="(template, index) in filteredTemplates" :key="index" type="banner"
-              :loading="templateLoadingStates[template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')]">
-              <view class="template-item" @click="navigateToEditor(template)">
-                <view class="template-preview"
-                  :id="'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')">
-                  <image class="template-image"
-                    :src="capturedImages[template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')] || ''"
-                    mode="aspectFill"></image>
+            <!-- Dynamic Templates from JSON -->
+            <template v-if="jsonTemplates.length > 0">
+              <!-- Filter to only show the 5 main templates -->
+              <x-skeleton v-for="(template, index) in filteredTemplates" :key="index" type="banner"
+                :loading="templateLoadingStates[template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')]">
+                <view class="template-item" @click="navigateToEditor(template)">
+                  <view class="template-preview"
+                    :id="'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')">
+                    <image class="template-image"
+                      :src="capturedImages[template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')] || ''"
+                      mode="aspectFill"></image>
+                  </view>
+                  <view class="template-label">
+                    <text class="template-name">{{ template.name.replace(/ Page/i, '') }}</text>
+                  </view>
                 </view>
-                <view class="template-label">
-                  <text class="template-name">{{ template.name.replace(/ Page/i, '') }}</text>
-                </view>
-              </view>
-            </x-skeleton>
-            
-            <!-- Add New Page Button -->
-            <view class="template-item add-template-item" @click="navigateTo('plus')">
-              <view class="template-preview add-template-preview">
-                <view class="add-icon">+</view>
-              </view>
-              <view class="template-label">
-                <text class="template-name">Add New Page</text>
-              </view>
-            </view>
-          </template>
+              </x-skeleton>
 
-          <!-- Fallback Static Templates -->
-          <template v-else>
-            <!-- Signup Template -->
-            <x-skeleton type="banner" :loading="templateLoadingStates.signup">
-              <view class="template-item" @click="navigateToEditor('signup')">
-                <view class="template-preview" id="template-signup">
-                  <image class="template-image" :src="capturedImages.signup" mode="aspectFill"></image>
+              <!-- Add New Page Button -->
+              <view class="template-item add-template-item" @click="navigateTo('plus')">
+                <view class="template-preview add-template-preview">
+                  <view class="add-icon">+</view>
                 </view>
                 <view class="template-label">
-                  <text class="template-name">Signup</text>
+                  <text class="template-name">Add New Page</text>
                 </view>
               </view>
-            </x-skeleton>
+            </template>
 
-            <!-- Home Template -->
-            <x-skeleton type="banner" :loading="templateLoadingStates.home">
-              <view class="template-item" @click="navigateToEditor('home')">
-                <view class="template-preview" id="template-home">
-                  <image class="template-image" :src="capturedImages.home" mode="aspectFill"></image>
+            <!-- Fallback Static Templates -->
+            <template v-else>
+              <!-- Signup Template -->
+              <x-skeleton type="banner" :loading="templateLoadingStates.signup">
+                <view class="template-item" @click="navigateToEditor('signup')">
+                  <view class="template-preview" id="template-signup">
+                    <image class="template-image" :src="capturedImages.signup" mode="aspectFill"></image>
+                  </view>
+                  <view class="template-label">
+                    <text class="template-name">Signup</text>
+                  </view>
                 </view>
-                <view class="template-label">
-                  <text class="template-name">Home</text>
-                </view>
-              </view>
-            </x-skeleton>
+              </x-skeleton>
 
-            <!-- notification Template -->
-            <x-skeleton type="banner" :loading="templateLoadingStates.notification">
-              <view class="template-item" @click="navigateToEditor('notification')">
-                <view class="template-preview" id="template-notification">
-                  <image class="template-image" :src="capturedImages.notification" mode="aspectFill"></image>
+              <!-- Home Template -->
+              <x-skeleton type="banner" :loading="templateLoadingStates.home">
+                <view class="template-item" @click="navigateToEditor('home')">
+                  <view class="template-preview" id="template-home">
+                    <image class="template-image" :src="capturedImages.home" mode="aspectFill"></image>
+                  </view>
+                  <view class="template-label">
+                    <text class="template-name">Home</text>
+                  </view>
                 </view>
-                <view class="template-label">
-                  <text class="template-name">notification</text>
-                </view>
-              </view>
-            </x-skeleton>
+              </x-skeleton>
 
-            <!-- Profile Template -->
-            <x-skeleton type="banner" :loading="templateLoadingStates.profile">
-              <view class="template-item" @click="navigateToEditor('profile')">
-                <view class="template-preview" id="template-profile">
-                  <image class="template-image" :src="capturedImages.profile" mode="aspectFill"></image>
+              <!-- notification Template -->
+              <x-skeleton type="banner" :loading="templateLoadingStates.notification">
+                <view class="template-item" @click="navigateToEditor('notification')">
+                  <view class="template-preview" id="template-notification">
+                    <image class="template-image" :src="capturedImages.notification" mode="aspectFill"></image>
+                  </view>
+                  <view class="template-label">
+                    <text class="template-name">notification</text>
+                  </view>
                 </view>
-                <view class="template-label">
-                  <text class="template-name">Profile</text>
-                </view>
-              </view>
-            </x-skeleton>
+              </x-skeleton>
 
-            <!-- Settings Template -->
-            <x-skeleton type="banner" :loading="templateLoadingStates.settings">
-              <view class="template-item" @click="navigateToEditor('settings')">
-                <view class="template-preview" id="template-settings">
-                  <image class="template-image" :src="capturedImages.settings" mode="aspectFill"></image>
+              <!-- Profile Template -->
+              <x-skeleton type="banner" :loading="templateLoadingStates.profile">
+                <view class="template-item" @click="navigateToEditor('profile')">
+                  <view class="template-preview" id="template-profile">
+                    <image class="template-image" :src="capturedImages.profile" mode="aspectFill"></image>
+                  </view>
+                  <view class="template-label">
+                    <text class="template-name">Profile</text>
+                  </view>
                 </view>
-                <view class="template-label">
-                  <text class="template-name">Settings</text>
+              </x-skeleton>
+
+              <!-- Settings Template -->
+              <x-skeleton type="banner" :loading="templateLoadingStates.settings">
+                <view class="template-item" @click="navigateToEditor('settings')">
+                  <view class="template-preview" id="template-settings">
+                    <image class="template-image" :src="capturedImages.settings" mode="aspectFill"></image>
+                  </view>
+                  <view class="template-label">
+                    <text class="template-name">Settings</text>
+                  </view>
                 </view>
-              </view>
-            </x-skeleton>
-          </template>
-        </view>
+              </x-skeleton>
+            </template>
+          </view>
         </view>
       </view>
 
@@ -409,7 +414,7 @@
 
     <!-- Create New Page Dialog -->
     <view class="dialog-overlay" v-if="showCreatePageDialog" @click="closeCreatePageDialog">
-      <view class="dialog-container" @click.stop>
+      <view class="dialog-container create-page-dialog" @click.stop>
         <view class="dialog-content">
           <text class="dialog-title">Create a New Page</text>
 
@@ -417,7 +422,7 @@
           <view class="error-notification" v-if="errorMessage">
             <text>{{ errorMessage }}</text>
           </view>
-          
+
           <view class="device-options">
             <view class="device-option" :class="{ 'selected': selectedDevice === 'mobile' }"
               @click="selectDevice('mobile')">
@@ -431,7 +436,7 @@
               <text>Desktop</text>
             </view>
           </view>
-          
+
           <!-- Model Selection -->
           <view class="model-selection-container">
             <text class="model-selection-label">Select AI Model</text>
@@ -442,13 +447,8 @@
                   <view class="dropdown-arrow" :class="{ 'rotated': showModelDropdown }">▼</view>
                 </view>
                 <view class="dropdown-options" v-if="showModelDropdown">
-                  <view 
-                    v-for="option in modelOptions" 
-                    :key="option.value"
-                    class="dropdown-option"
-                    :class="{ 'selected': selectedPageModel === option.value }"
-                    @click.stop="selectModel(option.value)"
-                  >
+                  <view v-for="option in modelOptions" :key="option.value" class="dropdown-option"
+                    :class="{ 'selected': selectedPageModel === option.value }" @click.stop="selectModel(option.value)">
                     <view class="option-content">
                       <text class="option-text">{{ option.text }}</text>
                       <view v-if="option.isPro" class="pro-badge">PRO</view>
@@ -477,15 +477,15 @@
 
     <!-- Delete Pages Dialog -->
     <view class="dialog-overlay" v-if="showDeleteDialog" @click="closeDeleteDialog">
-      <view class="dialog-container" @click.stop>
+      <view class="dialog-container deleteDialogGuide" @click.stop>
         <view class="dialog-content">
           <text class="dialog-title">Delete Pages</text>
-          
+
           <!-- Error notification -->
           <view class="error-notification" v-if="errorMessage">
             <text>{{ errorMessage }}</text>
           </view>
-          
+
           <!-- Select All Option -->
           <view class="select-all-container" v-if="jsonTemplates.length > 0">
             <!-- Custom checkbox implementation -->
@@ -494,7 +494,7 @@
               <text class="select-all-text">Select All</text>
             </view>
           </view>
-          
+
           <view class="delete-pages-list" v-if="jsonTemplates.length > 0">
             <view class="delete-page-item" v-for="(template, index) in jsonTemplates" :key="index">
               <!-- Custom checkbox implementation -->
@@ -507,9 +507,10 @@
           <view class="empty-state" v-else>
             <text>No pages available to delete</text>
           </view>
-          
+
           <view class="delete-actions">
-            <button class="delete-btn" :disabled="pagesToDelete.length === 0" @click="deleteSelectedPages">Delete Selected</button>
+            <button class="delete-btn" :disabled="pagesToDelete.length === 0" @click="deleteSelectedPages">Delete
+              Selected</button>
             <button class="cancel-btn" @click="closeDeleteDialog">Cancel</button>
           </view>
         </view>
@@ -521,31 +522,26 @@
       <view class="dialog-container import-dialog" @click.stop>
         <view class="dialog-content">
           <text class="dialog-title">Import File</text>
-          
+
           <!-- Error notification -->
           <view class="error-notification" v-if="importError">
             <text>{{ importError }}</text>
           </view>
-          
+
           <!-- Import type tabs -->
           <view class="import-type-tabs">
-            <view 
-              v-for="type in importTypeOptions" 
-              :key="type.value" 
-              class="import-type-tab" 
-              :class="{ active: selectedImportType === type.value }"
-              @click="selectImportType(type.value)"
-            >
+            <view v-for="type in importTypeOptions" :key="type.value" class="import-type-tab"
+              :class="{ active: selectedImportType === type.value }" @click="selectImportType(type.value)">
               {{ type.label }}
             </view>
           </view>
-          
+
           <view class="import-description">
             <text>{{ importDescription }}</text>
           </view>
-          
 
-          
+
+
           <view class="file-upload-container">
             <!-- HTML file picker -->
             <view v-if="selectedImportType === 'html'" class="html-file-picker">
@@ -565,18 +561,11 @@
                 <text class="file-content-preview">{{ htmlFileContent.substring(0, 100) }}...</text>
               </view>
             </view>
-            
+
             <!-- Regular file picker for other types -->
-            <uni-file-picker 
-              v-else
-              v-model="importFileList"
-              fileMediatype="all"
-              mode="grid"
-              :limit="selectedImportType === 'image' ? 10 : 1"
-              :file-extname="allowedExtensions"
-              @success="successUploadFiles" 
-              @delete="onImportFileDelete"
-            >
+            <uni-file-picker v-else v-model="importFileList" fileMediatype="all" mode="grid"
+              :limit="selectedImportType === 'image' ? 10 : 1" :file-extname="allowedExtensions"
+              @success="successUploadFiles" @delete="onImportFileDelete">
               <view class="upload-placeholder">
                 <view class="upload-icon">
                   <view class="folder-icon">
@@ -590,13 +579,11 @@
               </view>
             </uni-file-picker>
           </view>
-          
+
           <view class="import-actions">
-            <button 
-              class="import-btn" 
-              :disabled="selectedImportType === 'html' ? !htmlFileContent : !importFileList.length" 
-              @click="importProject"
-            >
+            <button class="import-btn"
+              :disabled="selectedImportType === 'html' ? !htmlFileContent : !importFileList.length"
+              @click="importProject">
               Import
             </button>
             <button class="cancel-btn" @click="closeImportDialog">Cancel</button>
@@ -678,6 +665,17 @@
         </view>
       </view>
     </view>
+    <view class="toast-overlay" v-if="customToastVisible" @click="customToastVisible = false">
+      <view class="custom-toast" @click.stop>
+        <image class="device-icon" :src="customToastType === 'success' ? '../../static/success.png' : '../../static/skip.png'"></image>
+        <text class="custom-toast-message">{{ customToastMessage }}</text>
+      </view>
+    </view>
+    <!-- Longze Guide Component -->
+    <longze-guide ref="guide" :steps="guideSteps" :theme="guideTheme" :primaryColor="'#e53935'"
+      :primaryHoverColor="'#d32f2f'" :highlightColor="'#e53935'" :skip-enabled="true" @complete="onGuideComplete"
+      @skip="onGuideSkip" @step-change="onGuideStepChange" />
+
   </view>
 </template>
 
@@ -811,6 +809,84 @@ export default {
       // Import progress properties
       isImporting: false,
       importProgress: 0,
+      customToastVisible: false,
+      customToastMessage: '',
+      customToastType: 'success',
+      guideTheme: 'dark',
+      guideSteps: [
+        {
+          target: '.plus_guide',
+          title: 'First Step',
+          content: 'This is the first step of the guide - click the plus button to add a new page to your project',
+          position: 'bottom'
+        },
+        {
+          target: '.create-page-dialog',
+          title: 'Second Step',
+          content: 'This is the second step of the guide - As same as before create project process, you can create a new page for your project at here',
+          position: 'right'
+        },
+        {
+          target: '.import_guide',
+          title: 'Third Step',
+          content: 'This is the third step of the guide - click the import button to import a new page to your project',
+          position: 'right'
+        },
+        {
+          target: '.import-dialog',
+          title: 'Fourth Step',
+          content: 'This is the fourth step of the guide - You can import file from here, the imported images or html will be automatic convert the editable prototype, you can do the second edit base on the imported prototype',
+          position: 'right'
+        },
+        // {
+        //   target: '.import-type-tabs',
+        //   title: 'Fifth Step',
+        //   content: 'This is the fifth step of the guide - You can select the type of file you want to import, choose the image or html file',
+        //   position: 'right'
+        // },
+        // {
+        //   target: '.file-upload-container',
+        //   title: 'Sixth Step',
+        //   content: 'This is the sixth step of the guide - You can upload the file from your computer',
+        //   position: 'right'
+        // },
+        // {
+        //   target: '.import-btn',
+        //   title: 'Fifth Step',
+        //   content: 'This is the fifth step of the guide -  Now click the import button to import the file',
+        //   position: 'right'
+        // },
+        {
+          target: '.delete_guide',
+          title: 'Fifth Step',
+          content: 'This is the fifth step of the guide - You can delete the page by click this icon',
+          position: 'right'
+        },
+        {
+          target: '.deleteDialogGuide',
+          title: 'Sixth Step',
+          content: 'This is the sixth step of the guide - You can delete the page from here',
+          position: 'right'
+        },
+        {
+          target: '.export-button',
+          title: 'Seventh Step',
+          content: 'This is the seventh step of the guide - You can export the project as images, html, vue2, vue3, react',
+          position: 'left'
+        },
+        {
+          target: '.refresh-button',
+          title: 'Eighth Step',
+          content: 'This is the eighth step of the guide - You can refresh the page from here',
+          position: 'left'
+        },
+        {
+          target: '.share-button',
+          title: 'Ninth Step',
+          content: 'This is the ninth step of the guide - You can share the project from here',
+          position: 'left'
+        },
+      ]
     }
   },
 
@@ -906,8 +982,6 @@ export default {
       this.templateLoadingStates.settings = false;
       this.templatesLoading = false;
     }, 900); // Reduced from 2700ms
-
-
     // console.log(this.jsonTemplates);
     
     // Add click outside listener for dropdown
@@ -918,7 +992,9 @@ export default {
     // Remove click outside listener
     document.removeEventListener('click', this.handleClickOutside);
   },
-
+  onLoad() {
+    this.checkAndStartGuide();
+  },
   onShow() {
     // Load images from local storage first
     this.loadImagesFromStorage();
@@ -966,8 +1042,67 @@ export default {
       this.progressInterval = null;
     }
   },
-
   methods: {
+    checkAndStartGuide() {
+      const designHasGuideShown = uni.getStorageSync('designHasUserGuideShown'); // 或 localStorage.getItem('hasUserGuideShown')
+      if (!designHasGuideShown) {
+        setTimeout(() => {
+          this.startGuide(); 
+          uni.setStorageSync('designHasUserGuideShown', true); 
+        }, 1000); 
+      }
+    },
+    // Longze Guide methods
+    startGuide() {
+      const guide = this.$refs.guide;
+      if (guide) {
+        guide.start();
+      }
+    },
+    showCustomToast(message, type = 'success') {
+      this.customToastMessage = message;
+      this.customToastType = type;
+      this.customToastVisible = true;
+
+      // Auto-hide after 1 seconds
+      setTimeout(() => {
+        this.customToastVisible = false;
+      }, 1000);
+    },
+    onGuideComplete() {
+      this.showCustomToast('Finish Guide！', 'success');
+    },
+    onGuideSkip() {
+      this.showCustomToast('Already Skip Guide', 'none');
+    },
+    onGuideStepChange(index) {
+      // When moving from step 0 to step 1 (i.e., after first Next click), open the dialog
+      if (index === 1) {
+        this.showCreatePageDialog = true;
+        this.pageDescription = '';
+        this.errorMessage = '';
+        // Initialize model selection to gimini2.5
+        this.selectedPageModel = 'gimini2.5';
+      }
+      else if (index === 2) {
+        this.showCreatePageDialog = false;
+      }
+      else if (index === 3) {
+        this.showImportDialog = true;
+        this.importFileList = [];
+        this.importError = '';
+        this.selectedImportType = 'image';
+      }
+      else if (index === 4) {
+        this.closeImportDialog();
+      }
+      else if(index === 5){
+        this.showDeleteDialog = true;
+      }
+      else if(index === 6){
+        this.closeDeleteDialog();
+      }
+    },
     shareProject() {
       uni.showToast({
         title: 'This feature is developing, please wait for the update',
@@ -2424,6 +2559,9 @@ export default {
         this.importFileList = [];
         this.importError = '';
         this.selectedImportType = 'image';
+      }
+      if (item === 'guide') {
+        this.startGuide();
       }
     },
     selectTemplate(template) {
@@ -6148,5 +6286,53 @@ export default {
   margin-top: auto;
   padding-top: 16px;
 }
+/* Toast Overlay */
+.toast-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2000;
+  pointer-events: none;
+  /* Allow clicks to pass through except on the toast itself */
+}
+/* Custom Toast styles */
+.custom-toast {
+  position: fixed;
+  bottom: 20px;
+  left: 50%;
+  transform: translateX(-50%);
+  background-color: #333;
+  border-radius: 8px;
+  padding: 12px 20px;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 2001;
+  animation: toast-in 0.15s ease-out forwards;
+  pointer-events: auto;
+  will-change: transform, opacity;
 
+  .custom-toast-icon {
+    font-size: 20px;
+    color: #fff;
+  }
+
+  .custom-toast-message {
+    color: #fff;
+    font-size: 14px;
+    flex: 1;
+  }
+
+  @media (max-width: 480px) {
+    width: 80%;
+    max-width: 300px;
+
+    .custom-toast-message {
+      font-size: 13px;
+    }
+  }
+}
 </style>

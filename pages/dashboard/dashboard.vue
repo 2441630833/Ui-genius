@@ -693,10 +693,10 @@ export default {
       this.customToastType = type;
       this.customToastVisible = true;
 
-      // Auto-hide after 3 seconds
+      // Auto-hide after 1 seconds
       setTimeout(() => {
         this.customToastVisible = false;
-      }, 3000);
+      }, 1000);
     },
     loadProjectsByUid() {
       // Check if user is logged in
