@@ -3143,46 +3143,49 @@ export default {
       return /^#([0-9A-F]{3}){1,2}$/i.test(color);
     },
     saveProjectToCloud(content) {
-      // const content = uni.getStorageSync('latest_7_overall_page');
-      // Get user ID
-      const userId = uni.getStorageSync('uid');
-      if (!userId) {
-        console.log('No user ID');
-        return Promise.reject(new Error('No user ID'));
-      }
-      // Later can add skip user login limit that only allow login user to save project and share project
-      // test mode no login,just return 
-      // if (userId == '123bcbfeqqaeabfaf5a') {
-      //   return Promise.resolve();
-      // }
+      // Check for existing project ID
+      const currentProjectId = uni.getStorageSync('currentProjectId');
+
       // Prepare project data
       const projectData = {
-        uid: userId,
-        email: uni.getStorageSync('email') || '',
-        projectTitle: content.AIProjectName || 'Untitled Project',
-        projectDescription: content.AIProjectDescription || 'No description',
+        id: currentProjectId,
         generated_overall_pages: content
       };
 
-      // Call the cloud function to save the project
+      // Decide action and payload
+      const action = currentProjectId ? 'update' : 'create';
+      const callData = currentProjectId ? {
+        action: action,
+        id: currentProjectId,
+        data: projectData
+      } : {
+        action: action,
+        data: projectData
+      };
+
+      // Call cloud function to save
       return uniCloud.callFunction({
         name: 'user-project',
-        data: {
-          action: 'create',
-          data: projectData
-        }
+        data: callData
       }).then(res => {
-        // console.log('res', res); 
-        if (res.result && res.result.success && res.result.project_id) {
-          // Store the project ID for future reference
-          uni.setStorageSync('currentProjectId', res.result.project_id);
-          // console.log('Project saved successfully with ID:', res.result.project_id);
-          return res.result.project_id;
+        if (res.result && res.result.success) {
+          if (action === 'create' && res.result.project_id) {
+            uni.setStorageSync('currentProjectId', res.result.project_id);
+            console.log('Project created in cloud with ID:', res.result.project_id);
+          } else {
+            console.log('Project updated in cloud with ID:', currentProjectId);
+          }
+          return res.result.project_id || currentProjectId;
         } else {
-          throw new Error('Failed to create project');
+          throw new Error('Failed to ' + action + ' project');
         }
       }).catch(err => {
         console.error('Cloud function error:', err);
+        uni.showToast({
+          title: 'Cloud save failed',
+          icon: 'error',
+          duration: 2000
+        });
         throw err;
       });
     },
