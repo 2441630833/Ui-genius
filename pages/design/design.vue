@@ -3148,6 +3148,7 @@ export default {
         console.log('No user ID');
         return Promise.reject(new Error('No user ID'));
       }
+      // Later can add skip user login limit that only allow login user to save project and share project
       // test mode no login,just return 
       // if (userId == '123bcbfeqqaeabfaf5a') {
       //   return Promise.resolve();
