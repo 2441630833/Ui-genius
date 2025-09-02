@@ -127,9 +127,11 @@ export default function initPermission() {
 							icon: 'none'
 						})
 						
-						uni.switchTab({
-							url: loginPage
-						})
+						setTimeout(() => {
+						uni.navigateTo({
+								url: loginPage
+							})
+						}, 2000);
 						return false
 					} else {
 						return e
