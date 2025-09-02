@@ -883,7 +883,7 @@ export default {
         {
           target: '.share-button',
           title: 'Ninth Step',
-          content: 'This is the ninth step of the guide - You can share the project from here',
+          content: 'This is the ninth step of the guide - You can share the project to your colleague to work collaboratively together',
           position: 'left'
         },
       ]
@@ -939,6 +939,9 @@ export default {
 
   mounted() {
     // this.saveProjectToCloud();
+    // If opened via shared link, parse and load immediately
+    this.tryLoadSharedFromQuery();
+
     // Check if we have a stored project description
     const projectDescription = uni.getStorageSync('projectDescription');
     if (projectDescription) {
@@ -992,8 +995,15 @@ export default {
     // Remove click outside listener
     document.removeEventListener('click', this.handleClickOutside);
   },
-  onLoad() {
+  onLoad(options) {
     this.checkAndStartGuide();
+    // Also handle shared content if navigating normally (non-H5)
+    if (options && options.pid) {
+      this.tryImportByProjectId(options.pid);
+    } else if (options && options.shared) {
+      // Backward compatibility: old base64 payload
+      this.tryImportShared(options.shared);
+    }
   },
   onShow() {
     // Load images from local storage first
@@ -1043,6 +1053,58 @@ export default {
     }
   },
   methods: {
+    tryLoadSharedFromQuery() {
+      // H5 only: parse params from hash URL
+      // #ifdef H5
+      try {
+        const hash = window.location.hash || '';
+        const queryIndex = hash.indexOf('?');
+        if (queryIndex !== -1) {
+          const query = hash.substring(queryIndex + 1);
+          const params = new URLSearchParams(query);
+          const pid = params.get('pid');
+          if (pid) {
+            this.tryImportByProjectId(pid);
+            return;
+          }
+          const shared = params.get('shared');
+          if (shared) {
+            // Backward compatibility: old base64 payload
+            this.tryImportShared(shared);
+          }
+        }
+      } catch (e) {
+        console.warn('Failed parsing shared query:', e);
+      }
+      // #endif
+    },
+    tryImportShared(payload) {
+      try {
+        const decodeBase64 = (b64) => {
+          try {
+            return decodeURIComponent(escape(atob(b64)));
+          } catch (e) {
+            return atob(b64);
+          }
+        };
+        const json = decodeBase64(payload);
+        const project = JSON.parse(json);
+        if (!project || !project.pages || !Array.isArray(project.pages)) {
+          throw new Error('Invalid project format');
+        }
+        uni.setStorageSync('latest_7_overall_page', project);
+        uni.setStorageSync('force_regeneration', 'true');
+        this.loadJsonTemplates();
+        this.updateLoadingStates();
+        setTimeout(() => {
+          this.generatePreviewImages();
+        }, 100);
+        uni.showToast({ title: 'Project loaded from link', icon: 'success', duration: 2000 });
+      } catch (e) {
+        console.error('Failed to import shared project:', e);
+        uni.showToast({ title: 'Invalid share link', icon: 'none', duration: 2000 });
+      }
+    },
     checkAndStartGuide() {
       const designHasGuideShown = uni.getStorageSync('designHasUserGuideShown'); // 或 localStorage.getItem('hasUserGuideShown')
       if (!designHasGuideShown) {
@@ -1104,16 +1166,94 @@ export default {
       }
     },
     shareProject() {
-      uni.showToast({
-        title: 'This feature is developing, please wait for the update',
-        icon: 'none',
-        duration: 2000
+      try {
+        let projectId = uni.getStorageSync('currentProjectId');
+        
+        if (!projectId) {
+          // No project ID found, create a new project first
+          const projectData = uni.getStorageSync('latest_7_overall_page');
+          if (!projectData) {
+            uni.showToast({
+              title: 'No project data found',
+              icon: 'none',
+              duration: 2000
+            });
+            return;
+          }
+          
+          // Show loading toast
+          uni.showLoading({
+            title: 'Creating project...',
+            mask: true
+          });
+          
+          // Create new project using the existing saveProjectToCloud method
+          this.saveProjectToCloud(JSON.parse(projectData)).then(() => {
+            uni.hideLoading();
+            
+            // Get the newly created project ID
+            projectId = uni.getStorageSync('currentProjectId');
+            if (projectId) {
+              this.generateShareUrl(projectId);
+            } else {
+              uni.showToast({
+                title: 'Failed to create project',
+                icon: 'none',
+                duration: 2000
+              });
+            }
+          }).catch(error => {
+            uni.hideLoading();
+            uni.showToast({
+              title: 'Failed to create project',
+              icon: 'none',
+              duration: 2000
+            });
+            console.error('Error creating project:', error);
+          });
+          return;
+        }
+        
+        // Project ID exists, generate share URL directly
+        this.generateShareUrl(projectId);
+        
+      } catch (error) {
+        uni.showToast({
+          title: 'Share failed',
+          icon: 'none',
+          duration: 2000
+        });
+        console.error('shareProject error:', error);
+      }
+    },
+    
+    generateShareUrl(projectId) {
+      let shareUrl = '';
+      // #ifdef H5
+      const base = window.location.origin + window.location.pathname + '#/pages/design/design';
+      shareUrl = `${base}?pid=${encodeURIComponent(projectId)}`;
+      // #endif
+      // #ifndef H5
+      shareUrl = `/pages/design/design?pid=${encodeURIComponent(projectId)}`;
+      // #endif
+      
+      uni.setClipboardData({
+        data: shareUrl,
+        success: () => {
+          uni.showToast({
+            title: 'Share link copied',
+            icon: 'success',
+            duration: 2000
+          });
+        },
+        fail: () => {
+          uni.showToast({
+            title: 'Copy failed',
+            icon: 'none',
+            duration: 2000
+          });
+        }
       });
-      // Share the project
-      // uni.share({
-      //   title: 'Share Project',
-      //   path: '/pages/design/design',
-      // });
     },
     exportProject() {
       // Show custom action sheet instead of uni.showActionSheet
@@ -3006,12 +3146,12 @@ export default {
       const userId = uni.getStorageSync('uid');
       if (!userId) {
         console.log('No user ID');
-        return;
+        return Promise.reject(new Error('No user ID'));
       }
       // test mode no login,just return 
-      if (userId == '123bcbfeqqaeabfaf5a') {
-        return
-      }
+      // if (userId == '123bcbfeqqaeabfaf5a') {
+      //   return Promise.resolve();
+      // }
       // Prepare project data
       const projectData = {
         uid: userId,
@@ -3022,20 +3162,25 @@ export default {
       };
 
       // Call the cloud function to save the project
-      uniCloud.callFunction({
+      return uniCloud.callFunction({
         name: 'user-project',
         data: {
           action: 'create',
           data: projectData
         }
       }).then(res => {
-        if (res.result && res.result.success && res.result.data && res.result.data.id) {
+        // console.log('res', res); 
+        if (res.result && res.result.success && res.result.project_id) {
           // Store the project ID for future reference
-          uni.setStorageSync('currentProjectId', res.result.data.id);
-          console.log('Project saved successfully with ID:', res.result.data.id);
+          uni.setStorageSync('currentProjectId', res.result.project_id);
+          // console.log('Project saved successfully with ID:', res.result.project_id);
+          return res.result.project_id;
+        } else {
+          throw new Error('Failed to create project');
         }
       }).catch(err => {
         console.error('Cloud function error:', err);
+        throw err;
       });
     },
     // Add a new method to fully refresh templates
@@ -4663,7 +4808,37 @@ export default {
       };
       
       reader.readAsText(file, 'UTF-8'); // 以文本形式读取
-    }
+    },
+    tryImportByProjectId(projectId) {
+      if (!projectId) return;
+      uni.showLoading({ title: 'Loading project...' });
+      uniCloud.callFunction({
+        name: 'generated-overall-pages',
+        data: {
+          action: 'read',
+          id: projectId
+        }
+      }).then(res => {
+        uni.hideLoading();
+        if (res.result && res.result.success && res.result.data) {
+          uni.setStorageSync('latest_7_overall_page', JSON.stringify(res.result.data));
+          uni.setStorageSync('currentProjectId', projectId);
+          uni.setStorageSync('force_regeneration', 'true');
+          this.loadJsonTemplates();
+          this.updateLoadingStates();
+          setTimeout(() => {
+            this.generatePreviewImages();
+          }, 100);
+          uni.showToast({ title: 'Project loaded', icon: 'success', duration: 2000 });
+        } else {
+          uni.showToast({ title: 'Failed to load project', icon: 'none', duration: 2000 });
+        }
+      }).catch(err => {
+        uni.hideLoading();
+        uni.showToast({ title: 'Error loading project', icon: 'none', duration: 2000 });
+        console.error('Cloud function error:', err);
+      });
+    },
   }
 }
 </script>

@@ -507,6 +507,7 @@ export default {
       
       // Get the project id
       const projectId = project._id;
+      uni.setStorageSync('currentProjectId', projectId);
       
       if (!projectId) {
         uni.showToast({
@@ -532,7 +533,7 @@ export default {
         
         if (res.result && res.result.success && res.result.data) {
           // Store the project data in local storage
-          uni.setStorageSync('latest_7_overall_page', res.result.data);
+          uni.setStorageSync('latest_7_overall_page', JSON.stringify(res.result.data));
           uni.setStorageSync('currentProjectId', projectId);
           
           // Navigate to design page
