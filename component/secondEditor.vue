@@ -299,6 +299,9 @@ export default {
                     // 将更新后的数据保存到storage
                     uni.setStorageSync('latest_7_overall_page', JSON.stringify(storedData));
                     
+                    // 同时保存到云端
+                    this.saveProjectToCloud(storedData);
+                    
                     // 显示保存成功提示
                     uni.showToast({
                         title: 'page saved',
@@ -348,6 +351,57 @@ export default {
                 console.error('无法触发iframe方法：iframe未就绪');
             }
         },
+
+        // 保存项目到云端
+        saveProjectToCloud(content) {
+            // 检查是否有现有的项目ID
+            const currentProjectId = uni.getStorageSync('currentProjectId');
+            
+            // 准备项目数据
+            const projectData = {
+                id: currentProjectId,
+                generated_overall_pages: content
+            };
+
+            // 如果有现有项目ID，使用更新方法；否则创建新项目
+            const action = currentProjectId ? 'update' : 'create';
+            const callData = currentProjectId ? {
+                action: action,
+                id: currentProjectId,
+                data: projectData
+            } : {
+                action: action,
+                data: projectData
+            };
+
+            // 调用云函数保存项目
+            return uniCloud.callFunction({
+                name: 'user-project',
+                data: callData
+            }).then(res => {
+                if (res.result && res.result.success) {
+                    // 如果是新创建的项目，存储项目ID
+                    if (action === 'create' && res.result.project_id) {
+                        uni.setStorageSync('currentProjectId', res.result.project_id);
+                        console.log('Project created in cloud with ID:', res.result.project_id);
+                    } else {
+                        console.log('Project updated in cloud with ID:', currentProjectId);
+                    }
+                    return res.result.project_id || currentProjectId;
+                } else {
+                    throw new Error('Failed to ' + action + ' project');
+                }
+            }).catch(err => {
+                console.error('Cloud function error:', err);
+                // 显示错误提示
+                uni.showToast({
+                    title: 'Cloud save failed',
+                    icon: 'error',
+                    duration: 2000
+                });
+                throw err;
+            });
+        }
 
     }
 };

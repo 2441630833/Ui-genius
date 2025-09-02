@@ -997,6 +997,7 @@ export default {
   },
   onLoad(options) {
     this.checkAndStartGuide();
+    this.pullRefreshProject();
     // Also handle shared content if navigating normally (non-H5)
     if (options && options.pid) {
       this.tryImportByProjectId(options.pid);
@@ -2043,6 +2044,11 @@ export default {
     },
 
     refreshData() {
+      // Use the new pullRefreshProject method to refresh from cloud
+      this.pullRefreshProject();
+    },
+
+    refreshDataLocal() {
       // Clear stored images first
       this.clearStoredImages();
 
@@ -2064,8 +2070,6 @@ export default {
         this.templateLoadingStates.notification = true;
         this.templateLoadingStates.profile = true;
         this.templateLoadingStates.settings = true;
-
-
       }
 
       // Generate preview images first
@@ -2081,8 +2085,6 @@ export default {
           }
         }, 1500 + (index * 300));
       });
-
-
     },
 
     // Methods to handle HTML2Canvas
@@ -4838,6 +4840,75 @@ export default {
         uni.hideLoading();
         uni.showToast({ title: 'Error loading project', icon: 'none', duration: 2000 });
         console.error('Cloud function error:', err);
+      });
+    },
+    
+    pullRefreshProject() {
+      // Get the current project ID from storage
+      const currentProjectId = uni.getStorageSync('currentProjectId');
+      
+      if (!currentProjectId) {
+        // If no current project ID, fall back to regular refresh
+        this.refreshDataLocal();
+        return;
+      }
+      
+      // Show loading indicator
+      uni.showLoading({ title: 'Refreshing project...' });
+      
+      // Call the cloud function to get the latest project data
+      uniCloud.callFunction({
+        name: 'generated-overall-pages',
+        data: {
+          action: 'read',
+          id: currentProjectId
+        }
+      }).then(res => {
+        uni.hideLoading();
+        if (res.result && res.result.success && res.result.data) {
+          // Update the project data with the latest version
+          uni.setStorageSync('latest_7_overall_page', JSON.stringify(res.result.data));
+          // uni.setStorageSync('force_regeneration', 'true');
+          
+          // Clear stored images to force regeneration
+          this.clearStoredImages();
+          
+          // Reset all loading states
+          this.templatesLoading = true;
+          
+          // Load the updated JSON templates
+          // this.loadJsonTemplates();
+          // this.updateLoadingStates();
+          
+          // Generate new preview images
+          setTimeout(() => {
+            this.generatePreviewImages();
+          }, 100);
+          
+          // Start revealing templates with staggered timing
+          const keys = Object.keys(this.templateLoadingStates);
+          keys.forEach((key, index) => {
+            setTimeout(() => {
+              this.$set(this.templateLoadingStates, key, false);
+              if (index === keys.length - 1) {
+                this.templatesLoading = false;
+              }
+            }, 1500 + (index * 300));
+          });
+          
+          uni.showToast({ title: 'Project refreshed', icon: 'success', duration: 2000 });
+        } else {
+          // If cloud refresh fails, fall back to regular refresh
+          console.warn('Failed to refresh from cloud, falling back to local refresh');
+          this.refreshDataLocal();
+        }
+      }).catch(err => {
+        uni.hideLoading();
+        console.error('Cloud function error during refresh:', err);
+        
+        // If cloud refresh fails, fall back to regular refresh
+        console.warn('Cloud refresh failed, falling back to local refresh');
+        this.refreshDataLocal();
       });
     },
   }
