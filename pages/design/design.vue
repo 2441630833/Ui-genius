@@ -2039,6 +2039,8 @@ export default {
     refreshData() {
       // Use the new pullRefreshProject method to refresh from cloud
       this.pullRefreshProject();
+      this.loadJsonTemplates();
+      this.updateLoadingStates();
     },
 
     refreshDataLocal() {
