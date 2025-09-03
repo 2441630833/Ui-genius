@@ -356,10 +356,12 @@ export default {
         saveProjectToCloud(content) {
             // 检查是否有现有的项目ID
             const currentProjectId = uni.getStorageSync('currentProjectId');
+            const uid = uni.getStorageSync('uid');
             
             // 准备项目数据
             const projectData = {
-                id: currentProjectId,
+                uid: uid,
+                currentProjectId: currentProjectId,
                 generated_overall_pages: content
             };
 

@@ -938,10 +938,6 @@ export default {
   },
 
   mounted() {
-    // this.saveProjectToCloud();
-    // If opened via shared link, parse and load immediately
-    this.tryLoadSharedFromQuery();
-
     // Check if we have a stored project description
     const projectDescription = uni.getStorageSync('projectDescription');
     if (projectDescription) {
@@ -1001,10 +997,7 @@ export default {
     // Also handle shared content if navigating normally (non-H5)
     if (options && options.pid) {
       this.tryImportByProjectId(options.pid);
-    } else if (options && options.shared) {
-      // Backward compatibility: old base64 payload
-      this.tryImportShared(options.shared);
-    }
+    } 
   },
   onShow() {
     // Load images from local storage first
@@ -1054,58 +1047,58 @@ export default {
     }
   },
   methods: {
-    tryLoadSharedFromQuery() {
-      // H5 only: parse params from hash URL
-      // #ifdef H5
-      try {
-        const hash = window.location.hash || '';
-        const queryIndex = hash.indexOf('?');
-        if (queryIndex !== -1) {
-          const query = hash.substring(queryIndex + 1);
-          const params = new URLSearchParams(query);
-          const pid = params.get('pid');
-          if (pid) {
-            this.tryImportByProjectId(pid);
-            return;
-          }
-          const shared = params.get('shared');
-          if (shared) {
-            // Backward compatibility: old base64 payload
-            this.tryImportShared(shared);
-          }
-        }
-      } catch (e) {
-        console.warn('Failed parsing shared query:', e);
-      }
-      // #endif
-    },
-    tryImportShared(payload) {
-      try {
-        const decodeBase64 = (b64) => {
-          try {
-            return decodeURIComponent(escape(atob(b64)));
-          } catch (e) {
-            return atob(b64);
-          }
-        };
-        const json = decodeBase64(payload);
-        const project = JSON.parse(json);
-        if (!project || !project.pages || !Array.isArray(project.pages)) {
-          throw new Error('Invalid project format');
-        }
-        uni.setStorageSync('latest_7_overall_page', project);
-        uni.setStorageSync('force_regeneration', 'true');
-        this.loadJsonTemplates();
-        this.updateLoadingStates();
-        setTimeout(() => {
-          this.generatePreviewImages();
-        }, 100);
-        uni.showToast({ title: 'Project loaded from link', icon: 'success', duration: 2000 });
-      } catch (e) {
-        console.error('Failed to import shared project:', e);
-        uni.showToast({ title: 'Invalid share link', icon: 'none', duration: 2000 });
-      }
-    },
+    // tryLoadSharedFromQuery() {
+    //   // H5 only: parse params from hash URL
+    //   // #ifdef H5
+    //   try {
+    //     const hash = window.location.hash || '';
+    //     const queryIndex = hash.indexOf('?');
+    //     if (queryIndex !== -1) {
+    //       const query = hash.substring(queryIndex + 1);
+    //       const params = new URLSearchParams(query);
+    //       const pid = params.get('pid');
+    //       if (pid) {
+    //         this.tryImportByProjectId(pid);
+    //         return;
+    //       }
+    //       const shared = params.get('shared');
+    //       if (shared) {
+    //         // Backward compatibility: old base64 payload
+    //         this.tryImportShared(shared);
+    //       }
+    //     }
+    //   } catch (e) {
+    //     console.warn('Failed parsing shared query:', e);
+    //   }
+    //   // #endif
+    // },
+    // tryImportShared(payload) {
+    //   try {
+    //     const decodeBase64 = (b64) => {
+    //       try {
+    //         return decodeURIComponent(escape(atob(b64)));
+    //       } catch (e) {
+    //         return atob(b64);
+    //       }
+    //     };
+    //     const json = decodeBase64(payload);
+    //     const project = JSON.parse(json);
+    //     if (!project || !project.pages || !Array.isArray(project.pages)) {
+    //       throw new Error('Invalid project format');
+    //     }
+    //     uni.setStorageSync('latest_7_overall_page', project);
+    //     uni.setStorageSync('force_regeneration', 'true');
+    //     this.loadJsonTemplates();
+    //     this.updateLoadingStates();
+    //     setTimeout(() => {
+    //       this.generatePreviewImages();
+    //     }, 100);
+    //     uni.showToast({ title: 'Project loaded from link', icon: 'success', duration: 2000 });
+    //   } catch (e) {
+    //     console.error('Failed to import shared project:', e);
+    //     uni.showToast({ title: 'Invalid share link', icon: 'none', duration: 2000 });
+    //   }
+    // },
     checkAndStartGuide() {
       const designHasGuideShown = uni.getStorageSync('designHasUserGuideShown'); // 或 localStorage.getItem('hasUserGuideShown')
       if (!designHasGuideShown) {
@@ -3145,10 +3138,12 @@ export default {
     saveProjectToCloud(content) {
       // Check for existing project ID
       const currentProjectId = uni.getStorageSync('currentProjectId');
+      const uid = uni.getStorageSync('uid');
 
       // Prepare project data
       const projectData = {
-        id: currentProjectId,
+        uid: uid,
+        currentProjectId: currentProjectId,
         generated_overall_pages: content
       };
 
@@ -4827,9 +4822,28 @@ export default {
       }).then(res => {
         uni.hideLoading();
         if (res.result && res.result.success && res.result.data) {
-          uni.setStorageSync('latest_7_overall_page', JSON.stringify(res.result.data));
-          uni.setStorageSync('currentProjectId', projectId);
+          const importedData = res.result.data;
+          // Store imported project locally
+          uni.setStorageSync('latest_7_overall_page', JSON.stringify(importedData));
           uni.setStorageSync('force_regeneration', 'true');
+
+          // If this is the first time importing (no local project yet),
+          // create a new project in the user's cloud with the imported content
+          const existingProjectId = uni.getStorageSync('currentProjectId');
+          if (!existingProjectId) {
+            this.saveProjectToCloud(importedData)
+              .then((newId) => {
+                // saveProjectToCloud sets currentProjectId on create; no further action needed
+                console.log('Imported project saved to cloud with ID:', newId || uni.getStorageSync('currentProjectId'));
+              })
+              .catch((err) => {
+                console.error('Failed to save imported project to cloud:', err);
+              });
+          } else {
+            // Maintain existing behavior when a project already exists locally
+            uni.setStorageSync('currentProjectId', projectId);
+          }
+
           this.loadJsonTemplates();
           this.updateLoadingStates();
           setTimeout(() => {
