@@ -773,7 +773,7 @@ export default {
 
       // Custom action sheet properties
       showCustomActionSheet: false,
-      actionSheetOptions: ['Export as Images', 'Export as HTML', 'Export as Vue 2', 'Export as Vue 3', 'Export as React'],
+      actionSheetOptions: ['Export as HTML', 'Export as Vue 2', 'Export as Vue 3', 'Export as React'],
       showCreatePageDialog: false,
       pageDescription: '',
       examplePageDescription: 'A modern login page of Artificial Intelligence Tech Stack',
@@ -1261,15 +1261,15 @@ export default {
     handleActionSheetSelection(index) {
       this.closeCustomActionSheet();
 
-      const exportTypes = ['images', 'html', 'vue2', 'vue3', 'react'];
+      const exportTypes = ['html', 'vue2', 'vue3', 'react'];
       this.exportType = exportTypes[index];
 
       switch (this.exportType) {
         // case 'images':
         //   console.log(this.exportType);
-        case 'images':
-          this.exportImages();
-          break;
+        // case 'images':
+        //   this.exportImages();
+        //   break;
         case 'html':
           this.exportHTML();
           break;
@@ -1281,318 +1281,318 @@ export default {
       }
     },
 
-    async exportImages() {
-      // Debounce protection
-      if (this.isExporting) {
-        uni.showToast({
-          title: 'Export already in progress',
-          icon: 'none',
-          duration: 2000
-        });
-        return;
-      }
+//     async exportImages() {
+//       // Debounce protection
+//       if (this.isExporting) {
+//         uni.showToast({
+//           title: 'Export already in progress',
+//           icon: 'none',
+//           duration: 2000
+//         });
+//         return;
+//       }
 
-      this.isExporting = true;
+//       this.isExporting = true;
 
-      // Show loading toast
-      uni.showLoading({
-        title: 'Preparing images...',
-        mask: true
-      });
+//       // Show loading toast
+//       uni.showLoading({
+//         title: 'Preparing images...',
+//         mask: true
+//       });
 
-      try {
-        // Get the project data from storage
-        const jsonData = uni.getStorageSync('latest_7_overall_page');
-        if (!jsonData) {
-          uni.hideLoading();
-          uni.showToast({
-            title: 'No project data found',
-            icon: 'none',
-            duration: 2000
-          });
-          this.isExporting = false;
-          return;
-        }
+//       try {
+//         // Get the project data from storage
+//         const jsonData = uni.getStorageSync('latest_7_overall_page');
+//         if (!jsonData) {
+//           uni.hideLoading();
+//           uni.showToast({
+//             title: 'No project data found',
+//             icon: 'none',
+//             duration: 2000
+//           });
+//           this.isExporting = false;
+//           return;
+//         }
 
-        // Parse the JSON data
-        const projectData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+//         // Parse the JSON data
+//         const projectData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
 
-        // Check if we have pages
-        if (!projectData.pages || !projectData.pages.length) {
-          uni.hideLoading();
-          uni.showToast({
-            title: 'No pages found in project',
-            icon: 'none',
-            duration: 2000
-          });
-          this.isExporting = false;
-          return;
-        }
+//         // Check if we have pages
+//         if (!projectData.pages || !projectData.pages.length) {
+//           uni.hideLoading();
+//           uni.showToast({
+//             title: 'No pages found in project',
+//             icon: 'none',
+//             duration: 2000
+//           });
+//           this.isExporting = false;
+//           return;
+//         }
 
-        // Create a hidden iframe to isolate rendering from the main page
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'absolute';
-        iframe.style.left = '-9999px';
-        iframe.style.top = '-9999px';
-        iframe.style.width = '1440px';
-        iframe.style.height = '2000px';
-        iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
-        document.body.appendChild(iframe);
+//         // Create a hidden iframe to isolate rendering from the main page
+//         const iframe = document.createElement('iframe');
+//         iframe.style.position = 'absolute';
+//         iframe.style.left = '-9999px';
+//         iframe.style.top = '-9999px';
+//         iframe.style.width = '1440px';
+//         iframe.style.height = '2000px';
+//         iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
+//         document.body.appendChild(iframe);
 
-        // Initialize iframe document with minimal HTML and base styles
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        iframeDoc.open();
-        iframeDoc.write(`<!DOCTYPE html>
-<html><head><meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<style>
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; background: #ffffff; font-family: Arial, sans-serif; color: #333333; }
-  .page-root { padding: 20px; max-width: 1200px; margin: 0 auto; }
-  h1 { font-size: 24px; font-weight: bold; margin: 0 0 20px; }
-</style>
-</head><body></body></html>`);
-        iframeDoc.close();
+//         // Initialize iframe document with minimal HTML and base styles
+//         const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+//         iframeDoc.open();
+//         iframeDoc.write(`<!DOCTYPE html>
+// <html><head><meta charset="utf-8" />
+// <meta name="viewport" content="width=device-width, initial-scale=1" />
+// <style>
+//   * { box-sizing: border-box; }
+//   html, body { margin: 0; padding: 0; background: #ffffff; font-family: Arial, sans-serif; color: #333333; }
+//   .page-root { padding: 20px; max-width: 1200px; margin: 0 auto; }
+//   h1 { font-size: 24px; font-weight: bold; margin: 0 0 20px; }
+// </style>
+// </head><body></body></html>`);
+//         iframeDoc.close();
 
-        const images = [];
-        const renderPage = async (index) => {
-          if (index >= projectData.pages.length) {
-            // Clean up the iframe
-            document.body.removeChild(iframe);
-            // Export the images
-            // #ifdef H5 
-            this.exportImagesWeb(images);
-            // #endif
-            // #ifdef APP-PLUS
-            this.exportImagesMobile(images);
-            // #endif
-            return;
-          }
+//         const images = [];
+//         const renderPage = async (index) => {
+//           if (index >= projectData.pages.length) {
+//             // Clean up the iframe
+//             document.body.removeChild(iframe);
+//             // Export the images
+//             // #ifdef H5 
+//             this.exportImagesWeb(images);
+//             // #endif
+//             // #ifdef APP-PLUS
+//             this.exportImagesMobile(images);
+//             // #endif
+//             return;
+//           }
 
-          const page = projectData.pages[index];
-          const pageName = page.name.replace(/ Page/i, '');
-          const pageKey = pageName.toLowerCase().replace(/\s+/g, '-');
+//           const page = projectData.pages[index];
+//           const pageName = page.name.replace(/ Page/i, '');
+//           const pageKey = pageName.toLowerCase().replace(/\s+/g, '-');
 
-          // Reset iframe body content for this page
-          iframeDoc.body.innerHTML = '';
+//           // Reset iframe body content for this page
+//           iframeDoc.body.innerHTML = '';
 
-          // Build the page markup inside the iframe document
-          const root = iframeDoc.createElement('div');
-          root.className = 'page-root';
+//           // Build the page markup inside the iframe document
+//           const root = iframeDoc.createElement('div');
+//           root.className = 'page-root';
 
-          const titleEl = iframeDoc.createElement('h1');
-          titleEl.textContent = pageName;
-          root.appendChild(titleEl);
+//           const titleEl = iframeDoc.createElement('h1');
+//           titleEl.textContent = pageName;
+//           root.appendChild(titleEl);
 
-          const contentEl = iframeDoc.createElement('div');
-          contentEl.innerHTML = page.component || '<div>No content available</div>';
-          root.appendChild(contentEl);
+//           const contentEl = iframeDoc.createElement('div');
+//           contentEl.innerHTML = page.component || '<div>No content available</div>';
+//           root.appendChild(contentEl);
 
-          iframeDoc.body.appendChild(root);
+//           iframeDoc.body.appendChild(root);
 
-          // Wait a moment for images/fonts inside iframe to layout
-          await new Promise(resolve => setTimeout(resolve, 120));
+//           // Wait a moment for images/fonts inside iframe to layout
+//           await new Promise(resolve => setTimeout(resolve, 120));
 
-          try {
-            const contentHeight = root.scrollHeight;
-            const contentWidth = root.scrollWidth;
+//           try {
+//             const contentHeight = root.scrollHeight;
+//             const contentWidth = root.scrollWidth;
 
-            const canvas = await html2canvas(root, {
-              width: contentWidth,
-              height: contentHeight,
-              scale: 2,
-              useCORS: true,
-              logging: false,
-              backgroundColor: '#ffffff',
-              allowTaint: true
-            });
+//             const canvas = await html2canvas(root, {
+//               width: contentWidth,
+//               height: contentHeight,
+//               scale: 2,
+//               useCORS: true,
+//               logging: false,
+//               backgroundColor: '#ffffff',
+//               allowTaint: true
+//             });
 
-            const imageData = canvas.toDataURL('image/png');
-            images.push({ key: pageKey, data: imageData });
+//             const imageData = canvas.toDataURL('image/png');
+//             images.push({ key: pageKey, data: imageData });
 
-            // Next page
-            renderPage(index + 1);
-          } catch (error) {
-            console.error(`Error capturing screenshot for ${pageName}:`, error);
-            // Continue with next page even on error
-            renderPage(index + 1);
-          }
-        };
+//             // Next page
+//             renderPage(index + 1);
+//           } catch (error) {
+//             console.error(`Error capturing screenshot for ${pageName}:`, error);
+//             // Continue with next page even on error
+//             renderPage(index + 1);
+//           }
+//         };
 
-        // Start rendering pages
-        renderPage(0);
-      } catch (error) {
-        uni.hideLoading();
-        uni.showToast({
-          title: 'Error exporting images',
-          icon: 'none',
-          duration: 2000
-        });
-        console.error('Error exporting images:', error);
-        this.isExporting = false;
+//         // Start rendering pages
+//         renderPage(0);
+//       } catch (error) {
+//         uni.hideLoading();
+//         uni.showToast({
+//           title: 'Error exporting images',
+//           icon: 'none',
+//           duration: 2000
+//         });
+//         console.error('Error exporting images:', error);
+//         this.isExporting = false;
 
-        // Clean up any temporary elements
-        const orphanIframes = Array.from(document.querySelectorAll('iframe'))
-          .filter(f => f.style && f.style.left === '-9999px' && f.style.top === '-9999px');
-        orphanIframes.forEach(f => {
-          try { document.body.removeChild(f); } catch (_) {}
-        });
-      }
-    },
+//         // Clean up any temporary elements
+//         const orphanIframes = Array.from(document.querySelectorAll('iframe'))
+//           .filter(f => f.style && f.style.left === '-9999px' && f.style.top === '-9999px');
+//         orphanIframes.forEach(f => {
+//           try { document.body.removeChild(f); } catch (_) {}
+//         });
+//       }
+//     },
 
-    exportImagesMobile(images) {
-      try {
-        // For mobile platforms, save images one by one to downloads folder
-        let savedCount = 0;
+//     exportImagesMobile(images) {
+//       try {
+//         // For mobile platforms, save images one by one to downloads folder
+//         let savedCount = 0;
 
-        const saveNext = (index) => {
-          if (index >= images.length) {
-            uni.hideLoading();
-            uni.showToast({
-              title: `${savedCount} images exported`,
-              icon: 'success',
-              duration: 2000
-            });
-            this.isExporting = false; // Reset export flag when done
-            return;
-          }
+//         const saveNext = (index) => {
+//           if (index >= images.length) {
+//             uni.hideLoading();
+//             uni.showToast({
+//               title: `${savedCount} images exported`,
+//               icon: 'success',
+//               duration: 2000
+//             });
+//             this.isExporting = false; // Reset export flag when done
+//             return;
+//           }
 
-          const image = images[index];
-          const filePath = `${uni.env.USER_DATA_PATH}/${image.key}.png`;
+//           const image = images[index];
+//           const filePath = `${uni.env.USER_DATA_PATH}/${image.key}.png`;
 
-          // Convert base64 to file and save
-          const fs = uni.getFileSystemManager();
-          const buffer = uni.base64ToArrayBuffer(image.data.split(',')[1]);
+//           // Convert base64 to file and save
+//           const fs = uni.getFileSystemManager();
+//           const buffer = uni.base64ToArrayBuffer(image.data.split(',')[1]);
 
-          fs.writeFile({
-            filePath: filePath,
-            data: buffer,
-            encoding: 'binary',
-            success: () => {
-              // Save to photos album
-              uni.saveImageToPhotosAlbum({
-                filePath: filePath,
-                success: () => {
-                  savedCount++;
-                  saveNext(index + 1);
-                },
-                fail: (err) => {
-                  // console.error(`Failed to save ${image.key}.png to photos:`, err);
-                  saveNext(index + 1);
-                }
-              });
-            },
-            fail: (err) => {
-              // console.error(`Failed to write ${image.key}.png:`, err);
-              saveNext(index + 1);
-            }
-          });
-        };
+//           fs.writeFile({
+//             filePath: filePath,
+//             data: buffer,
+//             encoding: 'binary',
+//             success: () => {
+//               // Save to photos album
+//               uni.saveImageToPhotosAlbum({
+//                 filePath: filePath,
+//                 success: () => {
+//                   savedCount++;
+//                   saveNext(index + 1);
+//                 },
+//                 fail: (err) => {
+//                   // console.error(`Failed to save ${image.key}.png to photos:`, err);
+//                   saveNext(index + 1);
+//                 }
+//               });
+//             },
+//             fail: (err) => {
+//               // console.error(`Failed to write ${image.key}.png:`, err);
+//               saveNext(index + 1);
+//             }
+//           });
+//         };
 
-        saveNext(0);
-      } catch (error) {
-        uni.hideLoading();
-        // console.error('Error in exportImagesMobile:', error);
-        uni.showToast({
-          title: 'Error exporting images',
-          icon: 'none',
-          duration: 2000
-        });
-        this.isExporting = false; // Reset export flag on error
-      }
-    },
+//         saveNext(0);
+//       } catch (error) {
+//         uni.hideLoading();
+//         // console.error('Error in exportImagesMobile:', error);
+//         uni.showToast({
+//           title: 'Error exporting images',
+//           icon: 'none',
+//           duration: 2000
+//         });
+//         this.isExporting = false; // Reset export flag on error
+//       }
+//     },
 
-    async exportImagesWeb(images) {
-      try {
-        // Use the imported JSZip and saveAs
-        // If they're not available, show an error
-        if (typeof JSZip !== 'function' || typeof saveAs !== 'function') {
-          uni.hideLoading();
-          // console.error('JSZip or saveAs is not available');
-          uni.showToast({
-            title: 'Export libraries not available',
-            icon: 'none',
-            duration: 2000
-          });
-          this.isExporting = false;
-          return;
-        }
+//     async exportImagesWeb(images) {
+//       try {
+//         // Use the imported JSZip and saveAs
+//         // If they're not available, show an error
+//         if (typeof JSZip !== 'function' || typeof saveAs !== 'function') {
+//           uni.hideLoading();
+//           // console.error('JSZip or saveAs is not available');
+//           uni.showToast({
+//             title: 'Export libraries not available',
+//             icon: 'none',
+//             duration: 2000
+//           });
+//           this.isExporting = false;
+//           return;
+//         }
 
-        // console.log(`Exporting ${images.length} images to a single zip file`);
+//         // console.log(`Exporting ${images.length} images to a single zip file`);
 
-        // Create a single zip file with all images
-        const zip = new JSZip();
-        let imagesFolder = zip.folder("ui_genius_images");
+//         // Create a single zip file with all images
+//         const zip = new JSZip();
+//         let imagesFolder = zip.folder("ui_genius_images");
 
-        // Convert all images to blobs and add them to the zip
-        for (let i = 0; i < images.length; i++) {
-          const image = images[i];
-          try {
-            // Convert base64 data URL to blob
-            const parts = image.data.split(';base64,');
-            const contentType = parts[0].split(':')[1];
-            const raw = window.atob(parts[1]);
-            const rawLength = raw.length;
-            const uInt8Array = new Uint8Array(rawLength);
+//         // Convert all images to blobs and add them to the zip
+//         for (let i = 0; i < images.length; i++) {
+//           const image = images[i];
+//           try {
+//             // Convert base64 data URL to blob
+//             const parts = image.data.split(';base64,');
+//             const contentType = parts[0].split(':')[1];
+//             const raw = window.atob(parts[1]);
+//             const rawLength = raw.length;
+//             const uInt8Array = new Uint8Array(rawLength);
 
-            for (let j = 0; j < rawLength; ++j) {
-              uInt8Array[j] = raw.charCodeAt(j);
-            }
+//             for (let j = 0; j < rawLength; ++j) {
+//               uInt8Array[j] = raw.charCodeAt(j);
+//             }
 
-            const blob = new Blob([uInt8Array], { type: contentType });
-            imagesFolder.file(`${image.key}.png`, blob);
-            // console.log(`Added ${image.key}.png to zip (${i + 1}/${images.length})`);
-          } catch (error) {
-            // console.error(`Error processing image ${image.key}:`, error);
-          }
-        }
+//             const blob = new Blob([uInt8Array], { type: contentType });
+//             imagesFolder.file(`${image.key}.png`, blob);
+//             // console.log(`Added ${image.key}.png to zip (${i + 1}/${images.length})`);
+//           } catch (error) {
+//             // console.error(`Error processing image ${image.key}:`, error);
+//           }
+//         }
 
-        // Generate and save the zip
-        const content = await zip.generateAsync({ type: "blob" });
-        saveAs(content, "ui_genius_images.zip");
+//         // Generate and save the zip
+//         const content = await zip.generateAsync({ type: "blob" });
+//         saveAs(content, "ui_genius_images.zip");
 
-        uni.hideLoading();
-        uni.showToast({
-          title: 'Images exported successfully!',
-          icon: 'success',
-          duration: 2000
-        });
-      } catch (error) {
-        // Handle any errors
-        uni.hideLoading();
-        // console.error('Error exporting images:', error);
-        uni.showToast({
-          title: 'Error exporting images',
-          icon: 'none',
-          duration: 2000
-        });
-      } finally {
-        // Always reset the exporting flag when done
-        this.isExporting = false;
-      }
-    },
+//         uni.hideLoading();
+//         uni.showToast({
+//           title: 'Images exported successfully!',
+//           icon: 'success',
+//           duration: 2000
+//         });
+//       } catch (error) {
+//         // Handle any errors
+//         uni.hideLoading();
+//         // console.error('Error exporting images:', error);
+//         uni.showToast({
+//           title: 'Error exporting images',
+//           icon: 'none',
+//           duration: 2000
+//         });
+//       } finally {
+//         // Always reset the exporting flag when done
+//         this.isExporting = false;
+//       }
+//     },
 
-    exportImagesIndividually(images) {
-      // Fallback method to download images one by one
-      uni.showToast({
-        title: 'Downloading images individually',
-        icon: 'none',
-        duration: 2000
-      });
+//     exportImagesIndividually(images) {
+//       // Fallback method to download images one by one
+//       uni.showToast({
+//         title: 'Downloading images individually',
+//         icon: 'none',
+//         duration: 2000
+//       });
 
-      images.forEach(image => {
-        try {
-          const a = document.createElement('a');
-          a.href = image.data;
-          a.download = `${image.key}.png`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        } catch (e) {
-          // console.error(`Failed to download ${image.key}.png`, e);
-        }
-      });
-    },
+//       images.forEach(image => {
+//         try {
+//           const a = document.createElement('a');
+//           a.href = image.data;
+//           a.download = `${image.key}.png`;
+//           document.body.appendChild(a);
+//           a.click();
+//           document.body.removeChild(a);
+//         } catch (e) {
+//           // console.error(`Failed to download ${image.key}.png`, e);
+//         }
+//       });
+//     },
 
     exportHTML() {
       // Show loading toast
