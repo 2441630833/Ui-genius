@@ -593,16 +593,15 @@
     </view>
 
     <!-- Color Palette Overlay -->
-    <view v-if="showColorPalette" class="color-palette-overlay">
+    <!-- <view v-if="showColorPalette" class="color-palette-overlay">
       <view class="color-palette-container">
         <text class="color-palette-title" style="display: block;">Select Theme Color For Your Project</text>
 
-        <!-- Error message area -->
+
         <view v-if="colorPaletteError" class="color-palette-error">
           <text class="error-text">{{ colorPaletteError }}</text>
         </view>
 
-        <!-- Neutral Colors Row -->
         <view class="color-palette-row">
           <view v-for="(color, index) in neutralColors" :key="'neutral-' + index" class="color-swatch"
             :style="{ backgroundColor: color.hex }" :class="{ 'selected': selectedColor === color.hex }"
@@ -612,7 +611,7 @@
           </view>
         </view>
 
-        <!-- Pastel Colors Row -->
+
         <view class="color-palette-row">
           <view v-for="(color, index) in pastelColors" :key="'pastel-' + index" class="color-swatch"
             :style="{ backgroundColor: color.hex }" :class="{ 'selected': selectedColor === color.hex }"
@@ -622,7 +621,7 @@
           </view>
         </view>
 
-        <!-- Warm Colors Row -->
+
         <view class="color-palette-row">
           <view v-for="(color, index) in warmColors" :key="'warm-' + index" class="color-swatch"
             :style="{ backgroundColor: color.hex }" :class="{ 'selected': selectedColor === color.hex }"
@@ -632,7 +631,6 @@
           </view>
         </view>
 
-        <!-- Cool Colors Row -->
         <view class="color-palette-row">
           <view v-for="(color, index) in coolColors" :key="'cool-' + index" class="color-swatch"
             :style="{ backgroundColor: color.hex }" :class="{ 'selected': selectedColor === color.hex }"
@@ -642,7 +640,7 @@
           </view>
         </view>
 
-        <!-- Custom color input -->
+
         <view class="color-input-container">
           <text class="color-input-label">Custom Color:</text>
           <input type="text" v-model="customColor" class="color-input" placeholder="#RRGGBB"
@@ -652,19 +650,13 @@
             :class="{ 'selected': customColor && isValidColor(customColor) && !selectedColor }"></view>
         </view>
 
-        <!-- Simplified Preview section - only button -->
-        <!-- <view class="color-preview-section">
-          <text class="preview-label">Preview:</text>
-          <view class="preview-button" :style="{ backgroundColor: previewColor }">Button</view>
-        </view> -->
-
         <view class="color-actions">
           <button class="color-confirm" :style="{ backgroundColor: previewColor, color: '#ffffff' }"
             @click="confirmColorSelection">Apply Theme</button>
           <button class="color-cancel" @click="cancelColorSelection">Cancel</button>
         </view>
       </view>
-    </view>
+    </view> -->
     <view class="toast-overlay" v-if="customToastVisible" @click="customToastVisible = false">
       <view class="custom-toast" @click.stop>
         <image class="device-icon" :src="customToastType === 'success' ? '../../static/success.png' : '../../static/skip.png'"></image>
@@ -3025,118 +3017,118 @@ export default {
         duration: 2000
       });
     },
-    selectColor(color) {
-      // Clear any error message when selecting a color
-      this.colorPaletteError = '';
+    // selectColor(color) {
+    //   // Clear any error message when selecting a color
+    //   this.colorPaletteError = '';
 
-      this.selectedColor = color;
-      this.customColor = ''; // Clear custom color when a predefined color is selected
-      this.previewColor = color; // Update preview color
-    },
-    cancelColorSelection() {
-      this.showColorPalette = false;
-      this.selectedColor = '';
-      this.customColor = '';
-      this.previewColor = '#86E3CE'; // Reset to default color
-      this.colorPaletteError = ''; // Clear any error message
-    },
-    confirmColorSelection() {
-      // Clear any previous error
-      this.colorPaletteError = '';
+    //   this.selectedColor = color;
+    //   this.customColor = ''; // Clear custom color when a predefined color is selected
+    //   this.previewColor = color; // Update preview color
+    // },
+    // cancelColorSelection() {
+    //   this.showColorPalette = false;
+    //   this.selectedColor = '';
+    //   this.customColor = '';
+    //   this.previewColor = '#86E3CE'; // Reset to default color
+    //   this.colorPaletteError = ''; // Clear any error message
+    // },
+    // confirmColorSelection() {
+    //   // Clear any previous error
+    //   this.colorPaletteError = '';
 
-      // Use either selected color from swatches or custom color input
-      const themeColor = this.customColor && this.isValidColor(this.customColor)
-        ? this.customColor
-        : this.selectedColor;
+    //   // Use either selected color from swatches or custom color input
+    //   const themeColor = this.customColor && this.isValidColor(this.customColor)
+    //     ? this.customColor
+    //     : this.selectedColor;
 
-      if (!themeColor) {
-        this.colorPaletteError = 'Please select a valid color';
-        return;
-      }
+    //   if (!themeColor) {
+    //     this.colorPaletteError = 'Please select a valid color';
+    //     return;
+    //   }
 
-      // Show loading
-      uni.showLoading({
-        title: 'Updating theme...',
-        mask: true
-      });
+    //   // Show loading
+    //   uni.showLoading({
+    //     title: 'Updating theme...',
+    //     mask: true
+    //   });
 
-      // Get the current template data
-      const jsonData = uni.getStorageSync('latest_7_overall_page');
-      if (!jsonData) {
-        uni.hideLoading();
-        this.colorPaletteError = 'No usable page data available, please generate your project first';
-        return;
-      }
+    //   // Get the current template data
+    //   const jsonData = uni.getStorageSync('latest_7_overall_page');
+    //   if (!jsonData) {
+    //     uni.hideLoading();
+    //     this.colorPaletteError = 'No usable page data available, please generate your project first';
+    //     return;
+    //   }
 
-      // Send the color and template data to backend
-      this.updateThemeColor(themeColor, jsonData);
-    },
-    updateThemeColor(color, templateData) {
-      // Make API call to update theme color
-      uni.request({
-        url: `${API_BASE_URL}/update-theme-color`,
-        method: 'POST',
-        data: {
-          themeColor: color,
-          templateData: typeof templateData === 'string' ? templateData : JSON.stringify(templateData)
-        },
-        header: {
-          'content-type': 'application/json'
-        },
-        success: (res) => {
-          uni.hideLoading();
+    //   // Send the color and template data to backend
+    //   this.updateThemeColor(themeColor, jsonData);
+    // },
+    // updateThemeColor(color, templateData) {
+    //   // Make API call to update theme color
+    //   uni.request({
+    //     url: `${API_BASE_URL}/update-theme-color`,
+    //     method: 'POST',
+    //     data: {
+    //       themeColor: color,
+    //       templateData: typeof templateData === 'string' ? templateData : JSON.stringify(templateData)
+    //     },
+    //     header: {
+    //       'content-type': 'application/json'
+    //     },
+    //     success: (res) => {
+    //       uni.hideLoading();
 
-          if (res.statusCode === 200 && res.data) {
-            // Store the updated template data
-            uni.setStorageSync('latest_7_overall_page', res.data);
+    //       if (res.statusCode === 200 && res.data) {
+    //         // Store the updated template data
+    //         uni.setStorageSync('latest_7_overall_page', res.data);
 
-            // Clear stored images to force regeneration with new theme
-            this.clearStoredImages();
+    //         // Clear stored images to force regeneration with new theme
+    //         this.clearStoredImages();
 
-            // Refresh the UI
-            this.loadJsonTemplates();
-            this.generatePreviewImages();
+    //         // Refresh the UI
+    //         this.loadJsonTemplates();
+    //         this.generatePreviewImages();
 
-            // Hide color palette
-            this.showColorPalette = false;
+    //         // Hide color palette
+    //         this.showColorPalette = false;
 
-            uni.showToast({
-              title: 'Theme updated successfully',
-              icon: 'success',
-              duration: 2000
-            });
-          } else {
-            this.colorPaletteError = 'Failed to update theme';
-          }
-        },
-        fail: (err) => {
-          uni.hideLoading();
-          this.colorPaletteError = 'Error updating theme: ' + (err.errMsg || 'Unknown error');
-        }
-      });
-    },
-    validateColorInput() {
-      // Clear any error message when entering a custom color
-      this.colorPaletteError = '';
+    //         uni.showToast({
+    //           title: 'Theme updated successfully',
+    //           icon: 'success',
+    //           duration: 2000
+    //         });
+    //       } else {
+    //         this.colorPaletteError = 'Failed to update theme';
+    //       }
+    //     },
+    //     fail: (err) => {
+    //       uni.hideLoading();
+    //       this.colorPaletteError = 'Error updating theme: ' + (err.errMsg || 'Unknown error');
+    //     }
+    //   });
+    // },
+    // validateColorInput() {
+    //   // Clear any error message when entering a custom color
+    //   this.colorPaletteError = '';
 
-      // Clear selected color when custom color is being entered
-      if (this.customColor) {
-        this.selectedColor = '';
-      }
+    //   // Clear selected color when custom color is being entered
+    //   if (this.customColor) {
+    //     this.selectedColor = '';
+    //   }
 
-      // Update preview color if valid
-      if (this.isValidColor(this.customColor)) {
-        this.previewColor = this.customColor;
-      } else if (this.selectedColor) {
-        this.previewColor = this.selectedColor;
-      } else {
-        this.previewColor = '#86E3CE'; // Default color
-      }
-    },
-    isValidColor(color) {
-      // Check if the color is a valid hex color
-      return /^#([0-9A-F]{3}){1,2}$/i.test(color);
-    },
+    //   // Update preview color if valid
+    //   if (this.isValidColor(this.customColor)) {
+    //     this.previewColor = this.customColor;
+    //   } else if (this.selectedColor) {
+    //     this.previewColor = this.selectedColor;
+    //   } else {
+    //     this.previewColor = '#86E3CE'; // Default color
+    //   }
+    // },
+    // isValidColor(color) {
+    //   // Check if the color is a valid hex color
+    //   return /^#([0-9A-F]{3}){1,2}$/i.test(color);
+    // },
     saveProjectToCloud(content) {
       // Check for existing project ID
       const currentProjectId = uni.getStorageSync('currentProjectId');
