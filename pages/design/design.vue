@@ -556,9 +556,12 @@
                 <text class="upload-text">Click to select HTML file</text>
                 <text class="upload-hint">Allowed: .html</text>
               </view>
-              <view v-if="htmlFileContent" class="html-file-info">
-                <text class="file-info-text">HTML file loaded successfully: {{ htmlFileName }}</text>
-                <text class="file-content-preview">{{ htmlFileContent.substring(0, 100) }}...</text>
+              <view v-if="htmlFiles && htmlFiles.length" class="html-file-info">
+                <text class="file-info-text">{{ htmlFiles.length }} HTML file(s) loaded:</text>
+                <view v-for="(f, i) in htmlFiles" :key="i" style="margin-top: 8px;">
+                  <text class="file-info-text">- {{ f.name }}</text>
+                  <text class="file-content-preview">{{ f.content.substring(0, 100) }}...</text>
+                </view>
               </view>
             </view>
 
@@ -582,7 +585,7 @@
 
           <view class="import-actions">
             <button class="import-btn"
-              :disabled="selectedImportType === 'html' ? !htmlFileContent : !importFileList.length"
+              :disabled="selectedImportType === 'html' ? (htmlFiles.length === 0) : !importFileList.length"
               @click="importProject">
               Import
             </button>
@@ -797,6 +800,7 @@ export default {
       // HTML file content
       htmlFileContent: '',
       htmlFileName: '',
+      htmlFiles: [],
       
       // Import progress properties
       isImporting: false,
@@ -3017,118 +3021,6 @@ export default {
         duration: 2000
       });
     },
-    // selectColor(color) {
-    //   // Clear any error message when selecting a color
-    //   this.colorPaletteError = '';
-
-    //   this.selectedColor = color;
-    //   this.customColor = ''; // Clear custom color when a predefined color is selected
-    //   this.previewColor = color; // Update preview color
-    // },
-    // cancelColorSelection() {
-    //   this.showColorPalette = false;
-    //   this.selectedColor = '';
-    //   this.customColor = '';
-    //   this.previewColor = '#86E3CE'; // Reset to default color
-    //   this.colorPaletteError = ''; // Clear any error message
-    // },
-    // confirmColorSelection() {
-    //   // Clear any previous error
-    //   this.colorPaletteError = '';
-
-    //   // Use either selected color from swatches or custom color input
-    //   const themeColor = this.customColor && this.isValidColor(this.customColor)
-    //     ? this.customColor
-    //     : this.selectedColor;
-
-    //   if (!themeColor) {
-    //     this.colorPaletteError = 'Please select a valid color';
-    //     return;
-    //   }
-
-    //   // Show loading
-    //   uni.showLoading({
-    //     title: 'Updating theme...',
-    //     mask: true
-    //   });
-
-    //   // Get the current template data
-    //   const jsonData = uni.getStorageSync('latest_7_overall_page');
-    //   if (!jsonData) {
-    //     uni.hideLoading();
-    //     this.colorPaletteError = 'No usable page data available, please generate your project first';
-    //     return;
-    //   }
-
-    //   // Send the color and template data to backend
-    //   this.updateThemeColor(themeColor, jsonData);
-    // },
-    // updateThemeColor(color, templateData) {
-    //   // Make API call to update theme color
-    //   uni.request({
-    //     url: `${API_BASE_URL}/update-theme-color`,
-    //     method: 'POST',
-    //     data: {
-    //       themeColor: color,
-    //       templateData: typeof templateData === 'string' ? templateData : JSON.stringify(templateData)
-    //     },
-    //     header: {
-    //       'content-type': 'application/json'
-    //     },
-    //     success: (res) => {
-    //       uni.hideLoading();
-
-    //       if (res.statusCode === 200 && res.data) {
-    //         // Store the updated template data
-    //         uni.setStorageSync('latest_7_overall_page', res.data);
-
-    //         // Clear stored images to force regeneration with new theme
-    //         this.clearStoredImages();
-
-    //         // Refresh the UI
-    //         this.loadJsonTemplates();
-    //         this.generatePreviewImages();
-
-    //         // Hide color palette
-    //         this.showColorPalette = false;
-
-    //         uni.showToast({
-    //           title: 'Theme updated successfully',
-    //           icon: 'success',
-    //           duration: 2000
-    //         });
-    //       } else {
-    //         this.colorPaletteError = 'Failed to update theme';
-    //       }
-    //     },
-    //     fail: (err) => {
-    //       uni.hideLoading();
-    //       this.colorPaletteError = 'Error updating theme: ' + (err.errMsg || 'Unknown error');
-    //     }
-    //   });
-    // },
-    // validateColorInput() {
-    //   // Clear any error message when entering a custom color
-    //   this.colorPaletteError = '';
-
-    //   // Clear selected color when custom color is being entered
-    //   if (this.customColor) {
-    //     this.selectedColor = '';
-    //   }
-
-    //   // Update preview color if valid
-    //   if (this.isValidColor(this.customColor)) {
-    //     this.previewColor = this.customColor;
-    //   } else if (this.selectedColor) {
-    //     this.previewColor = this.selectedColor;
-    //   } else {
-    //     this.previewColor = '#86E3CE'; // Default color
-    //   }
-    // },
-    // isValidColor(color) {
-    //   // Check if the color is a valid hex color
-    //   return /^#([0-9A-F]{3}){1,2}$/i.test(color);
-    // },
     saveProjectToCloud(content) {
       // Check for existing project ID
       const currentProjectId = uni.getStorageSync('currentProjectId');
@@ -4104,6 +3996,7 @@ export default {
       this.importFileList = [];
       this.htmlFileContent = '';
       this.htmlFileName = '';
+      this.htmlFiles = [];
       this.importError = '';
       this.selectedImportType = 'image';
     },
@@ -4113,6 +4006,7 @@ export default {
       this.importFileList = [];
       this.htmlFileContent = '';
       this.htmlFileName = '';
+      this.htmlFiles = [];
       this.importError = '';
     },
     
@@ -4138,8 +4032,8 @@ export default {
     
     importProject() {
       if (this.selectedImportType === 'html') {
-        if (!this.htmlFileContent) {
-          this.importError = 'Please select an HTML file to import';
+        if (!this.htmlFiles || this.htmlFiles.length === 0) {
+          this.importError = 'Please select at least one HTML file to import';
           return;
         }
       } else {
@@ -4649,18 +4543,15 @@ export default {
         clearInterval(progressInterval);
         this.importProgress = 100;
         
-        console.log('Importing HTML content, length:', this.htmlFileContent.length);
-        console.log('HTML content preview:', this.htmlFileContent.substring(0, 200));
+        const filesToImport = (this.htmlFiles && this.htmlFiles.length)
+          ? this.htmlFiles
+          : (this.htmlFileContent ? [{ name: this.htmlFileName || 'Imported.html', content: this.htmlFileContent }] : []);
+        if (!filesToImport.length) {
+          throw new Error('No HTML files to import');
+        }
+        console.log('Importing HTML files count:', filesToImport.length);
         
-        // Create a new page from the HTML content
-        // const timestamp = new Date().toLocaleString();
-        const pageName = this.htmlFileName 
-          ? `Imported ${this.htmlFileName}`
-          : `Imported HTML ${timestamp}`;
-        const newPage = {
-          name: pageName,
-          component: this.htmlFileContent
-        };
+        const timestamp = new Date().toLocaleString();
         
         // Get existing project data
         const existingProjectData = uni.getStorageSync('latest_7_overall_page');
@@ -4676,8 +4567,12 @@ export default {
           };
         }
         
-        // Add the new page to the project
-        projectData.pages.push(newPage);
+        // Add a new page to the project for each HTML file
+        filesToImport.forEach(f => {
+          const nameBase = f.name ? f.name.replace(/\.(html?|HTML?)$/, '') : 'HTML';
+          const pageName = f.name ? `Imported ${nameBase}` : `Imported HTML ${timestamp}`;
+          projectData.pages.push({ name: pageName, component: f.content });
+        });
         
         // Save the updated project data
         const updatedProjectData = JSON.stringify(projectData);
@@ -4710,15 +4605,9 @@ export default {
             this.refreshTemplates();
           }, 500);
 
-          // Show success message
-          // uni.showToast({
-          //   title: 'HTML file imported successfully!',
-          //   icon: 'success',
-          //   duration: 2000
-          // });
-
           // Navigate to editor with the new template ID
-          const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+          const lastPage = projectData.pages[projectData.pages.length - 1];
+          const newTemplateId = lastPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
           uni.setStorageSync('selectedTemplateId', newTemplateId);
 
           setTimeout(() => {
@@ -4746,17 +4635,19 @@ export default {
       // Clear previous HTML content first
       this.htmlFileContent = '';
       this.htmlFileName = '';
+      this.htmlFiles = [];
       
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = '.html'; // 限制为HTML文件
+      input.multiple = true;
       input.onchange = (e) => {
-        const file = e.target.files[0];
-        if (file) {
-          this.readFileContent(file);
+        const files = Array.from(e.target.files || []);
+        if (files.length) {
+          this.readMultipleFiles(files);
         }
-        // Clear the input value to allow selecting the same file again
-        input.value = '';
+         // Clear the input value to allow selecting the same file again
+         input.value = '';
       };
       input.click();
     },
@@ -4770,6 +4661,7 @@ export default {
         const content = event.target.result;
         this.htmlFileContent = content;
         this.htmlFileName = file.name; // Store the filename
+        this.htmlFiles = [{ name: file.name, content }];
         console.log('HTML file content loaded:', file.name);
         console.log('Content length:', this.htmlFileContent.length);
         console.log('First 100 characters:', this.htmlFileContent.substring(0, 100));
@@ -4784,6 +4676,7 @@ export default {
         } else {
           this.htmlFileContent = '';
           this.htmlFileName = '';
+          this.htmlFiles = [];
           uni.showToast({
             title: 'Invalid HTML file content',
             icon: 'none',
@@ -4795,6 +4688,7 @@ export default {
       reader.onerror = () => {
         console.error('读取文件失败');
         this.htmlFileContent = '';
+        this.htmlFiles = [];
         uni.showToast({
           title: 'Failed to read file',
           icon: 'none',
@@ -4803,6 +4697,34 @@ export default {
       };
       
       reader.readAsText(file, 'UTF-8'); // 以文本形式读取
+    },
+    // Read multiple HTML files as text and populate htmlFiles
+    readMultipleFiles(files) {
+      const readOne = (file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => resolve({ name: file.name, content: event.target.result });
+        reader.onerror = () => reject(new Error(`Failed to read file: ${file.name}`));
+        reader.readAsText(file, 'UTF-8');
+      });
+      Promise.all(files.map(readOne))
+        .then(results => {
+          // Filter out empty contents
+          const valid = results.filter(r => r.content && String(r.content).trim());
+          this.htmlFiles = valid;
+          if (valid.length === 0) {
+            uni.showToast({ title: 'Selected files are empty', icon: 'none', duration: 2000 });
+            return;
+          }
+          // Keep backward-compatible single fields for any other logic
+          this.htmlFileName = valid[0].name;
+          this.htmlFileContent = valid[0].content;
+          uni.showToast({ title: `${valid.length} HTML file(s) loaded`, icon: 'success', duration: 2000 });
+        })
+        .catch(err => {
+          console.error(err);
+          this.htmlFiles = [];
+          uni.showToast({ title: 'Failed to read selected files', icon: 'none', duration: 2000 });
+        });
     },
     tryImportByProjectId(projectId) {
       if (!projectId) return;
