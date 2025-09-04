@@ -558,9 +558,12 @@
               </view>
               <view v-if="htmlFiles && htmlFiles.length" class="html-file-info">
                 <text class="file-info-text">{{ htmlFiles.length }} HTML file(s) loaded:</text>
-                <view v-for="(f, i) in htmlFiles" :key="i" style="margin-top: 8px;">
-                  <text class="file-info-text">- {{ f.name }}</text>
-                  <text class="file-content-preview">{{ f.content.substring(0, 100) }}...</text>
+                <view v-for="(f, i) in htmlFiles" :key="i" class="file-list-item">
+                  <view class="file-list-item-header">
+                    <text class="file-info-text">- {{ f.name }}</text>
+                    <button class="remove-file-btn" @click.stop="removeHtmlFile(i)">Delete</button>
+                  </view>
+                  <!-- <text class="file-content-preview">{{ f.content.substring(0, 100) }}...</text> -->
                 </view>
               </view>
             </view>
@@ -4844,6 +4847,11 @@ export default {
         this.refreshDataLocal();
       });
     },
+    removeHtmlFile(index) {
+      if (!Array.isArray(this.htmlFiles)) return;
+      if (index < 0 || index >= this.htmlFiles.length) return;
+      this.htmlFiles.splice(index, 1);
+    }
   }
 }
 </script>
@@ -5772,7 +5780,7 @@ export default {
   border-radius: 10px;
   box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
   width: 90%;
-  max-width: 500px;
+  max-width: 570px;
   padding: 30px;
   position: relative;
 }
@@ -6517,4 +6525,22 @@ export default {
     }
   }
 }
+
+.file-list-item { margin-top: 2px; }
+.file-list-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+.remove-file-btn {
+  background-color: #f5f5f5;
+  color: #e53935;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.remove-file-btn:hover { background-color: #ffecec; }
+
 </style>

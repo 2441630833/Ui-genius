@@ -42,6 +42,12 @@
             :src="activeNavItem === 'guide' ? '../../static/guide_white.png' : '../../static/guide.png'"></image>
           <text class="nav-text">Guide</text>
         </view>
+        <!-- Newly added Share nav item -->
+        <view class="nav-item" :class="{ active: activeNavItem === 'share' }" @click="setActiveNavItem('share')">
+          <image class="sidebar-icon"
+            :src="activeNavItem === 'share' ? '../../static/import_white.png' : '../../static/import.png'"></image>
+          <text class="nav-text">Share</text>
+        </view>
       </view>
     </view>
 
@@ -215,6 +221,54 @@
           <text class="title">Settings</text>
         </view>
         <text>Settings page content will be implemented here.</text>
+      </view>
+
+      <!-- Share Content (Import HTML in main area) -->
+      <view v-if="activeNavItem === 'share'" class="settings-content">
+        <view class="header">
+          <text class="title">Share</text>
+        </view>
+        <view class="settings-section">
+          <text class="section-title">Import HTML Files</text>
+          <text class="section-description">Select one or more HTML files to add as pages to your current project.</text>
+
+          <!-- Replaced basic input with design page's HTML file picker -->
+          <view class="file-upload-container">
+            <view class="html-file-picker">
+              <view class="upload-placeholder" @click="chooseHtmlFile">
+                <view class="upload-icon">
+                  <view class="folder-icon">
+                    <view class="folder-body"></view>
+                    <view class="folder-tab"></view>
+                  </view>
+                  <view class="upload-arrow">↑</view>
+                </view>
+                <text class="upload-text">Click to select HTML file(s)</text>
+                <text class="upload-hint">Allowed: .html</text>
+              </view>
+              <view v-if="htmlFiles && htmlFiles.length" class="html-file-info">
+                <text class="file-info-text">{{ htmlFiles.length }} HTML file(s) loaded:</text>
+                <view v-for="(f, i) in htmlFiles" :key="i" class="file-list-item">
+                  <view class="file-list-item-header">
+                    <text class="file-info-text">- {{ f.name }}</text>
+                    <button class="remove-file-btn" @click.stop="removeHtmlFile(i)">Delete</button>
+                  </view>
+                  <!-- <text class="file-content-preview">{{ f.content.substring(0, 100) }}...</text> -->
+                </view>
+              </view>
+            </view>
+          </view>
+
+          <view v-if="!isImporting">
+            <button class="save-btn" :disabled="!htmlFiles.length" @click="startHtmlImport">Import</button>
+          </view>
+          <view v-else class="password-strength">
+            <view class="progress-bar">
+              <view class="progress-indicator" :style="{ width: importProgress + '%' }"></view>
+            </view>
+            <text class="strength-text">{{ importProgress }}%</text>
+          </view>
+        </view>
       </view>
     </view>
 
@@ -409,7 +463,13 @@ export default {
           content: 'This is the final step of the guide - click the continue button to start generating your project',
           position: 'right'
         }
-      ]
+      ],
+      // Import / Share state
+      isImporting: false,
+      importProgress: 0,
+      htmlFiles: [],
+      htmlFileContent: '',
+      htmlFileName: ''
     }
   },
   watch: {
@@ -785,39 +845,6 @@ export default {
       this.userProjects.forEach((project, index) => {
         this.projectLoadingStates[`user-project-${index}`] = false;
       });
-
-
-
-
-      // Only update if we have user projects
-      // if (!Array.isArray(this.userProjects) || this.userProjects.length === 0) {
-      //   // If no user projects, show default projects with staggered loading
-      //   setTimeout(() => {
-      //     this.projectLoadingStates.alpha = false;
-      //   }, 800);
-
-      //   setTimeout(() => {
-      //     this.projectLoadingStates.beta = false;
-      //   }, 1300);
-
-      //   setTimeout(() => {
-      //     this.projectLoadingStates.gamma = false;
-      //   }, 1800);
-      //   return;
-      // }
-
-      // // If we have user projects, update the loading states for them
-      // this.projectLoadingStates = {};
-
-      // // Create loading states for user projects with staggered timing
-      // this.userProjects.slice(0, 3).forEach((project, index) => {
-      //   const key = `user-project-${index}`;
-      //   this.projectLoadingStates[key] = true;
-
-      //   setTimeout(() => {
-      //     this.projectLoadingStates[key] = false;
-      //   }, 800 + (index * 500));
-      // });
     },
 
     // loadProjectById(id) {
@@ -1419,6 +1446,159 @@ export default {
       else if (index === 4) {
         this.tryExample();
       }
+    },
+    onHtmlFileChange(event) {
+      const files = event.target && event.target.files ? Array.from(event.target.files) : [];
+      if (!files.length) {
+        this.htmlFiles = [];
+        return;
+      }
+      // Read all files as text
+      const readPromises = files.map(file => {
+        return new Promise((resolve) => {
+          const reader = new FileReader();
+          reader.onload = (e) => resolve({ name: file.name, content: e.target.result });
+          reader.readAsText(file, 'utf-8');
+        });
+      });
+      Promise.all(readPromises).then(results => {
+        this.htmlFiles = results;
+      }).catch(err => {
+        console.error('Error reading files:', err);
+        this.htmlFiles = [];
+        uni.showToast({ title: 'Failed to read selected files', icon: 'none' });
+      });
+    },
+    startHtmlImport() {
+      if (!this.htmlFiles.length) return;
+      this.isImporting = true;
+      this.importProgress = 0;
+      const progressInterval = setInterval(() => {
+        if (this.importProgress < 95) {
+          this.importProgress += 5;
+        }
+      }, 80);
+      this.handleHtmlImport(progressInterval);
+    },
+    handleHtmlImport(progressInterval) {
+      try {
+        // Stop the progress interval
+        clearInterval(progressInterval);
+        this.importProgress = 100;
+        
+        const filesToImport = (this.htmlFiles && this.htmlFiles.length)
+          ? this.htmlFiles
+          : (this.htmlFileContent ? [{ name: this.htmlFileName || 'Imported.html', content: this.htmlFileContent }] : []);
+        if (!filesToImport.length) {
+          throw new Error('No HTML files to import');
+        }
+        console.log('Importing HTML files count:', filesToImport.length);
+        
+        const timestamp = new Date().toLocaleString();
+        
+        // Get existing project data
+        const existingProjectData = uni.getStorageSync('latest_7_overall_page');
+        let projectData;
+        
+        if (existingProjectData) {
+          projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
+        } else {
+          projectData = {
+            pages: [],
+            AIProjectDescription: 'My Project',
+            AIProjectName: 'UI Genius Project',
+          };
+        }
+        
+        // Add a new page to the project for each HTML file
+        filesToImport.forEach(f => {
+          const nameBase = f.name ? f.name.replace(/\.(html?|HTML?)$/, '') : 'HTML';
+          const pageName = f.name ? `Imported ${nameBase}` : `Imported HTML ${timestamp}`;
+          projectData.pages.push({ name: pageName, component: f.content });
+        });
+        
+        // Save the updated project data
+        const updatedProjectData = JSON.stringify(projectData);
+        uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+        
+        // Set flag to force regeneration of images
+        uni.setStorageSync('force_regeneration', 'true');
+        
+        // Close import dialog
+        setTimeout(() => {
+          this.showImportDialog = false;
+          this.isImporting = false;
+
+          // Navigate to editor with the new template ID (use last page)
+          const lastPage = projectData.pages[projectData.pages.length - 1];
+          const newTemplateId = lastPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+          uni.setStorageSync('selectedTemplateId', newTemplateId);
+
+          // Navigate to editor (same flow as design)
+          setTimeout(() => {
+            uni.switchTab({
+              url: '/pages/editor/editor'
+            });
+          }, 200);
+        }, 400);
+
+      } catch (error) {
+        console.error('Error processing HTML import:', error);
+        
+        // Handle error
+        this.isImporting = false;
+        uni.showToast({
+          title: 'Failed to process HTML import: ' + error.message,
+          icon: 'none',
+          duration: 3000
+        });
+      }
+    },
+    // Added from design page: chooseHtmlFile and readMultipleFiles for HTML imports
+    chooseHtmlFile() {
+      this.htmlFileContent = '';
+      this.htmlFileName = '';
+      this.htmlFiles = [];
+      const input = document.createElement('input');
+      input.type = 'file';
+      input.accept = '.html';
+      input.multiple = true;
+      input.onchange = (e) => {
+        const files = Array.from(e.target.files || []);
+        if (files.length) {
+          this.readMultipleFiles(files);
+        }
+        input.value = '';
+      };
+      input.click();
+    },
+    readMultipleFiles(files) {
+      const readOne = (file) => new Promise((resolve, reject) => {
+        const reader = new FileReader();
+        reader.onload = (event) => resolve({ name: file.name, content: event.target.result });
+        reader.onerror = () => reject(new Error(`Failed to read file: ${file.name}`));
+        reader.readAsText(file, 'UTF-8');
+      });
+      Promise.all(files.map(readOne))
+        .then(results => {
+          const valid = results.filter(r => r.content && String(r.content).trim());
+          this.htmlFiles = valid;
+          if (valid.length === 0) {
+            uni.showToast({ title: 'Selected files are empty', icon: 'none', duration: 2000 });
+          } else {
+            uni.showToast({ title: `Loaded ${valid.length} file(s)`, icon: 'success', duration: 1500 });
+          }
+        })
+        .catch(err => {
+          console.error('Error reading files:', err);
+          this.htmlFiles = [];
+          uni.showToast({ title: 'Failed to read selected files', icon: 'none' });
+        });
+    },
+    removeHtmlFile(index) {
+      if (!Array.isArray(this.htmlFiles)) return;
+      if (index < 0 || index >= this.htmlFiles.length) return;
+      this.htmlFiles.splice(index, 1);
     }
   }
 }
@@ -2295,7 +2475,7 @@ export default {
 }
 
 /* Override uni-data-select styles */
-:deep(.uni-data-select) {
+::deep(.uni-data-select) {
   width: 100%;
 }
 
@@ -2348,4 +2528,164 @@ export default {
 .guide-step2:hover {
   background-color: #1976d2;
 }
+
+/* Progress bar for import */
+.progress-bar {
+  width: 100%;
+  height: 8px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin: 10px 0 5px;
+}
+
+.progress-indicator {
+  height: 100%;
+  width: 0;
+  background-color: #e53935;
+  transition: width 0.2s ease;
+}
+
+/* File Upload Container and Placeholder Styles (copied from design page) */
+.file-upload-container {
+  margin: 20px 0;
+}
+
+.upload-placeholder {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 40px 20px;
+  border: 2px dashed #e0e0e0;
+  border-radius: 12px;
+  background-color: #fafafa;
+  transition: all 0.3s ease;
+  cursor: pointer;
+  min-height: 200px;
+  width: 100%;
+  box-sizing: border-box;
+  position: relative;
+  z-index: 1;
+}
+
+.upload-placeholder:hover {
+  border-color: #e53935;
+  background-color: #fff5f5;
+}
+
+.upload-icon {
+  position: relative;
+  margin-bottom: 20px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.folder-icon {
+  position: relative;
+  width: 60px;
+  height: 45px;
+  margin-right: 15px;
+}
+
+.folder-body {
+  position: absolute;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  height: 35px;
+  background: linear-gradient(135deg, #9e9e9e, #757575);
+  border-radius: 0 4px 4px 4px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+}
+
+.folder-tab {
+  position: absolute;
+  top: 0;
+  left: 8px;
+  width: 25px;
+  height: 12px;
+  background: linear-gradient(135deg, #bdbdbd, #9e9e9e);
+  border-radius: 4px 4px 0 0;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.upload-arrow {
+  font-size: 24px;
+  color: #e53935;
+  font-weight: bold;
+  animation: bounce 2s infinite;
+}
+
+@keyframes bounce {
+  0%, 20%, 50%, 80%, 100% { transform: translateY(0); }
+  40% { transform: translateY(-8px); }
+  60% { transform: translateY(-4px); }
+}
+
+.upload-text {
+  font-size: 16px;
+  font-weight: 500;
+  color: #333;
+  margin-bottom: 8px;
+  text-align: center;
+}
+
+.upload-hint {
+  font-size: 14px;
+  color: #666;
+  text-align: center;
+  line-height: 1.4;
+}
+
+.html-file-picker { width: 100%; }
+
+.html-file-info {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f0f8ff;
+  border: 1px solid #b3d9ff;
+  border-radius: 8px;
+}
+
+.file-info-text {
+  display: block;
+  font-size: 14px;
+  color: #0066cc;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.file-content-preview {
+  display: block;
+  font-size: 12px;
+  color: #666;
+  font-family: 'Courier New', monospace;
+  background-color: #f5f5f5;
+  padding: 8px;
+  border-radius: 4px;
+  white-space: pre-wrap;
+  word-break: break-all;
+  max-height: 100px;
+  overflow: hidden;
+}
+
+.file-list-item { margin-top: 2px; }
+.file-list-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.remove-file-btn {
+  background-color: #f5f5f5;
+  color: #e53935;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 12px;
+}
+.remove-file-btn:hover { background-color: #ffecec; }
 </style>
