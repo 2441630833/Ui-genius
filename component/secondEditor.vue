@@ -10,9 +10,10 @@
 export default {
     data() {
         return {
-            pageUrl: '../static/editor/editor.html', // 指向静态文件夹中的 HTML 文件
-            iframeLoaded: false, // 记录iframe是否已加载完成
-            checkInterval: null // 用于定期检查iframe状态
+            // Use absolute path instead of relative path
+            pageUrl: '/static/editor/editor.html',
+            iframeLoaded: false,
+            checkInterval: null
         };
     },
     mounted() {
@@ -403,6 +404,11 @@ export default {
                 });
                 throw err;
             });
+        },
+        getEditorUrl() {
+            // Get the current origin and construct the full URL
+            const baseUrl = window.location.origin;
+            return `${baseUrl}/static/editor/editor.html`;
         }
 
     }

@@ -72,6 +72,9 @@
     "h5" : {
         "devServer" : {
             "port" : 5173
+        },
+        "router": {
+            "mode": "history" 
         }
     }
 }

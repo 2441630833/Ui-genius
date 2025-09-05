@@ -43,11 +43,11 @@
           <text class="nav-text">Guide</text>
         </view>
         <!-- Newly added Share nav item -->
-        <view class="nav-item" :class="{ active: activeNavItem === 'share' }" @click="setActiveNavItem('share')">
+        <!-- <view class="nav-item" :class="{ active: activeNavItem === 'share' }" @click="setActiveNavItem('share')">
           <image class="sidebar-icon"
             :src="activeNavItem === 'share' ? '../../static/import_white.png' : '../../static/import.png'"></image>
           <text class="nav-text">Share</text>
-        </view>
+        </view> -->
       </view>
     </view>
 
