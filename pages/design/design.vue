@@ -1223,7 +1223,7 @@ export default {
     generateShareUrl(projectId) {
       let shareUrl = '';
       // #ifdef H5
-      const base = window.location.origin + window.location.pathname + '#/pages/design/design';
+      const base = window.location.origin + '/pages/design/design';
       shareUrl = `${base}?pid=${encodeURIComponent(projectId)}`;
       // #endif
       // #ifndef H5
