@@ -463,11 +463,12 @@
           <view class="try-example-container">
             <text class="description-label">Describe your page in plain English</text>
             <button class="try-example-btn" @click="tryPageExample">Try example</button>
+            <button class="try-example-btn" :disabled="!pageDescription || isOptimizingPrompt" @click="optimizePageDescription">{{ isOptimizingPrompt ? 'Optimizing...' : 'Improve with AI' }}</button>
           </view>
           <view class="description-container">
             <textarea class="project-description-input" placeholder="Enter your page description"
-              v-model="pageDescription" maxlength="700"></textarea>
-            <text class="char-count">{{ pageDescription.length }}/700</text>
+              v-model="pageDescription" maxlength="7000"></textarea>
+            <text class="char-count">{{ pageDescription.length }}/7000 </text>
           </view>
 
           <button class="continue-btn" @click="createPage">Continue</button>
@@ -885,7 +886,8 @@ export default {
           content: 'This is the ninth step of the guide - You can share the project to your colleague to work collaboratively together',
           position: 'left'
         },
-      ]
+      ],
+      isOptimizingPrompt: false
     }
   },
 
@@ -4851,7 +4853,45 @@ export default {
       if (!Array.isArray(this.htmlFiles)) return;
       if (index < 0 || index >= this.htmlFiles.length) return;
       this.htmlFiles.splice(index, 1);
-    }
+    },
+    optimizePageDescription() {
+      if (!this.pageDescription || this.isOptimizingPrompt) return;
+      this.isOptimizingPrompt = true;
+      // Optional: show a quick toast
+      uni.showToast({ title: 'Optimizing...', icon: 'none', duration: 1500 });
+      uni.request({
+        url: `${API_BASE_URL}/optimize-prompt`,
+        method: 'POST',
+        header: { 'content-type': 'application/json' },
+        data: {
+          description: this.pageDescription,
+          model: 'gimini2.5'
+        },
+        timeout: 120000,
+        success: (res) => {
+          console.log('Optimize prompt response:', res);  
+          try {
+            const data = res && res.data ? res.data : {};
+            // Try several common shapes
+            const optimized = data.optimized_description  || '';
+            if (typeof optimized === 'string' && optimized.trim().length > 0) {
+              this.pageDescription = optimized.trim();
+              uni.showToast({ title: 'Prompt improved', icon: 'success', duration: 1500 });
+            } else {
+              uni.showToast({ title: 'No optimized prompt returned', icon: 'none', duration: 2000 });
+            }
+          } catch (e) {
+            uni.showToast({ title: 'Optimize failed', icon: 'none', duration: 2000 });
+          }
+        },
+        fail: (err) => {
+          uni.showToast({ title: `Optimize error: ${err.errMsg || 'Request failed'}`, icon: 'none', duration: 2500 });
+        },
+        complete: () => {
+          this.isOptimizingPrompt = false;
+        }
+      });
+    },
   }
 }
 </script>
@@ -5883,17 +5923,36 @@ export default {
 }
 
 .try-example-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 12px;
   background-color: #e53935;
   color: #fff;
-  margin-right: 0px;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 16px;
-  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  width: auto;
+  max-width: 100%;
+  transition: background-color 0.2s, transform 0.1s;
+  margin-left: 8px;
 
   &:hover {
     background-color: #d32f2f;
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    background-color: #f1a9a7;
+    cursor: not-allowed;
+    transform: none;
   }
 }
 

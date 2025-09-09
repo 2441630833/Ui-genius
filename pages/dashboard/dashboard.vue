@@ -329,11 +329,12 @@
           <view class="try-example-container">
             <text class="description-label">Describe your project in plain English</text>
             <button class="try-example-btn" @click="tryExample">Try example</button>
+            <button class="try-example-btn" :disabled="!projectDescription || isOptimizingPrompt" @click="optimizeProjectDescription">{{ isOptimizingPrompt ? 'Optimizing...' : 'Improve with AI' }}</button>
           </view>
           <view class="description-container">
             <textarea class="project-description-input" placeholder="Enter your project description"
-              v-model="projectDescription" maxlength="700"></textarea>
-            <text class="char-count">{{ projectDescription.length }}/700</text>
+              v-model="projectDescription" maxlength="7000"></textarea>
+            <text class="char-count">{{ projectDescription.length }}/7000</text>
           </view>
           </div>
 
@@ -469,7 +470,8 @@ export default {
       importProgress: 0,
       htmlFiles: [],
       htmlFileContent: '',
-      htmlFileName: ''
+      htmlFileName: '',
+      isOptimizingPrompt: false,
     }
   },
   watch: {
@@ -630,6 +632,41 @@ export default {
     },
     tryExample() {
       this.projectDescription = this.exampleDescription;
+    },
+    optimizeProjectDescription() {
+      if (!this.projectDescription || this.isOptimizingPrompt) return;
+      this.isOptimizingPrompt = true;
+      uni.showToast({ title: 'Optimizing...', icon: 'none', duration: 1500 });
+      uni.request({
+        url: `${API_BASE_URL}/optimize-prompt`,
+        method: 'POST',
+        header: { 'content-type': 'application/json' },
+        data: {
+          description: this.projectDescription,
+          model: this.selectedModel || 'gimini2.5'
+        },
+        timeout: 120000,
+        success: (res) => {
+          try {
+            const data = res && res.data ? res.data : {};
+            const optimized = data.optimized_description  || '';
+            if (typeof optimized === 'string' && optimized.trim().length > 0) {
+              this.projectDescription = optimized.trim();
+              uni.showToast({ title: 'Prompt improved', icon: 'success', duration: 1500 });
+            } else {
+              uni.showToast({ title: 'No optimized prompt returned', icon: 'none', duration: 2000 });
+            }
+          } catch (e) {
+            uni.showToast({ title: 'Optimize failed', icon: 'none', duration: 2000 });
+          }
+        },
+        fail: (err) => {
+          uni.showToast({ title: `Optimize error: ${err.errMsg || 'Request failed'}`, icon: 'none', duration: 2500 });
+        },
+        complete: () => {
+          this.isOptimizingPrompt = false;
+        }
+      });
     },
     async createProject() {
       // temporary return and show toast the back end is constructing within 1 week, please wait
@@ -1919,17 +1956,36 @@ export default {
 }
 
 .try-example-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  height: 36px;
+  padding: 0 12px;
   background-color: #e53935;
   color: #fff;
-  margin-right: 0px;
   border: none;
-  border-radius: 10px;
+  border-radius: 8px;
   cursor: pointer;
-  font-size: 16px;
-  border-radius: 5px;
+  font-size: 14px;
+  font-weight: 500;
+  white-space: nowrap;
+  width: auto;
+  max-width: 100%;
+  transition: background-color 0.2s, transform 0.1s;
+  margin-left: 8px;
 
   &:hover {
     background-color: #d32f2f;
+  }
+
+  &:active {
+    transform: translateY(1px);
+  }
+
+  &:disabled {
+    background-color: #f1a9a7;
+    cursor: not-allowed;
+    transform: none;
   }
 }
 
