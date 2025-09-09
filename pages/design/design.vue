@@ -4869,7 +4869,7 @@ export default {
         },
         timeout: 120000,
         success: (res) => {
-          console.log('Optimize prompt response:', res);  
+          // console.log('Optimize prompt response:', res);  
           try {
             const data = res && res.data ? res.data : {};
             // Try several common shapes
