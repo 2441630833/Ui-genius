@@ -145,17 +145,17 @@
                         <a href="#" class="btn btn-primary">Contact Sales</a>
                     </div><div class="pricing-card" style="margin-right: 25px; width: 450px;">
                         <div class="label">PRO</div>
-                        <span class="price">$9<span>/ Month</span></span>
+                        <span class="price">$29<span>/ Month</span></span>
                         <ul>
-                            <li>100 UI generation&nbsp;request</li>
-                            <li>20 screenshot convertion</li><li>Pro AI model</li>
+                            <li>Unlimited UI generation&nbsp;request</li>
+                            <li>Unlimited screenshot convertion</li><li>Pro AI model</li>
                             <li>Unlimited storage</li>
                             <li>Priority support</li>
                         </ul>
                         <a href="#" class="btn btn-primary">Contact Sales</a>
                     </div><div class="pricing-card" style="width: 450px;">
-                        <div class="label">ENTERPRISE</div>
-                        <span class="price">$19<span>/ Month</span></span>
+                        <div class="label">Lifetime Deals</div>
+                        <span class="price">$79<span>/ Lifetime</span></span>
                         <ul>
                             <li>Unlimited&nbsp;UI generation&nbsp;request</li>
                             <li>Unlimited screenshot convertion</li><li>Unlimited prompt limatation&nbsp;</li><li>Pro AI model</li>
@@ -245,7 +245,7 @@
             <div class="footer-links">
                 <h4>Connect with us</h4>
                 <div class="social-icons">
-                    <a href="#" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
+                    <a href="https://x.com/Uigenius13952" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
                 </div>
             </div>
         </div>
