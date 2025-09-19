@@ -206,11 +206,15 @@
           <button class="save-btn" @click="changePassword">Change password</button>
         </view>
 
+        <view class="settings-section">
+          <text class="section-title">Change Account</text>
+          <text class="section-description">You can change your account below</text>
+          <button class="logout-btn" @click="changeAccount">Change Account</button>
+        </view>
         <!-- Logout Section -->
         <view class="settings-section">
           <text class="section-title">Logout</text>
           <text class="section-description">You can logout from your account below</text>
-
           <button class="logout-btn" @click="logout">Logout</button>
         </view>
       </view>
@@ -1296,6 +1300,22 @@ export default {
           });
         }, 1500);
       }, 1000);
+    },
+    changeAccount() {      
+      uni.removeStorageSync('googleUserInfo');
+      uni.removeStorageSync('uid');
+      uni.removeStorageSync('token');
+      uni.removeStorageSync('tokenExpiration');
+
+      uni.removeStorageSync('googleToken');
+      uni.removeStorageSync('googleTokenExpiration');
+      uni.removeStorageSync('googleUid');
+
+      uni.removeStorageSync('latest_7_overall_page');
+      uni.removeStorageSync('currentProjectId');
+      uni.navigateTo({
+        url: '/pages/login/login'
+      });
     },
     onNumPagesChange(e) {
       this.numPages = e.detail.value;

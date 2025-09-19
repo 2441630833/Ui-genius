@@ -2247,17 +2247,24 @@ export default {
       captureSequentially(0);
     },
 
-    generateUI() {
+    async generateUI() {
       // Prevent multiple simultaneous API calls
       if (this.isGenerating) {
         return;
       }
+
+      // Check membership before proceeding
+      const membershipCheck = await this.performMembershipCheck('generate-ui');
+      if (!membershipCheck.allowed) {
+        return; // Exit if not allowed
+      }
+
       // Show generation progress overlay
       this.isGenerating = true;
       this.generationProgress = 0;
 
-        // Set up progress interval - evenly distributed over 5 minutes (300 seconds)
-        const progressInterval = setInterval(() => {
+      // Set up progress interval - evenly distributed over 5 minutes (300 seconds)
+      const progressInterval = setInterval(() => {
         if (this.generationProgress < 98) {
           // Calculate increment to reach 98% in approximately 5 minutes
           // 98% over 300 seconds = ~0.33% per second
@@ -3439,7 +3446,7 @@ export default {
         }
       }
     },
-    createPage() {
+    async createPage() {
       // Close the dialog immediately to provide better UX
       this.showCreatePageDialog = false;
       
@@ -3448,6 +3455,13 @@ export default {
         this.errorMessage = 'Please enter a page description';
         this.showCreatePageDialog = true; // Re-open dialog if validation fails
         return;
+      }
+
+      // Check membership before proceeding
+      const membershipCheck = await this.performMembershipCheck('create-page');
+      if (!membershipCheck.allowed) {
+        this.showCreatePageDialog = true; // Re-open dialog if not allowed
+        return; // Exit if not allowed
       }
 
       // Clear error message when validation passes
@@ -4035,7 +4049,7 @@ export default {
       }
     },
     
-    importProject() {
+    async importProject() {
       if (this.selectedImportType === 'html') {
         if (!this.htmlFiles || this.htmlFiles.length === 0) {
           this.importError = 'Please select at least one HTML file to import';
@@ -4047,6 +4061,15 @@ export default {
           return;
         }
       }
+
+      // Only check membership for image imports, not HTML imports
+      if (this.selectedImportType === 'image') {
+        const membershipCheck = await this.performMembershipCheck('import-project');
+        if (!membershipCheck.allowed) {
+          return; // Exit if not allowed
+        }
+      }
+
       this.showImportDialog = false;
       // Show import progress overlay
       this.isImporting = true;
@@ -4892,6 +4915,129 @@ export default {
         }
       });
     },
+
+    // Membership check methods
+    async checkMembership() {
+      try {
+        const uid = uni.getStorageSync('uid');
+        if (!uid) {
+          throw new Error('User not logged in');
+        }
+
+        const result = await uniCloud.callFunction({
+          name: 'checkMembership',
+          data: {
+            action: 'checkMembership',
+            uid: uid
+          }
+        });
+
+        if (result.result && result.result.success) {
+          return result.result.data;
+        } else {
+          throw new Error(result.result?.message || 'Failed to check membership');
+        }
+      } catch (error) {
+        console.error('Error checking membership:', error);
+        throw error;
+      }
+    },
+
+    async checkFreeUsage(type) {
+      try {
+        const uid = uni.getStorageSync('uid');
+        if (!uid) {
+          throw new Error('User not logged in');
+        }
+
+        const result = await uniCloud.callFunction({
+          name: 'checkMembership',
+          data: {
+            action: 'checkFreeUsage',
+            uid: uid,
+            type: type // 0 for UI generation, 1 for screenshot conversion
+          }
+        });
+
+        if (result.result && result.result.success) {
+          return result.result.data;
+        } else {
+          throw new Error(result.result?.message || 'Failed to check free usage');
+        }
+      } catch (error) {
+        console.error('Error checking free usage:', error);
+        throw error;
+      }
+    },
+
+    async performMembershipCheck(actionType) {
+      try {
+        // First check membership
+        const membershipData = await this.checkMembership();
+        
+        if (membershipData.hasMembership) {
+          // User has membership, allow the action
+          return { allowed: true, reason: 'membership', membershipData };
+        }
+
+        // No membership, check free usage based on action type
+        let usageType;
+        switch (actionType) {
+          case 'generate-ui':
+          case 'create-page':
+            usageType = 0; // UI generation
+            break;
+          case 'import-project':
+            usageType = 1; // Screenshot conversion
+            break;
+          case 'export-code':
+          case 'optimize-prompt':
+            usageType = 0; // UI generation
+            break;
+          default:
+            throw new Error('Invalid action type');
+        }
+
+        const freeUsageData = await this.checkFreeUsage(usageType);
+        
+        if (!freeUsageData.allowed) {
+          // Show membership upgrade dialog or message
+          const usageTypeText = usageType === 0 ? 'UI generation' : 'screenshot conversion';
+          const message = `You have reached your free ${usageTypeText} limit. Please upgrade to continue.`;
+          
+          uni.showModal({
+            title: 'Upgrade Required',
+            content: message,
+            showCancel: true,
+            confirmText: 'Upgrade',
+            cancelText: 'Cancel',
+            success: (res) => {
+              if (res.confirm) {
+                // Navigate to membership page
+                uni.navigateTo({
+                  url: '/pages/login/login'
+                });
+              }
+            }
+          });
+          
+          return { allowed: false, reason: freeUsageData.reason, freeUsageData };
+        }
+
+        // Free usage allowed
+        return { allowed: true, reason: 'free_usage', freeUsageData };
+        
+      } catch (error) {
+        console.error('Error performing membership check:', error);
+        uni.showToast({
+          title: 'Error checking permissions: ' + error.message,
+          icon: 'none',
+          duration: 3000
+        });
+        return { allowed: false, reason: 'error', error: error.message };
+      }
+    },
+
   }
 }
 </script>

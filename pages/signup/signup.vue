@@ -181,7 +181,7 @@ export default {
                 // console.log(e);
 
                 setTimeout(() => {
-                    uni.switchTab({
+                    uni.navigateTo({
                         url: '/pages/login/login',
                         complete: (e) => {
                             // console.log(e);
@@ -195,7 +195,7 @@ export default {
                 })
         },
         navigateBack() {
-            uni.switchTab({
+            uni.navigateTo({
                 url: '/pages/login/login',
                 fail: () => {
                     uni.navigateTo({ url: '/pages/login/login' })
