@@ -2253,11 +2253,7 @@ export default {
         return;
       }
 
-      // Check membership before proceeding
-      const membershipCheck = await this.performMembershipCheck('generate-ui');
-      if (!membershipCheck.allowed) {
-        return; // Exit if not allowed
-      }
+   
 
       // Show generation progress overlay
       this.isGenerating = true;
@@ -2272,6 +2268,16 @@ export default {
           this.generationProgress += increment;
         }
       }, 1000);
+
+
+         // Check membership before proceeding
+      const membershipCheck = await this.performMembershipCheck('generate-ui');
+      if (!membershipCheck.allowed) {
+        this.isGenerating = false;
+        this.generationProgress = 0;
+        clearInterval(progressInterval);
+        return; // Exit if not allowed
+      }
 
       // Get existing project data
       const existingProjectData = uni.getStorageSync('latest_7_overall_page');
@@ -3458,11 +3464,11 @@ export default {
       }
 
       // Check membership before proceeding
-      const membershipCheck = await this.performMembershipCheck('create-page');
-      if (!membershipCheck.allowed) {
-        this.showCreatePageDialog = true; // Re-open dialog if not allowed
-        return; // Exit if not allowed
-      }
+      // const membershipCheck = await this.performMembershipCheck('create-page');
+      // if (!membershipCheck.allowed) {
+      //   this.showCreatePageDialog = true; // Re-open dialog if not allowed
+      //   return; // Exit if not allowed
+      // }
 
       // Clear error message when validation passes
       this.errorMessage = '';
@@ -3480,7 +3486,15 @@ export default {
           this.generationProgress += increment;
         }
       }, 1000);
-
+      // Check membership before proceeding
+      const membershipCheck = await this.performMembershipCheck('create-page');
+      if (!membershipCheck.allowed) {
+        this.isGenerating = false;
+        this.generationProgress = 0;
+        clearInterval(progressInterval);
+        this.showCreatePageDialog = false; // Re-open dialog if not allowed
+        return; // Exit if not allowed
+      }
       // Get existing project data
       const existingProjectData = uni.getStorageSync('latest_7_overall_page');
       let projectData;
@@ -4063,12 +4077,12 @@ export default {
       }
 
       // Only check membership for image imports, not HTML imports
-      if (this.selectedImportType === 'image') {
-        const membershipCheck = await this.performMembershipCheck('import-project');
-        if (!membershipCheck.allowed) {
-          return; // Exit if not allowed
-        }
-      }
+      // if (this.selectedImportType === 'image') {
+      //   const membershipCheck = await this.performMembershipCheck('import-project');
+      //   if (!membershipCheck.allowed) {
+      //     return; // Exit if not allowed
+      //   }
+      // }
 
       this.showImportDialog = false;
       // Show import progress overlay
@@ -4085,6 +4099,17 @@ export default {
         }
       }, 1000);
       
+      // Only check membership for image imports, not HTML imports
+      if (this.selectedImportType === 'image') {
+        const membershipCheck = await this.performMembershipCheck('import-project');
+        if (!membershipCheck.allowed) {
+          this.isImporting = false;
+          this.importProgress = 0;
+          clearInterval(progressInterval);
+          return; // Exit if not allowed
+        }
+      }
+
       // Check if import type is HTML - handle directly
       if (this.selectedImportType === 'html') {
         this.handleHtmlImport(progressInterval);
@@ -4877,8 +4902,15 @@ export default {
       if (index < 0 || index >= this.htmlFiles.length) return;
       this.htmlFiles.splice(index, 1);
     },
-    optimizePageDescription() {
+    async optimizePageDescription() {
       if (!this.pageDescription || this.isOptimizingPrompt) return;
+
+      // Check membership before proceeding
+      // const membershipCheck = await this.performMembershipCheck('optimize-prompt');
+      // if (!membershipCheck.allowed) {
+      //   return; // Exit if not allowed
+      // }
+
       this.isOptimizingPrompt = true;
       // Optional: show a quick toast
       uni.showToast({ title: 'Optimizing...', icon: 'none', duration: 1500 });
