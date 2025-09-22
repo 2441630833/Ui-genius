@@ -29,7 +29,13 @@
             :src="activeNavItem === 'account' ? '../../static/account_white.png' : '../../static/account.png'"></image>
           <text class="nav-text">Account</text>
         </view>
-
+        <!-- Membership nav item -->
+        <view class="nav-item" :class="{ active: activeNavItem === 'membership' }" @click="setActiveNavItem('membership')">
+          <image class="sidebar-icon"
+            :src="activeNavItem === 'membership' ? '../../static/membership_white.png' : '../../static/membership.png'"></image>
+          <text class="nav-text">Membership</text>
+        </view>
+        <!-- Settings nav item -->
         <view class="nav-item" :class="{ active: activeNavItem === 'settings' }" @click="setActiveNavItem('settings')">
           <image class="sidebar-icon"
             :src="activeNavItem === 'settings' ? '../../static/settings_white.png' : '../../static/settings.png'">
@@ -388,14 +394,21 @@
       @skip="onGuideSkip"
       @step-change="onGuideStepChange"
     />
+
+    <!-- Membership Component -->
+    <Membership v-if="activeNavItem === 'membership'" />
   </view>
 </template>
 
 <script>
 import { API_BASE_URL } from '../../env.js';
+import Membership from './membership.vue';
 
 export default {
   name: 'Dashboard',
+  components: {
+    Membership
+  },
   data() {
     return {
       activeNavItem: 'dashboard',
@@ -738,7 +751,7 @@ export default {
       if (!isConnected) return;
 
       // If we reach here, connection is good
-
+      // Clear all storage that stored before
       await uni.removeStorageSync('latest_7_overall_page');
       await uni.removeStorageSync('projectDescription');
       await uni.removeStorageSync('selectedDevice');
@@ -751,7 +764,7 @@ export default {
       await uni.removeStorageSync('uigenius_image_settings');
       await uni.removeStorageSync('uigenius_image_profile');
       await uni.removeStorageSync('uigenius_image_notification');
-
+      await uni.removeStorageSync('currentProjectId');
 
       await uni.setStorageSync('projectDescription', this.projectDescription);
       await uni.setStorageSync('selectedDevice', this.selectedDevice);

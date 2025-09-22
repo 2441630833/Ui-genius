@@ -675,6 +675,21 @@
       :primaryHoverColor="'#d32f2f'" :highlightColor="'#e53935'" :skip-enabled="true" @complete="onGuideComplete"
       @skip="onGuideSkip" @step-change="onGuideStepChange" />
 
+    <!-- Custom Upgrade Modal -->
+    <view v-if="showUpgradeModal" class="upgrade-modal-overlay" @click="closeUpgradeModal">
+      <view class="upgrade-modal-container" @click.stop>
+        <view class="upgrade-modal-header">
+          <text class="upgrade-modal-title">Upgrade Required</text>
+        </view>
+        <view class="upgrade-modal-content">
+          <text class="upgrade-modal-message">{{ upgradeModalMessage }}</text>
+        </view>
+        <view class="upgrade-modal-actions">
+          <button class="upgrade-modal-cancel" @click="closeUpgradeModal">Cancel</button>
+          <button class="upgrade-modal-confirm" @click="handleUpgradeConfirm">Upgrade</button>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -887,7 +902,9 @@ export default {
           position: 'left'
         },
       ],
-      isOptimizingPrompt: false
+      isOptimizingPrompt: false,
+      showUpgradeModal: false,
+      upgradeModalMessage: ''
     }
   },
 
@@ -2358,6 +2375,8 @@ export default {
               // Extract the page data
               if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
                 const newPage = parsedResponse.pages[0];
+                const projectTitle = parsedResponse.AIProjectName;
+                const projectDescription = parsedResponse.AIProjectDescription;
                 
                 // Rename the page if needed
                 if (!newPage.name.toLowerCase().includes('page')) {
@@ -2372,7 +2391,7 @@ export default {
                 uni.setStorageSync('latest_7_overall_page', updatedProjectData);
                 
                 // Save project to the cloud if logged in
-                this.saveProjectToCloud(projectData);
+                this.saveProjectToCloud(projectData, projectTitle, projectDescription);
                 
                 // Set flag to force regeneration of images
                 uni.setStorageSync('force_regeneration', 'true');
@@ -3039,15 +3058,19 @@ export default {
         duration: 2000
       });
     },
-    saveProjectToCloud(content) {
+    saveProjectToCloud(content, projectTitle, projectDescription) {
       // Check for existing project ID
       const currentProjectId = uni.getStorageSync('currentProjectId');
       const uid = uni.getStorageSync('uid');
+      const email = uni.getStorageSync('email');
 
       // Prepare project data
       const projectData = {
         uid: uid,
+        email: email,
         currentProjectId: currentProjectId,
+        projectTitle: projectTitle || '',
+        projectDescription: projectDescription || '',
         generated_overall_pages: content
       };
 
@@ -3068,6 +3091,7 @@ export default {
         data: callData
       }).then(res => {
         if (res.result && res.result.success) {
+          console.log('res.result', res.result);
           if (action === 'create' && res.result.project_id) {
             uni.setStorageSync('currentProjectId', res.result.project_id);
             console.log('Project created in cloud with ID:', res.result.project_id);
@@ -5037,21 +5061,8 @@ export default {
           const usageTypeText = usageType === 0 ? 'UI generation' : 'screenshot conversion';
           const message = `You have reached your free ${usageTypeText} limit. Please upgrade to continue.`;
           
-          uni.showModal({
-            title: 'Upgrade Required',
-            content: message,
-            showCancel: true,
-            confirmText: 'Upgrade',
-            cancelText: 'Cancel',
-            success: (res) => {
-              if (res.confirm) {
-                // Navigate to membership page
-                uni.navigateTo({
-                  url: '/pages/login/login'
-                });
-              }
-            }
-          });
+          // Use custom modal instead of uni.showModal
+          this.showCustomUpgradeModal(message);
           
           return { allowed: false, reason: freeUsageData.reason, freeUsageData };
         }
@@ -5070,6 +5081,23 @@ export default {
       }
     },
 
+    showCustomUpgradeModal(message) {
+      this.upgradeModalMessage = message;
+      this.showUpgradeModal = true;
+    },
+
+    closeUpgradeModal() {
+      this.showUpgradeModal = false;
+      this.upgradeModalMessage = '';
+    },
+
+    handleUpgradeConfirm() {
+      this.closeUpgradeModal();
+      // Navigate to membership page
+      uni.navigateTo({
+        url: '/pages/login/login'
+      });
+    }
   }
 }
 </script>
@@ -6779,5 +6807,84 @@ export default {
   font-size: 12px;
 }
 .remove-file-btn:hover { background-color: #ffecec; }
+
+/* Custom Upgrade Modal Styles */
+.upgrade-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.5);
+  z-index: 1001;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.upgrade-modal-container {
+  background-color: #ffffff;
+  border-radius: 12px;
+  padding: 20px;
+  box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+  width: 90%;
+  max-width: 570px;
+  text-align: center;
+}
+
+.upgrade-modal-header {
+  display: flex;
+  justify-content: center;
+  margin-bottom: 16px;
+  padding-bottom: 8px;
+  border-bottom: 1px solid #f0f0f0;
+}
+
+.upgrade-modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+}
+
+.upgrade-modal-content {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.upgrade-modal-message {
+  font-size: 16px;
+  color: #666;
+}
+
+.upgrade-modal-actions {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 16px;
+}
+
+.upgrade-modal-cancel, .upgrade-modal-confirm {
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+}
+
+.upgrade-modal-cancel {
+  background-color: #f5f5f5;
+  color: #333;
+}
+
+.upgrade-modal-confirm {
+  background-color: #e53935;
+  color: #fff;
+}
+
+.upgrade-modal-cancel:hover, .upgrade-modal-confirm:hover {
+  opacity: 0.9;
+}
 
 </style>
