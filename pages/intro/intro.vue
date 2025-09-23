@@ -9,12 +9,12 @@
                 </a>
                 <nav class="nav-menu">
                     <ul>
-                        <li><a href="#home">HOME</a></li>
-                        <li><a href="#features">FEATURES</a></li>
-                        <li><a href="#why-choose">WHY UIGENIUS</a></li>
-                        <li><a href="#testimonial">TESTIMONIAL</a></li>
-                        <li><a href="#pricing">PRICING</a></li>
-                        <li><a href="#contact">CONTACT</a></li>
+                        <li><a @click.prevent="scrollToSection('home')">HOME</a></li>
+                        <li><a @click.prevent="scrollToSection('features')">FEATURES</a></li>
+                        <li><a @click.prevent="scrollToSection('why-choose')">WHY UIGENIUS</a></li>
+                        <li><a @click.prevent="scrollToSection('testimonial')">TESTIMONIAL</a></li>
+                        <li><a @click.prevent="scrollToSection('pricing')">PRICING</a></li>
+                        <li><a @click.prevent="scrollToSection('contact')">CONTACT</a></li>
                     </ul>
                     <div class="try-free" @click="goToLogin">
                         <span>Try</span>
@@ -275,6 +275,15 @@ export default {
   methods: {
     scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
+    },
+    scrollToSection(sectionId) {
+      const element = document.getElementById(sectionId);
+      if (element) {
+        element.scrollIntoView({ 
+          behavior: 'smooth',
+          block: 'start'
+        });
+      }
     },
     goToLogin() {
       // If login is a tabBar page, switchTab is required; otherwise navigateTo works.
