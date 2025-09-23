@@ -2270,12 +2270,10 @@ export default {
         return;
       }
 
-   
 
       // Show generation progress overlay
       this.isGenerating = true;
-      this.generationProgress = 0;
-
+      this.generationProgress = 0;     
       // Set up progress interval - evenly distributed over 5 minutes (300 seconds)
       const progressInterval = setInterval(() => {
         if (this.generationProgress < 98) {
@@ -2286,16 +2284,26 @@ export default {
         }
       }, 1000);
 
-
-         // Check membership before proceeding
-      const membershipCheck = await this.performMembershipCheck('generate-ui');
-      if (!membershipCheck.allowed) {
-        this.isGenerating = false;
-        this.generationProgress = 0;
-        clearInterval(progressInterval);
-        return; // Exit if not allowed
+      // Check special user limitation first
+      const skipLoginUid = uni.getStorageSync('uid');
+      if (skipLoginUid === '123bcbfeqqaeabfaf5a') {
+        const specialUserCheck = await this.checkSpecialUserLimitation('generate-ui');
+        if (!specialUserCheck.allowed) {
+          this.isGenerating = false;
+          this.generationProgress = 0;
+          clearInterval(progressInterval);
+          return; // Exit if not allowed
+        }
       }
-
+      else {
+        const membershipCheck = await this.performMembershipCheck('generate-ui');
+        if (!membershipCheck.allowed) {
+          this.isGenerating = false;
+          this.generationProgress = 0;
+          clearInterval(progressInterval);
+          return; // Exit if not allowed
+        }
+      }
       // Get existing project data
       const existingProjectData = uni.getStorageSync('latest_7_overall_page');
       let projectData;
@@ -3487,13 +3495,6 @@ export default {
         return;
       }
 
-      // Check membership before proceeding
-      // const membershipCheck = await this.performMembershipCheck('create-page');
-      // if (!membershipCheck.allowed) {
-      //   this.showCreatePageDialog = true; // Re-open dialog if not allowed
-      //   return; // Exit if not allowed
-      // }
-
       // Clear error message when validation passes
       this.errorMessage = '';
 
@@ -3510,14 +3511,30 @@ export default {
           this.generationProgress += increment;
         }
       }, 1000);
-      // Check membership before proceeding
-      const membershipCheck = await this.performMembershipCheck('create-page');
-      if (!membershipCheck.allowed) {
-        this.isGenerating = false;
-        this.generationProgress = 0;
-        clearInterval(progressInterval);
-        this.showCreatePageDialog = false; // Re-open dialog if not allowed
-        return; // Exit if not allowed
+      // Get the current user ID
+      const skipLoginUid = uni.getStorageSync('uid');
+      // Check if this is the special user
+      if (skipLoginUid === '123bcbfeqqaeabfaf5a') {
+        // Check special user limitation first
+        const specialUserCheck = await this.checkSpecialUserLimitation('create-page');
+        if (!specialUserCheck.allowed) {
+          this.isGenerating = false;
+          this.generationProgress = 0;
+          clearInterval(progressInterval);
+          this.showCreatePageDialog = false; // Re-open dialog if not allowed
+          return; // Exit if not allowed
+        }
+      }
+      else{
+        // Check membership before proceeding
+        const membershipCheck = await this.performMembershipCheck('create-page');
+        if (!membershipCheck.allowed) {
+          this.isGenerating = false;
+          this.generationProgress = 0;
+          clearInterval(progressInterval);
+          this.showCreatePageDialog = false; // Re-open dialog if not allowed
+          return; // Exit if not allowed
+        }
       }
       // Get existing project data
       const existingProjectData = uni.getStorageSync('latest_7_overall_page');
@@ -4125,12 +4142,25 @@ export default {
       
       // Only check membership for image imports, not HTML imports
       if (this.selectedImportType === 'image') {
-        const membershipCheck = await this.performMembershipCheck('import-project');
-        if (!membershipCheck.allowed) {
-          this.isImporting = false;
-          this.importProgress = 0;
-          clearInterval(progressInterval);
-          return; // Exit if not allowed
+        // Check special user limitation first
+        const skipLoginUid = uni.getStorageSync('uid');
+        if (skipLoginUid === '123bcbfeqqaeabfaf5a') {
+          const specialUserCheck = await this.checkSpecialUserLimitation('import-project');
+          if (!specialUserCheck.allowed) {
+            this.isImporting = false;
+            this.importProgress = 0;
+            clearInterval(progressInterval);
+            return; // Exit if not allowed
+          }
+        }
+        else {
+          const membershipCheck = await this.performMembershipCheck('import-project');
+          if (!membershipCheck.allowed) {
+            this.isImporting = false;
+            this.importProgress = 0;
+            clearInterval(progressInterval);
+            return; // Exit if not allowed
+          }
         }
       }
 
@@ -5100,7 +5130,43 @@ export default {
       uni.switchTab({
         url: '/pages/dashboard/dashboard'
       });
-    }
+    },
+    async checkSpecialUserLimitation(actionType) {
+      try {
+        // Get the current usage count for this special user
+        const usageKey = 'special_user_usage';
+        let currentUsage = uni.getStorageSync(usageKey) || 0;
+        
+        // Check if user has reached the limit (3 times total)
+        if (currentUsage >= 3) {
+          uni.showToast({
+            title: 'You have reached your limit of 3 operations, please login to get 10 more operations',
+            icon: 'none',
+            duration: 4000
+          });          
+          return { allowed: false, reason: 'limit_reached', currentUsage: currentUsage };
+        }
+        
+        // Check if the action type is one of the limited actions
+        const limitedActions = ['generate-ui', 'create-page', 'import-project'];
+        if (limitedActions.includes(actionType)) {
+          // Increment the usage count
+          currentUsage += 1;
+          uni.setStorageSync(usageKey, currentUsage);
+          // Show remaining usage
+          const remaining = 3 - currentUsage;
+          return { allowed: true, reason: 'special_user', currentUsage: currentUsage, remaining: remaining };
+        }
+        
+        // For non-limited actions, allow the action
+        return { allowed: true, reason: 'normal_action' };
+        
+      } catch (error) {
+        console.error('Error checking special user limitation:', error);
+        // If there's an error, allow the action to proceed
+        return { allowed: true, reason: 'error_fallback' };
+      }
+    },
   }
 }
 </script>

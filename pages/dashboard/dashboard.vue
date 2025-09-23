@@ -413,7 +413,7 @@ export default {
     return {
       activeNavItem: 'dashboard',
       showCreateProjectDialog: false,
-      selectedDevice: '',
+      selectedDevice: 'desktop',
       projectDescription: '',
       numPages: 1,
       exampleDescription: 'Sign up page for a dating app',
