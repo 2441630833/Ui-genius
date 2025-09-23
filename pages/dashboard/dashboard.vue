@@ -496,8 +496,18 @@ export default {
       this.updatePasswordStrength();
     }
   },
-  onLoad() {
+  onLoad(options) {
     this.checkAndStartGuide();
+  },
+  onShow() {
+    // Pick up desired nav from storage when returning to tab
+    try {
+      const nav = uni.getStorageSync('dashboardNavItem');
+      if (nav) {
+        this.setActiveNavItem(nav);
+        uni.removeStorageSync('dashboardNavItem');
+      }
+    } catch (e) {}
   },
   mounted() {
     // Staggered loading for projects

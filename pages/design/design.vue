@@ -5094,8 +5094,11 @@ export default {
     handleUpgradeConfirm() {
       this.closeUpgradeModal();
       // Navigate to membership page
-      uni.navigateTo({
-        url: '/pages/login/login'
+      try {
+        uni.setStorageSync('dashboardNavItem', 'membership');
+      } catch (e) {}
+      uni.switchTab({
+        url: '/pages/dashboard/dashboard'
       });
     }
   }
