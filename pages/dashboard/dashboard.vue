@@ -507,7 +507,14 @@ export default {
         this.setActiveNavItem(nav);
         uni.removeStorageSync('dashboardNavItem');
       }
+      
+      const ifLoadProjectsByUidWhenUserBackToDashboard = uni.getStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard');
+      if (ifLoadProjectsByUidWhenUserBackToDashboard) {
+        this.loadProjectsByUid();
+        uni.removeStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard');
+      }
     } catch (e) {}
+
   },
   mounted() {
     // Staggered loading for projects
@@ -726,7 +733,7 @@ export default {
         try {
           // Race between fetch and timeout for faster response
           const timeoutPromise = new Promise((_, reject) =>
-            setTimeout(() => reject(new Error('Timeout')), 1000)
+            setTimeout(() => reject(new Error('Timeout')), 5000)
           );
 
           const fetchPromise = fetch(`https://aiback.uigenius.top`, {
@@ -780,6 +787,8 @@ export default {
       await uni.setStorageSync('selectedDevice', this.selectedDevice);
       await uni.setStorageSync('selectedModel', this.selectedModel);
       await uni.setStorageSync('numPages', this.numPages);
+      // if loadProjectsByUid
+      await uni.setStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard', 'true');
       // Set flag to indicate we should generate UI when design page loads
       await uni.setStorageSync('shouldGenerateUI', 'true');
       this.closeCreateProjectDialog();
