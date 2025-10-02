@@ -1018,11 +1018,6 @@ export default {
     } 
   },
   onShow() {
-    // 保存当前标签页状态到本地存储
-    if (typeof uni !== 'undefined') {
-      uni.setStorageSync('lastTabPage', 'pages/design/design')
-    }
-    
     // Load images from local storage first
     this.loadImagesFromStorage();
 

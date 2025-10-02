@@ -500,11 +500,6 @@ export default {
     this.checkAndStartGuide();
   },
   onShow() {
-    // 保存当前标签页状态到本地存储
-    if (typeof uni !== 'undefined') {
-      uni.setStorageSync('lastTabPage', 'pages/dashboard/dashboard')
-    }
-    
     // Pick up desired nav from storage when returning to tab
     try {
       const nav = uni.getStorageSync('dashboardNavItem');

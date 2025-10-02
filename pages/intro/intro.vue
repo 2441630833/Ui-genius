@@ -272,12 +272,7 @@ export default {
       submitting: false
     }
   },
-  onShow() {
-    // 保存当前标签页状态到本地存储
-    if (typeof uni !== 'undefined') {
-      uni.setStorageSync('lastTabPage', 'pages/intro/intro')
-    }
-  },
+
   methods: {
     scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
