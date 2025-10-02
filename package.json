@@ -1,9 +1,9 @@
 {
     "id": "uni-hello-i18n",
-    "name": "Hello i18n",
-    "displayName": "hello-i18n 示例工程",
+    "name": "ui-genius",
+    "displayName": "UI Genius",
     "version": "1.0.2",
-    "description": "uni-app 国际化演示",
+    "description": "UI Genius",
     "keywords": [
         "i18n",
         "hello-i18n",
@@ -80,9 +80,60 @@
         "@grapesjs/studio-sdk": "^1.0.45",
         "@grapesjs/studio-sdk-plugins": "^1.0.21",
         "file-saver": "^2.0.5",
-        "jszip": "^3.10.1"
+        "jszip": "^3.10.1",
+        "electron-icon-builder": "^2.0.1"
     },
     "devDependencies": {
-        "html2canvas": "^1.4.1"
+        "html2canvas": "^1.4.1",
+        "electron": "^38.1.2",
+        "electron-builder": "^26.0.12"
+    },
+    "main": "electron/main.js",
+    "scripts": {
+        "electron": "electron .",
+        "dist:win": "electron-builder -w",
+        "dist:dir": "electron-builder --dir",
+        "dist:appx": "electron-builder --win --x64 --config.win.target=appx --publish never",
+        "build:icon": "electron-icon-builder --input=static/logo.png --output=build --flatten",
+        "build:h5": "node -e \"console.log('请使用 HBuilderX 构建 H5 到 dist/build/h5，或配置 uni-app CLI');\""
+    },
+    "build": {
+        "appId": "com.uigenius.app",
+        "productName": "UI Genius",
+        "directories": {
+            "buildResources": "build",
+            "output": "dist_electron"
+        },
+        "files": [
+            "electron/**/*",
+            "unpackage/dist/build/web/**/*",
+            "package.json"
+        ],
+        "extraResources": [
+            {
+                "from": "static",
+                "to": "static"
+            }
+        ],
+        "asar": true,
+        "extraMetadata": {
+            "main": "electron/main.js"
+        },
+        "win": {
+            "icon": "build/icon.ico",
+            "target": [
+                {
+                    "target": "nsis",
+                    "arch": [
+                        "x64"
+                    ]
+                }
+            ]
+        },
+        "nsis": {
+            "oneClick": false,
+            "perMachine": false,
+            "allowToChangeInstallationDirectory": true
+        }
     }
 }

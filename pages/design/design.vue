@@ -1018,6 +1018,11 @@ export default {
     } 
   },
   onShow() {
+    // 保存当前标签页状态到本地存储
+    if (typeof uni !== 'undefined') {
+      uni.setStorageSync('lastTabPage', 'pages/design/design')
+    }
+    
     // Load images from local storage first
     this.loadImagesFromStorage();
 
@@ -1242,7 +1247,9 @@ export default {
     generateShareUrl(projectId) {
       let shareUrl = '';
       // #ifdef H5
-      const base = window.location.origin + '/pages/design/design';
+      // 检测是否在Electron环境中运行
+      const isElectron = window.location.protocol === 'http:' && window.location.hostname === '127.0.0.1';
+      const base = isElectron ? 'https://uigenius.top/pages/design/design' : window.location.origin + '/pages/design/design';
       shareUrl = `${base}?pid=${encodeURIComponent(projectId)}`;
       // #endif
       // #ifndef H5
@@ -2059,6 +2066,8 @@ export default {
       this.pullRefreshProject();
       this.loadJsonTemplates();
       this.updateLoadingStates();
+      // Generate preview images to restore the template images
+      this.generatePreviewImages();
     },
 
     refreshDataLocal() {

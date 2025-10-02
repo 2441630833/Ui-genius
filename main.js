@@ -3,7 +3,7 @@ import messages from './locale/index'
 
 let i18nConfig = {
   // locale: uni.getLocale(),
-  locale: uni.getSystemInfoSync().language,
+  locale: 'en', // 设置默认语言为英语
   messages
 }
 
@@ -11,12 +11,12 @@ let i18nConfig = {
 import Vue from 'vue'
 import VueI18n from 'vue-i18n'
 Vue.use(VueI18n)
-const i18n = new VueI18n(i18nConfig)
+const i18nVue2 = new VueI18n(i18nConfig)
 // console.log(i18nConfig)
 Vue.config.productionTip = false
 App.mpType = 'app'
 const app = new Vue({
-  i18n,
+  i18n: i18nVue2,
   ...App
 })
 app.$mount()
@@ -25,10 +25,10 @@ app.$mount()
 // #ifdef VUE3
 import { createSSRApp } from 'vue'
 import { createI18n } from 'vue-i18n'
-const i18n = createI18n(i18nConfig)
+const i18nVue3 = createI18n(i18nConfig)
 export function createApp() {
   const app = createSSRApp(App)
-  app.use(i18n)
+  app.use(i18nVue3)
   return {
     app
   }
