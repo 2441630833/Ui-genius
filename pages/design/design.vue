@@ -2391,10 +2391,8 @@ export default {
                 const projectTitle = parsedResponse.AIProjectName;
                 const projectDescription = parsedResponse.AIProjectDescription;
                 
-                // Rename the page if needed
-                if (!newPage.name.toLowerCase().includes('page')) {
-                  newPage.name = newPage.name + ' Page';
-                }
+                // Use AIProjectName directly as page name
+                newPage.name = parsedResponse.AIProjectName;
                 
                 // Add the new page to the project
                 projectData.pages.push(newPage);
@@ -3622,10 +3620,8 @@ export default {
               if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
                 const newPage = parsedResponse.pages[0];
                 
-                // Rename the page if needed
-                if (!newPage.name.toLowerCase().includes('page')) {
-                  newPage.name = newPage.name + ' Page';
-                }
+                // Use AIProjectName directly as page name
+                newPage.name = parsedResponse.AIProjectName;
                 
                 // Add the new page to the project
                 projectData.pages.push(newPage);
@@ -4662,8 +4658,6 @@ export default {
           throw new Error('No HTML files to import');
         }
         console.log('Importing HTML files count:', filesToImport.length);
-        
-        const timestamp = new Date().toLocaleString();
         
         // Get existing project data
         const existingProjectData = uni.getStorageSync('latest_7_overall_page');
