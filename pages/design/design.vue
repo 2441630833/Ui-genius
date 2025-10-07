@@ -2061,8 +2061,7 @@ export default {
       this.pullRefreshProject();
       this.loadJsonTemplates();
       this.updateLoadingStates();
-      // Generate preview images to restore the template images
-      this.generatePreviewImages();
+      // Note: generatePreviewImages() is handled by pullRefreshProject()
     },
 
     refreshDataLocal() {
@@ -2089,8 +2088,10 @@ export default {
         this.templateLoadingStates.settings = true;
       }
 
-      // Generate preview images first
-      this.generatePreviewImages();
+      // Generate preview images first with proper timing
+      setTimeout(() => {
+        this.generatePreviewImages();
+      }, 500);
 
       // Start revealing templates with staggered timing
       const keys = Object.keys(this.templateLoadingStates);
@@ -4927,6 +4928,8 @@ export default {
           // Generate new preview images
           setTimeout(() => {
             this.generatePreviewImages();
+            // Load the newly generated images after a delay
+            this.loadImagesFromStorage();
           }, 100);
           
           // Start revealing templates with staggered timing
