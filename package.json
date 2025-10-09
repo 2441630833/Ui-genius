@@ -1,18 +1,25 @@
 {
-    "id": "uni-hello-i18n",
+    "id": "ui-genius",
     "name": "ui-genius",
-    "displayName": "UI Genius",
-    "version": "1.0.2",
-    "description": "UI Genius",
+    "displayName": "Uigenius",
+    "version": "1.0.3",
+    "description": "AI-powered UX/UI design tool for rapid prototyping and design generation",
     "keywords": [
-        "i18n",
-        "hello-i18n",
-        "多语言"
+        "ui-design",
+        "ux-design",
+        "ai-powered",
+        "design-tool",
+        "prototyping",
+        "code-generation",
+        "vue",
+        "react",
+        "design-automation"
     ],
     "dcloudext": {
         "category": [
-            "前端页面模板",
-            "uni-app前端项目模板"
+            "AI设计工具",
+            "UI/UX设计平台",
+            "代码生成工具"
         ],
         "sale": {
             "regular": {
@@ -99,9 +106,9 @@
     },
     "build": {
         "appId": "com.uigenius.app",
-        "productName": "UI Genius",
+        "productName": "Uigenius",
         "directories": {
-            "buildResources": "build",
+            "buildResources": "./build/icons",
             "output": "dist_electron"
         },
         "files": [
@@ -127,6 +134,12 @@
                     "arch": [
                         "x64"
                     ]
+                },
+                {
+                    "target": "appx",
+                    "arch": [
+                      "x64"
+                    ]
                 }
             ]
         },
@@ -134,6 +147,15 @@
             "oneClick": false,
             "perMachine": false,
             "allowToChangeInstallationDirectory": true
+        },
+        "appx": {
+            "identityName": "AD11B95F.Uigenius",
+            "publisher": "CN=69601FC2-D90D-4AFF-889C-6B7EE5281E09",
+            "publisherDisplayName": "朱龙泽",
+            "applicationId": "com.uigenius.app",
+            "languages": [
+              "en-US"
+            ]
         }
     }
 }

@@ -8,7 +8,7 @@ const url = require('url');
 let server;
 
 // Set a fixed user data path to persist localStorage
-const userDataPath = path.join(app.getPath('appData'), 'UI Genius');
+const userDataPath = path.join(app.getPath('appData'), 'Uigenius');
 app.setPath('userData', userDataPath);
 console.log('User data path set to:', userDataPath);
 console.log('App data directory:', app.getPath('appData'));

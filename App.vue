@@ -7,6 +7,14 @@ import { saveCurrentTab, restoreLastTab, isTabPage } from './common/tabStorage.j
       console.log('App Launch')
       initPermission()
       
+      // 强制设置默认语言为英语
+      try {
+        uni.setLocale('en')
+        console.log('Default locale set to English')
+      } catch (error) {
+        console.error('Failed to set default locale:', error)
+      }
+      
       // 恢复上次访问的标签页
       restoreLastTab()
     },
