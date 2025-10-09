@@ -1,11 +1,79 @@
-const { app, BrowserWindow, shell } = require('electron');
+const { app, BrowserWindow, shell, Menu } = require('electron');
 const { session } = require('electron');
 const path = require('path');
 const fs = require('fs');
 const http = require('http');
 const url = require('url');
-
 let server;
+
+// Create application menu
+function createMenu() {
+  const template = [
+    {
+      label: 'File',
+      submenu: [
+        { role: 'quit' }
+      ]
+    },
+    {
+      label: 'Edit',
+      submenu: [
+        { role: 'undo' },
+        { role: 'redo' },
+        { type: 'separator' },
+        { role: 'cut' },
+        { role: 'copy' },
+        { role: 'paste' }
+      ]
+    },
+    {
+      label: 'View',
+      submenu: [
+        { role: 'reload' },
+        { role: 'forceReload' },
+        { role: 'toggleDevTools' },
+        { type: 'separator' },
+        { role: 'resetZoom' },
+        { role: 'zoomIn' },
+        { role: 'zoomOut' },
+        { type: 'separator' },
+        { role: 'togglefullscreen' }
+      ]
+    },
+    {
+      label: 'Help',
+      submenu: [
+        {
+          label: 'About Uigenius',
+          click: async () => {
+            const { dialog } = require('electron');
+            await dialog.showMessageBox({
+              type: 'info',
+              title: 'About Uigenius',
+              message: 'Uigenius v1.0.3',
+              detail: 'AI-powered UX/UI design tool for rapid prototyping and design generation'
+            });
+          }
+        },
+        {
+          label: 'Keyboard Shortcuts',
+          click: async () => {
+            const { dialog } = require('electron');
+            await dialog.showMessageBox({
+              type: 'info',
+              title: 'Keyboard Shortcuts',
+              message: 'Keyboard Shortcuts',
+              detail: 'Ctrl+R: Reload\nCtrl+Shift+I: Developer Tools\nF11: Toggle Fullscreen'
+            });
+          }
+        }
+      ]
+    }
+  ];
+
+  const menu = Menu.buildFromTemplate(template);
+  Menu.setApplicationMenu(menu);
+}
 
 // Set a fixed user data path to persist localStorage
 const userDataPath = path.join(app.getPath('appData'), 'Uigenius');
@@ -129,10 +197,12 @@ function createMainWindow(startUrl) {
 }
 
 app.whenReady().then(() => {
+  createMenu(); // Add this line
+  
   const webAppPath = resolveWebAppPath();
   if (!webAppPath) {
     const errorWindow = new BrowserWindow({ width: 800, height: 200, autoHideMenuBar: true });
-    const html = '<!doctype html><html><body><h2>未找到 H5 构建产物</h2><p>请先构建 H5 到 <code>dist/build/h5</code> 或 <code>unpackage/dist/build/h5</code> 后再运行 Electron。</p></body></html>';
+    const html = '<!doctype html><html><body><h2>H5 Build Output Not Found</h2><p>Please build H5 to <code>dist/build/h5</code> or <code>unpackage/dist/build/h5</code> before running Electron.</p></body></html>';
     errorWindow.loadURL('data:text/html;charset=utf-8,' + encodeURIComponent(html));
     return;
   }
