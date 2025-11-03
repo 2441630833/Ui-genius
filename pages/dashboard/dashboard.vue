@@ -65,8 +65,9 @@
           <text class="title">Dashboard</text>
           <view class="user-actions">
             <!-- <button class="refresh-btn" @click="refreshProjects">Refresh Projects</button> -->
-            <image class="bell-icon" src="../../static/bell.png"></image>
-            <image class="avatar" :src="userInfo.picture || userInfo.avatar || '../../static/avatar1.png'"></image>
+            <image v-if="activeNavItem === 'dashboard'" class="refresh-icon" src="../../static/refresh.png" @click="refreshProjects"></image>
+            <!-- <image class="bell-icon" src="../../static/bell.png"></image> -->
+            <image class="avatar" :src="userInfo.picture || userInfo.avatar || '../../static/avatar1.png'" @click="setActiveNavItem('account')"></image>
           </view>
         </view>
 
@@ -1728,6 +1729,20 @@ export default {
   height: 24px;
   object-fit: contain;
   color: #767676;
+}
+
+.refresh-icon {
+  width: 18px;
+  height: 18px;
+  object-fit: contain;
+  color: #767676;
+  cursor: pointer;
+  margin-right: 15px;
+  transition: transform 0.3s ease;
+}
+
+.refresh-icon:hover {
+  transform: rotate(180deg);
 }
 
 .bell-icon {
