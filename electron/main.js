@@ -15,31 +15,31 @@ function createMenu() {
         { role: 'quit' }
       ]
     },
-    {
-      label: 'Edit',
-      submenu: [
-        { role: 'undo' },
-        { role: 'redo' },
-        { type: 'separator' },
-        { role: 'cut' },
-        { role: 'copy' },
-        { role: 'paste' }
-      ]
-    },
-    {
-      label: 'View',
-      submenu: [
-        { role: 'reload' },
-        { role: 'forceReload' },
-        { role: 'toggleDevTools' },
-        { type: 'separator' },
-        { role: 'resetZoom' },
-        { role: 'zoomIn' },
-        { role: 'zoomOut' },
-        { type: 'separator' },
-        { role: 'togglefullscreen' }
-      ]
-    },
+    // {
+    //   label: 'Edit',
+    //   submenu: [
+    //     { role: 'undo' },
+    //     { role: 'redo' },
+    //     { type: 'separator' },
+    //     { role: 'cut' },
+    //     { role: 'copy' },
+    //     { role: 'paste' }
+    //   ]
+    // },
+    // {
+    //   label: 'View',
+    //   submenu: [
+    //     { role: 'reload' },
+    //     { role: 'forceReload' },
+    //     { role: 'toggleDevTools' },
+    //     { type: 'separator' },
+    //     { role: 'resetZoom' },
+    //     { role: 'zoomIn' },
+    //     { role: 'zoomOut' },
+    //     { type: 'separator' },
+    //     { role: 'togglefullscreen' }
+    //   ]
+    // },
     {
       label: 'Help',
       submenu: [
@@ -50,20 +50,8 @@ function createMenu() {
             await dialog.showMessageBox({
               type: 'info',
               title: 'About Uigenius',
-              message: 'Uigenius v1.0.3',
+              message: 'Uigenius v1.0.6',
               detail: 'AI-powered UX/UI design tool for rapid prototyping and design generation'
-            });
-          }
-        },
-        {
-          label: 'Keyboard Shortcuts',
-          click: async () => {
-            const { dialog } = require('electron');
-            await dialog.showMessageBox({
-              type: 'info',
-              title: 'Keyboard Shortcuts',
-              message: 'Keyboard Shortcuts',
-              detail: 'Ctrl+R: Reload\nCtrl+Shift+I: Developer Tools\nF11: Toggle Fullscreen'
             });
           }
         }
