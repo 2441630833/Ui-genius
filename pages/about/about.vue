@@ -233,10 +233,7 @@ export default {
     },
     goToHome() {
       uni.switchTab({
-        url: '/pages/intro/intro',
-        fail: () => {
-          uni.navigateTo({ url: '/pages/intro/intro' })
-        }
+        url: '/pages/intro/intro'
       });
     },
     goToAbout() {
@@ -247,10 +244,7 @@ export default {
     },
     goToContact() {
       uni.switchTab({
-        url: '/pages/intro/intro',
-        fail: () => {
-          uni.navigateTo({ url: '/pages/intro/intro' })
-        }
+        url: '/pages/intro/intro'
       });
     },
     goToLogin() {
