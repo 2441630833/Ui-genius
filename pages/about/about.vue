@@ -167,8 +167,8 @@
         <div class="footer-links">
           <h4>Product</h4>
           <ul>
-            <li><a @click.prevent="goToHome">Features</a></li>
-            <li><a @click.prevent="goToHome">Pricing</a></li>
+            <li><a @click.prevent="goToFeatures">Features</a></li>
+            <li><a @click.prevent="goToPricing">Pricing</a></li>
           </ul>
         </div>
         <div class="footer-links">
@@ -242,9 +242,33 @@ export default {
     goToCareers() {
       uni.navigateTo({ url: '/pages/careers/careers' });
     },
-    goToContact() {
+    goToFeatures() {
       uni.switchTab({
-        url: '/pages/intro/intro'
+        url: '/pages/intro/intro',
+        success: () => {
+          uni.setStorageSync('scrollToSection', 'features');
+        }
+      });
+    },
+    goToPricing() {
+      uni.switchTab({
+        url: '/pages/intro/intro',
+        success: () => {
+          uni.setStorageSync('scrollToSection', 'pricing');
+        }
+      });
+    },
+    goToContact() {
+      // Navigate to intro page and scroll to contact section
+      // First, navigate to the page
+      uni.switchTab({
+        url: '/pages/intro/intro',
+        success: () => {
+          // Use event bus or global method to scroll to contact section
+          // Since we can't pass parameters with switchTab, we'll use a different approach
+          // Store the target section in storage
+          uni.setStorageSync('scrollToSection', 'contact');
+        }
       });
     },
     goToLogin() {

@@ -284,6 +284,19 @@ export default {
     }
   },
 
+  onShow() {
+    // Check if we need to scroll to a specific section
+    const scrollToSection = uni.getStorageSync('scrollToSection');
+    if (scrollToSection) {
+      // Clear the storage
+      uni.removeStorageSync('scrollToSection');
+      // Wait a bit for the page to fully render
+      setTimeout(() => {
+        this.scrollToSection(scrollToSection);
+      }, 300);
+    }
+  },
+
   methods: {
     scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
