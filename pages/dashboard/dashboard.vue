@@ -48,6 +48,12 @@
             :src="activeNavItem === 'guide' ? '../../static/guide_white.png' : '../../static/guide.png'"></image>
           <text class="nav-text">Guide</text>
         </view>
+        <!-- Delete Projects nav item -->
+        <view class="nav-item" :class="{ active: activeNavItem === 'delete' }" @click="setActiveNavItem('delete')">
+          <image class="sidebar-icon"
+            :src="activeNavItem === 'delete' ? '../../static/delete_white.png' : '../../static/delete.png'"></image>
+          <text class="nav-text">Delete Projects</text>
+        </view>
         <!-- Newly added Share nav item -->
         <!-- <view class="nav-item" :class="{ active: activeNavItem === 'share' }" @click="setActiveNavItem('share')">
           <image class="sidebar-icon"
@@ -234,6 +240,61 @@
         <text>Settings page content will be implemented here.</text>
       </view>
 
+      <!-- Delete Projects Content -->
+      <view v-if="activeNavItem === 'delete'" class="settings-content">
+        <view class="header">
+          <text class="title">Delete Projects</text>
+          <view class="header-actions" v-if="userProjects && userProjects.length > 0">
+            <button class="select-all-btn" @click="toggleSelectAll">
+              {{ selectedProjects.length === userProjects.length ? 'Deselect All' : 'Select All' }}
+            </button>
+            <button 
+              class="delete-selected-btn" 
+              :disabled="selectedProjects.length === 0"
+              @click="confirmDeleteSelectedProjects"
+            >
+              Delete Selected ({{ selectedProjects.length }})
+            </button>
+          </view>
+        </view>
+        <view class="settings-section">
+          <text class="section-title">Manage Your Projects</text>
+          <text class="section-description">Select projects below to delete them permanently. This action cannot be undone.</text>
+
+          <!-- Loading state -->
+          <view v-if="deleteProjectsLoading" class="loading-container">
+            <text class="loading-text">Loading projects...</text>
+          </view>
+
+          <!-- No projects state -->
+          <view v-else-if="!userProjects || userProjects.length === 0" class="no-projects-container">
+            <text class="no-projects-text">No projects found</text>
+          </view>
+
+          <!-- Projects list -->
+          <view v-else class="delete-projects-list">
+            <view 
+              v-for="(project, index) in userProjects" 
+              :key="project._id" 
+              class="delete-project-item"
+              :class="{ 'selected': isProjectSelected(project._id) }"
+              @click="toggleProjectSelection(project._id)"
+            >
+              <view class="project-checkbox">
+                <view class="checkbox" :class="{ 'checked': isProjectSelected(project._id) }">
+                  <text v-if="isProjectSelected(project._id)" class="checkbox-icon">✓</text>
+                </view>
+              </view>
+              <view class="project-info">
+                <text class="project-name">{{ project.projectTitle }}</text>
+                <text class="project-desc">{{ project.projectDescription }}</text>
+              </view>
+              <button class="delete-project-btn" @click.stop="confirmDeleteProject(project)">Delete</button>
+            </view>
+          </view>
+        </view>
+      </view>
+
       <!-- Share Content (Import HTML in main area) -->
       <view v-if="activeNavItem === 'share'" class="settings-content">
         <view class="header">
@@ -278,6 +339,46 @@
               <view class="progress-indicator" :style="{ width: importProgress + '%' }"></view>
             </view>
             <text class="strength-text">{{ importProgress }}%</text>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Delete Confirmation Dialog -->
+    <view class="dialog-overlay" v-if="showDeleteDialog" @click="closeDeleteDialog">
+      <view class="dialog-container delete-dialog" @click.stop>
+        <view class="dialog-content">
+          <text class="dialog-title">Confirm Delete</text>
+          <text class="delete-warning" v-if="!isMultipleDelete">
+            Are you sure you want to delete this project? This action cannot be undone.
+          </text>
+          <text class="delete-warning" v-else>
+            Are you sure you want to delete {{ projectsToDelete.length }} project(s)? This action cannot be undone.
+          </text>
+          
+          <!-- Single project delete -->
+          <view class="project-to-delete" v-if="projectToDelete && !isMultipleDelete">
+            <text class="project-name-highlight">{{ projectToDelete.projectTitle }}</text>
+            <text class="project-desc-highlight">{{ projectToDelete.projectDescription }}</text>
+          </view>
+          
+          <!-- Multiple projects delete -->
+          <view class="projects-to-delete-list" v-if="isMultipleDelete">
+            <view 
+              v-for="project in projectsToDelete" 
+              :key="project._id" 
+              class="project-to-delete-item"
+            >
+              <text class="project-name-highlight">{{ project.projectTitle }}</text>
+              <text class="project-desc-highlight">{{ project.projectDescription }}</text>
+            </view>
+          </view>
+          
+          <view class="delete-dialog-actions">
+            <button class="cancel-btn" @click="closeDeleteDialog">Cancel</button>
+            <button class="confirm-delete-btn" @click="deleteProjects" :disabled="isDeletingProject">
+              {{ isDeletingProject ? 'Deleting...' : 'Delete' }}
+            </button>
           </view>
         </view>
       </view>
@@ -491,6 +592,14 @@ export default {
       htmlFileContent: '',
       htmlFileName: '',
       isOptimizingPrompt: false,
+      // Delete projects state
+      deleteProjectsLoading: false,
+      showDeleteDialog: false,
+      projectToDelete: null,
+      isDeletingProject: false,
+      selectedProjects: [], // Array of selected project IDs
+      isMultipleDelete: false, // Flag for multiple delete
+      projectsToDelete: [], // Array of projects to delete
     }
   },
   watch: {
@@ -1699,6 +1808,187 @@ export default {
       if (!Array.isArray(this.htmlFiles)) return;
       if (index < 0 || index >= this.htmlFiles.length) return;
       this.htmlFiles.splice(index, 1);
+    },
+    
+    // Delete project methods
+    confirmDeleteProject(project) {
+      this.projectToDelete = project;
+      this.projectsToDelete = [project];
+      this.isMultipleDelete = false;
+      this.showDeleteDialog = true;
+    },
+    
+    confirmDeleteSelectedProjects() {
+      if (this.selectedProjects.length === 0) return;
+      
+      this.projectsToDelete = this.userProjects.filter(p => 
+        this.selectedProjects.includes(p._id)
+      );
+      this.isMultipleDelete = true;
+      this.showDeleteDialog = true;
+    },
+    
+    closeDeleteDialog() {
+      this.showDeleteDialog = false;
+      this.projectToDelete = null;
+      this.projectsToDelete = [];
+      this.isMultipleDelete = false;
+      this.isDeletingProject = false;
+    },
+    
+    async deleteProjects() {
+      if ((this.projectsToDelete.length === 0) || this.isDeletingProject) return;
+      
+      this.isDeletingProject = true;
+      const projectIds = this.projectsToDelete.map(p => p._id);
+      const totalProjects = projectIds.length;
+      const currentProjectId = uni.getStorageSync('currentProjectId');
+      
+      uni.showLoading({
+        title: `Deleting ${totalProjects} project(s)...`
+      });
+      
+      try {
+        // Single project delete - use original delete action
+        if (totalProjects === 1) {
+          const res = await uniCloud.callFunction({
+            name: 'user-project',
+            data: {
+              action: 'delete',
+              id: projectIds[0]
+            }
+          });
+          
+          uni.hideLoading();
+          
+          if (res.result && res.result.success) {
+            // Remove from local array
+            const index = this.userProjects.findIndex(p => p._id === projectIds[0]);
+            if (index !== -1) {
+              this.userProjects.splice(index, 1);
+            }
+            
+            // If the deleted project is the current project, clear it
+            if (currentProjectId === projectIds[0]) {
+              uni.removeStorageSync('currentProjectId');
+              uni.removeStorageSync('latest_7_overall_page');
+            }
+            
+            // Clear selection
+            this.selectedProjects = [];
+            
+            // Close dialog
+            this.closeDeleteDialog();
+            
+            this.showCustomToast('Project deleted successfully', 'success');
+          } else {
+            uni.showToast({
+              title: res.result.message || 'Failed to delete project',
+              icon: 'none',
+              duration: 2000
+            });
+          }
+        } 
+        // Multiple projects delete - use batch delete action
+        else {
+          const res = await uniCloud.callFunction({
+            name: 'user-project',
+            data: {
+              action: 'batchDelete',
+              projectIds: projectIds
+            }
+          });
+          
+          uni.hideLoading();
+          
+          if (res.result && res.result.data) {
+            const { successCount, failCount, deleteResults } = res.result.data;
+            
+            // Remove successfully deleted projects from local array
+            if (deleteResults && deleteResults.length > 0) {
+              deleteResults.forEach(result => {
+                if (result.success) {
+                  const index = this.userProjects.findIndex(p => p._id === result.projectId);
+                  if (index !== -1) {
+                    this.userProjects.splice(index, 1);
+                  }
+                  
+                  // If the deleted project is the current project, clear it
+                  if (currentProjectId === result.projectId) {
+                    uni.removeStorageSync('currentProjectId');
+                    uni.removeStorageSync('latest_7_overall_page');
+                  }
+                }
+              });
+            }
+            
+            // Clear selection
+            this.selectedProjects = [];
+            
+            // Close dialog
+            this.closeDeleteDialog();
+            
+            // Show result message
+            if (failCount === 0) {
+              this.showCustomToast(`Successfully deleted ${successCount} project(s)`, 'success');
+            } else if (successCount === 0) {
+              uni.showToast({
+                title: `Failed to delete all ${failCount} project(s)`,
+                icon: 'none',
+                duration: 2500
+              });
+            } else {
+              uni.showToast({
+                title: `Deleted ${successCount} project(s), ${failCount} failed`,
+                icon: 'none',
+                duration: 2500
+              });
+            }
+          } else {
+            uni.showToast({
+              title: 'Failed to delete projects',
+              icon: 'none',
+              duration: 2000
+            });
+          }
+        }
+      } catch (error) {
+        uni.hideLoading();
+        console.error('Error deleting projects:', error);
+        uni.showToast({
+          title: 'Error deleting projects',
+          icon: 'none',
+          duration: 2000
+        });
+      } finally {
+        this.isDeletingProject = false;
+      }
+    },
+    
+    // Multi-select methods
+    toggleProjectSelection(projectId) {
+      const index = this.selectedProjects.indexOf(projectId);
+      if (index > -1) {
+        // Remove from selection
+        this.selectedProjects.splice(index, 1);
+      } else {
+        // Add to selection
+        this.selectedProjects.push(projectId);
+      }
+    },
+    
+    isProjectSelected(projectId) {
+      return this.selectedProjects.includes(projectId);
+    },
+    
+    toggleSelectAll() {
+      if (this.selectedProjects.length === this.userProjects.length) {
+        // Deselect all
+        this.selectedProjects = [];
+      } else {
+        // Select all
+        this.selectedProjects = this.userProjects.map(p => p._id);
+      }
     }
   }
 }
@@ -1859,6 +2149,12 @@ export default {
         background-color: #c62828;
       }
     }
+  }
+  
+  .header-actions {
+    display: flex;
+    gap: 10px;
+    align-items: center;
   }
 }
 
@@ -2821,4 +3117,266 @@ export default {
   font-size: 12px;
 }
 .remove-file-btn:hover { background-color: #ffecec; }
+
+/* Delete Projects styles */
+.select-all-btn {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #eaeaea;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  
+  &:hover {
+    background-color: #e8e8e8;
+  }
+}
+
+.delete-selected-btn {
+  background-color: #f44336;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 8px 16px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: #d32f2f;
+  }
+  
+  &:disabled {
+    background-color: #ffcdd2;
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+}
+
+.loading-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 40px 0;
+}
+
+.loading-text {
+  font-size: 16px;
+  color: #666;
+}
+
+.no-projects-container {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 60px 20px;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+}
+
+.no-projects-text {
+  font-size: 16px;
+  color: #999;
+}
+
+.delete-projects-list {
+  display: flex;
+  flex-direction: column;
+  gap: 15px;
+}
+
+.delete-project-item {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px;
+  background-color: #f8f8f8;
+  border-radius: 8px;
+  border: 1px solid #eaeaea;
+  transition: all 0.2s ease;
+  cursor: pointer;
+  
+  &:hover {
+    background-color: #fff;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+  }
+  
+  &.selected {
+    background-color: #fff5f5;
+    border-color: #e53935;
+    box-shadow: 0 2px 8px rgba(229, 57, 53, 0.15);
+  }
+}
+
+.project-checkbox {
+  margin-right: 15px;
+  display: flex;
+  align-items: center;
+}
+
+.checkbox {
+  width: 20px;
+  height: 20px;
+  border: 2px solid #ccc;
+  border-radius: 4px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.2s ease;
+  background-color: white;
+  
+  &.checked {
+    background-color: #e53935;
+    border-color: #e53935;
+  }
+}
+
+.checkbox-icon {
+  color: white;
+  font-size: 14px;
+  font-weight: bold;
+  line-height: 1;
+}
+
+.project-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  margin-right: 20px;
+}
+
+.project-name {
+  font-size: 16px;
+  font-weight: 600;
+  color: #333;
+  display: block;
+}
+
+.project-desc {
+  font-size: 14px;
+  color: #666;
+  display: block;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.delete-project-btn {
+  background-color: #f44336;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 10px 20px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  white-space: nowrap;
+  
+  &:hover {
+    background-color: #d32f2f;
+  }
+}
+
+/* Delete Dialog styles */
+.delete-dialog {
+  max-width: 500px;
+}
+
+.delete-warning {
+  display: block;
+  font-size: 16px;
+  color: #666;
+  margin-bottom: 20px;
+  line-height: 1.5;
+}
+
+.project-to-delete {
+  background-color: #fff5f5;
+  border: 1px solid #ffcdd2;
+  border-radius: 8px;
+  padding: 15px;
+  margin-bottom: 25px;
+}
+
+.projects-to-delete-list {
+  max-height: 300px;
+  overflow-y: auto;
+  margin-bottom: 25px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+}
+
+.project-to-delete-item {
+  background-color: #fff5f5;
+  border: 1px solid #ffcdd2;
+  border-radius: 8px;
+  padding: 12px 15px;
+}
+
+.project-name-highlight {
+  display: block;
+  font-size: 16px;
+  font-weight: 600;
+  color: #e53935;
+  margin-bottom: 5px;
+}
+
+.project-desc-highlight {
+  display: block;
+  font-size: 14px;
+  color: #666;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.delete-dialog-actions {
+  display: flex;
+  gap: 15px;
+  justify-content: flex-end;
+}
+
+.cancel-btn {
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #eaeaea;
+  border-radius: 6px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: #e8e8e8;
+  }
+}
+
+.confirm-delete-btn {
+  background-color: #f44336;
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  
+  &:hover {
+    background-color: #d32f2f;
+  }
+  
+  &:disabled {
+    background-color: #ffcdd2;
+    cursor: not-allowed;
+  }
+}
 </style>
