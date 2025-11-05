@@ -1241,15 +1241,12 @@ export default {
     
     generateShareUrl(projectId) {
       let shareUrl = '';
-      // #ifdef H5
-      // 检测是否在Electron环境中运行
-      const isElectron = window.location.protocol === 'http:' && window.location.hostname === '127.0.0.1';
-      const base = isElectron ? 'https://uigenius.top/pages/design/design' : window.location.origin + '/pages/design/design';
+      // force the base url to be https://uigenius.top/pages/design/design
+      
+      const base = 'https://uigenius.top/pages/design/design'
+      // const isElectron = window.location.protocol === 'http:' && window.location.hostname === '127.0.0.1';
+      // const base = isElectron ? 'https://uigenius.top/pages/design/design' : window.location.origin + '/pages/design/design';
       shareUrl = `${base}?pid=${encodeURIComponent(projectId)}`;
-      // #endif
-      // #ifndef H5
-      shareUrl = `/pages/design/design?pid=${encodeURIComponent(projectId)}`;
-      // #endif
       
       uni.setClipboardData({
         data: shareUrl,
@@ -4834,6 +4831,57 @@ export default {
     },
     tryImportByProjectId(projectId) {
       if (!projectId) return;
+      
+      // Check if this shared project has already been imported
+      let importedProjectsMap = {};
+      try {
+        const mapStr = uni.getStorageSync('importedShareProjectsMap');
+        if (mapStr) {
+          importedProjectsMap = JSON.parse(mapStr);
+        }
+      } catch (e) {
+        console.error('Failed to parse importedShareProjectsMap:', e);
+      }
+      
+      // If already imported, load the existing project instead of creating a new one
+      if (importedProjectsMap[projectId]) {
+        const existingProjectId = importedProjectsMap[projectId];
+        console.log('Project already imported. Loading existing project:', existingProjectId);
+        
+        uni.showLoading({ title: 'Loading imported project...' });
+        uniCloud.callFunction({
+          name: 'generated-overall-pages',
+          data: {
+            action: 'read',
+            id: existingProjectId
+          }
+        }).then(res => {
+          uni.hideLoading();
+          if (res.result && res.result.success && res.result.data) {
+            const projectData = res.result.data;
+            uni.setStorageSync('latest_7_overall_page', JSON.stringify(projectData));
+            uni.setStorageSync('currentProjectId', existingProjectId);
+            uni.setStorageSync('force_regeneration', 'true');
+            
+            this.loadJsonTemplates();
+            this.updateLoadingStates();
+            setTimeout(() => {
+              this.generatePreviewImages();
+            }, 100);
+            
+            uni.showToast({ title: 'Loaded previously imported project', icon: 'success', duration: 2000 });
+          } else {
+            uni.showToast({ title: 'Failed to load existing project', icon: 'none', duration: 2000 });
+          }
+        }).catch(err => {
+          uni.hideLoading();
+          uni.showToast({ title: 'Error loading existing project', icon: 'none', duration: 2000 });
+          console.error('Cloud function error:', err);
+        });
+        return;
+      }
+      
+      // If not imported before, proceed with import
       uni.showLoading({ title: 'Loading project...' });
       uniCloud.callFunction({
         name: 'generated-overall-pages',
@@ -4849,29 +4897,53 @@ export default {
           uni.setStorageSync('latest_7_overall_page', JSON.stringify(importedData));
           uni.setStorageSync('force_regeneration', 'true');
 
-          // If this is the first time importing (no local project yet),
-          // create a new project in the user's cloud with the imported content
-          const existingProjectId = uni.getStorageSync('currentProjectId');
-          if (!existingProjectId) {
-            this.saveProjectToCloud(importedData)
+          // Always create a new project for the current user when importing from a share link
+          // Clear the existing project ID to force creation of a new project
+          const originalProjectId = uni.getStorageSync('currentProjectId');
+          uni.removeStorageSync('currentProjectId');
+          
+          // Prepare project title and description for imported project
+          const importedProjectTitle = 'Shared project from other users';
+          const importDate = new Date().toLocaleString('en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric', 
+            hour: '2-digit', 
+            minute: '2-digit' 
+          });
+          const importedProjectDescription = `Imported shared project on ${importDate}`;
+          
+          // Create a new project in the current user's account with the imported content
+            this.saveProjectToCloud(importedData, importedProjectTitle, importedProjectDescription)
               .then((newId) => {
-                // saveProjectToCloud sets currentProjectId on create; no further action needed
-                console.log('Imported project saved to cloud with ID:', newId || uni.getStorageSync('currentProjectId'));
+              // saveProjectToCloud sets currentProjectId on create
+              const createdProjectId = newId || uni.getStorageSync('currentProjectId');
+              console.log('Imported project saved to cloud with ID:', createdProjectId);
+              
+              // Record the mapping from shared project ID to new project ID
+              importedProjectsMap[projectId] = createdProjectId;
+              uni.setStorageSync('importedShareProjectsMap', JSON.stringify(importedProjectsMap));
+              
+              // Set flag to refresh dashboard when user navigates to it
+              uni.setStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard', 'true');
+              
+              uni.showToast({ title: 'Project imported successfully', icon: 'success', duration: 2000 });
               })
               .catch((err) => {
                 console.error('Failed to save imported project to cloud:', err);
-              });
-          } else {
-            // Maintain existing behavior when a project already exists locally
-            uni.setStorageSync('currentProjectId', projectId);
-          }
+              // Restore original project ID on failure
+              if (originalProjectId) {
+                uni.setStorageSync('currentProjectId', originalProjectId);
+              }
+              uni.showToast({ title: 'Failed to save imported project', icon: 'none', duration: 2000 });
+            });
 
           this.loadJsonTemplates();
           this.updateLoadingStates();
           setTimeout(() => {
             this.generatePreviewImages();
+            this.refreshTemplates();
           }, 100);
-          uni.showToast({ title: 'Project loaded', icon: 'success', duration: 2000 });
         } else {
           uni.showToast({ title: 'Failed to load project', icon: 'none', duration: 2000 });
         }
