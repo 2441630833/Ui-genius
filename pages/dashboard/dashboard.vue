@@ -75,7 +75,7 @@
           <!-- User Projects -->
           <template v-if="Array.isArray(userProjects) && userProjects.length > 0">
             <x-skeleton v-for="(project, index) in userProjects" :key="'user-project-' + index" type="banner"
-              :loading="false">
+              :loading="userProjectsLoading">
               <view class="project-card" @click="jumpToDesign(project)">
                 <image class="project-image"
                   src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(3).png"
@@ -430,6 +430,7 @@ export default {
       customToastMessage: '',
       customToastType: 'success',
       userProjects: [],
+      userProjectsLoading: false,
       userInfo: uni.getStorageSync('googleUserInfo'),
       accountSettings: {
         firstName: '',
@@ -568,6 +569,7 @@ export default {
       this.projectLoadingStates.alpha = true;
       this.projectLoadingStates.beta = true;
       this.projectLoadingStates.gamma = true;
+      this.userProjectsLoading = true;
 
       // Reload user projects from cloud
       this.loadProjectsByUid();
@@ -836,6 +838,7 @@ export default {
     loadProjectsByUid() {
       // Check if user is logged in
       if (!this.checkUserLogin()) {
+        this.userProjectsLoading = false;
         return;
       }
 
@@ -843,6 +846,7 @@ export default {
 
       if (!userId) {
         console.log('No user ID found');
+        this.userProjectsLoading = false;
         // uni.showToast({
         //   title: 'User ID not found',
         //   icon: 'none',
@@ -853,12 +857,16 @@ export default {
 
       console.log('Loading projects for user ID:', userId);
 
+      // Set loading state
+      this.userProjectsLoading = true;
+
       uni.showLoading({
         title: 'Loading your projects...'
       });
       // test mode no login,just return 
       if (userId == '123bcbfeqqaeabfaf5a') {
         uni.hideLoading();
+        this.userProjectsLoading = false;
         return
       }
 
@@ -871,6 +879,7 @@ export default {
         }
       }).then(res => {
         uni.hideLoading();
+        this.userProjectsLoading = false;
         if (res.result && res.result.success) {
           console.log(res.result)
           // Ensure userProjects is always an array
@@ -888,6 +897,7 @@ export default {
         }
       }).catch(err => {
         uni.hideLoading();
+        this.userProjectsLoading = false;
         uni.showToast({
           title: 'Error loading projects',
           icon: 'none'
