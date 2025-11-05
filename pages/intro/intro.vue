@@ -237,8 +237,8 @@
             <div class="footer-links">
                 <h4>Company</h4>
                 <ul>
-                    <li><a href="#">About Us</a></li>
-                    <li><a href="#">Careers</a></li>
+                    <li><a @click.prevent="goToAboutUs">About Us</a></li>
+                    <li><a @click.prevent="goToCareers">Careers</a></li>
                     <li><a @click.prevent="scrollToSection('contact')">Contact</a></li>
                 </ul>
             </div>
@@ -309,6 +309,12 @@ export default {
     },
     contactSupport() {
       window.location.href = 'mailto:support@uigenius.top';
+    },
+    goToAboutUs() {
+      uni.navigateTo({ url: '/pages/about/about' });
+    },
+    goToCareers() {
+      uni.navigateTo({ url: '/pages/careers/careers' });
     },
     async submitForm() {
       if (this.submitting) return;
@@ -908,6 +914,198 @@ ul {
     color: var(--light-text);
     max-width: 600px;
     margin: 0 auto 30px;
+}
+
+/* About Us Section */
+.about-us {
+    padding: 100px 0;
+    background-color: var(--background-white);
+}
+
+.about-content {
+    display: grid;
+    grid-template-columns: 1.5fr 1fr;
+    gap: 60px;
+    align-items: start;
+}
+
+.about-text h3 {
+    font-size: 24px;
+    font-weight: 600;
+    color: var(--dark-text);
+    margin-top: 30px;
+    margin-bottom: 15px;
+}
+
+.about-text h3:first-child {
+    margin-top: 0;
+}
+
+.about-text p {
+    font-size: 16px;
+    line-height: 1.8;
+    color: var(--light-text);
+    margin-bottom: 20px;
+}
+
+.about-stats {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: 30px;
+    background-color: var(--light-gray-bg);
+    padding: 40px;
+    border-radius: 10px;
+}
+
+.stat-item {
+    text-align: center;
+}
+
+.stat-number {
+    font-size: 42px;
+    font-weight: 700;
+    color: var(--primary-red);
+    margin-bottom: 10px;
+}
+
+.stat-label {
+    font-size: 14px;
+    color: var(--light-text);
+    font-weight: 500;
+}
+
+/* Careers Section */
+.careers {
+    padding: 100px 0;
+    background-color: var(--light-gray-bg);
+}
+
+.careers-content {
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+.career-intro {
+    text-align: center;
+    max-width: 800px;
+    margin: 0 auto 60px;
+}
+
+.career-intro p {
+    font-size: 18px;
+    line-height: 1.8;
+    color: var(--light-text);
+}
+
+.career-positions {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 30px;
+    margin-bottom: 80px;
+}
+
+.position-card {
+    background-color: var(--background-white);
+    padding: 35px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.position-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 8px 25px rgba(0, 0, 0, 0.1);
+}
+
+.position-card h3 {
+    font-size: 22px;
+    font-weight: 600;
+    color: var(--dark-text);
+    margin-bottom: 15px;
+}
+
+.position-meta {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    margin-bottom: 20px;
+}
+
+.position-location,
+.position-type {
+    font-size: 14px;
+    color: var(--light-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.position-location i,
+.position-type i {
+    color: var(--primary-red);
+    font-size: 14px;
+}
+
+.position-card p {
+    font-size: 15px;
+    line-height: 1.6;
+    color: var(--light-text);
+    margin-bottom: 25px;
+}
+
+.position-card .btn {
+    width: 100%;
+    text-align: center;
+}
+
+.career-benefits {
+    background-color: var(--background-white);
+    padding: 50px;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.career-benefits h3 {
+    font-size: 28px;
+    font-weight: 600;
+    color: var(--dark-text);
+    text-align: center;
+    margin-bottom: 40px;
+}
+
+.benefits-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+    gap: 40px;
+}
+
+.benefit-item {
+    text-align: center;
+}
+
+.benefit-item i {
+    font-size: 40px;
+    color: var(--primary-red);
+    margin-bottom: 20px;
+    background-color: rgba(239, 68, 68, 0.1);
+    border-radius: 50%;
+    width: 80px;
+    height: 80px;
+    display: inline-flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.benefit-item h4 {
+    font-size: 18px;
+    font-weight: 600;
+    color: var(--dark-text);
+    margin-bottom: 10px;
+}
+
+.benefit-item p {
+    font-size: 14px;
+    color: var(--light-text);
 }
 
 /* Contact Section */

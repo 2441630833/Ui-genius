@@ -47,6 +47,20 @@
             "style": {
                 "navigationBarTitleText": "%index.signup%"
             }
+        },
+        {
+            "path": "pages/about/about",
+            "style": {
+                "navigationBarTitleText": "%index.about%",
+                "enablePullDownRefresh": false
+            }
+        },
+        {
+            "path": "pages/careers/careers",
+            "style": {
+                "navigationBarTitleText": "%index.careers%",
+                "enablePullDownRefresh": false
+            }
         }
     ],
     "easycom": {
