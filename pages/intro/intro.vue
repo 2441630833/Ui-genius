@@ -119,11 +119,11 @@
         <section id="testimonial" class="testimonial">
             <div class="container">
                 <div class="testimonial-card">
-                    <p>"Uigenius has revolutionized our design workflow! The text-to-design feature saves us countless hours of work. We can now generate beautiful interface prototypes in minutes instead of days. The AI understands our requirements perfectly and the output quality is consistently impressive."</p>
+                    <p>"Uigenius has helped us create beautiful and functional designs for our AI projects. It's a great tool for quickly prototyping and iterating on designs. Save us time and effort."</p>
                     <div class="testimonial-author">
-                        <img src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/testAvatar.png" alt="Fajar Profile Picture">
-                        <span class="name">FAJAR</span>
-                        <span class="title">CEO, Euphorica</span>
+                        <img src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/avatar.png" alt="Fajar Profile Picture">
+                        <span class="name">Belal Alsinglawi</span>
+                        <span class="title">CEO, Innovalab.ai</span>
                     </div>
                 </div>
             </div>
@@ -142,7 +142,7 @@
                             <li>3 screenshot convertion</li>
                             <li>Free AI model</li>
                         </ul>
-                        <a href="#" class="btn btn-primary">Contact Sales</a>
+                        <a href="#" class="btn btn-primary" @click.prevent="contactSupport">Contact Sales</a>
                     </div><div class="pricing-card" style="margin-right: 25px; width: 450px;">
                         <div class="label">PRO</div>
                         <span class="price">$29<span>/ Month</span></span>
@@ -152,7 +152,7 @@
                             <li>Unlimited storage</li>
                             <li>Priority support</li>
                         </ul>
-                        <a href="#" class="btn btn-primary">Contact Sales</a>
+                        <a href="#" class="btn btn-primary" @click.prevent="contactSupport">Contact Sales</a>
                     </div><div class="pricing-card" style="width: 450px;">
                         <div class="label">Lifetime Deals</div>
                         <span class="price">$79<span>/ Lifetime</span></span>
@@ -163,7 +163,7 @@
                             <li>Priority support</li>
                             <li>Dedicated account manager</li>
                         </ul>
-                        <a href="#" class="btn btn-primary">Contact Sales</a>
+                        <a href="#" class="btn btn-primary" @click.prevent="contactSupport">Contact Sales</a>
                     </div>
                 </div>
             </div>
@@ -188,7 +188,7 @@
         <section class="start-for-free">
             <div class="container">
                 <h2 class="section-title">Start For Free</h2>
-                <p>Existing customized ideas through client-based deliverables.<br>Compellingly unleash fully tested outsourcing</p>
+                <p>Skip login user can get 3 times free trial.<br>Login user can get 10 times free trial.</p>
             </div>
         </section>
 
@@ -229,9 +229,9 @@
             <div class="footer-links">
                 <h4>Product</h4>
                 <ul>
-                    <li><a href="#features">Features</a></li>
-                    <li><a href="#pricing">Pricing</a></li>
-                    <li><a href="#">Tutorials</a></li>
+                    <li><a @click.prevent="scrollToSection('features')">Features</a></li>
+                    <li><a @click.prevent="scrollToSection('pricing')">Pricing</a></li>
+                    <!-- <li><a href="#">Tutorials</a></li> -->
                 </ul>
             </div>
             <div class="footer-links">
@@ -239,7 +239,7 @@
                 <ul>
                     <li><a href="#">About Us</a></li>
                     <li><a href="#">Careers</a></li>
-                    <li><a href="#contact">Contact</a></li>
+                    <li><a @click.prevent="scrollToSection('contact')">Contact</a></li>
                 </ul>
             </div>
             <div class="footer-links">
@@ -248,10 +248,21 @@
                     <a href="https://x.com/Uigenius13952" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
                 </div>
             </div>
+            <div class="footer-links">
+                <h4>Customer Support</h4>
+                <div class="support-email">
+                    <a href="mailto:support@uigenius.top"><i class="fas fa-envelope"></i> support@uigenius.top</a>
+                </div>
+            </div>
         </div>
         <div class="footer-bottom">
             <div class="container">
                 <p>© 2025 Uigenius. All rights reserved.</p>
+                <div class="footer-legal-links">
+                    <a href="#terms">Terms of Service</a>
+                    <span class="separator">|</span>
+                    <a href="#privacy">Privacy Policy</a>
+                </div>
             </div>
         </div>
     </footer>
@@ -295,6 +306,9 @@ export default {
           uni.navigateTo({ url: '/pages/login/login' })
         }
       })
+    },
+    contactSupport() {
+      window.location.href = 'mailto:support@uigenius.top';
     },
     async submitForm() {
       if (this.submitting) return;
@@ -980,8 +994,12 @@ ul {
 
 .footer-grid {
     display: grid;
-    grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
-    gap: 40px;
+    grid-template-columns: 2fr 1fr 1fr 1fr 1fr;
+    gap: 50px;
+}
+
+.footer-about {
+    padding-right: 20px;
 }
 
 .footer-about .logo {
@@ -992,7 +1010,7 @@ ul {
 .footer-about p {
     font-size: 14px;
     line-height: 1.8;
-    max-width: 300px;
+    max-width: 320px;
 }
 
 .footer-links h4 {
@@ -1009,6 +1027,7 @@ ul {
 .footer-links a {
     font-size: 15px;
     transition: color 0.3s ease;
+    cursor: pointer;
 }
 
 .footer-links a:hover {
@@ -1025,6 +1044,27 @@ ul {
     color: var(--primary-red);
 }
 
+.support-email {
+    margin-top: 10px;
+}
+
+.support-email a {
+    font-size: 15px;
+    color: var(--light-text);
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    transition: color 0.3s ease;
+}
+
+.support-email a:hover {
+    color: var(--primary-red);
+}
+
+.support-email i {
+    font-size: 18px;
+}
+
 .footer-bottom {
     border-top: 1px solid var(--border-color);
     padding-top: 30px;
@@ -1032,6 +1072,28 @@ ul {
     text-align: center;
     font-size: 14px;
     color: var(--lighter-text);
+}
+
+.footer-legal-links {
+    margin-top: 15px;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 10px;
+}
+
+.footer-legal-links a {
+    color: var(--lighter-text);
+    font-size: 14px;
+    transition: color 0.3s ease;
+}
+
+.footer-legal-links a:hover {
+    color: var(--primary-red);
+}
+
+.footer-legal-links .separator {
+    color: var(--border-color);
 }
 
 /* Scroll to Top Button */
@@ -1073,7 +1135,11 @@ ul {
         font-size: 36px;
     }
     .footer-grid {
-        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+        gap: 35px;
+    }
+    .footer-about {
+        padding-right: 0;
     }
 }
 
@@ -1168,6 +1234,13 @@ ul {
     }
     .social-icons {
         margin-top: 20px;
+    }
+    .footer-legal-links {
+        flex-direction: column;
+        gap: 8px;
+    }
+    .footer-legal-links .separator {
+        display: none;
     }
 }
 </style>
