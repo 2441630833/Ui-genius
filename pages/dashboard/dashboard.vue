@@ -18,7 +18,7 @@
         </view>
         <view class="nav-item" :class="{ active: activeNavItem === 'dashboard' }"
           @click="setActiveNavItem('dashboard')">
-          <image class="sidebar-icon"
+          <image class="sidebar-icon dashboard-icon"
             :src="activeNavItem === 'dashboard' ? '../../static/dashboard_white.png' : '../../static/dashboard.png'">
           </image>
           <text class="nav-text">Dashboard</text>
@@ -36,12 +36,12 @@
           <text class="nav-text">Membership</text>
         </view>
         <!-- Settings nav item -->
-        <view class="nav-item" :class="{ active: activeNavItem === 'settings' }" @click="setActiveNavItem('settings')">
+        <!-- <view class="nav-item" :class="{ active: activeNavItem === 'settings' }" @click="setActiveNavItem('settings')">
           <image class="sidebar-icon"
             :src="activeNavItem === 'settings' ? '../../static/settings_white.png' : '../../static/settings.png'">
           </image>
           <text class="nav-text">Settings</text>
-        </view>
+        </view> -->
         <!-- Newly added Guide nav item -->
         <view class="nav-item" :class="{ active: activeNavItem === 'guide' }" @click="startGuide()">
           <image class="sidebar-icon"
@@ -50,7 +50,7 @@
         </view>
         <!-- Delete Projects nav item -->
         <view class="nav-item" :class="{ active: activeNavItem === 'delete' }" @click="setActiveNavItem('delete')">
-          <image class="sidebar-icon"
+          <image class="sidebar-icon delete-icon"
             :src="activeNavItem === 'delete' ? '../../static/delete_white.png' : '../../static/delete.png'"></image>
           <text class="nav-text">Delete Projects</text>
         </view>
@@ -2029,6 +2029,16 @@ export default {
   height: 24px;
   object-fit: contain;
   color: #767676;
+}
+
+.delete-icon {
+  width: 22px;
+  height: 22px;
+}
+
+.dashboard-icon {
+  width: 22px;
+  height: 22px;
 }
 
 .refresh-icon {
