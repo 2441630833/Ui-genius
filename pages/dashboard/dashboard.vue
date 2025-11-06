@@ -84,7 +84,7 @@
               :loading="userProjectsLoading">
               <view class="project-card" @click="jumpToDesign(project)">
                 <image class="project-image"
-                  src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(3).png"
+                  :src="project.projectPreviewImage || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(3).png'"
                   mode="aspectFill">
                 </image>
                 <view class="project-content">

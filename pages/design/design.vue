@@ -2149,9 +2149,115 @@ export default {
         try {
           uni.setStorageSync(`uigenius_image_${key}`, data.imageData);
           // console.log(`Stored image data for ${key} in local storage`);
+          
+          // Check if this is the first page and update project preview
+          this.updateProjectPreviewIfNeeded(key, data.imageData);
         } catch (e) {
           // console.error(`Failed to store image data for ${key} from local storage:`, e);
         }
+      }
+    },
+    
+    updateProjectPreviewIfNeeded(pageKey, imageData) {
+      // Get the current project data
+      const projectDataStr = uni.getStorageSync('latest_7_overall_page');
+      if (!projectDataStr) {
+        return;
+      }
+      
+      try {
+        const projectData = typeof projectDataStr === 'string' ? JSON.parse(projectDataStr) : projectDataStr;
+        
+        // Check if this is the first page
+        if (projectData.pages && projectData.pages.length > 0) {
+          const firstPage = projectData.pages[0];
+          const firstPageKey = firstPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+          
+          // If this is the first page's image, update the project preview
+          if (pageKey === firstPageKey) {
+            const currentProjectId = uni.getStorageSync('currentProjectId');
+            
+            // Only update if we have a valid project ID
+            if (currentProjectId) {
+              console.log('Updating project preview image for first page:', pageKey);
+              
+              // Call cloud function to update preview image
+              uniCloud.callFunction({
+                name: 'user-project',
+                data: {
+                  action: 'update',
+                  id: currentProjectId,
+                  data: {
+                    currentProjectId: currentProjectId,
+                    projectPreviewImage: imageData
+                  }
+                }
+              }).then(res => {
+                if (res.result && res.result.success) {
+                  console.log('Project preview image updated successfully');
+                }
+              }).catch(err => {
+                console.error('Failed to update project preview image:', err);
+              });
+            }
+          }
+        }
+      } catch (e) {
+        console.error('Error updating project preview:', e);
+      }
+    },
+    
+    updateImportedProjectPreview(projectData) {
+      // Get the first page preview image from storage
+      if (!projectData || !projectData.pages || projectData.pages.length === 0) {
+        console.log('No pages in imported project to create preview');
+        return;
+      }
+      
+      const firstPage = projectData.pages[0];
+      const firstPageKey = firstPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+      
+      try {
+        const previewImage = uni.getStorageSync(`uigenius_image_${firstPageKey}`);
+        
+        if (!previewImage) {
+          console.log('Preview image not yet generated for first page:', firstPageKey);
+          // Retry after another delay
+          setTimeout(() => {
+            this.updateImportedProjectPreview(projectData);
+          }, 1000);
+          return;
+        }
+        
+        const currentProjectId = uni.getStorageSync('currentProjectId');
+        
+        if (!currentProjectId) {
+          console.log('No current project ID found');
+          return;
+        }
+        
+        console.log('Updating imported project preview image with first page:', firstPageKey);
+        
+        // Update the project preview image in the cloud
+        uniCloud.callFunction({
+          name: 'user-project',
+          data: {
+            action: 'update',
+            id: currentProjectId,
+            data: {
+              currentProjectId: currentProjectId,
+              projectPreviewImage: previewImage
+            }
+          }
+        }).then(res => {
+          if (res.result && res.result.success) {
+            console.log('Imported project preview image updated successfully');
+          }
+        }).catch(err => {
+          console.error('Failed to update imported project preview image:', err);
+        });
+      } catch (e) {
+        console.error('Error updating imported project preview:', e);
       }
     },
 
@@ -3072,6 +3178,21 @@ export default {
       const uid = uni.getStorageSync('uid');
       const email = uni.getStorageSync('email');
 
+      // Get preview image for the first page
+      let previewImage = '';
+      if (content && content.pages && content.pages.length > 0) {
+        const firstPage = content.pages[0];
+        const firstPageKey = firstPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+        
+        // Try to get the captured image from storage
+        try {
+          previewImage = uni.getStorageSync(`uigenius_image_${firstPageKey}`) || '';
+          console.log(`Using preview image for project from page: ${firstPageKey}`);
+        } catch (e) {
+          console.error('Failed to get preview image:', e);
+        }
+      }
+
       // Prepare project data
       const projectData = {
         uid: uid,
@@ -3079,7 +3200,8 @@ export default {
         currentProjectId: currentProjectId,
         projectTitle: projectTitle || '',
         projectDescription: projectDescription || '',
-        generated_overall_pages: content
+        generated_overall_pages: content,
+        projectPreviewImage: previewImage
       };
 
       // Decide action and payload
@@ -4867,6 +4989,11 @@ export default {
             this.updateLoadingStates();
             setTimeout(() => {
               this.generatePreviewImages();
+              
+              // Update preview image after images are generated
+              setTimeout(() => {
+                this.updateImportedProjectPreview(projectData);
+              }, 2000);
             }, 100);
             
             uni.showToast({ title: 'Loaded previously imported project', icon: 'success', duration: 2000 });
@@ -4914,8 +5041,8 @@ export default {
           const importedProjectDescription = `Imported shared project on ${importDate}`;
           
           // Create a new project in the current user's account with the imported content
-            this.saveProjectToCloud(importedData, importedProjectTitle, importedProjectDescription)
-              .then((newId) => {
+          this.saveProjectToCloud(importedData, importedProjectTitle, importedProjectDescription)
+            .then((newId) => {
               // saveProjectToCloud sets currentProjectId on create
               const createdProjectId = newId || uni.getStorageSync('currentProjectId');
               console.log('Imported project saved to cloud with ID:', createdProjectId);
@@ -4928,9 +5055,9 @@ export default {
               uni.setStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard', 'true');
               
               uni.showToast({ title: 'Project imported successfully', icon: 'success', duration: 2000 });
-              })
-              .catch((err) => {
-                console.error('Failed to save imported project to cloud:', err);
+            })
+            .catch((err) => {
+              console.error('Failed to save imported project to cloud:', err);
               // Restore original project ID on failure
               if (originalProjectId) {
                 uni.setStorageSync('currentProjectId', originalProjectId);
@@ -4943,6 +5070,12 @@ export default {
           setTimeout(() => {
             this.generatePreviewImages();
             this.refreshTemplates();
+            
+            // After preview images are generated, update the project preview image
+            // Wait longer to ensure images are captured
+            setTimeout(() => {
+              this.updateImportedProjectPreview(importedData);
+            }, 2000);
           }, 100);
         } else {
           uni.showToast({ title: 'Failed to load project', icon: 'none', duration: 2000 });
