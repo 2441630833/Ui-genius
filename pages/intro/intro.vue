@@ -259,9 +259,9 @@
             <div class="container">
                 <p>© 2025 Uigenius. All rights reserved.</p>
                 <div class="footer-legal-links">
-                    <a href="#terms">Terms of Service</a>
+                    <a @click.prevent="goToTerms">Terms of Service</a>
                     <span class="separator">|</span>
-                    <a href="#privacy">Privacy Policy</a>
+                    <a @click.prevent="goToPrivacy">Privacy Policy</a>
                 </div>
             </div>
         </div>
@@ -328,6 +328,12 @@ export default {
     },
     goToCareers() {
       uni.navigateTo({ url: '/pages/careers/careers' });
+    },
+    goToTerms() {
+      uni.navigateTo({ url: '/pages/terms/terms' });
+    },
+    goToPrivacy() {
+      uni.navigateTo({ url: '/pages/privacy/privacy' });
     },
     async submitForm() {
       if (this.submitting) return;
