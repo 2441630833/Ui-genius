@@ -142,7 +142,7 @@
                             <li>3 screenshot convertion</li>
                             <li>Free AI model</li>
                         </ul>
-                        <a href="#" class="btn btn-primary" @click.prevent="contactSupport">Contact Sales</a>
+                        <a href="#" class="btn btn-primary" @click.prevent="contactSales">Contact Sales</a>
                     </div><div class="pricing-card" style="margin-right: 25px; width: 450px;">
                         <div class="label">PRO</div>
                         <span class="price">$29<span>/ Month</span></span>
@@ -152,7 +152,7 @@
                             <li>Unlimited storage</li>
                             <li>Priority support</li>
                         </ul>
-                        <a href="#" class="btn btn-primary" @click.prevent="contactSupport">Contact Sales</a>
+                        <a href="#" class="btn btn-primary" @click.prevent="contactSales">Contact Sales</a>
                     </div><div class="pricing-card" style="width: 450px;">
                         <div class="label">Lifetime Deals</div>
                         <span class="price">$79<span>/ Lifetime</span></span>
@@ -163,7 +163,7 @@
                             <li>Priority support</li>
                             <li>Dedicated account manager</li>
                         </ul>
-                        <a href="#" class="btn btn-primary" @click.prevent="contactSupport">Contact Sales</a>
+                        <a href="#" class="btn btn-primary" @click.prevent="contactSales">Contact Sales</a>
                     </div>
                 </div>
             </div>
@@ -319,6 +319,9 @@ export default {
           uni.navigateTo({ url: '/pages/login/login' })
         }
       })
+    },
+    contactSales() {
+      window.location.href = 'mailto:sales@uigenius.top';
     },
     contactSupport() {
       window.location.href = 'mailto:support@uigenius.top';
