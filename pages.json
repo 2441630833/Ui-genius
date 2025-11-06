@@ -61,6 +61,20 @@
                 "navigationBarTitleText": "%index.careers%",
                 "enablePullDownRefresh": false
             }
+        },
+        {
+            "path": "pages/terms/terms",
+            "style": {
+                "navigationBarTitleText": "Terms of Service",
+                "enablePullDownRefresh": false
+            }
+        },
+        {
+            "path": "pages/privacy/privacy",
+            "style": {
+                "navigationBarTitleText": "Privacy Policy",
+                "enablePullDownRefresh": false
+            }
         }
     ],
     "easycom": {
