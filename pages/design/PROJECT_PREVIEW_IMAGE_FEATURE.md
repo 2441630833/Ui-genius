@@ -31,11 +31,14 @@ Added new field to the `user-create-project` collection:
 - Listens for page screenshot generation events
 - Automatically updates the project preview image when the first page's screenshot is completed
 - Updates the cloud database in real-time
+- **Anti-duplicate mechanism**: Uses `preview_updated_${projectId}` flag in localStorage to ensure each project's preview is only updated once
+- Skips update if preview has already been set for the project
 
 #### New `updateImportedProjectPreview` Method
 - Specifically handles preview images for projects imported via share links
 - Updates the imported project's preview image after preview images are generated
-- Includes retry mechanism that automatically retries if preview image hasn't been generated yet
+- **Retry mechanism**: Automatically retries up to 5 times (with 1-second intervals) if preview image hasn't been generated yet
+- **Anti-duplicate mechanism**: Checks `preview_updated_${projectId}` flag to prevent multiple updates
 - Ensures imported projects also display correct preview images
 
 ### 4. Dashboard Page Modifications (`pages/dashboard/dashboard.vue`)
@@ -115,6 +118,9 @@ Added new field to the `user-create-project` collection:
 1. Preview images are stored as base64 encoding, which may consume considerable storage space for large projects
 2. If first page screenshot generation fails, project will use default placeholder image
 3. Preview images update automatically after page screenshots are generated, no additional action needed
+4. **Anti-duplicate protection**: Each project's preview image is only updated once per project ID. The flag is stored as `preview_updated_${projectId}` in localStorage
+5. **Retry limit**: Imported projects will retry up to 5 times to get preview images, preventing infinite loops
+6. When a new project is created, the preview update flag is automatically cleared to allow the new project to set its preview
 
 ## Future Optimization Suggestions
 

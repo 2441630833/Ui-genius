@@ -2179,6 +2179,15 @@ export default {
             
             // Only update if we have a valid project ID
             if (currentProjectId) {
+              // Check if we've already updated the preview for this project
+              const previewUpdatedKey = `preview_updated_${currentProjectId}`;
+              const alreadyUpdated = uni.getStorageSync(previewUpdatedKey);
+              
+              if (alreadyUpdated) {
+                console.log('Project preview already updated, skipping:', currentProjectId);
+                return;
+              }
+              
               console.log('Updating project preview image for first page:', pageKey);
               
               // Call cloud function to update preview image
@@ -2195,6 +2204,8 @@ export default {
               }).then(res => {
                 if (res.result && res.result.success) {
                   console.log('Project preview image updated successfully');
+                  // Mark as updated to prevent duplicate updates
+                  uni.setStorageSync(previewUpdatedKey, 'true');
                 }
               }).catch(err => {
                 console.error('Failed to update project preview image:', err);
@@ -2207,10 +2218,26 @@ export default {
       }
     },
     
-    updateImportedProjectPreview(projectData) {
+    updateImportedProjectPreview(projectData, retryCount = 0) {
       // Get the first page preview image from storage
       if (!projectData || !projectData.pages || projectData.pages.length === 0) {
         console.log('No pages in imported project to create preview');
+        return;
+      }
+      
+      const currentProjectId = uni.getStorageSync('currentProjectId');
+      
+      if (!currentProjectId) {
+        console.log('No current project ID found');
+        return;
+      }
+      
+      // Check if we've already updated the preview for this project
+      const previewUpdatedKey = `preview_updated_${currentProjectId}`;
+      const alreadyUpdated = uni.getStorageSync(previewUpdatedKey);
+      
+      if (alreadyUpdated) {
+        console.log('Imported project preview already updated, skipping:', currentProjectId);
         return;
       }
       
@@ -2221,18 +2248,16 @@ export default {
         const previewImage = uni.getStorageSync(`uigenius_image_${firstPageKey}`);
         
         if (!previewImage) {
-          console.log('Preview image not yet generated for first page:', firstPageKey);
-          // Retry after another delay
-          setTimeout(() => {
-            this.updateImportedProjectPreview(projectData);
-          }, 1000);
-          return;
-        }
-        
-        const currentProjectId = uni.getStorageSync('currentProjectId');
-        
-        if (!currentProjectId) {
-          console.log('No current project ID found');
+          // Only retry up to 5 times to prevent infinite loops
+          if (retryCount < 5) {
+            console.log(`Preview image not yet generated for first page: ${firstPageKey}, retry ${retryCount + 1}/5`);
+            // Retry after another delay
+            setTimeout(() => {
+              this.updateImportedProjectPreview(projectData, retryCount + 1);
+            }, 1000);
+          } else {
+            console.log('Max retry attempts reached, preview image not available');
+          }
           return;
         }
         
@@ -2252,6 +2277,8 @@ export default {
         }).then(res => {
           if (res.result && res.result.success) {
             console.log('Imported project preview image updated successfully');
+            // Mark as updated to prevent duplicate updates
+            uni.setStorageSync(previewUpdatedKey, 'true');
           }
         }).catch(err => {
           console.error('Failed to update imported project preview image:', err);
@@ -3225,6 +3252,10 @@ export default {
           if (action === 'create' && res.result.project_id) {
             uni.setStorageSync('currentProjectId', res.result.project_id);
             console.log('Project created in cloud with ID:', res.result.project_id);
+            
+            // Clear the preview update flag for the new project to allow preview update
+            const previewUpdatedKey = `preview_updated_${res.result.project_id}`;
+            uni.removeStorageSync(previewUpdatedKey);
           } else {
             console.log('Project updated in cloud with ID:', currentProjectId);
           }
