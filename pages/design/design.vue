@@ -1975,6 +1975,39 @@ export default {
         } catch (e) {
           console.error('Error parsing JSON template data:', e);
         }
+      } else {
+        // No project data - clear templates to show fallback static templates
+        if (this.jsonTemplates.length > 0 || this.dynamicTemplateIds.length > 0) {
+          this.jsonTemplates = [];
+          this.dynamicTemplateIds = [];
+          
+          // Clear all existing loading states first
+          this.templateLoadingStates = {};
+          
+          // Reset to static template loading states
+          this.$set(this.templateLoadingStates, 'signup', true);
+          this.$set(this.templateLoadingStates, 'home', true);
+          this.$set(this.templateLoadingStates, 'notification', true);
+          this.$set(this.templateLoadingStates, 'profile', true);
+          this.$set(this.templateLoadingStates, 'settings', true);
+          
+          // Force a re-render to show fallback templates
+          this.$forceUpdate();
+          
+          // Generate preview images for static templates
+          this.$nextTick(() => {
+            setTimeout(() => {
+              this.generatePreviewImages();
+              // Reveal static templates
+              const staticKeys = ['signup', 'home', 'notification', 'profile', 'settings'];
+              staticKeys.forEach((key, index) => {
+                setTimeout(() => {
+                  this.$set(this.templateLoadingStates, key, false);
+                }, 500 + (index * 100));
+              });
+            }, 300);
+          });
+        }
       }
     },
 

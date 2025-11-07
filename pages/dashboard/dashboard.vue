@@ -708,8 +708,14 @@ export default {
       }
     },
     jumpToDesign(project) {
-      // If no project is provided (for default projects), just navigate to design page
+      // If no project is provided (for example projects), clear any stored project data
+      // and navigate to design page to show template previews
       if (!project) {
+        // Clear stored project data to ensure template previews are shown
+        uni.removeStorageSync('latest_7_overall_page');
+        uni.removeStorageSync('currentProjectId');
+        uni.removeStorageSync('shouldGenerateUI');
+        
         uni.switchTab({
           url: '/pages/design/design'
         });
