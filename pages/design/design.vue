@@ -4554,12 +4554,35 @@ export default {
                 // Add the new page to the project
                 projectData.pages.push(newPage);
                 
+                // Generate title and description for imported project
+                const currentProjectId = uni.getStorageSync('currentProjectId');
+                let projectTitle, projectDescription;
+                
+                if (!currentProjectId) {
+                  // Creating a new project - generate title and description
+                  const importDate = new Date().toLocaleString('en-US', { 
+                    year: 'numeric', 
+                    month: 'short', 
+                    day: 'numeric'
+                  });
+                  const fileNames = this.importFileList.map(f => {
+                    const name = f.name || f.url || 'image';
+                    return name.split('/').pop().split('\\').pop();
+                  }).join(', ');
+                  projectTitle = fileNames ? `Imported Image Project - ${fileNames.split(',')[0]}` : 'Imported Image Project';
+                  projectDescription = `Project created from imported image${this.importFileList.length > 1 ? 's' : ''} on ${importDate}`;
+                } else {
+                  // Updating existing project - use existing title/description or generate new ones
+                  projectTitle = projectData.AIProjectName || 'Imported Image Project';
+                  projectDescription = projectData.AIProjectDescription || 'Project updated with imported image';
+                }
+                
                 // Save the updated project data
                 const updatedProjectData = JSON.stringify(projectData);
                 uni.setStorageSync('latest_7_overall_page', updatedProjectData);
                 
                 // Save project to the cloud if logged in
-                this.saveProjectToCloud(projectData);
+                this.saveProjectToCloud(projectData, projectTitle, projectDescription);
                 
                 // Set flag to force regeneration of images
                 uni.setStorageSync('force_regeneration', 'true');
@@ -4634,12 +4657,35 @@ export default {
                     // Add the new page to the project
                     projectData.pages.push(newPage);
                     
+                    // Generate title and description for imported project
+                    const currentProjectId = uni.getStorageSync('currentProjectId');
+                    let projectTitle, projectDescription;
+                    
+                    if (!currentProjectId) {
+                      // Creating a new project - generate title and description
+                      const importDate = new Date().toLocaleString('en-US', { 
+                        year: 'numeric', 
+                        month: 'short', 
+                        day: 'numeric'
+                      });
+                      const fileNames = this.importFileList.map(f => {
+                        const name = f.name || f.url || 'image';
+                        return name.split('/').pop().split('\\').pop();
+                      }).join(', ');
+                      projectTitle = fileNames ? `Imported Image Project - ${fileNames.split(',')[0]}` : 'Imported Image Project';
+                      projectDescription = `Project created from imported image${this.importFileList.length > 1 ? 's' : ''} on ${importDate}`;
+                    } else {
+                      // Updating existing project - use existing title/description or generate new ones
+                      projectTitle = projectData.AIProjectName || 'Imported Image Project';
+                      projectDescription = projectData.AIProjectDescription || 'Project updated with imported image';
+                    }
+                    
                     // Save the updated project data
                     const updatedProjectData = JSON.stringify(projectData);
                     uni.setStorageSync('latest_7_overall_page', updatedProjectData);
                     
                     // Save project to the cloud if logged in
-                    this.saveProjectToCloud(projectData);
+                    this.saveProjectToCloud(projectData, projectTitle, projectDescription);
                     
                     // Set flag to force regeneration of images
                     uni.setStorageSync('force_regeneration', 'true');
@@ -4733,12 +4779,35 @@ export default {
                   // Add the new page to the project
                   projectData.pages.push(newPage);
                   
+                  // Generate title and description for imported project
+                  const currentProjectId = uni.getStorageSync('currentProjectId');
+                  let projectTitle, projectDescription;
+                  
+                  if (!currentProjectId) {
+                    // Creating a new project - generate title and description
+                    const importDate = new Date().toLocaleString('en-US', { 
+                      year: 'numeric', 
+                      month: 'short', 
+                      day: 'numeric'
+                    });
+                    const fileNames = this.importFileList.map(f => {
+                      const name = f.name || f.url || 'image';
+                      return name.split('/').pop().split('\\').pop();
+                    }).join(', ');
+                    projectTitle = fileNames ? `Imported Image Project - ${fileNames.split(',')[0]}` : 'Imported Image Project';
+                    projectDescription = `Project created from imported image${this.importFileList.length > 1 ? 's' : ''} on ${importDate}`;
+                  } else {
+                    // Updating existing project - use existing title/description or generate new ones
+                    projectTitle = projectData.AIProjectName || 'Imported Image Project';
+                    projectDescription = projectData.AIProjectDescription || 'Project updated with imported image';
+                  }
+                  
                   // Save the updated project data
                   const updatedProjectData = JSON.stringify(projectData);
                   uni.setStorageSync('latest_7_overall_page', updatedProjectData);
                   
                   // Save project to the cloud if logged in
-                  this.saveProjectToCloud(projectData);
+                  this.saveProjectToCloud(projectData, projectTitle, projectDescription);
                   
                   // Set flag to force regeneration of images
                   uni.setStorageSync('force_regeneration', 'true');
@@ -4990,16 +5059,40 @@ export default {
         // Add a new page to the project for each HTML file
         filesToImport.forEach(f => {
           const nameBase = f.name ? f.name.replace(/\.(html?|HTML?)$/, '') : 'HTML';
+          const timestamp = new Date().getTime();
           const pageName = f.name ? `Imported ${nameBase}` : `Imported HTML ${timestamp}`;
           projectData.pages.push({ name: pageName, component: f.content });
         });
+        
+        // Generate title and description for imported project
+        const currentProjectId = uni.getStorageSync('currentProjectId');
+        let projectTitle, projectDescription;
+        
+        if (!currentProjectId) {
+          // Creating a new project - generate title and description
+          const importDate = new Date().toLocaleString('en-US', { 
+            year: 'numeric', 
+            month: 'short', 
+            day: 'numeric'
+          });
+          const fileNames = filesToImport.map(f => {
+            const name = f.name || 'HTML';
+            return name.replace(/\.(html?|HTML?)$/, '');
+          }).join(', ');
+          projectTitle = fileNames ? `Imported HTML Project - ${fileNames.split(',')[0]}` : 'Imported HTML Project';
+          projectDescription = `Project created from imported HTML file${filesToImport.length > 1 ? 's' : ''} on ${importDate}`;
+        } else {
+          // Updating existing project - use existing title/description or generate new ones
+          projectTitle = projectData.AIProjectName || 'Imported HTML Project';
+          projectDescription = projectData.AIProjectDescription || 'Project updated with imported HTML';
+        }
         
         // Save the updated project data
         const updatedProjectData = JSON.stringify(projectData);
         uni.setStorageSync('latest_7_overall_page', updatedProjectData);
         
         // Save project to the cloud if logged in
-        this.saveProjectToCloud(projectData);
+        this.saveProjectToCloud(projectData, projectTitle, projectDescription);
         
         // Set flag to force regeneration of images
         uni.setStorageSync('force_regeneration', 'true');
