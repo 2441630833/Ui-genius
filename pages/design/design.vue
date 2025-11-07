@@ -2915,9 +2915,18 @@ export default {
       try {
         let component = template.component;
         
-        // Clean up code block markers if present, but leave style tags intact
+        // Clean up code block markers if present
         if (typeof component === 'string' && component.startsWith('```')) {
           component = component.replace(/^```(?:html|vue)?\s*/, '').replace(/```\s*$/, '');
+        }
+        
+        // Remove style tags to prevent CSS leakage to the page
+        // This prevents global styles from affecting the design page layout
+        if (typeof component === 'string') {
+          // Remove <style> tags and their content (including scoped styles)
+          component = component.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+          // Also remove style attributes that might contain global CSS
+          // Keep inline styles for individual elements but be cautious
         }
         
         return component;
