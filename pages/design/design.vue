@@ -109,7 +109,15 @@
           <view class="preview-header">
             <text class="preview-title">{{ template.name.replace(/ Page/i, '') }}</text>
           </view>
-          <view class="preview-content" v-html="getSimplifiedPreview(template)"></view>
+          <view class="preview-content-wrapper">
+            <!-- HTML content without style tags -->
+            <view class="preview-content" v-html="getPreviewHTML(template)"></view>
+          </view>
+          <!-- Inject scoped styles dynamically -->
+          <view v-if="getScopedStyles(template)" class="preview-style-injector" 
+                :data-styles="getScopedStyles(template)"
+                :data-template-id="'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')">
+          </view>
         </view>
       </template>
 
@@ -736,6 +744,8 @@ export default {
 
       jsonTemplates: [],
       dynamicTemplateIds: [],
+      // Store parsed template content (HTML and scoped styles)
+      parsedTemplates: {},
 
       // Add a flag to track if we should generate UI
       shouldGenerateUI: false,
@@ -977,6 +987,11 @@ export default {
 
     // Load images from storage on initial mount to avoid display issues
     this.loadImagesFromStorage();
+    
+    // Inject scoped styles after initial mount
+    this.$nextTick(() => {
+      this.injectScopedStyles();
+    });
 
     // Set up loading state timers
     setTimeout(() => {
@@ -1005,9 +1020,16 @@ export default {
     document.addEventListener('click', this.handleClickOutside);
   },
   
+  updated() {
+    // Inject scoped styles for templates after DOM update
+    this.injectScopedStyles();
+  },
+  
   beforeUnmount() {
     // Remove click outside listener
     document.removeEventListener('click', this.handleClickOutside);
+    // Clean up injected styles
+    this.cleanupInjectedStyles();
   },
   onLoad(options) {
     this.checkAndStartGuide();
@@ -1944,8 +1966,11 @@ export default {
             // Update loading states for dynamic templates
             this.updateLoadingStates();
 
-            // Force a re-render
+            // Force a re-render and inject styles
             this.$forceUpdate();
+            this.$nextTick(() => {
+              this.injectScopedStyles();
+            });
           }
         } catch (e) {
           console.error('Error parsing JSON template data:', e);
@@ -2907,33 +2932,175 @@ export default {
         }
       });
     },
-    getSimplifiedPreview(template) {
+    // Parse template and extract HTML and styles separately
+    parseTemplate(template) {
       if (!template || !template.component) {
-        return '<div class="preview-placeholder">No preview available</div>';
+        return { html: '<div class="preview-placeholder">No preview available</div>', styles: '' };
       }
 
       try {
         let component = template.component;
+        const templateId = 'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
         
         // Clean up code block markers if present
         if (typeof component === 'string' && component.startsWith('```')) {
           component = component.replace(/^```(?:html|vue)?\s*/, '').replace(/```\s*$/, '');
         }
         
-        // Remove style tags to prevent CSS leakage to the page
-        // This prevents global styles from affecting the design page layout
-        if (typeof component === 'string') {
-          // Remove <style> tags and their content (including scoped styles)
-          component = component.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
-          // Also remove style attributes that might contain global CSS
-          // Keep inline styles for individual elements but be cautious
+        if (typeof component !== 'string') {
+          return { html: '<div class="preview-placeholder">Invalid component format</div>', styles: '' };
         }
         
-        return component;
+        // Extract style tags
+        const styleRegex = /<style[^>]*>([\s\S]*?)<\/style>/gi;
+        let styles = '';
+        let match;
+        const styleMatches = [];
+        
+        while ((match = styleRegex.exec(component)) !== null) {
+          styleMatches.push(match[1]);
+        }
+        
+        // Remove style tags from HTML
+        let html = component.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+        
+        // Scope the styles to this template's container
+        if (styleMatches.length > 0) {
+          const scopedStyles = styleMatches.map(styleContent => {
+            // Add scope prefix to all CSS selectors
+            // This ensures styles only apply within the template container
+            return this.scopeCSS(styleContent, `#${templateId} .preview-content`);
+          }).join('\n');
+          
+          // Return styles as plain CSS (not wrapped in style tag)
+          // We'll inject it dynamically via updated hook
+          styles = scopedStyles;
+        }
+        
+        return { html, styles };
       } catch (e) {
-        console.error('Error rendering component:', e);
-        return '<div class="preview-placeholder">Error rendering preview</div>';
+        console.error('Error parsing template:', e);
+        return { html: '<div class="preview-placeholder">Error rendering preview</div>', styles: '' };
       }
+    },
+    
+    // Scope CSS selectors to a specific container
+    // This ensures styles only apply within the preview container, preventing global CSS leakage
+    scopeCSS(css, scopeSelector) {
+      if (!css || !scopeSelector) return css;
+      
+      let scopedCSS = css;
+      
+      // First, handle @media queries - extract and scope their content
+      scopedCSS = scopedCSS.replace(/@media\s+([^{]+)\{([\s\S]*?)\}/g, (match, mediaQuery, content) => {
+        // Scope all rules inside the media query
+        const scopedContent = this.scopeCSSRules(content, scopeSelector);
+        return `@media ${mediaQuery} {${scopedContent}}`;
+      });
+      
+      // Handle @keyframes - keep them as is (they don't need scoping)
+      // But we'll scope any selectors that reference them
+      
+      // Handle regular CSS rules - scope all selectors
+      scopedCSS = scopedCSS.replace(/(^|\n|\r)([^{@\n\r]+)\{([^}]+)\}/gm, (match, prefix, selector, declarations) => {
+        const trimmedSelector = selector.trim();
+        // Skip @rules (already handled above)
+        if (trimmedSelector.startsWith('@')) {
+          return match;
+        }
+        // Skip empty selectors
+        if (!trimmedSelector) {
+          return match;
+        }
+        // Handle multiple selectors separated by commas
+        const scopedSelectors = trimmedSelector.split(',').map(s => {
+          const trimmed = s.trim();
+          // Don't scope if it's already scoped or is a pseudo-element/class
+          if (trimmed.startsWith(scopeSelector) || trimmed.startsWith('::') || trimmed.startsWith(':')) {
+            return trimmed;
+          }
+          return `${scopeSelector} ${trimmed}`;
+        }).join(', ');
+        
+        return `${prefix}${scopedSelectors} {${declarations}}`;
+      });
+      
+      return scopedCSS;
+    },
+    
+    // Scope CSS rules within a block (like inside @media)
+    scopeCSSRules(css, scopeSelector) {
+      if (!css) return css;
+      
+      // Handle nested rules and regular rules
+      return css.replace(/(^|\n|\r)([^{@\n\r]+)\{([^}]+)\}/gm, (match, prefix, selector, declarations) => {
+        const trimmedSelector = selector.trim();
+        if (trimmedSelector.startsWith('@') || !trimmedSelector) {
+          return match;
+        }
+        
+        // Handle multiple selectors separated by commas
+        const scopedSelectors = trimmedSelector.split(',').map(s => {
+          const trimmed = s.trim();
+          if (trimmed.startsWith(scopeSelector) || trimmed.startsWith('::') || trimmed.startsWith(':')) {
+            return trimmed;
+          }
+          return `${scopeSelector} ${trimmed}`;
+        }).join(', ');
+        
+        return `${prefix}${scopedSelectors} {${declarations}}`;
+      });
+    },
+    
+    // Get HTML content without styles
+    getPreviewHTML(template) {
+      const parsed = this.parseTemplate(template);
+      return parsed.html;
+    },
+    
+    // Get scoped styles
+    getScopedStyles(template) {
+      const parsed = this.parseTemplate(template);
+      return parsed.styles;
+    },
+    
+    // Legacy method for backward compatibility
+    getSimplifiedPreview(template) {
+      return this.getPreviewHTML(template);
+    },
+    
+    // Inject scoped styles dynamically into the page
+    injectScopedStyles() {
+      // Use nextTick to ensure DOM is updated
+      this.$nextTick(() => {
+        const injectors = document.querySelectorAll('.preview-style-injector');
+        injectors.forEach(injector => {
+          const templateId = injector.getAttribute('data-template-id');
+          const styles = injector.getAttribute('data-styles');
+          
+          if (!templateId || !styles) return;
+          
+          // Check if style already injected for this template
+          const existingStyleId = `scoped-style-${templateId}`;
+          let styleElement = document.getElementById(existingStyleId);
+          
+          if (!styleElement) {
+            // Create new style element
+            styleElement = document.createElement('style');
+            styleElement.id = existingStyleId;
+            document.head.appendChild(styleElement);
+          }
+          
+          // Update style content
+          styleElement.textContent = styles;
+        });
+      });
+    },
+    
+    // Clean up injected styles
+    cleanupInjectedStyles() {
+      const styleElements = document.querySelectorAll('[id^="scoped-style-"]');
+      styleElements.forEach(el => el.remove());
     },
 
     loadImagesFromStorage() {
@@ -5992,10 +6159,26 @@ export default {
   margin-top: 8px;
 }
 
+.preview-content-wrapper {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+
+.preview-scoped-styles {
+  display: none; /* Hide the style container, styles will still apply */
+}
+
+.preview-style-injector {
+  display: none; /* Hidden element used for style injection via data attributes */
+}
+
 .preview-content {
   display: flex;
   flex-direction: column;
   gap: 12px;
+  width: 100%;
+  height: 100%;
 }
 
 .preview-card {
