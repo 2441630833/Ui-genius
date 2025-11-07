@@ -2590,7 +2590,14 @@ export default {
                 uni.setStorageSync('latest_7_overall_page', updatedProjectData);
                 
                 // Save project to the cloud if logged in
-                this.saveProjectToCloud(projectData, projectTitle, projectDescription);
+                this.saveProjectToCloud(projectData, projectTitle, projectDescription)
+                  .then(() => {
+                    // Set flag to refresh dashboard when user returns
+                    uni.setStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard', 'true');
+                  })
+                  .catch((err) => {
+                    console.error('Failed to save project to cloud:', err);
+                  });
                 
                 // Set flag to force regeneration of images
                 uni.setStorageSync('force_regeneration', 'true');
@@ -4615,7 +4622,14 @@ export default {
                 uni.setStorageSync('latest_7_overall_page', updatedProjectData);
                 
                 // Save project to the cloud if logged in
-                this.saveProjectToCloud(projectData, projectTitle, projectDescription);
+                this.saveProjectToCloud(projectData, projectTitle, projectDescription)
+                  .then(() => {
+                    // Set flag to refresh dashboard when user returns
+                    uni.setStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard', 'true');
+                  })
+                  .catch((err) => {
+                    console.error('Failed to save project to cloud:', err);
+                  });
                 
                 // Set flag to force regeneration of images
                 uni.setStorageSync('force_regeneration', 'true');
@@ -4718,7 +4732,14 @@ export default {
                     uni.setStorageSync('latest_7_overall_page', updatedProjectData);
                     
                     // Save project to the cloud if logged in
-                    this.saveProjectToCloud(projectData, projectTitle, projectDescription);
+                    this.saveProjectToCloud(projectData, projectTitle, projectDescription)
+                      .then(() => {
+                        // Set flag to refresh dashboard when user returns
+                        uni.setStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard', 'true');
+                      })
+                      .catch((err) => {
+                        console.error('Failed to save project to cloud:', err);
+                      });
                     
                     // Set flag to force regeneration of images
                     uni.setStorageSync('force_regeneration', 'true');
@@ -4840,7 +4861,14 @@ export default {
                   uni.setStorageSync('latest_7_overall_page', updatedProjectData);
                   
                   // Save project to the cloud if logged in
-                  this.saveProjectToCloud(projectData, projectTitle, projectDescription);
+                  this.saveProjectToCloud(projectData, projectTitle, projectDescription)
+                    .then(() => {
+                      // Set flag to refresh dashboard when user returns
+                      uni.setStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard', 'true');
+                    })
+                    .catch((err) => {
+                      console.error('Failed to save project to cloud:', err);
+                    });
                   
                   // Set flag to force regeneration of images
                   uni.setStorageSync('force_regeneration', 'true');
@@ -5125,7 +5153,14 @@ export default {
         uni.setStorageSync('latest_7_overall_page', updatedProjectData);
         
         // Save project to the cloud if logged in
-        this.saveProjectToCloud(projectData, projectTitle, projectDescription);
+        this.saveProjectToCloud(projectData, projectTitle, projectDescription)
+          .then(() => {
+            // Set flag to refresh dashboard when user returns
+            uni.setStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard', 'true');
+          })
+          .catch((err) => {
+            console.error('Failed to save project to cloud:', err);
+          });
         
         // Set flag to force regeneration of images
         uni.setStorageSync('force_regeneration', 'true');
