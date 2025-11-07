@@ -2908,81 +2908,16 @@ export default {
       });
     },
     getSimplifiedPreview(template) {
-      // Return the component property as a string
       if (!template || !template.component) {
         return '<div class="preview-placeholder">No preview available</div>';
       }
 
       try {
-        // Make sure the component is a string
-        if (typeof template.component !== 'string') {
-          // If it's not a string, try to stringify it
-          return JSON.stringify(template.component);
-        }
-        
-        // Clean up the component string if needed
         let component = template.component;
         
-        // Remove code block markers if present
-        if (component.startsWith('```')) {
+        // Clean up code block markers if present, but leave style tags intact
+        if (typeof component === 'string' && component.startsWith('```')) {
           component = component.replace(/^```(?:html|vue)?\s*/, '').replace(/```\s*$/, '');
-        }
-        
-        // OPTIMIZATION: Extract and convert style tags to inline styles or scoped style elements
-        // Instead of removing styles, we need to process them to work with v-html
-        const styleMatches = component.match(/<style[^>]*>([\s\S]*?)<\/style>/gi);
-        let extractedStyles = '';
-        
-        if (styleMatches && styleMatches.length > 0) {
-          // Extract all style contents
-          styleMatches.forEach(styleTag => {
-            const styleContent = styleTag.replace(/<style[^>]*>|<\/style>/gi, '');
-            extractedStyles += styleContent + '\n';
-          });
-          
-          // Remove original style tags from component
-          component = component.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
-          
-          // Wrap the component with a scoped style tag that will work with v-html
-          // Use a unique class to scope the styles
-          const templateKey = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
-          const scopedClass = `template-${templateKey}-styles`;
-          
-          // Add scoped class to the root element
-          // First, try to add the class to the outermost div/view
-          component = component.replace(/^(\s*<(?:div|view|section|article)[^>]*)(\/?>)/, `$1 class="${scopedClass}"$2`);
-          
-          // If no match found, wrap the entire component
-          if (!component.includes(scopedClass)) {
-            component = `<div class="${scopedClass}">${component}</div>`;
-          }
-          
-          // Inject the style tag with scoped selectors
-          // Prepend all selectors with the scoped class
-          let scopedStyles = extractedStyles;
-          
-          // Simple scoping: add the scoped class before each selector
-          // This is a basic implementation - for complex selectors, you might need a CSS parser
-          scopedStyles = scopedStyles.replace(/(^|\})\s*([^{]+)\s*\{/g, (match, p1, p2) => {
-            // Skip @media, @keyframes, etc.
-            if (p2.trim().startsWith('@')) {
-              return match;
-            }
-            
-            // Add scoped class to each selector
-            const selectors = p2.split(',').map(sel => {
-              const trimmed = sel.trim();
-              if (trimmed.startsWith(':root') || trimmed.startsWith('html') || trimmed.startsWith('body')) {
-                return `.${scopedClass}`;
-              }
-              return `.${scopedClass} ${trimmed}`;
-            }).join(', ');
-            
-            return `${p1} ${selectors} {`;
-          });
-          
-          // Add the scoped style tag before the component
-          component = `<style>${scopedStyles}</style>${component}`;
         }
         
         return component;
@@ -5724,76 +5659,76 @@ export default {
 
   .icon {
     width: 20px;
-    height: 20px;
-    object-fit: contain;
-    cursor: pointer;
+  height: 20px;
+  object-fit: contain;
+  cursor: pointer;
+}
+
+.separator {
+  width: 1px;
+  height: 24px;
+  background-color: #eaeaea;
+  margin: 0 4px;
+}
+
+.tool-button {
+  padding: 6px 10px;
+  cursor: pointer;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #f5f5f5;
   }
 
-  .separator {
-    width: 1px;
-    height: 24px;
-    background-color: #eaeaea;
-    margin: 0 4px;
+  .button-text {
+    font-size: 14px;
+    color: #333;
+  }
+}
+
+.preview-button {
+  display: flex;
+  align-items: center;
+  height: 10%;
+  gap: 6px;
+  background-color: #e53935;
+  padding: 7px 14px;
+  margin-bottom: 7px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #c62828;
   }
 
-  .tool-button {
-    padding: 6px 10px;
-    cursor: pointer;
-    border-radius: 4px;
-    transition: background-color 0.2s;
-
-    &:hover {
-      background-color: #f5f5f5;
-    }
-
-    .button-text {
-      font-size: 14px;
-      color: #333;
-    }
+  .icon {
+    width: 16px;
+    height: 16px;
   }
 
-  .preview-button {
-    display: flex;
-    align-items: center;
-    height: 10%;
-    gap: 6px;
-    background-color: #e53935;
-    padding: 7px 14px;
-    margin-bottom: 7px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
-
-    &:hover {
-      background-color: #c62828;
-    }
-
-    .icon {
-      width: 16px;
-      height: 16px;
-    }
-
-    .preview-text {
-      font-size: 14px;
-      font-weight: 500;
-      color: #fff;
-    }
+  .preview-text {
+    font-size: 14px;
+    font-weight: 500;
+    color: #fff;
   }
+}
 
-  .action-button {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 32px;
-    height: 32px;
-    border-radius: 4px;
-    cursor: pointer;
-    transition: background-color 0.2s;
+.action-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 32px;
+  height: 32px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background-color 0.2s;
 
-    &:hover {
-      background-color: #f5f5f5;
-    }
+  &:hover {
+    background-color: #f5f5f5;
   }
+}
 }
 
 .section {
