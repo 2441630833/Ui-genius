@@ -2928,9 +2928,62 @@ export default {
           component = component.replace(/^```(?:html|vue)?\s*/, '').replace(/```\s*$/, '');
         }
         
-        // Fix row bar issue by removing problematic HTML elements and styles
-        // Remove any style tags that might be causing the black bars
-        component = component.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+        // OPTIMIZATION: Extract and convert style tags to inline styles or scoped style elements
+        // Instead of removing styles, we need to process them to work with v-html
+        const styleMatches = component.match(/<style[^>]*>([\s\S]*?)<\/style>/gi);
+        let extractedStyles = '';
+        
+        if (styleMatches && styleMatches.length > 0) {
+          // Extract all style contents
+          styleMatches.forEach(styleTag => {
+            const styleContent = styleTag.replace(/<style[^>]*>|<\/style>/gi, '');
+            extractedStyles += styleContent + '\n';
+          });
+          
+          // Remove original style tags from component
+          component = component.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
+          
+          // Wrap the component with a scoped style tag that will work with v-html
+          // Use a unique class to scope the styles
+          const templateKey = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+          const scopedClass = `template-${templateKey}-styles`;
+          
+          // Add scoped class to the root element
+          // First, try to add the class to the outermost div/view
+          component = component.replace(/^(\s*<(?:div|view|section|article)[^>]*)(\/?>)/, `$1 class="${scopedClass}"$2`);
+          
+          // If no match found, wrap the entire component
+          if (!component.includes(scopedClass)) {
+            component = `<div class="${scopedClass}">${component}</div>`;
+          }
+          
+          // Inject the style tag with scoped selectors
+          // Prepend all selectors with the scoped class
+          let scopedStyles = extractedStyles;
+          
+          // Simple scoping: add the scoped class before each selector
+          // This is a basic implementation - for complex selectors, you might need a CSS parser
+          scopedStyles = scopedStyles.replace(/(^|\})\s*([^{]+)\s*\{/g, (match, p1, p2) => {
+            // Skip @media, @keyframes, etc.
+            if (p2.trim().startsWith('@')) {
+              return match;
+            }
+            
+            // Add scoped class to each selector
+            const selectors = p2.split(',').map(sel => {
+              const trimmed = sel.trim();
+              if (trimmed.startsWith(':root') || trimmed.startsWith('html') || trimmed.startsWith('body')) {
+                return `.${scopedClass}`;
+              }
+              return `.${scopedClass} ${trimmed}`;
+            }).join(', ');
+            
+            return `${p1} ${selectors} {`;
+          });
+          
+          // Add the scoped style tag before the component
+          component = `<style>${scopedStyles}</style>${component}`;
+        }
         
         return component;
       } catch (e) {
@@ -5444,6 +5497,14 @@ export default {
           
           console.log(`Capturing element: ${elementId}`);
           
+          // OPTIMIZATION: Force reflow to ensure all styles are computed
+          // This helps ensure that dynamically injected styles are applied
+          void dom.offsetHeight;
+          
+          // Get computed styles to verify they're applied
+          const computedStyle = window.getComputedStyle(dom);
+          console.log(`Element background: ${computedStyle.backgroundColor}`);
+          
           html2canvas(dom, {
             width: dom.clientWidth,
             height: dom.clientHeight,
@@ -5452,10 +5513,67 @@ export default {
             useCORS: true,
             scale: 1.5, // Reduced from 2 for faster rendering
             logging: false, // Disable logging for performance
-            backgroundColor: null, // Transparent background
+            backgroundColor: '#ffffff', // OPTIMIZATION: Changed from null to white for better visibility
             imageTimeout: 0, // No timeout for images
             allowTaint: true, // Allow tainted canvas for better performance
-            removeContainer: true // Clean up after rendering
+            removeContainer: true, // Clean up after rendering
+            // OPTIMIZATION: Additional options for better style capture
+            foreignObjectRendering: false, // Use native rendering for better compatibility
+            ignoreElements: (element) => {
+              // Don't ignore any elements that might have styles
+              return false;
+            },
+            onclone: (clonedDoc) => {
+              // OPTIMIZATION: Ensure all styles are present in the cloned document
+              // This helps with dynamically added style tags
+              const clonedElement = clonedDoc.getElementById(elementId);
+              if (clonedElement) {
+                // Force a reflow in the cloned document
+                void clonedElement.offsetHeight;
+                
+                // Copy all computed styles explicitly
+                const originalElement = document.getElementById(elementId);
+                if (originalElement) {
+                  const allElements = originalElement.querySelectorAll('*');
+                  const clonedElements = clonedElement.querySelectorAll('*');
+                  
+                  // Ensure we have the same number of elements
+                  if (allElements.length === clonedElements.length) {
+                    for (let i = 0; i < allElements.length; i++) {
+                      const original = allElements[i];
+                      const cloned = clonedElements[i];
+                      const computedStyle = window.getComputedStyle(original);
+                      
+                      // Copy critical style properties that might be missing
+                      if (computedStyle.backgroundColor && computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+                        cloned.style.backgroundColor = computedStyle.backgroundColor;
+                      }
+                      if (computedStyle.color) {
+                        cloned.style.color = computedStyle.color;
+                      }
+                      if (computedStyle.fontSize) {
+                        cloned.style.fontSize = computedStyle.fontSize;
+                      }
+                      if (computedStyle.fontFamily) {
+                        cloned.style.fontFamily = computedStyle.fontFamily;
+                      }
+                      if (computedStyle.fontWeight) {
+                        cloned.style.fontWeight = computedStyle.fontWeight;
+                      }
+                      if (computedStyle.padding) {
+                        cloned.style.padding = computedStyle.padding;
+                      }
+                      if (computedStyle.margin) {
+                        cloned.style.margin = computedStyle.margin;
+                      }
+                      if (computedStyle.borderRadius) {
+                        cloned.style.borderRadius = computedStyle.borderRadius;
+                      }
+                    }
+                  }
+                }
+              }
+            }
           }).then((canvas) => {
             const imageData = canvas.toDataURL('image/png', 0.85); // Added compression for faster processing
             // Send the image data back to the Vue component
@@ -5469,7 +5587,7 @@ export default {
           console.error(`Exception while capturing ${elementId}:`, err);
           uni.$emit('capture-error', { element: elementId, error: `Exception: ${err.toString()}` });
         }
-      }, 50); // Reduced from 100ms
+      }, 100); // OPTIMIZATION: Increased from 50ms to 100ms to ensure styles are fully applied
     }
   }
 }
