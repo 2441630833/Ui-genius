@@ -2,6 +2,11 @@
 const whiteList = [
 	"/pages/signup/signup",
 	"/pages/login/login",
+	"/pages/intro/intro",
+	"/pages/about/about",
+	"/pages/careers/careers",
+	"/pages/privacy/privacy",
+	"/pages/terms/terms",
 ]
 //登录页
 const loginPage = "/pages/login/login"
