@@ -15,6 +15,9 @@ const DEFAULT_TAB_PAGES = [
 // Local storage key name
 const STORAGE_KEY = 'lastTabPage'
 
+// Flag to prevent multiple simultaneous restoration attempts
+let isRestoring = false
+
 /**
  * Normalize page path
  * @param {string} pagePath
@@ -153,7 +156,13 @@ export function getLastTab() {
 export function restoreLastTab(delay = 500) {
   const lastTab = getLastTab()
   
+  // Prevent multiple simultaneous restoration attempts
+  if (isRestoring) {
+    return
+  }
+  
   if (lastTab) {
+    isRestoring = true
     setTimeout(() => {
       // Runtime check for special URL parameters (e.g., pid parameter from share links)
       // Support for H5 platform
@@ -197,30 +206,65 @@ export function restoreLastTab(delay = 500) {
         currentRoute = normalizePagePath(currentPage && currentPage.route)
       }
 
-      if (currentRoute === lastTab) {
+      // Only skip if we're already on the target page AND it's a tab page
+      // This ensures we don't skip restoration when the app starts on a default page
+      if (currentRoute === lastTab && isTabPage(currentRoute)) {
+        isRestoring = false
         return
       }
 
       if (isTabPage(lastTab)) {
         uni.switchTab({
-          url: '/' + lastTab
+          url: '/' + lastTab,
+          success: () => {
+            isRestoring = false
+          },
+          fail: () => {
+            isRestoring = false
+          }
         })
       } else {
         const targetUrl = '/' + lastTab
 
         try {
           if (typeof uni.reLaunch === 'function') {
-            uni.reLaunch({ url: targetUrl })
+            uni.reLaunch({ 
+              url: targetUrl,
+              success: () => {
+                isRestoring = false
+              },
+              fail: () => {
+                isRestoring = false
+              }
+            })
           } else if (typeof uni.redirectTo === 'function') {
-            uni.redirectTo({ url: targetUrl })
+            uni.redirectTo({ 
+              url: targetUrl,
+              success: () => {
+                isRestoring = false
+              },
+              fail: () => {
+                isRestoring = false
+              }
+            })
           } else if (typeof uni.navigateTo === 'function') {
-            uni.navigateTo({ url: targetUrl })
+            uni.navigateTo({ 
+              url: targetUrl,
+              success: () => {
+                isRestoring = false
+              },
+              fail: () => {
+                isRestoring = false
+              }
+            })
           }
         } catch (navigateError) {
-          // Silent error handling
+          isRestoring = false
         }
       }
     }, delay)
+  } else {
+    isRestoring = false
   }
 }
 
