@@ -521,7 +521,7 @@ export default {
       selectedDevice: 'desktop',
       projectDescription: '',
       numPages: 1,
-      exampleDescription: 'Sign up page for a dating app',
+      exampleDescription: 'Generate one website as same as Apple Store page',
       errorMessage: '',
       projectLoadingStates: {
         alpha: true,

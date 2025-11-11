@@ -800,7 +800,7 @@ export default {
       actionSheetOptions: ['Export as HTML', 'Export as Vue 2', 'Export as Vue 3', 'Export as React'],
       showCreatePageDialog: false,
       pageDescription: '',
-      examplePageDescription: 'A modern login page of Artificial Intelligence Tech Stack',
+      examplePageDescription: 'Generate one website as same as Apple Store page',
       // examplePageDescription: 'A modern contact page with a form and interactive map, including name, email, and message fields',
       showDeleteDialog: false,
       pagesToDelete: [],
