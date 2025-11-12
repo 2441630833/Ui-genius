@@ -468,6 +468,16 @@
             </view>
           </view>
 
+          <!-- Extract Colors Switch -->
+          <view class="extract-colors-container">
+            <view class="extract-colors-row">
+              <text class="model-selection-label">Uniform the generation colour style</text>
+              <view class="toggle-switch" :class="{ 'active': useColorExtraction }" @click="">
+                <view class="toggle-slider"></view>
+              </view>
+            </view>
+          </view>
+
           <view class="try-example-container">
             <text class="description-label">Describe your page in plain English</text>
             <button class="try-example-btn" @click="tryPageExample">Try example</button>
@@ -608,7 +618,7 @@
     </view>
 
     <!-- Color Palette Overlay -->
-    <!-- <view v-if="showColorPalette" class="color-palette-overlay">
+    <view v-if="showColorPalette" class="color-palette-overlay">
       <view class="color-palette-container">
         <text class="color-palette-title" style="display: block;">Select Theme Color For Your Project</text>
 
@@ -671,7 +681,7 @@
           <button class="color-cancel" @click="cancelColorSelection">Cancel</button>
         </view>
       </view>
-    </view> -->
+    </view>
     <view class="toast-overlay" v-if="customToastVisible" @click="customToastVisible = false">
       <view class="custom-toast" @click.stop>
         <image class="device-icon" :src="customToastType === 'success' ? '../../static/success.png' : '../../static/skip.png'"></image>
@@ -838,6 +848,10 @@ export default {
       customToastMessage: '',
       customToastType: 'success',
       guideTheme: 'dark',
+      // Color extraction properties
+      isExtractingColors: false,
+      colorCard: [],
+      useColorExtraction: true, // Default is open/enabled
       guideSteps: [
         {
           target: '.plus_guide',
@@ -1048,6 +1062,9 @@ export default {
     if (storedDevice) {
       this.selectedDevice = storedDevice;
     }
+
+    // Load color card from storage
+    this.loadColorCardFromStorage();
 
     // Load JSON templates if available
     this.loadJsonTemplates();
@@ -2589,6 +2606,9 @@ export default {
                 const updatedProjectData = JSON.stringify(projectData);
                 uni.setStorageSync('latest_7_overall_page', updatedProjectData);
                 
+                // Extract colors from the new page
+                this.extractColorsFromPreviousPage(newPage);
+                
                 // Save project to the cloud if logged in
                 this.saveProjectToCloud(projectData, projectTitle, projectDescription)
                   .then(() => {
@@ -3910,8 +3930,17 @@ export default {
       }
 
       // Prepare form data for uni.request
+      let prompt = this.pageDescription;
+      
+      // If color card exists and toggle is enabled, append color information to the prompt
+      if (this.useColorExtraction && this.colorCard) {
+        const colorInstruction = `\n\nIMPORTANT COLOR SCHEME: Use the following 5 colors as the main color palette for this design: ${this.colorCard.join(', ')}. These colors should be prominently featured in the UI elements, backgrounds, buttons, headers, and other design components. Maintain visual consistency with these colors throughout the design.`;
+        prompt += colorInstruction;
+      }
+
+      
       const formData = {
-        prompt: this.pageDescription,
+        prompt: prompt,
         device_type: this.selectedDevice,
         model: this.selectedPageModel,
         num_pages: 1
@@ -3984,6 +4013,12 @@ export default {
                 const updatedProjectData = JSON.stringify(projectData);
                 uni.setStorageSync('latest_7_overall_page', updatedProjectData);
                 
+                // If useColorExtraction is enabled but colorCard doesn't exist, extract colors from the new page
+                // Note: This runs asynchronously in the background and doesn't block subsequent code execution
+                if (this.useColorExtraction && (!this.colorCard || this.colorCard.length === 0)) {
+                  this.extractColorsFromPreviousPage(newPage);
+                }
+                
                 // Save project to the cloud if logged in
                 this.saveProjectToCloud(projectData);
                 
@@ -4052,6 +4087,12 @@ export default {
                     // Save the updated project data
                     const updatedProjectData = JSON.stringify(projectData);
                     uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+                    
+                    // If useColorExtraction is enabled but colorCard doesn't exist, extract colors from the new page
+                    // Note: This runs asynchronously in the background and doesn't block subsequent code execution
+                    if (this.useColorExtraction && (!this.colorCard || this.colorCard.length === 0)) {
+                      this.extractColorsFromPreviousPage(newPage);
+                    }
                     
                     // Save project to the cloud if logged in
                     this.saveProjectToCloud(projectData);
@@ -4144,6 +4185,12 @@ export default {
                   // Save the updated project data
                   const updatedProjectData = JSON.stringify(projectData);
                   uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+                  
+                  // If useColorExtraction is enabled but colorCard doesn't exist, extract colors from the new page
+                  // Note: This runs asynchronously in the background and doesn't block subsequent code execution
+                  if (this.useColorExtraction && (!this.colorCard || this.colorCard.length === 0)) {
+                    this.extractColorsFromPreviousPage(newPage);
+                  }
                   
                   // Save project to the cloud if logged in
                   this.saveProjectToCloud(projectData);
@@ -5564,6 +5611,109 @@ export default {
       });
     },
 
+    async extractColorsFromPreviousPage(page = null) {
+      // If no page is provided, just return
+      if (!page || !page.component) {
+        return;
+      }
+
+      this.isExtractingColors = true;
+      uni.showToast({ title: 'Extracting colors...', icon: 'none', duration: 1500 });
+
+      try {
+        const htmlCode = page.component;
+
+        if (!htmlCode) {
+          throw new Error('No HTML code found in the page');
+        }
+
+        // Call the backend API to extract colors
+        uni.request({
+          url: `${API_BASE_URL}/extract-colors`,
+          method: 'POST',
+          header: { 'content-type': 'application/json' },
+          data: {
+            code: htmlCode,
+            model: this.selectedPageModel || 'gimini2.5'
+          },
+          timeout: 60000,
+          success: (res) => {
+            try {
+              const data = res && res.data ? res.data : {};
+              if (data.success && data.colors && Array.isArray(data.colors) && data.colors.length === 5) {
+                // Store color card in component data
+                this.colorCard = data.colors;
+                
+                // Store color card in localStorage
+                uni.setStorageSync('colorCard', JSON.stringify(data.colors));
+                
+                uni.showToast({ 
+                  title: 'Color card extracted successfully!', 
+                  icon: 'success', 
+                  duration: 2000 
+                });
+              } else {
+                throw new Error('Invalid color data returned from server');
+              }
+            } catch (e) {
+              console.error('Error processing color extraction response:', e);
+              uni.showToast({ 
+                title: 'Failed to extract colors: ' + e.message, 
+                icon: 'none', 
+                duration: 2000 
+              });
+            }
+          },
+          fail: (err) => {
+            console.error('Color extraction request failed:', err);
+            uni.showToast({ 
+              title: `Color extraction error: ${err.errMsg || 'Request failed'}`, 
+              icon: 'none', 
+              duration: 2500 
+            });
+          },
+          complete: () => {
+            this.isExtractingColors = false;
+          }
+        });
+      } catch (error) {
+        console.error('Error in extractColorsFromPreviousPage:', error);
+        uni.showToast({ 
+          title: 'Error: ' + error.message, 
+          icon: 'none', 
+          duration: 2000 
+        });
+        this.isExtractingColors = false;
+      }
+    },
+
+    clearColorCard() {
+      this.colorCard = [];
+      uni.removeStorageSync('colorCard');
+      uni.showToast({ 
+        title: 'Color card cleared', 
+        icon: 'success', 
+        duration: 1500 
+      });
+    },
+
+    loadColorCardFromStorage() {
+      try {
+        const storedColorCard = uni.getStorageSync('colorCard');
+        if (storedColorCard) {
+          this.colorCard = JSON.parse(storedColorCard);
+        }
+        
+        // Load the toggle state (default to true if not set)
+        const storedToggleState = uni.getStorageSync('useColorExtraction');
+        if (storedToggleState !== null && storedToggleState !== undefined && storedToggleState !== '') {
+          this.useColorExtraction = storedToggleState;
+        }
+      } catch (e) {
+        console.error('Error loading color card from storage:', e);
+      }
+    },
+
     // Membership check methods
     async checkMembership() {
       try {
@@ -6803,6 +6953,55 @@ export default {
   font-weight: 500;
   margin-bottom: 10px;
   display: block;
+}
+
+/* Color Extraction styles */
+.extract-colors-container {
+  margin-bottom: 20px;
+}
+
+.extract-colors-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  flex-direction: row;
+}
+
+.extract-colors-row .model-selection-label {
+  display: inline-block !important;
+  margin-bottom: 0 !important;
+  flex: 1;
+}
+
+.toggle-switch {
+  position: relative;
+  width: 50px;
+  height: 26px;
+  background-color: #ccc;
+  border-radius: 13px;
+  transition: background-color 0.3s;
+  cursor: pointer;
+  flex-shrink: 0;
+  
+  &.active {
+    background-color: #f44336;
+  }
+}
+
+.toggle-slider {
+  position: absolute;
+  top: 3px;
+  left: 3px;
+  width: 20px;
+  height: 20px;
+  background-color: #fff;
+  border-radius: 50%;
+  transition: transform 0.3s;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.toggle-switch.active .toggle-slider {
+  transform: translateX(24px);
 }
 
 .model-selector {

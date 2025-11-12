@@ -903,6 +903,8 @@ export default {
       await uni.removeStorageSync('uigenius_image_profile');
       await uni.removeStorageSync('uigenius_image_notification');
       await uni.removeStorageSync('currentProjectId');
+      await uni.removeStorageSync('colorCard');
+
 
       await uni.setStorageSync('projectDescription', this.projectDescription);
       await uni.setStorageSync('selectedDevice', this.selectedDevice);
