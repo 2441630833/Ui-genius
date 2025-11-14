@@ -37,9 +37,9 @@
         <!-- Neutral Colors Row -->
         <view class="color-palette-row">
           <view v-for="(color, index) in neutralColors" :key="'neutral-' + index" class="color-swatch"
-            :style="{ backgroundColor: color.hex }" :class="{ 'selected': selectedColor === color.hex }"
+            :style="{ backgroundColor: color.hex }" :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }"
             @click="selectColor(color.hex)">
-            <text v-if="selectedColor === color.hex" class="color-check">✓</text>
+            <text v-if="colorCard && colorCard.indexOf(color.hex) > -1" class="color-check">✓</text>
             <text class="color-hex">{{ color.hex }}</text>
           </view>
         </view>
@@ -47,9 +47,9 @@
         <!-- Pastel Colors Row -->
         <view class="color-palette-row">
           <view v-for="(color, index) in pastelColors" :key="'pastel-' + index" class="color-swatch"
-            :style="{ backgroundColor: color.hex }" :class="{ 'selected': selectedColor === color.hex }"
+            :style="{ backgroundColor: color.hex }" :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }"
             @click="selectColor(color.hex)">
-            <text v-if="selectedColor === color.hex" class="color-check">✓</text>
+            <text v-if="colorCard && colorCard.indexOf(color.hex) > -1" class="color-check">✓</text>
             <text class="color-hex">{{ color.hex }}</text>
           </view>
         </view>
@@ -57,9 +57,9 @@
         <!-- Warm Colors Row -->
         <view class="color-palette-row">
           <view v-for="(color, index) in warmColors" :key="'warm-' + index" class="color-swatch"
-            :style="{ backgroundColor: color.hex }" :class="{ 'selected': selectedColor === color.hex }"
+            :style="{ backgroundColor: color.hex }" :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }"
             @click="selectColor(color.hex)">
-            <text v-if="selectedColor === color.hex" class="color-check">✓</text>
+            <text v-if="colorCard && colorCard.indexOf(color.hex) > -1" class="color-check">✓</text>
             <text class="color-hex">{{ color.hex }}</text>
           </view>
         </view>
@@ -67,21 +67,31 @@
         <!-- Cool Colors Row -->
         <view class="color-palette-row">
           <view v-for="(color, index) in coolColors" :key="'cool-' + index" class="color-swatch"
-            :style="{ backgroundColor: color.hex }" :class="{ 'selected': selectedColor === color.hex }"
+            :style="{ backgroundColor: color.hex }" :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }"
             @click="selectColor(color.hex)">
-            <text v-if="selectedColor === color.hex" class="color-check">✓</text>
+            <text v-if="colorCard && colorCard.indexOf(color.hex) > -1" class="color-check">✓</text>
             <text class="color-hex">{{ color.hex }}</text>
           </view>
         </view>
 
-        <!-- Custom color input -->
-        <view class="color-input-container">
-          <text class="color-input-label">Custom Color:</text>
-          <input type="text" v-model="customColor" class="color-input" placeholder="#RRGGBB"
-            @input="validateColorInput" />
-          <view class="color-preview-swatch"
-            :style="{ backgroundColor: isValidColor(customColor) ? customColor : '#cccccc' }"
-            :class="{ 'selected': customColor && isValidColor(customColor) && !selectedColor }"></view>
+        <!-- Selected Colors Counter -->
+        <view v-if="colorCard && colorCard.length > 0" class="selected-colors-info">
+          <text class="selected-colors-text">Selected: {{ colorCard.length }}/5 colors</text>
+        </view>
+
+        <!-- Custom color inputs -->
+        <view class="custom-colors-section">
+          <text class="color-input-label">Custom Colors (up to 5):</text>
+          <view class="custom-colors-grid">
+            <view v-for="(color, index) in customColors" :key="'custom-' + index" class="custom-color-item">
+              <input type="text" v-model="customColors[index]" class="color-input" :placeholder="'#RRGGBB ' + (index + 1)"
+                @input="validateColorInput(index)" />
+              <view class="color-preview-swatch"
+                :style="{ backgroundColor: isValidColor(customColors[index]) ? customColors[index] : '#cccccc' }"
+                :class="{ 'selected': customColors[index] && isValidColor(customColors[index]) && colorCard && colorCard.indexOf(customColors[index]) > -1 }"
+                @click="selectColor(customColors[index])"></view>
+            </view>
+          </view>
         </view>
 
         <!-- Simplified Preview section - only button -->
@@ -227,10 +237,10 @@
           </image>
         </view> -->
 
-        <!-- <view class="nav-item" :class="{ active: activeNavItem === 'color' }" @click="navigateTo('color')">
+        <view class="nav-item" :class="{ active: activeNavItem === 'color' }" @click="navigateTo('color')">
           <image class="nav-icon" :src="activeNavItem === 'color' ? '/static/color_white.png' : '/static/color.png'">
           </image>
-        </view> -->
+        </view>
 
 
         <!-- <view class="nav-item" :class="{ active: activeNavItem === 'profile' }" @click="navigateTo('profile')">
@@ -629,9 +639,9 @@
 
         <view class="color-palette-row">
           <view v-for="(color, index) in neutralColors" :key="'neutral-' + index" class="color-swatch"
-            :style="{ backgroundColor: color.hex }" :class="{ 'selected': selectedColor === color.hex }"
+            :style="{ backgroundColor: color.hex }" :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }"
             @click="selectColor(color.hex)">
-            <text v-if="selectedColor === color.hex" class="color-check">✓</text>
+            <text v-if="colorCard && colorCard.indexOf(color.hex) > -1" class="color-check">✓</text>
             <text class="color-hex">{{ color.hex }}</text>
           </view>
         </view>
@@ -639,9 +649,9 @@
 
         <view class="color-palette-row">
           <view v-for="(color, index) in pastelColors" :key="'pastel-' + index" class="color-swatch"
-            :style="{ backgroundColor: color.hex }" :class="{ 'selected': selectedColor === color.hex }"
+            :style="{ backgroundColor: color.hex }" :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }"
             @click="selectColor(color.hex)">
-            <text v-if="selectedColor === color.hex" class="color-check">✓</text>
+            <text v-if="colorCard && colorCard.indexOf(color.hex) > -1" class="color-check">✓</text>
             <text class="color-hex">{{ color.hex }}</text>
           </view>
         </view>
@@ -649,22 +659,37 @@
 
         <view class="color-palette-row">
           <view v-for="(color, index) in warmColors" :key="'warm-' + index" class="color-swatch"
-            :style="{ backgroundColor: color.hex }" :class="{ 'selected': selectedColor === color.hex }"
+            :style="{ backgroundColor: color.hex }" :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }"
             @click="selectColor(color.hex)">
-            <text v-if="selectedColor === color.hex" class="color-check">✓</text>
+            <text v-if="colorCard && colorCard.indexOf(color.hex) > -1" class="color-check">✓</text>
             <text class="color-hex">{{ color.hex }}</text>
           </view>
         </view>
 
         <view class="color-palette-row">
           <view v-for="(color, index) in coolColors" :key="'cool-' + index" class="color-swatch"
-            :style="{ backgroundColor: color.hex }" :class="{ 'selected': selectedColor === color.hex }"
+            :style="{ backgroundColor: color.hex }" :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }"
             @click="selectColor(color.hex)">
-            <text v-if="selectedColor === color.hex" class="color-check">✓</text>
+            <text v-if="colorCard && colorCard.indexOf(color.hex) > -1" class="color-check">✓</text>
             <text class="color-hex">{{ color.hex }}</text>
           </view>
         </view>
 
+        <!-- Color Card Colors Row (if colors exist and are not in preset lists) -->
+        <view v-if="colorCard && colorCard.length > 0" class="color-palette-row">
+          <text class="color-card-label">Selected Colors:</text>
+          <view v-for="(color, index) in colorCard" :key="'colorcard-' + index" class="color-swatch"
+            :style="{ backgroundColor: color }" :class="{ 'selected': colorCard && colorCard.indexOf(color) > -1 }"
+            @click="selectColor(color)">
+            <text v-if="colorCard && colorCard.indexOf(color) > -1" class="color-check">✓</text>
+            <text class="color-hex">{{ color }}</text>
+          </view>
+        </view>
+
+        <!-- Selected Colors Counter -->
+        <view v-if="colorCard && colorCard.length > 0" class="selected-colors-info">
+          <text class="selected-colors-text">Selected: {{ colorCard.length }}/5 colors</text>
+        </view>
 
         <view class="color-input-container">
           <text class="color-input-label">Custom Color:</text>
@@ -672,7 +697,8 @@
             @input="validateColorInput" />
           <view class="color-preview-swatch"
             :style="{ backgroundColor: isValidColor(customColor) ? customColor : '#cccccc' }"
-            :class="{ 'selected': customColor && isValidColor(customColor) && !selectedColor }"></view>
+            :class="{ 'selected': customColor && isValidColor(customColor) && colorCard && colorCard.indexOf(customColor) > -1 }"
+            @click="selectColor(customColor)"></view>
         </view>
 
         <view class="color-actions">
@@ -793,7 +819,7 @@ export default {
         { hex: '#FA897B', name: 'Coral Red' },
         { hex: '#CCABD8', name: 'Lavender' }
       ],
-      selectedColor: '',
+      colorCard: [], // Array to store up to 5 selected colors
       customColor: '',
       previewColor: '#86E3CE', // Change default color to mint
       colorPaletteError: '',
@@ -2928,10 +2954,19 @@ export default {
       // Show color palette if color nav item is clicked
       if (item === 'color') {
         this.showColorPalette = true;
-        // Set default selected color to mint
-        if (!this.selectedColor && !this.customColor) {
-          this.selectedColor = this.coolColors[0].hex; // Mint color
+        // Load colorCard from storage if not already loaded
+        this.loadColorCardFromStorage();
+        // Set selected colors from colorCard if available
+        if (this.colorCard && this.colorCard.length > 0) {
+          // Use all colors from colorCard as selected (up to 5)
+          this.colorCard = [...this.colorCard];
+          this.previewColor = this.colorCard[0];
+          this.customColor = '';
+        } else {
+          // Initialize empty selection
+          this.colorCard = [];
           this.previewColor = this.coolColors[0].hex;
+          this.customColor = '';
         }
       }
 
@@ -5647,6 +5682,13 @@ export default {
                 // Store color card in localStorage
                 uni.setStorageSync('colorCard', JSON.stringify(data.colors));
                 
+          // If color palette is open, update selected colors from colorCard
+          if (this.showColorPalette && this.colorCard.length > 0) {
+            this.colorCard = [...this.colorCard];
+            this.previewColor = this.colorCard[0];
+            this.customColor = '';
+          }
+                
                 uni.showToast({ 
                   title: 'Color card extracted successfully!', 
                   icon: 'success', 
@@ -5690,6 +5732,10 @@ export default {
     clearColorCard() {
       this.colorCard = [];
       uni.removeStorageSync('colorCard');
+      // Clear selected colors when colorCard is cleared
+      this.colorCard = [];
+      this.customColor = '';
+      this.previewColor = this.coolColors[0].hex;
       uni.showToast({ 
         title: 'Color card cleared', 
         icon: 'success', 
@@ -5702,6 +5748,12 @@ export default {
         const storedColorCard = uni.getStorageSync('colorCard');
         if (storedColorCard) {
           this.colorCard = JSON.parse(storedColorCard);
+          // If color palette is open, update selected colors from colorCard
+          if (this.showColorPalette && this.colorCard.length > 0) {
+            this.colorCard = [...this.colorCard];
+            this.previewColor = this.colorCard[0];
+            this.customColor = '';
+          }
         }
         
         // Load the toggle state (default to true if not set)
@@ -5843,6 +5895,149 @@ export default {
         url: '/pages/dashboard/dashboard'
       });
     },
+    // Color palette methods
+    selectColor(color) {
+      // Initialize colorCard if not exists
+      if (!this.colorCard) {
+        this.colorCard = [];
+      }
+      
+      // Check if color is already selected
+      const index = this.colorCard.indexOf(color);
+      
+      if (index > -1) {
+        // If already selected, remove it (toggle off)
+        this.colorCard.splice(index, 1);
+      } else {
+        // If not selected and we have less than 5 colors, add it
+        if (this.colorCard.length < 5) {
+          this.colorCard.push(color);
+        } else {
+          // Show error if trying to select more than 5 colors
+          this.colorPaletteError = 'You can select up to 5 colors. Please deselect one first.';
+          setTimeout(() => {
+            this.colorPaletteError = '';
+          }, 3000);
+          return;
+        }
+      }
+      
+      // Update preview color to the first selected color or default
+      if (this.colorCard.length > 0) {
+        this.previewColor = this.colorCard[0];
+      } else {
+        this.previewColor = '#86E3CE';
+      }
+      
+      this.customColor = '';
+      this.colorPaletteError = '';
+    },
+
+    validateColorInput() {
+      if (this.customColor && this.isValidColor(this.customColor)) {
+        // Check if custom color is already selected
+        const index = this.colorCard ? this.colorCard.indexOf(this.customColor) : -1;
+        
+        if (index > -1) {
+          // Remove if already selected
+          this.colorCard.splice(index, 1);
+        } else {
+          // Add if not selected and we have less than 5 colors
+          if (!this.colorCard) {
+            this.colorCard = [];
+          }
+          if (this.colorCard.length < 5) {
+            this.colorCard.push(this.customColor);
+          } else {
+            this.colorPaletteError = 'You can select up to 5 colors. Please deselect one first.';
+            setTimeout(() => {
+              this.colorPaletteError = '';
+            }, 3000);
+            return;
+          }
+        }
+        
+        this.previewColor = this.colorCard.length > 0 ? this.colorCard[0] : this.customColor;
+        this.colorPaletteError = '';
+      } else if (this.customColor) {
+        this.colorPaletteError = 'Invalid color format. Please use #RRGGBB format.';
+      }
+    },
+
+    isValidColor(color) {
+      if (!color) return false;
+      // Check if it's a valid hex color (#RRGGBB or #RGB)
+      const hexPattern = /^#([A-Fa-f0-9]{6}|[A-Fa-f0-9]{3})$/;
+      return hexPattern.test(color);
+    },
+
+    confirmColorSelection() {
+      // Check if custom color is valid and add it if not already in colorCard
+      if (this.customColor && this.isValidColor(this.customColor)) {
+        if (!this.colorCard) {
+          this.colorCard = [];
+        }
+        if (this.colorCard.indexOf(this.customColor) === -1 && this.colorCard.length < 5) {
+          this.colorCard.push(this.customColor);
+        }
+      }
+      
+      // Check if we have at least one color selected
+      if (!this.colorCard || this.colorCard.length === 0) {
+        this.colorPaletteError = 'Please select at least one color or enter a valid custom color.';
+        return;
+      }
+
+      // Update colorCard with selected colors (up to 5)
+      // Pad with existing colors or default colors if less than 5
+      let newColorCard = [...this.colorCard];
+      
+      // If we have less than 5 colors, pad with existing colorCard colors or keep as is
+      if (newColorCard.length < 5 && this.colorCard && this.colorCard.length > 0) {
+        // Add remaining colors from existing colorCard
+        for (let i = newColorCard.length; i < 5 && i < this.colorCard.length; i++) {
+          if (newColorCard.indexOf(this.colorCard[i]) === -1) {
+            newColorCard.push(this.colorCard[i]);
+          }
+        }
+      }
+      
+      // Ensure we have exactly 5 colors (pad with first color if needed)
+      while (newColorCard.length < 5 && newColorCard.length > 0) {
+        newColorCard.push(newColorCard[0]);
+      }
+
+      // Update colorCard
+      this.colorCard = newColorCard.slice(0, 5);
+
+      // Save to storage
+      uni.setStorageSync('colorCard', JSON.stringify(this.colorCard));
+
+      // Close the palette
+      this.showColorPalette = false;
+      this.colorPaletteError = '';
+
+      uni.showToast({
+        title: `${this.colorCard.length} theme colors applied`,
+        icon: 'success',
+        duration: 2000
+      });
+    },
+
+    cancelColorSelection() {
+      this.showColorPalette = false;
+      this.colorPaletteError = '';
+      // Restore previous selection from colorCard if available
+      if (this.colorCard && this.colorCard.length > 0) {
+        this.colorCard = [...this.colorCard];
+        this.previewColor = this.colorCard[0];
+      } else {
+        this.colorCard = [];
+        this.previewColor = '#86E3CE';
+      }
+      this.customColor = '';
+    },
+
     async checkSpecialUserLimitation(actionType) {
       try {
         // Get the current usage count for this special user
@@ -6598,7 +6793,7 @@ export default {
   left: 0;
   right: 0;
   bottom: 0;
-  background-color: rgba(255, 255, 255, 0.95);
+  background-color: rgba(0, 0, 0, 0.5);
   z-index: 1000;
   display: flex;
   justify-content: center;
@@ -6627,10 +6822,32 @@ export default {
 .color-palette-row {
   display: flex;
   justify-content: center;
+  align-items: center;
   gap: 15px;
   margin-bottom: 20px;
   flex-wrap: wrap;
   /* Allow wrapping on smaller screens */
+}
+
+.color-card-label {
+  font-size: 14px;
+  color: #666;
+  margin-right: 10px;
+  font-weight: 500;
+}
+
+.selected-colors-info {
+  text-align: center;
+  margin: 15px 0;
+  padding: 10px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+}
+
+.selected-colors-text {
+  font-size: 14px;
+  color: #333;
+  font-weight: 500;
 }
 
 .color-swatch {
@@ -6657,7 +6874,7 @@ export default {
   }
 
   &.selected {
-    border: 2px solid #333;
+    border: 2px solid #e53935;
     box-shadow: 0 3px 8px rgba(0, 0, 0, 0.3);
   }
 }
