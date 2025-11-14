@@ -222,6 +222,11 @@
           </image>
         </view>
 
+        <view class="nav-item" :class="{ active: activeNavItem === 'color' }" @click="navigateTo('color')">
+          <image class="nav-icon" :src="activeNavItem === 'color' ? '/static/color_white.png' : '/static/color.png'">
+          </image>
+        </view>
+
         <view class="nav-item delete_guide" :class="{ active: activeNavItem === 'delete' }" @click="navigateTo('delete')">
           <image class="nav-icon" :src="activeNavItem === 'delete' ? '/static/delete_white.png' : '/static/delete.png'">
           </image>
@@ -237,10 +242,6 @@
           </image>
         </view> -->
 
-        <view class="nav-item" :class="{ active: activeNavItem === 'color' }" @click="navigateTo('color')">
-          <image class="nav-icon" :src="activeNavItem === 'color' ? '/static/color_white.png' : '/static/color.png'">
-          </image>
-        </view>
 
 
         <!-- <view class="nav-item" :class="{ active: activeNavItem === 'profile' }" @click="navigateTo('profile')">
@@ -694,7 +695,7 @@
         <view class="color-input-container">
           <text class="color-input-label">Custom Color:</text>
           <input type="text" v-model="customColor" class="color-input" placeholder="#RRGGBB"
-            @input="validateColorInput" />
+            @input="validateColorInput" @confirm="addCustomColor" />
           <view class="color-preview-swatch"
             :style="{ backgroundColor: isValidColor(customColor) ? customColor : '#cccccc' }"
             :class="{ 'selected': customColor && isValidColor(customColor) && colorCard && colorCard.indexOf(customColor) > -1 }"
@@ -5935,32 +5936,23 @@ export default {
 
     validateColorInput() {
       if (this.customColor && this.isValidColor(this.customColor)) {
-        // Check if custom color is already selected
-        const index = this.colorCard ? this.colorCard.indexOf(this.customColor) : -1;
-        
-        if (index > -1) {
-          // Remove if already selected
-          this.colorCard.splice(index, 1);
-        } else {
-          // Add if not selected and we have less than 5 colors
-          if (!this.colorCard) {
-            this.colorCard = [];
-          }
-          if (this.colorCard.length < 5) {
-            this.colorCard.push(this.customColor);
-          } else {
-            this.colorPaletteError = 'You can select up to 5 colors. Please deselect one first.';
-            setTimeout(() => {
-              this.colorPaletteError = '';
-            }, 3000);
-            return;
-          }
-        }
-        
-        this.previewColor = this.colorCard.length > 0 ? this.colorCard[0] : this.customColor;
+        // Only validate the color, don't automatically add to selection
+        // Clear any previous error
         this.colorPaletteError = '';
       } else if (this.customColor) {
         this.colorPaletteError = 'Invalid color format. Please use #RRGGBB format.';
+      }
+    },
+
+    addCustomColor() {
+      // Add custom color when user presses Enter
+      if (this.customColor && this.isValidColor(this.customColor)) {
+        this.selectColor(this.customColor);
+      } else if (this.customColor) {
+        this.colorPaletteError = 'Invalid color format. Please use #RRGGBB format.';
+        setTimeout(() => {
+          this.colorPaletteError = '';
+        }, 3000);
       }
     },
 
@@ -5989,26 +5981,8 @@ export default {
       }
 
       // Update colorCard with selected colors (up to 5)
-      // Pad with existing colors or default colors if less than 5
-      let newColorCard = [...this.colorCard];
-      
-      // If we have less than 5 colors, pad with existing colorCard colors or keep as is
-      if (newColorCard.length < 5 && this.colorCard && this.colorCard.length > 0) {
-        // Add remaining colors from existing colorCard
-        for (let i = newColorCard.length; i < 5 && i < this.colorCard.length; i++) {
-          if (newColorCard.indexOf(this.colorCard[i]) === -1) {
-            newColorCard.push(this.colorCard[i]);
-          }
-        }
-      }
-      
-      // Ensure we have exactly 5 colors (pad with first color if needed)
-      while (newColorCard.length < 5 && newColorCard.length > 0) {
-        newColorCard.push(newColorCard[0]);
-      }
-
-      // Update colorCard
-      this.colorCard = newColorCard.slice(0, 5);
+      // Keep the actual selected colors without padding
+      this.colorCard = [...this.colorCard];
 
       // Save to storage
       uni.setStorageSync('colorCard', JSON.stringify(this.colorCard));
