@@ -479,11 +479,11 @@
             </view>
           </view>
 
-          <!-- Extract Colors Switch -->
+          <!-- Apply Colors Switch -->
           <view class="extract-colors-container">
             <view class="extract-colors-row">
               <text class="model-selection-label">Uniform the generation colour style</text>
-              <view class="toggle-switch" :class="{ 'active': useColorExtraction }" @click="">
+              <view class="toggle-switch" :class="{ 'active': useColor }" @click="toggleuseColor">
                 <view class="toggle-slider"></view>
               </view>
             </view>
@@ -878,7 +878,7 @@ export default {
       // Color extraction properties
       isExtractingColors: false,
       colorCard: [],
-      useColorExtraction: true, // Default is open/enabled
+      useColor: true, // Default is open/enabled
       guideSteps: [
         {
           target: '.plus_guide',
@@ -3916,7 +3916,7 @@ export default {
       let prompt = this.pageDescription;
       
       // If color card exists and toggle is enabled, append color information to the prompt
-      if (this.useColorExtraction && this.colorCard) {
+      if (this.useColor && this.colorCard) {
         const colorInstruction = `\n\nIMPORTANT COLOR SCHEME: Use the following 5 colors as the main color palette for this design: ${this.colorCard.join(', ')}. These colors should be prominently featured in the UI elements, backgrounds, buttons, headers, and other design components. Maintain visual consistency with these colors throughout the design.`;
         prompt += colorInstruction;
       }
@@ -3996,9 +3996,9 @@ export default {
                 const updatedProjectData = JSON.stringify(projectData);
                 uni.setStorageSync('latest_7_overall_page', updatedProjectData);
                 
-                // If useColorExtraction is enabled but colorCard doesn't exist, extract colors from the new page
+                // If useColor is enabled but colorCard doesn't exist, extract colors from the new page
                 // Note: This runs asynchronously in the background and doesn't block subsequent code execution
-                if (this.useColorExtraction && (!this.colorCard || this.colorCard.length === 0)) {
+                if (this.useColor && (!this.colorCard || this.colorCard.length === 0)) {
                   this.extractColorsFromPreviousPage(newPage);
                 }
                 
@@ -4071,9 +4071,9 @@ export default {
                     const updatedProjectData = JSON.stringify(projectData);
                     uni.setStorageSync('latest_7_overall_page', updatedProjectData);
                     
-                    // If useColorExtraction is enabled but colorCard doesn't exist, extract colors from the new page
+                    // If useColor is enabled but colorCard doesn't exist, extract colors from the new page
                     // Note: This runs asynchronously in the background and doesn't block subsequent code execution
-                    if (this.useColorExtraction && (!this.colorCard || this.colorCard.length === 0)) {
+                    if (this.useColor && (!this.colorCard || this.colorCard.length === 0)) {
                       this.extractColorsFromPreviousPage(newPage);
                     }
                     
@@ -4169,9 +4169,9 @@ export default {
                   const updatedProjectData = JSON.stringify(projectData);
                   uni.setStorageSync('latest_7_overall_page', updatedProjectData);
                   
-                  // If useColorExtraction is enabled but colorCard doesn't exist, extract colors from the new page
+                  // If useColor is enabled but colorCard doesn't exist, extract colors from the new page
                   // Note: This runs asynchronously in the background and doesn't block subsequent code execution
-                  if (this.useColorExtraction && (!this.colorCard || this.colorCard.length === 0)) {
+                  if (this.useColor && (!this.colorCard || this.colorCard.length === 0)) {
                     this.extractColorsFromPreviousPage(newPage);
                   }
                   
@@ -5705,9 +5705,9 @@ export default {
         }
         
         // Load the toggle state (default to true if not set)
-        const storedToggleState = uni.getStorageSync('useColorExtraction');
+        const storedToggleState = uni.getStorageSync('useColor');
         if (storedToggleState !== null && storedToggleState !== undefined && storedToggleState !== '') {
-          this.useColorExtraction = storedToggleState;
+          this.useColor = storedToggleState === true || storedToggleState === 'true' || storedToggleState === 1 || storedToggleState === '1';
         }
       } catch (e) {
         console.error('Error loading color card from storage:', e);
@@ -5842,6 +5842,12 @@ export default {
       uni.switchTab({
         url: '/pages/dashboard/dashboard'
       });
+    },
+    toggleuseColor() {
+      this.useColor = !this.useColor;
+      try {
+        uni.setStorageSync('useColor', this.useColor);
+      } catch (e) {}
     },
     // Color palette methods
     selectColor(color) {
