@@ -1461,14 +1461,24 @@ export default {
           // Build the page markup inside the iframe document
           const root = iframeDoc.createElement('div');
           root.className = 'page-root';
+          root.id = 'template-' + pageKey;
 
           const titleEl = iframeDoc.createElement('h1');
           titleEl.textContent = pageName;
           root.appendChild(titleEl);
 
           const contentEl = iframeDoc.createElement('div');
-          contentEl.innerHTML = page.component || '<div>No content available</div>';
+          contentEl.className = 'preview-content';
+          const parsed = this.parseTemplate(page);
+          contentEl.innerHTML = (parsed && parsed.html) || page.component || '<div>No content available</div>';
           root.appendChild(contentEl);
+
+          // Inject scoped styles for this page into the iframe head
+          if (parsed && parsed.styles) {
+            const styleEl = iframeDoc.createElement('style');
+            styleEl.textContent = parsed.styles;
+            iframeDoc.head.appendChild(styleEl);
+          }
 
           iframeDoc.body.appendChild(root);
 
