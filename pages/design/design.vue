@@ -23,91 +23,6 @@
         <text class="progress-message">Processing imported files, please wait...</text>
       </view>
     </view>
-
-    <!-- Update the color palette component -->
-    <view v-if="showColorPalette" class="color-palette-overlay">
-      <view class="color-palette-container">
-        <text class="color-palette-title" style="display: block;">Select Theme Color For Your Project</text>
-
-        <!-- Error message area -->
-        <view v-if="colorPaletteError" class="color-palette-error">
-          <text class="error-text">{{ colorPaletteError }}</text>
-        </view>
-
-        <!-- Neutral Colors Row -->
-        <view class="color-palette-row">
-          <view v-for="(color, index) in neutralColors" :key="'neutral-' + index" class="color-swatch"
-            :style="{ backgroundColor: color.hex }" :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }"
-            @click="selectColor(color.hex)">
-            <text v-if="colorCard && colorCard.indexOf(color.hex) > -1" class="color-check">✓</text>
-            <text class="color-hex">{{ color.hex }}</text>
-          </view>
-        </view>
-
-        <!-- Pastel Colors Row -->
-        <view class="color-palette-row">
-          <view v-for="(color, index) in pastelColors" :key="'pastel-' + index" class="color-swatch"
-            :style="{ backgroundColor: color.hex }" :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }"
-            @click="selectColor(color.hex)">
-            <text v-if="colorCard && colorCard.indexOf(color.hex) > -1" class="color-check">✓</text>
-            <text class="color-hex">{{ color.hex }}</text>
-          </view>
-        </view>
-
-        <!-- Warm Colors Row -->
-        <view class="color-palette-row">
-          <view v-for="(color, index) in warmColors" :key="'warm-' + index" class="color-swatch"
-            :style="{ backgroundColor: color.hex }" :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }"
-            @click="selectColor(color.hex)">
-            <text v-if="colorCard && colorCard.indexOf(color.hex) > -1" class="color-check">✓</text>
-            <text class="color-hex">{{ color.hex }}</text>
-          </view>
-        </view>
-
-        <!-- Cool Colors Row -->
-        <view class="color-palette-row">
-          <view v-for="(color, index) in coolColors" :key="'cool-' + index" class="color-swatch"
-            :style="{ backgroundColor: color.hex }" :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }"
-            @click="selectColor(color.hex)">
-            <text v-if="colorCard && colorCard.indexOf(color.hex) > -1" class="color-check">✓</text>
-            <text class="color-hex">{{ color.hex }}</text>
-          </view>
-        </view>
-
-        <!-- Selected Colors Counter -->
-        <view v-if="colorCard && colorCard.length > 0" class="selected-colors-info">
-          <text class="selected-colors-text">Selected: {{ colorCard.length }}/5 colors</text>
-        </view>
-
-        <!-- Custom color inputs -->
-        <view class="custom-colors-section">
-          <text class="color-input-label">Custom Colors (up to 5):</text>
-          <view class="custom-colors-grid">
-            <view v-for="(color, index) in customColors" :key="'custom-' + index" class="custom-color-item">
-              <input type="text" v-model="customColors[index]" class="color-input" :placeholder="'#RRGGBB ' + (index + 1)"
-                @input="validateColorInput(index)" />
-              <view class="color-preview-swatch"
-                :style="{ backgroundColor: isValidColor(customColors[index]) ? customColors[index] : '#cccccc' }"
-                :class="{ 'selected': customColors[index] && isValidColor(customColors[index]) && colorCard && colorCard.indexOf(customColors[index]) > -1 }"
-                @click="selectColor(customColors[index])"></view>
-            </view>
-          </view>
-        </view>
-
-        <!-- Simplified Preview section - only button -->
-        <!-- <view class="color-preview-section">
-          <text class="preview-label">Preview:</text>
-          <view class="preview-button" :style="{ backgroundColor: previewColor }">Button</view>
-        </view> -->
-
-        <view class="color-actions">
-          <button class="color-confirm" :style="{ backgroundColor: previewColor, color: '#ffffff' }"
-            @click="confirmColorSelection">Apply Theme</button>
-          <button class="color-cancel" @click="cancelColorSelection">Cancel</button>
-        </view>
-      </view>
-    </view>
-
     <!-- Hidden Template Previews for html2canvas -->
     <view class="hidden-templates">
       <!-- Dynamic Templates from JSON -->
@@ -482,7 +397,7 @@
           <!-- Apply Colors Switch -->
           <view class="extract-colors-container">
             <view class="extract-colors-row">
-              <text class="model-selection-label">Uniform the generation colour style</text>
+              <text class="model-selection-label">Use the theme colour for your page</text>
               <view class="toggle-switch" :class="{ 'active': useColor }" @click="toggleuseColor">
                 <view class="toggle-slider"></view>
               </view>
