@@ -980,6 +980,14 @@ export default {
     // Inject scoped styles for templates after DOM update
     this.injectScopedStyles();
   },
+  onHide() {
+    // Remove injected template styles when leaving the page
+    this.cleanupInjectedStyles();
+  },
+  onUnload() {
+    // Ensure cleanup when the page is destroyed
+    this.cleanupInjectedStyles();
+  },
   
   beforeUnmount() {
     // Remove click outside listener
@@ -3029,6 +3037,8 @@ export default {
     
     // Inject scoped styles dynamically into the page
     injectScopedStyles() {
+      // Always start from a clean slate so no stale styles leak out
+      this.cleanupInjectedStyles();
       // Use nextTick to ensure DOM is updated
       this.$nextTick(() => {
         const injectors = document.querySelectorAll('.preview-style-injector');
