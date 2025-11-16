@@ -1,0 +1,40 @@
+{
+	"bsonType": "object",
+	"required": ["uid"],
+	"permission": {
+		"read": false,
+		"create": false,
+		"update": false,
+		"delete": false
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+		"uid": {
+			"bsonType": "string",
+			"description": "用户唯一标识id",
+			"foreignKey": "uni-id-users._id"
+		},
+		"email": {
+			"bsonType": "string",
+			"description": "邮箱地址"
+		},
+		"projectTitle": {
+			"bsonType": "string",
+			"description": "项目名称"
+		},
+		"projectDescription": {
+			"bsonType": "string",
+			"description": "项目描述"
+		},
+		"projectPreviewImage": {
+			"bsonType": "string",
+			"description": "项目预览图"
+		},
+		"themeColour": {
+			"bsonType": "array",
+			"description": "项目主题色"
+		}
+	}
+}

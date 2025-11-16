@@ -2,7 +2,7 @@
     "id": "ui-genius",
     "name": "ui-genius",
     "displayName": "Uigenius",
-    "version": "1.0.8",
+    "version": "1.0.9",
     "description": "AI-powered UX/UI design tool for rapid prototyping and design generation",
     "keywords": [
         "ui-design",
@@ -100,9 +100,7 @@
         "electron": "electron .",
         "dist:win": "electron-builder -w",
         "dist:dir": "electron-builder --dir",
-        "dist:appx": "electron-builder --win --x64 --config.win.target=appx --publish never",
-        "build:icon": "electron-icon-builder --input=static/logo.png --output=build --flatten",
-        "build:h5": "node -e \"console.log('请使用 HBuilderX 构建 H5 到 dist/build/h5，或配置 uni-app CLI');\""
+        "dist:appx": "electron-builder --win --x64 --config.win.target=appx --publish never"
     },
     "build": {
         "appId": "com.uigenius.app",

@@ -1,0 +1,7 @@
+{
+  "name": "contact-us",
+  "dependencies": {},
+  "extensions": {
+    "uni-cloud-jql": {}
+  }
+}

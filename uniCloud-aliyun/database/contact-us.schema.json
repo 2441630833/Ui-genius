@@ -1,0 +1,35 @@
+{
+	"bsonType": "object",
+	"required": [],
+	"permission": {
+		"read": false,
+		"create": false,
+		"update": false,
+		"delete": false
+	},
+	"properties": {
+		"_id": {
+			"description": "ID，系统自动生成"
+		},
+		"name": {
+			"bsonType": "string",
+			"description": "项目描述",
+			"trim": true
+		},
+		"email": {
+			"bsonType": "string",
+			"description": "项目描述",
+			"trim": true
+		},
+		"subject": {
+			"bsonType": "string",
+			"description": "项目描述",
+			"trim": true
+		},
+		"message": {
+			"bsonType": "string",
+			"description": "项目描述",
+			"trim": true
+		}
+	}
+}

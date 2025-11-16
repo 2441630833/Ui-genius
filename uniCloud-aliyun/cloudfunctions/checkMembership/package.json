@@ -1,0 +1,7 @@
+{
+  "name": "checkMembership",
+  "dependencies": {},
+  "extensions": {
+    "uni-cloud-jql": {}
+  }
+}
