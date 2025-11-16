@@ -5898,11 +5898,11 @@ export default {
         }
       }
       
-      // Check if we have at least one color selected
-      if (!this.colorCard || this.colorCard.length === 0) {
-        this.colorPaletteError = 'Please select at least one color or enter a valid custom color.';
-        return;
-      }
+      // Check if we have at least one color selected(don't check anymore)
+      // if (!this.colorCard || this.colorCard.length === 0) {
+      //   this.colorPaletteError = 'Please select at least one color or enter a valid custom color.';
+      //   return;
+      // }
 
       // Update colorCard with selected colors (up to 5)
       // Keep the actual selected colors without padding
