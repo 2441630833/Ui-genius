@@ -2503,9 +2503,6 @@ export default {
                 const updatedProjectData = JSON.stringify(projectData);
                 uni.setStorageSync('latest_7_overall_page', updatedProjectData);
                 
-                // Extract colors from the new page
-                this.extractColorsFromPreviousPage(newPage);
-                
                 // Save project to the cloud if logged in
                 this.saveProjectToCloud(projectData, projectTitle, projectDescription)
                   .then(() => {
@@ -2515,6 +2512,10 @@ export default {
                   .catch((err) => {
                     console.error('Failed to save project to cloud:', err);
                   });
+                  
+                // Extract colors from the new page
+                this.extractColors(newPage);
+
                 
                 // Set flag to force regeneration of images
                 uni.setStorageSync('force_regeneration', 'true');
@@ -3405,6 +3406,46 @@ export default {
         throw err;
       });
     },
+    saveProjectThemeToCloud(themeColour) {
+      // Check for existing project ID
+      const currentProjectId = uni.getStorageSync('currentProjectId');
+      
+      // If no project ID exists, cannot update theme
+      if (!currentProjectId) {
+        console.warn('No project ID found, cannot update theme color');
+        return Promise.reject(new Error('No project ID found'));
+      }
+
+      // Prepare theme update data
+      const projectData = {
+        themeColour: themeColour || []
+      };
+
+      // Call cloud function to update theme only
+      return uniCloud.callFunction({
+        name: 'user-project',
+        data: {
+          action: 'update',
+          id: currentProjectId,
+          data: projectData
+        }
+      }).then(res => {
+        if (res.result && res.result.success) {
+          console.log('Project theme updated in cloud with ID:', currentProjectId);
+          return res.result.project_id || currentProjectId;
+        } else {
+          throw new Error('Failed to update project theme');
+        }
+      }).catch(err => {
+        console.error('Cloud function error:', err);
+        uni.showToast({
+          title: 'Theme save failed',
+          icon: 'error',
+          duration: 2000
+        });
+        throw err;
+      });
+    },
     // Add a new method to fully refresh templates
     refreshTemplates() {
       console.log('Refreshing templates completely');
@@ -3923,9 +3964,9 @@ export default {
                 
                 // If useColor is enabled but colorCard doesn't exist, extract colors from the new page
                 // Note: This runs asynchronously in the background and doesn't block subsequent code execution
-                if (this.useColor && (!this.colorCard || this.colorCard.length === 0)) {
-                  this.extractColorsFromPreviousPage(newPage);
-                }
+                // if (this.useColor && (!this.colorCard || this.colorCard.length === 0)) {
+                //   this.extractColors(newPage);
+                // }
                 
                 // Save project to the cloud if logged in
                 this.saveProjectToCloud(projectData);
@@ -3998,9 +4039,9 @@ export default {
                     
                     // If useColor is enabled but colorCard doesn't exist, extract colors from the new page
                     // Note: This runs asynchronously in the background and doesn't block subsequent code execution
-                    if (this.useColor && (!this.colorCard || this.colorCard.length === 0)) {
-                      this.extractColorsFromPreviousPage(newPage);
-                    }
+                    // if (this.useColor && (!this.colorCard || this.colorCard.length === 0)) {
+                    //   this.extractColors(newPage);
+                    // }
                     
                     // Save project to the cloud if logged in
                     this.saveProjectToCloud(projectData);
@@ -4096,9 +4137,9 @@ export default {
                   
                   // If useColor is enabled but colorCard doesn't exist, extract colors from the new page
                   // Note: This runs asynchronously in the background and doesn't block subsequent code execution
-                  if (this.useColor && (!this.colorCard || this.colorCard.length === 0)) {
-                    this.extractColorsFromPreviousPage(newPage);
-                  }
+                  // if (this.useColor && (!this.colorCard || this.colorCard.length === 0)) {
+                  //   this.extractColors(newPage);
+                  // }
                   
                   // Save project to the cloud if logged in
                   this.saveProjectToCloud(projectData);
@@ -5519,7 +5560,7 @@ export default {
       });
     },
 
-    async extractColorsFromPreviousPage(page = null) {
+    async extractColors(page = null) {
       // If no page is provided, just return
       if (!page || !page.component) {
         return;
@@ -5555,12 +5596,17 @@ export default {
                 // Store color card in localStorage
                 uni.setStorageSync('colorCard', JSON.stringify(data.colors));
                 
-          // If color palette is open, update selected colors from colorCard
-          if (this.showColorPalette && this.colorCard.length > 0) {
-            this.colorCard = [...this.colorCard];
-            this.previewColor = this.colorCard[0];
-            this.customColor = '';
-          }
+                // If color palette is open, update selected colors from colorCard
+                if (this.showColorPalette && this.colorCard.length > 0) {
+                  this.colorCard = [...this.colorCard];
+                  this.previewColor = this.colorCard[0];
+                  this.customColor = '';
+                }
+                
+                // Save extracted colors to cloud
+                this.saveProjectThemeToCloud(this.colorCard).catch(err => {
+                  console.error('Failed to save extracted colors to cloud:', err);
+                });
                 
                 uni.showToast({ 
                   title: 'Color card extracted successfully!', 
@@ -5592,7 +5638,7 @@ export default {
           }
         });
       } catch (error) {
-        console.error('Error in extractColorsFromPreviousPage:', error);
+        console.error('Error in extractColors:', error);
         uni.showToast({ 
           title: 'Error: ' + error.message, 
           icon: 'none', 
@@ -5864,6 +5910,11 @@ export default {
 
       // Save to storage
       uni.setStorageSync('colorCard', JSON.stringify(this.colorCard));
+
+      // Save theme color to cloud
+      this.saveProjectThemeToCloud(this.colorCard).catch(err => {
+        console.error('Failed to save theme color:', err);
+      });
 
       // Close the palette
       this.showColorPalette = false;
