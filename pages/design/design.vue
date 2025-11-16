@@ -4617,16 +4617,6 @@ export default {
                 const updatedProjectData = JSON.stringify(projectData);
                 uni.setStorageSync('latest_7_overall_page', updatedProjectData);
                 
-                // Save project to the cloud if logged in
-                this.saveProjectToCloud(projectData, projectTitle, projectDescription)
-                  .then(() => {
-                    // Set flag to refresh dashboard when user returns
-                    uni.setStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard', 'true');
-                  })
-                  .catch((err) => {
-                    console.error('Failed to save project to cloud:', err);
-                  });
-                
                 // Set flag to force regeneration of images
                 uni.setStorageSync('force_regeneration', 'true');
                 
@@ -4644,6 +4634,21 @@ export default {
                   // Force generation of new preview images
                   setTimeout(() => {
                     this.generatePreviewImages();
+                    
+                    // After preview images are generated, update the project preview image and save to cloud
+                    setTimeout(() => {
+                      this.updateImportedProjectPreview(projectData);
+                      
+                      // Save project to the cloud if logged in
+                      this.saveProjectToCloud(projectData, projectTitle, projectDescription)
+                        .then(() => {
+                          // Set flag to refresh dashboard when user returns
+                          uni.setStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard', 'true');
+                        })
+                        .catch((err) => {
+                          console.error('Failed to save project to cloud:', err);
+                        });
+                    }, 2000);
                   }, 100);
                   
                   // Complete refresh after a delay
@@ -4727,16 +4732,6 @@ export default {
                     const updatedProjectData = JSON.stringify(projectData);
                     uni.setStorageSync('latest_7_overall_page', updatedProjectData);
                     
-                    // Save project to the cloud if logged in
-                    this.saveProjectToCloud(projectData, projectTitle, projectDescription)
-                      .then(() => {
-                        // Set flag to refresh dashboard when user returns
-                        uni.setStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard', 'true');
-                      })
-                      .catch((err) => {
-                        console.error('Failed to save project to cloud:', err);
-                      });
-                    
                     // Set flag to force regeneration of images
                     uni.setStorageSync('force_regeneration', 'true');
                     
@@ -4754,6 +4749,21 @@ export default {
                       // Force generation of new preview images
                       setTimeout(() => {
                         this.generatePreviewImages();
+                        
+                        // After preview images are generated, update the project preview image and save to cloud
+                        setTimeout(() => {
+                          this.updateImportedProjectPreview(projectData);
+                          
+                          // Save project to the cloud if logged in
+                          this.saveProjectToCloud(projectData, projectTitle, projectDescription)
+                            .then(() => {
+                              // Set flag to refresh dashboard when user returns
+                              uni.setStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard', 'true');
+                            })
+                            .catch((err) => {
+                              console.error('Failed to save project to cloud:', err);
+                            });
+                        }, 2000);
                       }, 100);
                       
                       // Complete refresh after a delay
@@ -4856,16 +4866,6 @@ export default {
                   const updatedProjectData = JSON.stringify(projectData);
                   uni.setStorageSync('latest_7_overall_page', updatedProjectData);
                   
-                  // Save project to the cloud if logged in
-                  this.saveProjectToCloud(projectData, projectTitle, projectDescription)
-                    .then(() => {
-                      // Set flag to refresh dashboard when user returns
-                      uni.setStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard', 'true');
-                    })
-                    .catch((err) => {
-                      console.error('Failed to save project to cloud:', err);
-                    });
-                  
                   // Set flag to force regeneration of images
                   uni.setStorageSync('force_regeneration', 'true');
                   
@@ -4883,6 +4883,21 @@ export default {
                     // Force generation of new preview images
                     setTimeout(() => {
                       this.generatePreviewImages();
+                      
+                      // After preview images are generated, update the project preview image and save to cloud
+                      setTimeout(() => {
+                        this.updateImportedProjectPreview(projectData);
+                        
+                        // Save project to the cloud if logged in
+                        this.saveProjectToCloud(projectData, projectTitle, projectDescription)
+                          .then(() => {
+                            // Set flag to refresh dashboard when user returns
+                            uni.setStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard', 'true');
+                          })
+                          .catch((err) => {
+                            console.error('Failed to save project to cloud:', err);
+                          });
+                      }, 2000);
                     }, 100);
                     
                     // Complete refresh after a delay
@@ -4945,9 +4960,6 @@ export default {
                   const updatedProjectData = JSON.stringify(projectData);
                   uni.setStorageSync('latest_7_overall_page', updatedProjectData);
                   
-                  // Save project to the cloud if logged in
-                  this.saveProjectToCloud(projectData);
-                  
                   // Set flag to force regeneration of images
                   uni.setStorageSync('force_regeneration', 'true');
                   
@@ -4965,6 +4977,14 @@ export default {
                     // Force generation of new preview images
                     setTimeout(() => {
                       this.generatePreviewImages();
+                      
+                      // After preview images are generated, update the project preview image and save to cloud
+                      setTimeout(() => {
+                        this.updateImportedProjectPreview(projectData);
+                        
+                        // Save project to the cloud if logged in
+                        this.saveProjectToCloud(projectData);
+                      }, 2000);
                     }, 100);
                     
                     // Complete refresh after a delay
