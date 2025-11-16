@@ -5673,6 +5673,9 @@ export default {
             this.previewColor = this.colorCard[0];
             this.customColor = '';
           }
+        } else {
+          // Clear colorCard if no stored color card exists
+          this.colorCard = [];
         }
         
         // Load the toggle state (default to true if not set)

@@ -747,7 +747,6 @@ export default {
         }
       }).then(res => {
         uni.hideLoading();
-        
         if (res.result && res.result.success && res.result.data) {
           // Store the project data in local storage
           uni.setStorageSync('latest_7_overall_page', JSON.stringify(res.result.data));
@@ -757,7 +756,32 @@ export default {
           uni.switchTab({
             url: '/pages/design/design'
           });
+          
+          // Fetch project metadata including theme color in the background
+          uniCloud.callFunction({
+            name: 'user-project',
+            data: {
+              action: 'readThemeColour',
+              id: projectId
+            }
+          }).then(res => {
+            if (res.result && res.result.success && res.result.data) {
+              // console.log('Theme color for project', res.result.data);
+              const themeColour = res.result.data.themeColour;
+              
+              // Load theme color if it exists
+              if (themeColour && Array.isArray(themeColour) && themeColour.length > 0) {
+                uni.setStorageSync('colorCard', JSON.stringify(themeColour));
+              } else {
+                // Clear colorCard if no theme color exists
+                uni.removeStorageSync('colorCard');
+              }
+            }
+          }).catch(err => {
+            console.error('Failed to load theme color:', err);
+          });
         } else {
+          uni.hideLoading();
           uni.showToast({
             title: 'Failed to load project data',
             icon: 'none'
