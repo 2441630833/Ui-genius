@@ -128,6 +128,11 @@ export function saveCurrentTab(pagePath) {
   }
 
   try {
+    // Don't save login page as it's not a tab page and shouldn't be auto-restored
+    if (normalizedPath === 'pages/login/login') {
+      return
+    }
+    
     if (isKnownPage(normalizedPath)) {
       uni.setStorageSync(STORAGE_KEY, normalizedPath)
     }

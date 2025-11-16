@@ -101,18 +101,28 @@ export default {
   },
   mounted() {
     this.getUserInfo()
-    // Retrieve stored email and password
-    const userEmail = uni.getStorageSync('userEmail')
-    const userPsw = uni.getStorageSync('userPsw')
-    if (userEmail && userPsw) {
-      this.user.email = userEmail
-      this.user.password = userPsw
-    } else {
-      this.user.email = ''
-      this.user.password = ''
+    this.restoreFormData()
+  },
+  watch: {
+    'user.email'(newVal) {
+      uni.setStorageSync('userEmail', newVal)
+    },
+    'user.password'(newVal) {
+      uni.setStorageSync('userPsw', newVal)
     }
   },
   methods: {
+    restoreFormData() {
+      // Retrieve stored email and password
+      const userEmail = uni.getStorageSync('userEmail')
+      const userPsw = uni.getStorageSync('userPsw')
+      if (userEmail) {
+        this.user.email = userEmail
+      }
+      if (userPsw) {
+        this.user.password = userPsw
+      }
+    },
     skipLogin() {
       const token = uni.getStorageSync('token');
       const hasValidToken = token && !isTokenExpired();
