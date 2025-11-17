@@ -22,7 +22,7 @@
               <li>Priority support</li>
             </ul>
           </div>
-          <button class="btn btn--primary" @click="openModal" style="background-color: rgb(229, 57, 53);">Contact Sales</button>
+          <button class="btn btn--primary" @click="openModal" style="background-color: rgb(229, 57, 53);">Buy PRO</button>
         </div>
 
         <!-- Lifetime Deals Card (Highlighted "Best Value") -->
@@ -40,7 +40,7 @@
               <li><strong>Dedicated account manager</strong></li>
             </ul>
           </div>
-          <button class="btn btn--primary" @click="openModal" style="background-color: rgb(229, 57, 53);">Contact Sales</button>
+          <button class="btn btn--primary" @click="openModal" style="background-color: rgb(229, 57, 53);">Buy Lifetime Deals</button>
         </div>
       </div>
     </main>
