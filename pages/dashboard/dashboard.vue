@@ -35,6 +35,12 @@
             :src="activeNavItem === 'membership' ? '../../static/membership_white.png' : '../../static/membership.png'"></image>
           <text class="nav-text">Membership</text>
         </view>
+        <!-- Invitecode nav item -->
+        <view class="nav-item" :class="{ active: activeNavItem === 'inviteCode' }" @click="setActiveNavItem('inviteCode')">
+          <image class="sidebar-icon"
+            :src="activeNavItem === 'inviteCode' ? '../../static/inviteCode_white.png' : '../../static/inviteCode.png'"></image>
+          <text class="nav-text">Invite Code</text>
+        </view>
         <!-- Settings nav item -->
         <!-- <view class="nav-item" :class="{ active: activeNavItem === 'settings' }" @click="setActiveNavItem('settings')">
           <image class="sidebar-icon"
@@ -502,17 +508,22 @@
 
     <!-- Membership Component -->
     <Membership v-if="activeNavItem === 'membership'" />
+
+    <!-- Invite Code Component -->
+    <InviteCode v-if="activeNavItem === 'inviteCode'" />
   </view>
 </template>
 
 <script>
 import { API_BASE_URL } from '../../env.js';
 import Membership from './membership.vue';
+import InviteCode from './inviteCode.vue';
 
 export default {
   name: 'Dashboard',
   components: {
-    Membership
+    Membership,
+    InviteCode
   },
   data() {
     return {
