@@ -1386,10 +1386,6 @@ export default {
           root.className = 'page-root';
           root.id = 'template-' + pageKey;
 
-          const titleEl = iframeDoc.createElement('h1');
-          titleEl.textContent = pageName;
-          root.appendChild(titleEl);
-
           const contentEl = iframeDoc.createElement('div');
           contentEl.className = 'preview-content';
           const parsed = this.parseTemplate(page);
