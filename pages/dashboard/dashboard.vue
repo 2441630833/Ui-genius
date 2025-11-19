@@ -1025,31 +1025,59 @@ export default {
         return
       }
 
-      // Pass uid directly as a parameter
-      uniCloud.callFunction({
-        name: 'user-project',
-        data: {
-          action: 'read',
-          id: userId
-        }
-      }).then(res => {
+      // Load both user's own projects and shared projects
+      Promise.all([
+        // Load user's own projects
+        uniCloud.callFunction({
+          name: 'user-project',
+          data: {
+            action: 'read',
+            id: userId
+          }
+        }),
+        // Load shared projects where user has access
+        uniCloud.callFunction({
+          name: 'user-project',
+          data: {
+            action: 'readSharedProjects',
+            data: {
+              uid: userId
+            }
+          }
+        })
+      ]).then(results => {
         uni.hideLoading();
         this.userProjectsLoading = false;
-        if (res.result && res.result.success) {
-          console.log(res.result)
-          // Ensure userProjects is always an array
-          this.userProjects = Array.isArray(res.result.data) ? res.result.data : [];
-          console.log(`Loaded ${this.userProjects.length} projects for user ID ${userId}`);
 
-          // Update the project grid with user projects
-          this.updateProjectGrid();
+        const ownProjectsRes = results[0];
+        const sharedProjectsRes = results[1];
+
+        let allProjects = [];
+
+        // Process own projects
+        if (ownProjectsRes.result && ownProjectsRes.result.success) {
+          const ownProjects = Array.isArray(ownProjectsRes.result.data) ? ownProjectsRes.result.data : [];
+          allProjects = allProjects.concat(ownProjects);
+          console.log(`Loaded ${ownProjects.length} own projects for user ID ${userId}`);
         } else {
-          uni.showToast({
-            title: 'Failed to load projects',
-            icon: 'none'
-          });
-          console.error('Cloud function error:', res.result);
+          console.error('Failed to load own projects:', ownProjectsRes.result);
         }
+
+        // Process shared projects
+        if (sharedProjectsRes.result && sharedProjectsRes.result.success) {
+          const sharedProjects = Array.isArray(sharedProjectsRes.result.data) ? sharedProjectsRes.result.data : [];
+          allProjects = allProjects.concat(sharedProjects);
+          console.log(`Loaded ${sharedProjects.length} shared projects for user ID ${userId}`);
+        } else {
+          console.error('Failed to load shared projects:', sharedProjectsRes.result);
+        }
+
+        // Ensure userProjects is always an array
+        this.userProjects = allProjects;
+        console.log(`Total ${this.userProjects.length} projects loaded (own + shared)`);
+
+        // Update the project grid with user projects
+        this.updateProjectGrid();
       }).catch(err => {
         uni.hideLoading();
         this.userProjectsLoading = false;

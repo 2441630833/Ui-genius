@@ -51,7 +51,7 @@ exports.main = async (event, context) => {
 
 			case 'read':
 				if (id) {
-					// Read a specific project by ID
+					// Read a specific project by user uid
 					const project = await collection.where({
 						uid: id
 					}).get();
@@ -74,6 +74,36 @@ exports.main = async (event, context) => {
 						success: true,
 						data: projects.data,
 						message: 'Projects retrieved successfully'
+					};
+				}
+				break;
+
+			case 'readUidByProjectId':
+				// Read user UID by project ID
+				if (id) {
+					// Get the project by project ID
+					const project = await collection.doc(id).get();
+					if (project.data && project.data.length > 0) {
+						const uid = project.data[0].uid;
+						response = {
+							success: true,
+							data: {
+								uid: uid
+							},
+							message: 'User UID retrieved successfully'
+						};
+					} else {
+						response = {
+							success: false,
+							data: null,
+							message: 'Project not found'
+						};
+					}
+				} else {
+					response = {
+						success: false,
+						data: null,
+						message: 'Project ID is required for readUidByProjectId operation'
 					};
 				}
 				break;
@@ -143,7 +173,7 @@ exports.main = async (event, context) => {
 				};
 				break;
 
-			case 'shareProjectUpdate':
+			case 'shareProjectUpdateUidArray':
 				// Share project by adding user UID to shareProjectUidArray
 				if (!id) {
 					throw new Error('Project ID is required for shareProject operation');
@@ -178,6 +208,23 @@ exports.main = async (event, context) => {
 						shareProjectUidArray: shareProjectUidArray
 					},
 					message: 'Project shared successfully'
+				};
+				break;
+			
+			
+			case 'readSharedProjects':
+				// Read projects where the user's UID exists in shareProjectUidArray
+				if (!data.uid) {
+					throw new Error('User UID is required for readSharedProjects operation');
+				}
+				// Query projects where shareProjectUidArray contains the user's UID
+				const sharedProjects = await collection.where({
+					shareProjectUidArray: db.command.elemMatch(db.command.eq(data.uid))
+				}).get();
+				response = {
+					success: true,
+					data: sharedProjects.data,
+					message: 'Shared projects retrieved successfully'
 				};
 				break;
 

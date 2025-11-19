@@ -997,11 +997,12 @@ export default {
   },
   onLoad(options) {
     this.checkAndStartGuide();
-    this.pullRefreshProject();
     // Also handle shared content if navigating normally (non-H5)
     if (options && options.pid) {
       this.tryImportByProjectId(options.pid);
-    } 
+    } else {
+      this.pullRefreshProject();
+    }
   },
   onShow() {
     // Load images from local storage first
@@ -1233,6 +1234,8 @@ export default {
       // force the base url to be https://uigenius.top/pages/design/design
       
       const base = 'https://uigenius.top/pages/design/design'
+      // test localhost url link
+      // const base = 'http://localhost:5173/pages/design/design'
       // const isElectron = window.location.protocol === 'http:' && window.location.hostname === '127.0.0.1';
       // const base = isElectron ? 'https://uigenius.top/pages/design/design' : window.location.origin + '/pages/design/design';
       shareUrl = `${base}?pid=${encodeURIComponent(projectId)}`;
@@ -5323,58 +5326,58 @@ export default {
       if (!projectId) return;
       
       // Check if this shared project has already been imported
-      let importedProjectsMap = {};
-      try {
-        const mapStr = uni.getStorageSync('importedShareProjectsMap');
-        if (mapStr) {
-          importedProjectsMap = JSON.parse(mapStr);
-        }
-      } catch (e) {
-        console.error('Failed to parse importedShareProjectsMap:', e);
-      }
+      // let importedProjectsMap = {};
+      // try {
+      //   const mapStr = uni.getStorageSync('importedShareProjectsMap');
+      //   if (mapStr) {
+      //     importedProjectsMap = JSON.parse(mapStr);
+      //   }
+      // } catch (e) {
+      //   console.error('Failed to parse importedShareProjectsMap:', e);
+      // }
       
-      // If already imported, load the existing project instead of creating a new one
-      if (importedProjectsMap[projectId]) {
-        const existingProjectId = importedProjectsMap[projectId];
-        console.log('Project already imported. Loading existing project:', existingProjectId);
+      // If already imported, load the existing project instead of push the uid to the project's share uid list
+      // if (importedProjectsMap[projectId]) {
+      //   const existingProjectId = importedProjectsMap[projectId];
+      //   console.log('Project already imported. Loading existing project:', existingProjectId);
         
-        uni.showLoading({ title: 'Loading imported project...' });
-        uniCloud.callFunction({
-          name: 'generated-overall-pages',
-          data: {
-            action: 'read',
-            id: existingProjectId
-          }
-        }).then(res => {
-          uni.hideLoading();
-          if (res.result && res.result.success && res.result.data) {
-            const projectData = res.result.data;
-            uni.setStorageSync('latest_7_overall_page', JSON.stringify(projectData));
-            uni.setStorageSync('currentProjectId', existingProjectId);
-            uni.setStorageSync('force_regeneration', 'true');
+      //   uni.showLoading({ title: 'Loading imported project...' });
+      //   uniCloud.callFunction({
+      //     name: 'generated-overall-pages',
+      //     data: {
+      //       action: 'read',
+      //       id: existingProjectId
+      //     }
+      //   }).then(res => {
+      //     uni.hideLoading();
+      //     if (res.result && res.result.success && res.result.data) {
+      //       const projectData = res.result.data;
+      //       uni.setStorageSync('latest_7_overall_page', JSON.stringify(projectData));
+      //       uni.setStorageSync('currentProjectId', existingProjectId);
+      //       uni.setStorageSync('force_regeneration', 'true');
             
-            this.loadJsonTemplates();
-            this.updateLoadingStates();
-            setTimeout(() => {
-              this.generatePreviewImages();
+      //       this.loadJsonTemplates();
+      //       this.updateLoadingStates();
+      //       setTimeout(() => {
+      //         this.generatePreviewImages();
               
-              // Update preview image after images are generated
-              setTimeout(() => {
-                this.updateImportedProjectPreview(projectData);
-              }, 2000);
-            }, 100);
+      //         // Update preview image after images are generated
+      //         setTimeout(() => {
+      //           this.updateImportedProjectPreview(projectData);
+      //         }, 2000);
+      //       }, 100);
             
-            uni.showToast({ title: 'Loaded previously imported project', icon: 'success', duration: 2000 });
-          } else {
-            uni.showToast({ title: 'Failed to load existing project', icon: 'none', duration: 2000 });
-          }
-        }).catch(err => {
-          uni.hideLoading();
-          uni.showToast({ title: 'Error loading existing project', icon: 'none', duration: 2000 });
-          console.error('Cloud function error:', err);
-        });
-        return;
-      }
+      //       uni.showToast({ title: 'Loaded previously imported project', icon: 'success', duration: 2000 });
+      //     } else {
+      //       uni.showToast({ title: 'Failed to load existing project', icon: 'none', duration: 2000 });
+      //     }
+      //   }).catch(err => {
+      //     uni.hideLoading();
+      //     uni.showToast({ title: 'Error loading existing project', icon: 'none', duration: 2000 });
+      //     console.error('Cloud function error:', err);
+      //   });
+      //   return;
+      // }
       
       // If not imported before, proceed with import
       uni.showLoading({ title: 'Loading project...' });
@@ -5391,26 +5394,64 @@ export default {
           // Store imported project locally
           uni.setStorageSync('latest_7_overall_page', JSON.stringify(importedData));
           uni.setStorageSync('force_regeneration', 'true');
+          this.loadJsonTemplates();
+          this.updateLoadingStates();
+          setTimeout(() => {
+            this.generatePreviewImages();
+            this.refreshTemplates();
+            
+            // After preview images are generated, update the project preview image
+            // Wait longer to ensure images are captured
+            setTimeout(() => {
+              this.updateImportedProjectPreview(importedData);
+            }, 2000);
+          }, 100);
 
           // Always create a new project for the current user when importing from a share link
           // Clear the existing project ID to force creation of a new project
           // const originalProjectId = uni.getStorageSync('currentProjectId');
           // uni.removeStorageSync('currentProjectId');
           
-          // Call shareProjectUpdate to add current user to the shared project's shareProjectUidArray
+          // Check if current user is the project owner
+          const currentUid = uni.getStorageSync('uid') || uni.getStorageSync('userInfo')?.uid;
+          if (currentUid == '123bcbfeqqaeabfaf5a') {
+            uni.hideLoading();
+            return
+          }
+          
           uniCloud.callFunction({
             name: 'user-project',
             data: {
-              action: 'shareProjectUpdate',
-              id: projectId,
-              data: {
-                shareUid: uni.getStorageSync('uid') || uni.getStorageSync('userInfo')?.uid 
+              action: 'readUidByProjectId',
+              id: projectId
+            }
+          }).then(uidRes => {
+            // Only call shareProjectUpdateUidArray if current user is not the project owner
+            if (uidRes.result && uidRes.result.success && uidRes.result.data) {
+              const projectOwnerUid = uidRes.result.data.uid;
+              
+              if (projectOwnerUid !== currentUid) {
+                // Call shareProjectUpdate to add current user to the shared project's shareProjectUidArray
+                uniCloud.callFunction({
+                  name: 'user-project',
+                  data: {
+                    action: 'shareProjectUpdateUidArray',
+                    id: projectId,
+                    data: {
+                      shareUid: currentUid
+                    }
+                  }
+                }).then(shareRes => {
+                  console.log('Project shared successfully:', shareRes);
+                }).catch(shareErr => {
+                  console.error('Failed to update share project:', shareErr);
+                });
+              } else {
+                console.log('Current user is the project owner, skipping share update');
               }
             }
-          }).then(shareRes => {
-            console.log('Project shared successfully:', shareRes);
-          }).catch(shareErr => {
-            console.error('Failed to update share project:', shareErr);
+          }).catch(uidErr => {
+            console.error('Failed to retrieve project owner UID:', uidErr);
           });
           
           // Prepare project title and description for imported project
@@ -5452,19 +5493,6 @@ export default {
               uni.showToast({ title: 'Failed to save imported project', icon: 'none', duration: 2000 });
             });
           */
-
-          this.loadJsonTemplates();
-          this.updateLoadingStates();
-          setTimeout(() => {
-            this.generatePreviewImages();
-            this.refreshTemplates();
-            
-            // After preview images are generated, update the project preview image
-            // Wait longer to ensure images are captured
-            setTimeout(() => {
-              this.updateImportedProjectPreview(importedData);
-            }, 2000);
-          }, 100);
         } else {
           uni.showToast({ title: 'Failed to load project', icon: 'none', duration: 2000 });
         }
