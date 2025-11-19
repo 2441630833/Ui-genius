@@ -5394,20 +5394,39 @@ export default {
 
           // Always create a new project for the current user when importing from a share link
           // Clear the existing project ID to force creation of a new project
-          const originalProjectId = uni.getStorageSync('currentProjectId');
-          uni.removeStorageSync('currentProjectId');
+          // const originalProjectId = uni.getStorageSync('currentProjectId');
+          // uni.removeStorageSync('currentProjectId');
+          
+          // Call shareProjectUpdate to add current user to the shared project's shareProjectUidArray
+          uniCloud.callFunction({
+            name: 'user-project',
+            data: {
+              action: 'shareProjectUpdate',
+              id: projectId,
+              data: {
+                shareUid: uni.getStorageSync('uid') || uni.getStorageSync('userInfo')?.uid 
+              }
+            }
+          }).then(shareRes => {
+            console.log('Project shared successfully:', shareRes);
+          }).catch(shareErr => {
+            console.error('Failed to update share project:', shareErr);
+          });
           
           // Prepare project title and description for imported project
-          const importedProjectTitle = 'Shared project from other users';
-          const importDate = new Date().toLocaleString('en-US', { 
-            year: 'numeric', 
-            month: 'short', 
-            day: 'numeric', 
-            hour: '2-digit', 
-            minute: '2-digit' 
-          });
-          const importedProjectDescription = `Imported shared project on ${importDate}`;
+          // const importedProjectTitle = 'Shared project from other users';
+          // const importDate = new Date().toLocaleString('en-US', { 
+          //   year: 'numeric', 
+          //   month: 'short', 
+          //   day: 'numeric', 
+          //   hour: '2-digit', 
+          //   minute: '2-digit' 
+          // });
+          // const importedProjectDescription = `Imported shared project on ${importDate}`;
           
+          // No longer need to create a new project - user now has direct access via shareProjectUpdate
+          // The shared project is added to the current user's accessible projects through shareProjectUidArray
+          /*
           // Create a new project in the current user's account with the imported content
           this.saveProjectToCloud(importedData, importedProjectTitle, importedProjectDescription)
             .then((newId) => {
@@ -5432,6 +5451,7 @@ export default {
               }
               uni.showToast({ title: 'Failed to save imported project', icon: 'none', duration: 2000 });
             });
+          */
 
           this.loadJsonTemplates();
           this.updateLoadingStates();

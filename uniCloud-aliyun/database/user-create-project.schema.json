@@ -16,6 +16,10 @@
 			"description": "用户唯一标识id",
 			"foreignKey": "uni-id-users._id"
 		},
+		"shareProjectUidArray": {
+			"bsonType": "array",
+			"description": "分享项目可访问的用户数组"
+		},
 		"email": {
 			"bsonType": "string",
 			"description": "邮箱地址"

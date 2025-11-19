@@ -23,7 +23,7 @@ exports.main = async (event, context) => {
 	try {
 		switch (action) {
 			case 'create':
-				console.log("testDataCheckForGoogle",data)
+				// console.log("testDataCheckForGoogle",data)
 				const projectInfo = {
 					uid: data.uid,
 					email: data.email,
@@ -34,7 +34,7 @@ exports.main = async (event, context) => {
 
 				// Create a new project
 				const createResult = await collection.add(projectInfo);
-				console.log("createResult", createResult)
+				// console.log("createResult", createResult)
 				const generalPages = {
 					user_create_project_id: createResult.id,
 					generated_overall_pages: data.generated_overall_pages
@@ -46,7 +46,7 @@ exports.main = async (event, context) => {
 					data: generalPageRes,
 					message: 'Project created successfully'
 				};
-				console.log(response)
+				// console.log(response)
 				break;
 
 			case 'read':
@@ -140,6 +140,44 @@ exports.main = async (event, context) => {
 					success: true,
 					project_id: id,
 					message: 'Project updated successfully'
+				};
+				break;
+
+			case 'shareProjectUpdate':
+				// Share project by adding user UID to shareProjectUidArray
+				if (!id) {
+					throw new Error('Project ID is required for shareProject operation');
+				}
+				if (!data.shareUid) {
+					throw new Error('User UID is required for shareProject operation');
+				}
+
+				// Get the current project to check existing shareProjectUidArray
+				const projectResult = await collection.doc(id).get();
+				if (!projectResult.data || projectResult.data.length === 0) {
+					throw new Error('Project not found');
+				}
+
+				const project = projectResult.data[0];
+				let shareProjectUidArray = project.shareProjectUidArray || [];
+
+				// Check if UID already exists in array to avoid duplicates
+				if (!shareProjectUidArray.includes(data.shareUid)) {
+					shareProjectUidArray.push(data.shareUid);
+				}
+
+				// Update the project with the new shareProjectUidArray
+				await collection.doc(id).update({
+					shareProjectUidArray: shareProjectUidArray
+				});
+
+				response = {
+					success: true,
+					project_id: id,
+					data: {
+						shareProjectUidArray: shareProjectUidArray
+					},
+					message: 'Project shared successfully'
 				};
 				break;
 
