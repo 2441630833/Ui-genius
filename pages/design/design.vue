@@ -759,11 +759,12 @@ export default {
       
       // Model selection for Create New Page dialog
       modelOptions: [
-        { value: 'gimini2.5', text: 'gimini2.5 (recommended 1 minute)', isPro: true },
+        { value: 'gemini3', text: 'gemini3 (recommended 1 minute)', isPro: true },
+        { value: 'gemini2.5', text: 'gemini2.5 (recommended 1 minute)', isPro: true },
         { value: 'uigenius5:latest', text: 'uigenius5:latest (recommended 3 minutes)', isPro: true },
         { value: 'uigenius3:basic', text: 'uigenius3:basic (free basic model, 3 minutes)', isPro: false},
       ],
-      selectedPageModel: 'gimini2.5',
+      selectedPageModel: 'gemini3',
       showModelDropdown: false,
       
       // Import dialog properties
@@ -1145,8 +1146,8 @@ export default {
         this.showCreatePageDialog = true;
         this.pageDescription = '';
         this.errorMessage = '';
-        // Initialize model selection to gimini2.5
-        this.selectedPageModel = 'gimini2.5';
+        // Initialize model selection to gemini3
+        this.selectedPageModel = 'gemini3';
       }
       else if (index === 2) {
         this.showCreatePageDialog = false;
@@ -2430,7 +2431,7 @@ export default {
       const formData = {
         prompt: uni.getStorageSync('projectDescription') || this.projectDescription,
         device_type: uni.getStorageSync('selectedDevice') || 'desktop',
-        model: uni.getStorageSync('selectedModel') || 'gimini2.5',
+        model: uni.getStorageSync('selectedModel') || 'gemini2.5',
         num_pages: 1
       };
 
@@ -2846,8 +2847,8 @@ export default {
         this.showCreatePageDialog = true;
         this.pageDescription = '';
         this.errorMessage = '';
-        // Initialize model selection to gimini2.5
-        this.selectedPageModel = 'gimini2.5';
+        // Initialize model selection to gemini3
+        this.selectedPageModel = 'gemini3';
       }
       
       // Show delete pages dialog if delete nav item is clicked
@@ -3649,7 +3650,7 @@ export default {
           method: 'POST',
           data: {
             templateData: JSON.stringify(projectData),
-            model: 'gimini2.5',
+            model: 'gemini2.5',
             framework: framework
           },
           header: {
@@ -5596,7 +5597,7 @@ export default {
         header: { 'content-type': 'application/json' },
         data: {
           description: this.pageDescription,
-          model: 'gimini2.5'
+          model: 'gemini2.5'
         },
         timeout: 120000,
         success: (res) => {
@@ -5647,7 +5648,7 @@ export default {
           header: { 'content-type': 'application/json' },
           data: {
             code: htmlCode,
-            model: this.selectedPageModel || 'gimini2.5'
+            model: this.selectedPageModel || 'gemini2.5'
           },
           timeout: 60000,
           success: (res) => {

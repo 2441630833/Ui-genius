@@ -559,11 +559,12 @@ export default {
       passwordStrengthText: '',
       // Model selection
       modelOptions: [
-        { value: 'gimini2.5', text: 'gimini2.5 (recommended 1 minute)', isPro: true },
+        { value: 'gemini3', text: 'gemini3 (recommended 1 minute)', isPro: true },
+        { value: 'gemini2.5', text: 'gemini2.5 (recommended 1 minute)', isPro: true },
         { value: 'uigenius5:latest', text: 'uigenius5:latest (recommended 3 minutes)', isPro: true },
         { value: 'uigenius3:basic', text: 'uigenius3:basic (free basic model, 3 minutes)', isPro: false},
       ],
-      selectedModel: 'gimini2.5',
+      selectedModel: 'gemini3',
       showModelDropdown: false,
       // Longze Guide
       guideTheme: 'dark',
@@ -833,7 +834,7 @@ export default {
         header: { 'content-type': 'application/json' },
         data: {
           description: this.projectDescription,
-          model: this.selectedModel || 'gimini2.5'
+          model: this.selectedModel || 'gemini2.5'
         },
         timeout: 120000,
         success: (res) => {
@@ -1724,7 +1725,7 @@ export default {
         this.selectDevice('desktop');
       }
       else if (index === 3) {
-        this.selectModel('gimini2.5')
+        this.selectModel('gemini2.5')
       }
       else if (index === 4) {
         this.tryExample();
