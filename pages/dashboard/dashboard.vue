@@ -1139,7 +1139,7 @@ export default {
             product_id: paymentParams.product_id || '',
             request_id: paymentParams.request_id || '',
             signature: paymentParams.signature || '',
-            membershipPlan: paymentParams.membershipPlan || 'pro' // Default to 'pro' if not specified
+            membershipPlan: uni.getStorageSync('membershipPlan') || 'pro',
           }
         });
 
@@ -1147,11 +1147,7 @@ export default {
 
         if (result.result && result.result.success) {
           // Payment verified successfully
-          uni.showToast({
-            title: 'Payment verified! Membership activated.',
-            icon: 'success',
-            duration: 2000
-          });
+          this.showCustomToast('Congratulations! Membership activated.', 'success');
           console.log('Payment verification successful:', result.result.data);
           
           // Reload projects to reflect membership changes
@@ -1988,6 +1984,7 @@ export default {
       const projectIds = this.projectsToDelete.map(p => p._id);
       const totalProjects = projectIds.length;
       const currentProjectId = uni.getStorageSync('currentProjectId');
+      const uid = uni.getStorageSync('uid');
       
       uni.showLoading({
         title: `Deleting ${totalProjects} project(s)...`
@@ -2000,7 +1997,8 @@ export default {
             name: 'user-project',
             data: {
               action: 'delete',
-              id: projectIds[0]
+              id: projectIds[0],
+              uid: uid
             }
           });
           
@@ -2040,7 +2038,8 @@ export default {
             name: 'user-project',
             data: {
               action: 'batchDelete',
-              projectIds: projectIds
+              projectIds: projectIds,
+              uid: uid
             }
           });
           
@@ -2672,9 +2671,9 @@ export default {
 /* Custom Toast styles */
 .custom-toast {
   position: fixed;
-  bottom: 20px;
+  top: 50%;
   left: 50%;
-  transform: translateX(-50%);
+  transform: translate(-50%, -50%);
   background-color: #333;
   border-radius: 8px;
   padding: 12px 20px;

@@ -10,7 +10,8 @@ exports.main = async (event, context) => {
 		action,
 		data = {},
 		id,
-		projectIds
+		projectIds,
+		uid
 	} = event;
 
 	// Response object
@@ -233,33 +234,79 @@ exports.main = async (event, context) => {
 				if (!id) {
 					throw new Error('ID is required for delete operation');
 				}
+				if (!uid) {
+					throw new Error('User UID is required for delete operation');
+				}
 
-				// First, delete from generated-overall-pages collection using user_create_project_id
-				const deleteGeneralPagesResult = await generalPageCollection.where({
-					user_create_project_id: id
-				}).remove();
-				
-				console.log('Deleted from generated-overall-pages:', deleteGeneralPagesResult);
+				// Get the project to verify ownership
+				const projectToDelete = await collection.doc(id).get();
+				if (!projectToDelete.data || projectToDelete.data.length === 0) {
+					throw new Error('Project not found');
+				}
 
-				// Then, delete from user-create-project collection using _id
-				const deleteResult = await collection.doc(id).remove();
+				const projectData = projectToDelete.data[0];
 				
-				console.log('Deleted from user-create-project:', deleteResult);
+				// Check if the user is the project owner
+				if (projectData.uid === uid) {
+					// User is the owner, delete the entire project
+					// First, delete from generated-overall-pages collection using user_create_project_id
+					const deleteGeneralPagesResult = await generalPageCollection.where({
+						user_create_project_id: id
+					}).remove();
 				
-				response = {
-					success: true,
-					data: {
-						projectDeleted: deleteResult,
-						pagesDeleted: deleteGeneralPagesResult
-					},
-					message: 'Project and associated pages deleted successfully'
-				};
+					console.log('Deleted from generated-overall-pages:', deleteGeneralPagesResult);
+
+					// Then, delete from user-create-project collection using _id
+					const deleteResult = await collection.doc(id).remove();
+				
+					console.log('Deleted from user-create-project:', deleteResult);
+				
+					response = {
+						success: true,
+						data: {
+							projectDeleted: deleteResult,
+							pagesDeleted: deleteGeneralPagesResult
+						},
+						message: 'Project and associated pages deleted successfully'
+					};
+				} else {
+					// User is not the owner, remove them from shareProjectUidArray
+					let shareProjectUidArray = projectData.shareProjectUidArray || [];
+					const initialLength = shareProjectUidArray.length;
+				
+					// Remove the user uid from the array
+					shareProjectUidArray = shareProjectUidArray.filter(sharedUid => sharedUid !== uid);
+				
+					if (shareProjectUidArray.length < initialLength) {
+						// Update the project with the modified shareProjectUidArray
+						await collection.doc(id).update({
+							shareProjectUidArray: shareProjectUidArray
+						});
+					
+						response = {
+							success: true,
+							data: {
+								shareProjectUidArray: shareProjectUidArray
+							},
+							message: 'User removed from shared project successfully'
+						};
+					} else {
+						response = {
+							success: false,
+							data: null,
+							message: 'User is not in the shared project list'
+						};
+					}
+				}
 				break;
 
 			case 'batchDelete':
 				// Batch delete multiple projects by IDs
 				if (!projectIds || !Array.isArray(projectIds) || projectIds.length === 0) {
 					throw new Error('projectIds array is required for batch delete operation');
+				}
+				if (!uid) {
+					throw new Error('User UID is required for batch delete operation');
 				}
 
 				console.log('Batch deleting projects:', projectIds);
@@ -274,35 +321,74 @@ exports.main = async (event, context) => {
 					const projectId = projectIds[i];
 					
 					try {
-						// Delete from generated-overall-pages collection
-						const batchDeletePagesResult = await generalPageCollection.where({
-							user_create_project_id: projectId
-						}).remove();
+						// Get the project to verify ownership
+						const projectToDelete = await collection.doc(projectId).get();
+						if (!projectToDelete.data || projectToDelete.data.length === 0) {
+							throw new Error('Project not found');
+						}
+
+						const projectData = projectToDelete.data[0];
 						
-						// Delete from user-create-project collection
-						const batchDeleteProjectResult = await collection.doc(projectId).remove();
-						
-						successCount++;
-						deleteResults.push({
-							projectId: projectId,
-							success: true,
-							pagesDeleted: batchDeletePagesResult,
-							projectDeleted: batchDeleteProjectResult
-						});
-						
-						console.log(`Successfully deleted project: ${projectId}`);
+						// Check if the user is the project owner
+						if (projectData.uid === uid) {
+							// User is the owner, delete the entire project
+							// Delete from generated-overall-pages collection
+							const batchDeletePagesResult = await generalPageCollection.where({
+								user_create_project_id: projectId
+							}).remove();
+							
+							// Delete from user-create-project collection
+							const batchDeleteProjectResult = await collection.doc(projectId).remove();
+							
+							successCount++;
+							deleteResults.push({
+								projectId: projectId,
+								success: true,
+								action: 'deleted',
+								pagesDeleted: batchDeletePagesResult,
+								projectDeleted: batchDeleteProjectResult
+							});
+							
+							console.log(`Successfully deleted project: ${projectId}`);
+						} else {
+							// User is not the owner, remove them from shareProjectUidArray
+							let shareProjectUidArray = projectData.shareProjectUidArray || [];
+							const initialLength = shareProjectUidArray.length;
+							
+							// Remove the user uid from the array
+							shareProjectUidArray = shareProjectUidArray.filter(sharedUid => sharedUid !== uid);
+							
+							if (shareProjectUidArray.length < initialLength) {
+								// Update the project with the modified shareProjectUidArray
+								await collection.doc(projectId).update({
+									shareProjectUidArray: shareProjectUidArray
+								});
+								
+								successCount++;
+								deleteResults.push({
+									projectId: projectId,
+									success: true,
+									action: 'removed_from_shared',
+									shareProjectUidArray: shareProjectUidArray
+								});
+								
+								console.log(`Successfully removed user from shared project: ${projectId}`);
+							} else {
+								throw new Error('User is not in the shared project list');
+							}
+						}
 					} catch (error) {
 						failCount++;
 						failedProjects.push({
 							projectId: projectId,
 							error: error.message
 						});
-						console.error(`Failed to delete project ${projectId}:`, error.message);
+						console.error(`Failed to process project ${projectId}:`, error.message);
 					}
 				}
 
 				response = {
-					success: failCount === 0, // Only true if all deletions succeeded
+					success: failCount === 0, // Only true if all operations succeeded
 					data: {
 						totalProjects: projectIds.length,
 						successCount: successCount,
@@ -323,7 +409,7 @@ exports.main = async (event, context) => {
 		response = {
 			success: false,
 			data: null,
-			message: error.message || 'An error occurred'
+			message: error.message
 		};
 	}
 
