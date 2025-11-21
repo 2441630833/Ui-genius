@@ -13,7 +13,7 @@
         <div class="pricing-card">
           <div>
             <h2 class="pricing-card__label" style="color: rgb(229, 57, 53);">PRO</h2>
-            <p class="pricing-card__price">$29 <span>/ Month</span></p>
+            <p class="pricing-card__price">$12 <span>/ Month</span></p>
             <ul class="pricing-card__features">
               <li>Unlimited UI generation request</li>
               <li>Unlimited screenshot conversion</li>
@@ -22,7 +22,7 @@
               <li>Priority support</li>
             </ul>
           </div>
-          <button class="btn btn--primary" @click="redirectToPayment('prod_4452mq0wGzdeMcctVgbm8U')" style="background-color: rgb(229, 57, 53);">Buy PRO</button>
+          <button class="btn btn--primary" @click="handleProPayment('prod_4452mq0wGzdeMcctVgbm8U')" style="background-color: rgb(229, 57, 53);">Buy PRO</button>
         </div>
 
         <!-- Lifetime Deals Card (Highlighted "Best Value") -->
@@ -40,7 +40,7 @@
               <li><strong>Dedicated account manager</strong></li>
             </ul>
           </div>
-          <button class="btn btn--primary" @click="openModal" style="background-color: rgb(229, 57, 53);">Buy Lifetime Deals</button>
+          <button class="btn btn--primary" @click="handleLifetimePayment('prod_7m7FLqGesIUZD6MstjzOLR')" style="background-color: rgb(229, 57, 53);">Buy Lifetime Deals</button>
         </div>
       </div>
     </main>
@@ -104,9 +104,19 @@ export default {
       // Optionally clear form or close modal after submission
       this.closeModal();
     },
+    handleProPayment(productId) {
+      // Set membershipPlan to 'pro' before redirecting to payment
+      uni.setStorageSync('membershipPlan', 'pro');
+      this.redirectToPayment(productId);
+    },
+    handleLifetimePayment(productId) {
+      // Set membershipPlan to 'lifetime' before redirecting to payment
+      uni.setStorageSync('membershipPlan', 'lifetime');
+      this.redirectToPayment(productId);
+    },
     redirectToPayment(productId) {
       // Redirect to payment URL in the same window
-      window.location.href = `https://www.creem.io/test/payment/${productId}`;
+      window.location.href = `https://www.creem.io/payment/${productId}`;
     },
   },
   mounted() {

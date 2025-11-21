@@ -145,7 +145,7 @@
                         <a href="#" class="btn btn-primary" @click.prevent="contactSales">Contact Sales</a>
                     </div><div class="pricing-card" style="margin-right: 25px; width: 450px;">
                         <div class="label">PRO</div>
-                        <span class="price">$29<span>/ Month</span></span>
+                        <span class="price">$12<span>/ Month</span></span>
                         <ul>
                             <li>Unlimited UI generation&nbsp;request</li>
                             <li>Unlimited screenshot convertion</li><li>Pro AI model</li>
