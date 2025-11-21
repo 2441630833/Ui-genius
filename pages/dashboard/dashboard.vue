@@ -194,7 +194,12 @@
           <text class="section-description">You can change your email below</text>
 
           <view class="form-group">
-            <text class="form-label">Email</text>
+            <text class="form-label">Current email address</text>
+            <text class="current-email">{{ currentEmail }}</text>
+          </view>
+
+          <view class="form-group">
+            <text class="form-label">New email address</text>
             <input class="form-input" type="email" v-model="accountSettings.email" placeholder="New email address" />
           </view>
 
@@ -555,6 +560,7 @@ export default {
         confirmPassword: '',
         photoUrl: ''
       },
+      currentEmail: uni.getStorageSync('email') || '',
       passwordStrength: 0,
       passwordStrengthText: '',
       // Model selection
@@ -1398,9 +1404,13 @@ export default {
           const userInfo = uni.getStorageSync('googleUserInfo') || {};
           userInfo.email = this.accountSettings.email;
           uni.setStorageSync('googleUserInfo', userInfo);
+          uni.setStorageSync('email', this.accountSettings.email);
 
           // Update the current userInfo object
           this.userInfo = userInfo;
+          
+          // Update the currentEmail to reflect the new email
+          this.currentEmail = this.accountSettings.email;
 
           uni.showToast({
             title: 'Email updated successfully',
@@ -2775,6 +2785,18 @@ export default {
   &::placeholder {
     color: #aaa;
   }
+}
+
+.current-email {
+  display: block;
+  width: 96.5%;
+  padding: 12px;
+  background-color: #f8f8f8;
+  border: 1px solid #eaeaea;
+  border-radius: 5px;
+  font-size: 14px;
+  color: #666;
+  line-height: 1.5;
 }
 
 .profile-photo-container {
