@@ -624,6 +624,11 @@ export default {
   },
   onLoad(options) {
     this.checkAndStartGuide();
+    
+    // Check if payment return parameters exist
+    if (options && (options.checkout_id || options.order_id || options.signature)) {
+      this.verifyCreemPayment(options);
+    }
   },
   onShow() {
     // Pick up desired nav from storage when returning to tab
@@ -1104,6 +1109,71 @@ export default {
       }
 
       return true;
+    },
+
+    async verifyCreemPayment(paymentParams) {
+      // navigate to the membership item
+      this.setActiveNavItem('membership');
+      // Get user ID from storage
+      const uid = uni.getStorageSync('uid');
+      if (!uid) {
+        console.log('No user ID found for payment verification');
+        return;
+      }
+
+      try {
+        uni.showLoading({
+          title: 'Verifying payment...'
+        });
+
+        // Call the checkMembership cloud function with verifyCreemSignature action
+        const result = await uniCloud.callFunction({
+          name: 'checkMembership',
+          data: {
+            action: 'verifyCreemSignature',
+            uid: uid,
+            checkout_id: paymentParams.checkout_id || '',
+            order_id: paymentParams.order_id || '',
+            customer_id: paymentParams.customer_id || '',
+            subscription_id: paymentParams.subscription_id || '',
+            product_id: paymentParams.product_id || '',
+            request_id: paymentParams.request_id || '',
+            signature: paymentParams.signature || '',
+            membershipPlan: paymentParams.membershipPlan || 'pro' // Default to 'pro' if not specified
+          }
+        });
+
+        uni.hideLoading();
+
+        if (result.result && result.result.success) {
+          // Payment verified successfully
+          uni.showToast({
+            title: 'Payment verified! Membership activated.',
+            icon: 'success',
+            duration: 2000
+          });
+          console.log('Payment verification successful:', result.result.data);
+          
+          // Reload projects to reflect membership changes
+          // this.setActiveNavItem('dashboard');
+        } else {
+          // Payment verification failed
+          uni.showToast({
+            title: result.result?.message || 'Payment verification failed',
+            icon: 'none',
+            duration: 2000
+          });
+          console.error('Payment verification failed:', result.result);
+        }
+      } catch (error) {
+        uni.hideLoading();
+        uni.showToast({
+          title: 'Error verifying payment',
+          icon: 'none',
+          duration: 2000
+        });
+        console.error('Payment verification error:', error);
+      }
     },
 
     updateProjectGrid() {

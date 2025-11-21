@@ -1,6 +1,35 @@
 'use strict';
+const crypto = require('crypto');
 const db = uniCloud.database();
 const usersCollection = db.collection('uni-id-users');
+
+// Helper function to verify Creem payment signature
+const verifyCreemSignature = (params, apiKey) => {
+	const { signature, ...rest } = params;
+	// Build data string in the order: request_id, checkout_id, order_id, customer_id, subscription_id, product_id, salt
+	// Only include parameters that have values
+	const orderedParams = [
+		'request_id',
+		'checkout_id',
+		'order_id',
+		'customer_id',
+		'subscription_id',
+		'product_id'
+	];
+	
+	const data = orderedParams
+		.filter(key => rest[key]) // Only include parameters with values
+		.map(key => `${key}=${rest[key]}`)
+		.concat(`salt=${apiKey}`)
+		.join('|');
+	
+	const expected = crypto.createHash('sha256').update(data).digest('hex');
+	console.log('Data to hash:', data);
+	console.log('Expected signature:', expected);
+	console.log('Received signature:', signature);
+	return expected === signature;
+};
+
 exports.main = async (event, context) => {
 	// Event parameters
 	const {
@@ -260,8 +289,96 @@ exports.main = async (event, context) => {
 				};
 				break;
 
-			default:
-				throw new Error('Invalid action. Use "checkMembership", "checkFreeUsage", or "validateInvitationCode"');
+		case 'verifyCreemSignature':
+			// Verify Creem payment return URL signature
+			const {
+				checkout_id,
+				order_id,
+				customer_id,
+				subscription_id,
+				product_id,
+				request_id,
+				signature,
+				membershipPlan
+			} = event;
+
+			// Check if all required parameters are provided
+			if (!signature) {
+				throw new Error('Signature is required for verification');
+			}
+
+			// Creem API key
+			const creemApiKey = 'creem_test_6DPe18CbuavdjNsshNtzI9';
+
+			// Prepare params for signature verification
+			const paramsToVerify = {
+				checkout_id: checkout_id || '',
+				order_id: order_id || '',
+				customer_id: customer_id || '',
+				subscription_id: subscription_id || '',
+				product_id: product_id || '',
+				request_id: request_id || '',
+				signature: signature
+			};
+
+			// Verify the signature
+			const isSignatureValid = verifyCreemSignature(paramsToVerify, creemApiKey);
+
+			if (!isSignatureValid) {
+				response = {
+					success: false,
+					data: {
+						isValid: false,
+						reason: 'invalid_signature'
+					},
+					message: 'Payment signature verification failed. The payment may be fraudulent.'
+				};
+				break;
+			}
+
+			// If signature is valid and uid is provided, update user membership
+			if (uid) {
+				// Determine membership type based on membershipPlan from frontend
+				const isLifetime = membershipPlan === 'lifetime';
+				
+				if (isLifetime) {
+					// Grant lifetime membership
+					await usersCollection.doc(uid).update({
+						isLifetimeMembership: true,
+						lastPaymentCheckoutId: checkout_id,
+						lastPaymentOrderId: order_id,
+						lastPaymentDate: new Date().getTime()
+					});
+				} else {
+					// Grant 1-month pro membership (30 days)
+					const oneMonthFromNow = currentTime.getTime() + (30 * 24 * 60 * 60 * 1000);
+					await usersCollection.doc(uid).update({
+						isProMembership: true,
+						proMembershipExpirationTime: oneMonthFromNow,
+						lastPaymentCheckoutId: checkout_id,
+						lastPaymentOrderId: order_id,
+						lastPaymentDate: new Date().getTime()
+					});
+				}
+			}
+
+			response = {
+				success: true,
+				data: {
+					isValid: true,
+					checkout_id: checkout_id,
+					order_id: order_id,
+					customer_id: customer_id,
+					subscription_id: subscription_id,
+					product_id: product_id,
+					membershipGranted: uid ? true : false
+				},
+				message: 'Payment signature verified successfully!'
+			};
+			break;
+
+		default:
+			throw new Error('Invalid action. Use "checkMembership", "checkFreeUsage", "validateInvitationCode", or "verifyCreemSignature"');
 		}
 
 	} catch (error) {
