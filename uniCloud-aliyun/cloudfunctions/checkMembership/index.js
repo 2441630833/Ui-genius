@@ -298,8 +298,7 @@ exports.main = async (event, context) => {
 				subscription_id,
 				product_id,
 				request_id,
-				signature,
-				membershipPlan
+				signature
 			} = event;
 
 			// Check if all required parameters are provided
@@ -338,8 +337,8 @@ exports.main = async (event, context) => {
 
 			// If signature is valid and uid is provided, update user membership
 			if (uid) {
-				// Determine membership type based on membershipPlan from frontend
-				const isLifetime = membershipPlan === 'lifetime';
+				// Determine membership type based on product_id
+				const isLifetime = product_id === 'prod_7m7FLqGesIUZD6MstjzOLR';
 				
 				if (isLifetime) {
 					// Grant lifetime membership

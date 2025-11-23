@@ -22,7 +22,7 @@
               <li>Priority support</li>
             </ul>
           </div>
-          <button class="btn btn--primary" @click="handleProPayment('prod_4452mq0wGzdeMcctVgbm8U')" style="background-color: rgb(229, 57, 53);">Buy PRO</button>
+          <button class="btn btn--primary" @click="handleProPayment('prod_23PrXe2PUsElWYj1C7cKqf')" style="background-color: rgb(229, 57, 53);">Buy PRO</button>
         </div>
 
         <!-- Lifetime Deals Card (Highlighted "Best Value") -->
@@ -104,15 +104,72 @@ export default {
       // Optionally clear form or close modal after submission
       this.closeModal();
     },
-    handleProPayment(productId) {
-      // Set membershipPlan to 'pro' before redirecting to payment
-      uni.setStorageSync('membershipPlan', 'pro');
-      this.redirectToPayment(productId);
+    async handleProPayment(productId) {
+      await this.checkMembershipBeforePayment(productId);
     },
-    handleLifetimePayment(productId) {
-      // Set membershipPlan to 'lifetime' before redirecting to payment
-      uni.setStorageSync('membershipPlan', 'lifetime');
-      this.redirectToPayment(productId);
+    async handleLifetimePayment(productId) {
+      await this.checkMembershipBeforePayment(productId);
+    },
+    async checkMembershipBeforePayment(productId) {
+      try {
+        uni.showLoading({
+          title: 'Checking membership...'
+        });
+
+        // Get user ID from storage
+        const uid = uni.getStorageSync('uid');
+        if (!uid) {
+          uni.hideLoading();
+          uni.showToast({
+            title: 'User ID not found',
+            icon: 'none',
+            duration: 2000
+          });
+          return;
+        }
+
+        // Call checkMembership cloud function
+        const result = await uniCloud.callFunction({
+          name: 'checkMembership',
+          data: {
+            action: 'checkMembership',
+            uid: uid
+          }
+        });
+
+        uni.hideLoading();
+
+        if (result.result && result.result.success) {
+          const membershipData = result.result.data;
+          
+          // Check if user already has membership
+          if (membershipData.hasMembership) {
+            uni.showToast({
+              title: 'You already have an active membership',
+              icon: 'none',
+              duration: 2000
+            });
+            return;
+          }
+
+          // User doesn't have membership, proceed to payment
+          this.redirectToPayment(productId);
+        } else {
+          uni.showToast({
+            title: result.result?.message || 'Failed to check membership',
+            icon: 'none',
+            duration: 2000
+          });
+        }
+      } catch (error) {
+        uni.hideLoading();
+        uni.showToast({
+          title: 'Error checking membership',
+          icon: 'none',
+          duration: 2000
+        });
+        console.error('Error checking membership:', error);
+      }
     },
     redirectToPayment(productId) {
       // Redirect to payment URL in the same window

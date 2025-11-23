@@ -1144,8 +1144,7 @@ export default {
             subscription_id: paymentParams.subscription_id || '',
             product_id: paymentParams.product_id || '',
             request_id: paymentParams.request_id || '',
-            signature: paymentParams.signature || '',
-            membershipPlan: uni.getStorageSync('membershipPlan') || 'pro',
+            signature: paymentParams.signature || ''
           }
         });
 
