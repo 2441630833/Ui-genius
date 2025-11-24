@@ -142,7 +142,7 @@
                             <li>3 screenshot convertion</li>
                             <li>Free AI model</li>
                         </ul>
-                        <a href="#" class="btn btn-primary" @click.prevent="contactSales">Contact Sales</a>
+                        <a href="#" class="btn btn-primary" @click="goToLogin">Try Free Now</a>
                     </div><div class="pricing-card" style="margin-right: 25px; width: 450px;">
                         <div class="label">PRO</div>
                         <span class="price">$12<span>/ Month</span></span>
@@ -152,7 +152,7 @@
                             <li>Unlimited storage</li>
                             <li>Priority support</li>
                         </ul>
-                        <a href="#" class="btn btn-primary" @click.prevent="contactSales">Contact Sales</a>
+                        <a href="#" class="btn btn-primary" @click.prevent="handleProPayment('prod_23PrXe2PUsElWYj1C7cKqf')">Buy Now</a>
                     </div><div class="pricing-card" style="width: 450px;">
                         <div class="label">Lifetime Deals</div>
                         <span class="price">$79<span>/ Lifetime</span></span>
@@ -163,7 +163,7 @@
                             <li>Priority support</li>
                             <li>Dedicated account manager</li>
                         </ul>
-                        <a href="#" class="btn btn-primary" @click.prevent="contactSales">Contact Sales</a>
+                        <a href="#" class="btn btn-primary" @click.prevent="handleLifetimePayment('prod_7m7FLqGesIUZD6MstjzOLR')">Buy Now</a>
                     </div>
                 </div>
             </div>
@@ -320,8 +320,77 @@ export default {
         }
       })
     },
-    contactSales() {
-      window.location.href = 'mailto:sales@uigenius.top';
+    async handleProPayment(productId) {
+      await this.checkMembershipBeforePayment(productId);
+    },
+    async handleLifetimePayment(productId) {
+      await this.checkMembershipBeforePayment(productId);
+    },
+    async checkMembershipBeforePayment(productId) {
+      try {
+        uni.showLoading({
+          title: 'Checking membership...'
+        });
+
+        // Get user ID from storage
+        const uid = uni.getStorageSync('uid');
+        if (!uid) {
+          uni.hideLoading();
+          uni.showToast({
+            title: 'User ID not found',
+            icon: 'none',
+            duration: 2000
+          });
+          uni.navigateTo({ url: '/pages/login/login' });
+          return;
+        }
+
+        // Call checkMembership cloud function
+        const result = await uniCloud.callFunction({
+          name: 'checkMembership',
+          data: {
+            action: 'checkMembership',
+            uid: uid
+          }
+        });
+
+        uni.hideLoading();
+
+        if (result.result && result.result.success) {
+          const membershipData = result.result.data;
+          
+          // Check if user already has membership
+          if (membershipData.hasMembership) {
+            uni.showToast({
+              title: 'You already have an active membership',
+              icon: 'none',
+              duration: 2000
+            });
+            return;
+          }
+
+          // User doesn't have membership, proceed to payment
+          this.redirectToPayment(productId);
+        } else {
+          uni.showToast({
+            title: result.result?.message || 'Failed to check membership',
+            icon: 'none',
+            duration: 2000
+          });
+        }
+      } catch (error) {
+        uni.hideLoading();
+        uni.showToast({
+          title: 'Error checking membership',
+          icon: 'none',
+          duration: 2000
+        });
+        console.error('Error checking membership:', error);
+      }
+    },
+    redirectToPayment(productId) {
+      // Redirect to payment URL in the same window
+      window.location.href = `https://www.creem.io/payment/${productId}`;
     },
     contactSupport() {
       window.location.href = 'mailto:support@uigenius.top';
