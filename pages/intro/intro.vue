@@ -313,12 +313,13 @@ export default {
     goToLogin() {
       // If login is a tabBar page, switchTab is required; otherwise navigateTo works.
       // Try switchTab first; if it fails, fallback to navigateTo.
-      uni.switchTab({
-        url: '/pages/login/login',
-        fail: () => {
-          uni.navigateTo({ url: '/pages/login/login' })
-        }
-      })
+    //   uni.switchTab({
+    //     url: '/pages/login/login',
+    //     fail: () => {
+    //       uni.navigateTo({ url: '/pages/login/login' })
+    //     }
+    //   })
+    uni.navigateTo({ url: '/pages/login/login' })
     },
     async handleProPayment(productId) {
       await this.checkMembershipBeforePayment(productId);

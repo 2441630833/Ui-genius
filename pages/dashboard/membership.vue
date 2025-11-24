@@ -127,6 +127,12 @@ export default {
           });
           return;
         }
+        // Check if userId matches the specific ID
+        if (uid == '123bcbfeqqaeabfaf5a') {
+          uni.hideLoading();
+          uni.navigateTo({ url: '/pages/login/login' })
+          return;
+        }
 
         // Call checkMembership cloud function
         const result = await uniCloud.callFunction({
