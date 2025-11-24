@@ -145,7 +145,7 @@ export default {
           // Check if user already has membership
           if (membershipData.hasMembership) {
             uni.showToast({
-              title: 'You already have an active membership',
+              title: 'You already have an active membership,don\'t need to buy again~',
               icon: 'none',
               duration: 2000
             });

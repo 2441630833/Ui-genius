@@ -1152,7 +1152,11 @@ export default {
 
         if (result.result && result.result.success) {
           // Payment verified successfully
-          this.showCustomToast('Congratulations! Membership activated.', 'success');
+          uni.showToast({
+            title: 'Congratulations! Membership activated.',
+            icon: 'success',
+            duration: 2000
+          });
           console.log('Payment verification successful:', result.result.data);
           
           // Reload projects to reflect membership changes
@@ -2680,9 +2684,9 @@ export default {
 /* Custom Toast styles */
 .custom-toast {
   position: fixed;
-  top: 50%;
+  bottom: 20px;
   left: 50%;
-  transform: translate(-50%, -50%);
+  transform: translate(-50%);
   background-color: #333;
   border-radius: 8px;
   padding: 12px 20px;
