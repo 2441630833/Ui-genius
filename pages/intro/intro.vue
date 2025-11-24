@@ -142,7 +142,7 @@
                             <li>3 screenshot convertion</li>
                             <li>Free AI model</li>
                         </ul>
-                        <a href="#" class="btn btn-primary" @click="goToLogin">Try Free Now</a>
+                        <a href="#" class="btn btn-primary" @click.prevent="goToLogin">Try Free Now</a>
                     </div><div class="pricing-card" style="margin-right: 25px; width: 450px;">
                         <div class="label">PRO</div>
                         <span class="price">$12<span>/ Month</span></span>
@@ -334,6 +334,7 @@ export default {
 
         // Get user ID from storage
         const uid = uni.getStorageSync('uid');
+        
         if (!uid) {
           uni.hideLoading();
           uni.showToast({
@@ -341,7 +342,14 @@ export default {
             icon: 'none',
             duration: 2000
           });
-          uni.navigateTo({ url: '/pages/login/login' });
+          this.goToLogin();
+          return;
+        }
+
+        // Check if userId matches the specific ID
+        if (uid == '123bcbfeqqaeabfaf5a') {
+          uni.hideLoading();
+          this.goToLogin();
           return;
         }
 
