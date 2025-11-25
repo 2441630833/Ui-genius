@@ -104,9 +104,33 @@
         </div>
       </section>
 
+      <section class="steps-section">
+        <div class="container">
+          <h2 class="section-title text-center">4. Use the Editor to Refine Your Design</h2>
+          <div class="content-wrapper">
+            <div class="text-content">
+              <p>
+                The <strong>Editor</strong> is where you can manually refine the AI-generated UI. It provides a rich set of tools to modify the design to your exact specifications.
+              </p>
+              <ul class="steps-list">
+                <li><strong>Real-time Preview:</strong> See your changes live as you make them.</li>
+                <li><strong>Component Palette:</strong> Drag and drop new elements like buttons, forms, and containers.</li>
+                <li><strong>Style Editor:</strong> Adjust colors, fonts, spacing, and other CSS properties.</li>
+                <li><strong>Save Page:</strong> When you're happy with the design, you can save it to update your project.</li>
+              </ul>
+            </div>
+            <div class="image-content">
+              <div class="placeholder-image">
+                <span class="placeholder-text">Editor workspace</span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+
       <section class="steps-section alt">
         <div class="container">
-          <h2 class="section-title text-center">4. Manage and iterate on projects</h2>
+          <h2 class="section-title text-center">5. Manage and iterate on projects</h2>
           <div class="content-wrapper reverse">
             <div class="image-content">
               <div class="placeholder-image">
@@ -554,6 +578,10 @@ ul {
   font-weight: 600;
   margin-bottom: 20px;
   color: var(--dark-text);
+}
+
+.footer-links ul {
+  padding-left: 0;
 }
 
 .footer-links ul li {
