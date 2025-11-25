@@ -6,6 +6,7 @@ const whiteList = [
 	"/pages/about/about",
 	"/pages/careers/careers",
 	"/pages/privacy/privacy",
+	"/pages/quickstart/quickstart",
 	"/pages/terms/terms",
 ]
 //登录页
