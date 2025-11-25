@@ -180,11 +180,11 @@ export default {
                     if (componentHtml) {
                         // 简单的HTML内容验证和修复
                         try {
-                            // 确保HTML内容有一个根元素包裹
-                            if (!componentHtml.trim().startsWith('<div') && !componentHtml.trim().startsWith('<section')) {
-                                componentHtml = `<div class="container">${componentHtml}</div>`;
-                                // console.log('已添加容器元素包裹HTML内容');
-                            }
+                            // 不再确保HTML内容有一个根元素包裹
+                            // if (!componentHtml.trim().startsWith('<div') && !componentHtml.trim().startsWith('<section')) {
+                            //     componentHtml = `<div class="container">${componentHtml}</div>`;
+                            //     // console.log('已添加容器元素包裹HTML内容');
+                            // }
                             
                             // 移除可能导致问题的脚本标签
                             componentHtml = componentHtml.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
