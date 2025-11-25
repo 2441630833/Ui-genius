@@ -10,6 +10,7 @@
                 <nav class="nav-menu">
                     <ul>
                         <li><a @click.prevent="scrollToSection('home')">HOME</a></li>
+                        <li><a @click.prevent="goToQuickStart">QUICK START</a></li>
                         <li><a @click.prevent="scrollToSection('features')">FEATURES</a></li>
                         <li><a @click.prevent="scrollToSection('why-choose')">WHY UIGENIUS</a></li>
                         <li><a @click.prevent="scrollToSection('testimonial')">TESTIMONIAL</a></li>
@@ -257,7 +258,7 @@
         </div>
         <div class="footer-bottom">
             <div class="container">
-                <p>© 2025 Uigenius. All rights reserved.</p>
+                <p> 2025 Uigenius. All rights reserved.</p>
                 <div class="footer-legal-links">
                     <a @click.prevent="goToTerms">Terms of Service</a>
                     <span class="separator">|</span>
@@ -406,6 +407,9 @@ export default {
     },
     goToAboutUs() {
       uni.navigateTo({ url: '/pages/about/about' });
+    },
+    goToQuickStart() {
+      uni.navigateTo({ url: '/pages/quickstart/quickstart' });
     },
     goToCareers() {
       uni.navigateTo({ url: '/pages/careers/careers' });

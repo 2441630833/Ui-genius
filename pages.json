@@ -75,6 +75,13 @@
                 "navigationBarTitleText": "Privacy Policy",
                 "enablePullDownRefresh": false
             }
+        },
+        {
+            "path": "pages/quickstart/quickstart",
+            "style": {
+                "navigationBarTitleText": "Quick Start",
+                "enablePullDownRefresh": false
+            }
         }
     ],
     "easycom": {
