@@ -48,9 +48,7 @@
               </ul>
             </div>
             <div class="image-content">
-              <div class="placeholder-image">
-                <span class="placeholder-text">Dashboard overview</span>
-              </div>
+              <img src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/quick_start/dashboard.png" alt="Dashboard overview" class="quickstart-image">
             </div>
           </div>
         </div>
@@ -62,7 +60,7 @@
           <div class="content-wrapper reverse">
             <div class="image-content">
               <div class="placeholder-image">
-                <span class="placeholder-text">Create Project dialog</span>
+                <img src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/quick_start/createPage.png" alt="Create project overview" class="quickstart-image">
               </div>
             </div>
             <div class="text-content">
@@ -92,12 +90,12 @@
                 <li>Use text prompts, screenshots, or sketches to generate designs.</li>
                 <li>Adjust <strong>colors</strong>, <strong>layout</strong>, and <strong>components</strong> as needed.</li>
                 <li>Preview different pages and sections of the generated UI.</li>
-                <li>When you are satisfied, you can export the design to code.</li>
+                <li>When you are satisfied, you can <strong>export</strong> the design to code.</li>
               </ul>
             </div>
             <div class="image-content">
               <div class="placeholder-image">
-                <span class="placeholder-text">Design workspace</span>
+                 <img src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/quick_start/design.png" alt="Design overview" class="quickstart-image">
               </div>
             </div>
           </div>
@@ -121,7 +119,7 @@
             </div>
             <div class="image-content">
               <div class="placeholder-image">
-                <span class="placeholder-text">Editor workspace</span>
+                  <img src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/quick_start/editor.png" alt="Editor overview" class="quickstart-image">
               </div>
             </div>
           </div>
@@ -134,7 +132,7 @@
           <div class="content-wrapper reverse">
             <div class="image-content">
               <div class="placeholder-image">
-                <span class="placeholder-text">Project management</span>
+                <img src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/quick_start/manage.png" alt="Manage projects overview" class="quickstart-image">
               </div>
             </div>
             <div class="text-content">
@@ -495,6 +493,15 @@ ul {
 .placeholder-text {
   font-size: 16px;
   color: var(--lighter-text);
+}
+
+.quickstart-image {
+  width: 100%;
+  max-width: 420px;
+  height: auto;
+  border-radius: 16px;
+  box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+  object-fit: cover;
 }
 
 .tips-section {
