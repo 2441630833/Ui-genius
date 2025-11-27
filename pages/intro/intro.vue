@@ -109,6 +109,9 @@
             <div class="container">
                 <h2 class="section-title text-center">As Seen On</h2>
                 <div class="company-logos">
+                    <div class="company-logo-item">
+                        <a href="https://www.producthunt.com/products/uigenius?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-uigenius" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1042924&theme=light&t=1764212733379" alt="Uigenius - Uigenius: AI-Powered UI/UX Design Tools | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
+                    </div>
                     <div class="company-logo-item"><span>GRAYGRIDS</span></div>
                     <div class="company-logo-item"><span>UIdeck</span></div>
                     <div class="company-logo-item"><span>Ayro UI</span></div>
@@ -826,12 +829,15 @@ ul {
 }
 
 .company-logo-item {
-    height: 40px; /* Standard height for logos */
+    height: 54px; /* Standard height for logos */
     width: auto;
-    max-width: 150px;
+    max-width: 250px;
     filter: grayscale(100%);
     opacity: 0.6;
     transition: opacity 0.3s ease, filter 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 .company-logo-item:hover {
     filter: grayscale(0%);
