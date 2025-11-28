@@ -30,7 +30,12 @@
         <section id="home" class="hero">
             <div class="container hero-content">
                 <h1>AI-powered UX/UI Design Tool<br> For Rapid Prototyping</h1>
-                <a href="#" class="btn btn-primary" @click.prevent="goToLogin">Try Uigenius Now</a>
+                <div class="hero-buttons">
+                    <a href="#" class="btn btn-primary" @click.prevent="goToLogin">Try Uigenius Now</a>
+                    <a href="https://apps.microsoft.com/detail/9P7XBXGZN5JS" class="btn btn-secondary">
+                        <i class="fab fa-windows"></i> Download for Windows
+                    </a>
+                </div>
             </div>
             <div class="hero-illustration"></div>
             <div class="scroll-to-top" @click="scrollToTop">
@@ -645,9 +650,57 @@ ul {
     color: var(--dark-text);
 }
 
+.hero-buttons {
+    display: flex;
+    justify-content: center;
+    gap: 20px;
+    margin-top: 25px;
+}
+
+.btn-secondary {
+    background-color: #ffffff;
+    color: #333;
+    border: 2px solid #ccc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.btn-secondary:hover {
+    background-color: #f2f2f2;
+    border-color: #999;
+}
+
+.btn-secondary .fab {
+    font-size: 1.2em;
+}
+
 .hero .btn {
     padding: 15px 40px;
     font-size: 18px;
+}
+
+.windows-download-btn {
+    background-color: #ffffff;
+    color: #333;
+    border: 2px solid #ccc;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 15px 30px;
+    font-size: 18px;
+    border-radius: 5px;
+    cursor: pointer;
+    transition: background-color 0.3s ease;
+}
+
+.windows-download-btn:hover {
+    background-color: #f2f2f2;
+    border-color: #999;
+}
+
+.windows-download-btn .fab {
+    font-size: 1.2em;
 }
 
 .hero-illustration {
