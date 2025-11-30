@@ -305,7 +305,7 @@ export default {
       // Google OAuth client ID
       window.clientId = '137524279748-rg43jumis252rh8odausn13glj64nmit.apps.googleusercontent.com'
       // Redirect URI
-      window.redirectUri = 'https://uigenius.top/pages/login/login'
+      window.redirectUri = `${window.location.origin}/pages/login/login`;
 
       // window.redirectUri = 'http://localhost:5173/pages/login/login'
       // Requested scopes
@@ -362,7 +362,7 @@ export default {
           code: code,
           client_id: '137524279748-rg43jumis252rh8odausn13glj64nmit.apps.googleusercontent.com',
           client_secret: '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',
-          redirect_uri: 'https://uigenius.top/pages/login/login',
+          redirect_uri: `${window.location.origin}/pages/login/login`,
           // redirect_uri: 'http://localhost:5173/pages/login/login',
           grant_type: 'authorization_code'
         },

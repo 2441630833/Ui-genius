@@ -29,15 +29,7 @@ function createMenu() {
     // {
     //   label: 'View',
     //   submenu: [
-    //     { role: 'reload' },
-    //     { role: 'forceReload' },
     //     { role: 'toggleDevTools' },
-    //     { type: 'separator' },
-    //     { role: 'resetZoom' },
-    //     { role: 'zoomIn' },
-    //     { role: 'zoomOut' },
-    //     { type: 'separator' },
-    //     { role: 'togglefullscreen' }
     //   ]
     // },
     {
@@ -50,7 +42,7 @@ function createMenu() {
             await dialog.showMessageBox({
               type: 'info',
               title: 'About Uigenius',
-              message: 'Uigenius v1.0.6',
+              message: 'Uigenius v1.1.3',
               detail: 'AI-powered UX/UI design tool for rapid prototyping and design generation'
             });
           }
@@ -126,18 +118,18 @@ function startLocalServer(webAppPath, callback) {
         res.end(data);
       }
     });
-  }).listen(FIXED_PORT, '127.0.0.1', (err) => {
+  }).listen(FIXED_PORT, 'localhost', (err) => {
     if (err) {
       console.error(`Failed to start server on port ${FIXED_PORT}:`, err);
       // 如果固定端口被占用，尝试其他端口
-      server.listen(0, '127.0.0.1', () => {
+      server.listen(0, 'localhost', () => {
         const port = server.address().port;
         console.log(`Fixed port ${FIXED_PORT} unavailable, using port ${port}`);
-        callback(`http://127.0.0.1:${port}`);
+        callback(`http://localhost:${port}`);
       });
     } else {
-      console.log(`Local server running at http://127.0.0.1:${FIXED_PORT}`);
-      callback(`http://127.0.0.1:${FIXED_PORT}`);
+      console.log(`Local server running at http://localhost:${FIXED_PORT}`);
+      callback(`http://localhost:${FIXED_PORT}`);
     }
   });
 }
