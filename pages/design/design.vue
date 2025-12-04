@@ -395,10 +395,10 @@
             </view>
           </view>
 
-          <!-- Apply Colors Switch -->
+          <!-- Apply Colors Switch and uniform style-->
           <view class="extract-colors-container">
             <view class="extract-colors-row">
-              <text class="model-selection-label">Use project theme and style for your page</text>
+              <text class="model-selection-label">Uniform style and use project theme colour</text>
               <view class="toggle-switch" :class="{ 'active': useColor }" @click="toggleuseColor">
                 <view class="toggle-slider"></view>
               </view>
