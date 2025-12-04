@@ -39,9 +39,8 @@
             <view class="preview-content" v-html="getPreviewHTML(template)"></view>
           </view>
           <!-- Inject scoped styles dynamically -->
-          <view v-if="getScopedStyles(template)" class="preview-style-injector" 
-                :data-styles="getScopedStyles(template)"
-                :data-template-id="'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')">
+          <view v-if="getScopedStyles(template)" class="preview-style-injector" :data-styles="getScopedStyles(template)"
+            :data-template-id="'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')">
           </view>
         </view>
       </template>
@@ -132,7 +131,8 @@
           </image>
         </view>
 
-        <view class="nav-item import_guide" :class="{ active: activeNavItem === 'import' }" @click="navigateTo('import')">
+        <view class="nav-item import_guide" :class="{ active: activeNavItem === 'import' }"
+          @click="navigateTo('import')">
           <image class="nav-icon" :src="activeNavItem === 'import' ? '/static/import_white.png' : '/static/import.png'">
           </image>
         </view>
@@ -142,7 +142,8 @@
           </image>
         </view>
 
-        <view class="nav-item delete_guide" :class="{ active: activeNavItem === 'delete' }" @click="navigateTo('delete')">
+        <view class="nav-item delete_guide" :class="{ active: activeNavItem === 'delete' }"
+          @click="navigateTo('delete')">
           <image class="nav-icon" :src="activeNavItem === 'delete' ? '/static/delete_white.png' : '/static/delete.png'">
           </image>
         </view>
@@ -397,7 +398,7 @@
           <!-- Apply Colors Switch -->
           <view class="extract-colors-container">
             <view class="extract-colors-row">
-              <text class="model-selection-label">Use the theme colour for your page</text>
+              <text class="model-selection-label">Use project theme and style for your page</text>
               <view class="toggle-switch" :class="{ 'active': useColor }" @click="toggleuseColor">
                 <view class="toggle-slider"></view>
               </view>
@@ -407,7 +408,8 @@
           <view class="try-example-container">
             <text class="description-label">Describe your page in plain English</text>
             <button class="try-example-btn" @click="tryPageExample">Try example</button>
-            <button class="try-example-btn" :disabled="!pageDescription || isOptimizingPrompt" @click="optimizePageDescription">{{ isOptimizingPrompt ? 'Optimizing...' : 'Improve with AI' }}</button>
+            <button class="try-example-btn" :disabled="!pageDescription || isOptimizingPrompt"
+              @click="optimizePageDescription">{{ isOptimizingPrompt ? 'Optimizing...' : 'Improve with AI' }}</button>
           </view>
           <view class="description-container">
             <textarea class="project-description-input" placeholder="Enter your page description"
@@ -555,8 +557,8 @@
 
         <view class="color-palette-row">
           <view v-for="(color, index) in neutralColors" :key="'neutral-' + index" class="color-swatch"
-            :style="{ backgroundColor: color.hex }" :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }"
-            @click="selectColor(color.hex)">
+            :style="{ backgroundColor: color.hex }"
+            :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }" @click="selectColor(color.hex)">
             <text v-if="colorCard && colorCard.indexOf(color.hex) > -1" class="color-check">✓</text>
             <text class="color-hex">{{ color.hex }}</text>
           </view>
@@ -565,8 +567,8 @@
 
         <view class="color-palette-row">
           <view v-for="(color, index) in pastelColors" :key="'pastel-' + index" class="color-swatch"
-            :style="{ backgroundColor: color.hex }" :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }"
-            @click="selectColor(color.hex)">
+            :style="{ backgroundColor: color.hex }"
+            :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }" @click="selectColor(color.hex)">
             <text v-if="colorCard && colorCard.indexOf(color.hex) > -1" class="color-check">✓</text>
             <text class="color-hex">{{ color.hex }}</text>
           </view>
@@ -575,8 +577,8 @@
 
         <view class="color-palette-row">
           <view v-for="(color, index) in warmColors" :key="'warm-' + index" class="color-swatch"
-            :style="{ backgroundColor: color.hex }" :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }"
-            @click="selectColor(color.hex)">
+            :style="{ backgroundColor: color.hex }"
+            :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }" @click="selectColor(color.hex)">
             <text v-if="colorCard && colorCard.indexOf(color.hex) > -1" class="color-check">✓</text>
             <text class="color-hex">{{ color.hex }}</text>
           </view>
@@ -584,8 +586,8 @@
 
         <view class="color-palette-row">
           <view v-for="(color, index) in coolColors" :key="'cool-' + index" class="color-swatch"
-            :style="{ backgroundColor: color.hex }" :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }"
-            @click="selectColor(color.hex)">
+            :style="{ backgroundColor: color.hex }"
+            :class="{ 'selected': colorCard && colorCard.indexOf(color.hex) > -1 }" @click="selectColor(color.hex)">
             <text v-if="colorCard && colorCard.indexOf(color.hex) > -1" class="color-check">✓</text>
             <text class="color-hex">{{ color.hex }}</text>
           </view>
@@ -609,8 +611,8 @@
 
         <view class="color-input-container">
           <text class="color-input-label">Custom Color:</text>
-          <input type="text" v-model="customColor" class="color-input" placeholder="#RRGGBB"
-            @input="validateColorInput" @confirm="addCustomColor" />
+          <input type="text" v-model="customColor" class="color-input" placeholder="#RRGGBB" @input="validateColorInput"
+            @confirm="addCustomColor" />
           <view class="color-preview-swatch"
             :style="{ backgroundColor: isValidColor(customColor) ? customColor : '#cccccc' }"
             :class="{ 'selected': customColor && isValidColor(customColor) && colorCard && colorCard.indexOf(customColor) > -1 }"
@@ -626,7 +628,8 @@
     </view>
     <view class="toast-overlay" v-if="customToastVisible" @click="customToastVisible = false">
       <view class="custom-toast" @click.stop>
-        <image class="device-icon" :src="customToastType === 'success' ? '../../static/success.png' : '../../static/skip.png'"></image>
+        <image class="device-icon"
+          :src="customToastType === 'success' ? '../../static/success.png' : '../../static/skip.png'"></image>
         <text class="custom-toast-message">{{ customToastMessage }}</text>
       </view>
     </view>
@@ -756,17 +759,17 @@ export default {
       // examplePageDescription: 'A modern contact page with a form and interactive map, including name, email, and message fields',
       showDeleteDialog: false,
       pagesToDelete: [],
-      
+
       // Model selection for Create New Page dialog
       modelOptions: [
         { value: 'gemini3', text: 'gemini3 (recommended 1 minute)', isPro: true },
         { value: 'gemini2.5', text: 'gemini2.5 (recommended 1 minute)', isPro: true },
         { value: 'uigenius5:latest', text: 'uigenius5:latest (recommended 3 minutes)', isPro: true },
-        { value: 'uigenius3:basic', text: 'uigenius3:basic (free basic model, 3 minutes)', isPro: false},
+        { value: 'uigenius3:basic', text: 'uigenius3:basic (free basic model, 3 minutes)', isPro: false },
       ],
       selectedPageModel: 'gemini3',
       showModelDropdown: false,
-      
+
       // Import dialog properties
       showImportDialog: false,
       importFileList: [],
@@ -778,12 +781,12 @@ export default {
         //{ value: 'react', label: 'React' }
       ],
       selectedImportType: 'image',
-      
+
       // HTML file content
       htmlFileContent: '',
       htmlFileName: '',
       htmlFiles: [],
-      
+
       // Import progress properties
       isImporting: false,
       importProgress: 0,
@@ -881,16 +884,16 @@ export default {
       if (!this.jsonTemplates || this.jsonTemplates.length === 0) {
         return [];
       }
-      
+
       // Return all templates
       return this.jsonTemplates;
     },
-    
+
     isAllSelected() {
       // Check if all pages are selected
       return this.jsonTemplates.length > 0 && this.pagesToDelete.length === this.jsonTemplates.length;
     },
-    
+
 
     allowedExtensions() {
       switch (this.selectedImportType) {
@@ -944,7 +947,7 @@ export default {
 
     // Load images from storage on initial mount to avoid display issues
     this.loadImagesFromStorage();
-    
+
     // Inject scoped styles after initial mount
     this.$nextTick(() => {
       this.injectScopedStyles();
@@ -972,11 +975,11 @@ export default {
       this.templatesLoading = false;
     }, 900); // Reduced from 2700ms
     // console.log(this.jsonTemplates);
-    
+
     // Add click outside listener for dropdown
     document.addEventListener('click', this.handleClickOutside);
   },
-  
+
   updated() {
     // Inject scoped styles for templates after DOM update
     this.injectScopedStyles();
@@ -989,7 +992,7 @@ export default {
     // Ensure cleanup when the page is destroyed
     this.cleanupInjectedStyles();
   },
-  
+
   beforeUnmount() {
     // Remove click outside listener
     document.removeEventListener('click', this.handleClickOutside);
@@ -1112,9 +1115,9 @@ export default {
       const designHasGuideShown = uni.getStorageSync('designHasUserGuideShown'); // 或 localStorage.getItem('hasUserGuideShown')
       if (!designHasGuideShown) {
         setTimeout(() => {
-          this.startGuide(); 
-          uni.setStorageSync('designHasUserGuideShown', true); 
-        }, 1000); 
+          this.startGuide();
+          uni.setStorageSync('designHasUserGuideShown', true);
+        }, 1000);
       }
     },
     // Longze Guide methods
@@ -1161,17 +1164,17 @@ export default {
       else if (index === 4) {
         this.closeImportDialog();
       }
-      else if(index === 5){
+      else if (index === 5) {
         this.showDeleteDialog = true;
       }
-      else if(index === 6){
+      else if (index === 6) {
         this.closeDeleteDialog();
       }
     },
     shareProject() {
       try {
         let projectId = uni.getStorageSync('currentProjectId');
-        
+
         if (!projectId) {
           // No project ID found, create a new project first
           const projectData = uni.getStorageSync('latest_7_overall_page');
@@ -1183,17 +1186,17 @@ export default {
             });
             return;
           }
-          
+
           // Show loading toast
           uni.showLoading({
             title: 'Creating project...',
             mask: true
           });
-          
+
           // Create new project using the existing saveProjectToCloud method
           this.saveProjectToCloud(JSON.parse(projectData)).then(() => {
             uni.hideLoading();
-            
+
             // Get the newly created project ID
             projectId = uni.getStorageSync('currentProjectId');
             if (projectId) {
@@ -1216,10 +1219,10 @@ export default {
           });
           return;
         }
-        
+
         // Project ID exists, generate share URL directly
         this.generateShareUrl(projectId);
-        
+
       } catch (error) {
         uni.showToast({
           title: 'Share failed',
@@ -1229,18 +1232,18 @@ export default {
         console.error('shareProject error:', error);
       }
     },
-    
+
     generateShareUrl(projectId) {
       let shareUrl = '';
       // force the base url to be https://uigenius.top/pages/design/design
-      
+
       const base = 'https://uigenius.top/pages/design/design'
       // test localhost url link
       // const base = 'http://localhost:5173/pages/design/design'
       // const isElectron = window.location.protocol === 'http:' && window.location.hostname === '127.0.0.1';
       // const base = isElectron ? 'https://uigenius.top/pages/design/design' : window.location.origin + '/pages/design/design';
       shareUrl = `${base}?pid=${encodeURIComponent(projectId)}`;
-      
+
       uni.setClipboardData({
         data: shareUrl,
         success: () => {
@@ -1450,7 +1453,7 @@ export default {
         const orphanIframes = Array.from(document.querySelectorAll('iframe'))
           .filter(f => f.style && f.style.left === '-9999px' && f.style.top === '-9999px');
         orphanIframes.forEach(f => {
-          try { document.body.removeChild(f); } catch (_) {}
+          try { document.body.removeChild(f); } catch (_) { }
         });
       }
     },
@@ -1894,20 +1897,20 @@ export default {
         if (this.jsonTemplates.length > 0 || this.dynamicTemplateIds.length > 0) {
           this.jsonTemplates = [];
           this.dynamicTemplateIds = [];
-          
+
           // Clear all existing loading states first
           this.templateLoadingStates = {};
-          
+
           // Reset to static template loading states
           this.$set(this.templateLoadingStates, 'signup', true);
           this.$set(this.templateLoadingStates, 'home', true);
           this.$set(this.templateLoadingStates, 'notification', true);
           this.$set(this.templateLoadingStates, 'profile', true);
           this.$set(this.templateLoadingStates, 'settings', true);
-          
+
           // Force a re-render to show fallback templates
           this.$forceUpdate();
-          
+
           // Generate preview images for static templates
           this.$nextTick(() => {
             setTimeout(() => {
@@ -1995,12 +1998,12 @@ export default {
         this.jsonTemplates.forEach(template => {
           const key = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
           this.$set(this.templateLoadingStates, key, true);
-          
+
           // Also prepare capturedImages object
           if (!this.capturedImages[key]) {
             this.$set(this.capturedImages, key, '');
           }
-          
+
           // Set a timeout to turn off loading state after a delay - REDUCED TIME
           setTimeout(() => {
             this.$set(this.templateLoadingStates, key, false);
@@ -2011,12 +2014,12 @@ export default {
         this.dynamicTemplateIds.forEach(id => {
           const key = id.replace('template-', '');
           this.$set(this.templateLoadingStates, key, true);
-  
+
           // Also prepare capturedImages object
           if (!this.capturedImages[key]) {
             this.$set(this.capturedImages, key, '');
           }
-  
+
           // Set a timeout to turn off loading state after a delay - REDUCED TIME
           setTimeout(() => {
             this.$set(this.templateLoadingStates, key, false);
@@ -2121,7 +2124,7 @@ export default {
         try {
           uni.setStorageSync(`uigenius_image_${key}`, data.imageData);
           // console.log(`Stored image data for ${key} in local storage`);
-          
+
           // Check if this is the first page and update project preview
           this.updateProjectPreviewIfNeeded(key, data.imageData);
         } catch (e) {
@@ -2129,39 +2132,39 @@ export default {
         }
       }
     },
-    
+
     updateProjectPreviewIfNeeded(pageKey, imageData) {
       // Get the current project data
       const projectDataStr = uni.getStorageSync('latest_7_overall_page');
       if (!projectDataStr) {
         return;
       }
-      
+
       try {
         const projectData = typeof projectDataStr === 'string' ? JSON.parse(projectDataStr) : projectDataStr;
-        
+
         // Check if this is the first page
         if (projectData.pages && projectData.pages.length > 0) {
           const firstPage = projectData.pages[0];
           const firstPageKey = firstPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
-          
+
           // If this is the first page's image, update the project preview
           if (pageKey === firstPageKey) {
             const currentProjectId = uni.getStorageSync('currentProjectId');
-            
+
             // Only update if we have a valid project ID
             if (currentProjectId) {
               // Check if we've already updated the preview for this project
               const previewUpdatedKey = `preview_updated_${currentProjectId}`;
               const alreadyUpdated = uni.getStorageSync(previewUpdatedKey);
-              
+
               if (alreadyUpdated) {
                 console.log('Project preview already updated, skipping:', currentProjectId);
                 return;
               }
-              
+
               console.log('Updating project preview image for first page:', pageKey);
-              
+
               // Call cloud function to update preview image
               uniCloud.callFunction({
                 name: 'user-project',
@@ -2189,36 +2192,36 @@ export default {
         console.error('Error updating project preview:', e);
       }
     },
-    
+
     updateImportedProjectPreview(projectData, retryCount = 0) {
       // Get the first page preview image from storage
       if (!projectData || !projectData.pages || projectData.pages.length === 0) {
         console.log('No pages in imported project to create preview');
         return;
       }
-      
+
       const currentProjectId = uni.getStorageSync('currentProjectId');
-      
+
       if (!currentProjectId) {
         console.log('No current project ID found');
         return;
       }
-      
+
       // Check if we've already updated the preview for this project
       const previewUpdatedKey = `preview_updated_${currentProjectId}`;
       const alreadyUpdated = uni.getStorageSync(previewUpdatedKey);
-      
+
       if (alreadyUpdated) {
         console.log('Imported project preview already updated, skipping:', currentProjectId);
         return;
       }
-      
+
       const firstPage = projectData.pages[0];
       const firstPageKey = firstPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
-      
+
       try {
         const previewImage = uni.getStorageSync(`uigenius_image_${firstPageKey}`);
-        
+
         if (!previewImage) {
           // Only retry up to 5 times to prevent infinite loops
           if (retryCount < 5) {
@@ -2232,9 +2235,9 @@ export default {
           }
           return;
         }
-        
+
         console.log('Updating imported project preview image with first page:', firstPageKey);
-        
+
         // Update the project preview image in the cloud
         uniCloud.callFunction({
           name: 'user-project',
@@ -2380,7 +2383,7 @@ export default {
 
       // Show generation progress overlay
       this.isGenerating = true;
-      this.generationProgress = 0;     
+      this.generationProgress = 0;
       // Set up progress interval - evenly distributed over 5 minutes (300 seconds)
       const progressInterval = setInterval(() => {
         if (this.generationProgress < 98) {
@@ -2454,7 +2457,7 @@ export default {
         timeout: 1200000,
         success: (response) => {
           // console.log('API Response:', response);
-          
+
           // Stop the progress interval
           clearInterval(progressInterval);
           this.generationProgress = 100;
@@ -2473,36 +2476,36 @@ export default {
 
           const data = response.data;
           // console.log('Generated page data:', data);
-          
+
           try {
             // Process the response data - handle both string and object formats
             let responseData = data;
-            
+
             // If it's an object with a response property, extract it
             if (typeof data === 'object' && data.response) {
               responseData = data.response;
             }
-            
+
             // If responseData is already a parsed object, use it directly
             if (typeof responseData === 'object' && responseData.pages) {
               const parsedResponse = responseData;
-              
+
               // Extract the page data
               if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
                 const newPage = parsedResponse.pages[0];
                 const projectTitle = parsedResponse.AIProjectName;
                 const projectDescription = parsedResponse.AIProjectDescription;
-                
+
                 // Use AIProjectName directly as page name
                 newPage.name = parsedResponse.AIProjectName;
-                
+
                 // Add the new page to the project
                 projectData.pages.push(newPage);
-                
+
                 // Save the updated project data
                 const updatedProjectData = JSON.stringify(projectData);
                 uni.setStorageSync('latest_7_overall_page', updatedProjectData);
-                
+
                 // Save project to the cloud if logged in
                 this.saveProjectToCloud(projectData, projectTitle, projectDescription)
                   .then(() => {
@@ -2512,43 +2515,43 @@ export default {
                   .catch((err) => {
                     console.error('Failed to save project to cloud:', err);
                   });
-                  
+
                 // Extract colors from the new page
                 this.extractColors(newPage);
 
-                
+
                 // Set flag to force regeneration of images
                 uni.setStorageSync('force_regeneration', 'true');
-                
+
                 // Hide generation overlay
                 setTimeout(() => {
                   this.isGenerating = false;
-                  
+
                   // Refresh templates to show the new page
                   this.loadJsonTemplates();
                   this.updateLoadingStates();
-                  
+
                   // Force generation of new preview images
                   setTimeout(() => {
                     this.generatePreviewImages();
                   }, 100);
-                  
+
                   // Complete refresh after a delay
                   setTimeout(() => {
                     this.refreshTemplates();
                   }, 500);
-                  
+
                   // Show success message
                   // uni.showToast({
                   //   title: 'New page created successfully!',
                   //   icon: 'success',
                   //   duration: 2000
                   // });
-                  
+
                   // Navigate to editor with the new template ID
                   const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
                   uni.setStorageSync('selectedTemplateId', newTemplateId);
-                  
+
                   setTimeout(() => {
                     uni.switchTab({
                       url: '/pages/editor/editor'
@@ -2561,47 +2564,47 @@ export default {
             } else if (typeof responseData === 'string') {
               try {
                 // Try to clean up the response string for proper JSON parsing
-                
+
                 // First attempt: Try direct parsing - it might already be valid JSON
                 try {
                   const parsedResponse = JSON.parse(responseData);
                   // If we get here, parsing succeeded
-                  
+
                   // Continue with the same logic as above
                   if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
                     const newPage = parsedResponse.pages[0];
-                    
+
                     // Rename the page if needed
                     if (!newPage.name.toLowerCase().includes('page')) {
                       newPage.name = newPage.name + ' Page';
                     }
-                    
+
                     // Add the new page to the project
                     projectData.pages.push(newPage);
-                    
+
                     // Save the updated project data
                     const updatedProjectData = JSON.stringify(projectData);
                     uni.setStorageSync('latest_7_overall_page', updatedProjectData);
-                    
+
                     // Save project to the cloud if logged in
                     this.saveProjectToCloud(projectData);
-                    
+
                     // Set flag to force regeneration of images
                     uni.setStorageSync('force_regeneration', 'true');
-                    
+
                     // Hide generation overlay
                     setTimeout(() => {
                       this.isGenerating = false;
-                      
+
                       // Refresh templates to show the new page
                       this.loadJsonTemplates();
                       this.updateLoadingStates();
-                      
+
                       // Force generation of new preview images
                       setTimeout(() => {
                         this.generatePreviewImages();
                       }, 100);
-                      
+
                       // Complete refresh after a delay
                       setTimeout(() => {
                         this.refreshTemplates();
@@ -2614,16 +2617,16 @@ export default {
                       //   duration: 2000
                       // });
 
-                  // Navigate to editor with the new template ID
-                  const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
-                  uni.setStorageSync('selectedTemplateId', newTemplateId);
-                  
-                  setTimeout(() => {
-                    uni.switchTab({
-                      url: '/pages/editor/editor'
-                    });
-                  }, 500);
-                }, 1000);
+                      // Navigate to editor with the new template ID
+                      const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                      uni.setStorageSync('selectedTemplateId', newTemplateId);
+
+                      setTimeout(() => {
+                        uni.switchTab({
+                          url: '/pages/editor/editor'
+                        });
+                      }, 500);
+                    }, 1000);
                   } else {
                     throw new Error('No valid page data found in response');
                   }
@@ -2631,17 +2634,17 @@ export default {
                 } catch (initialParseError) {
                   // First attempt failed, continue with more robust cleaning
                 }
-                
+
                 // Second attempt: More thorough cleaning for complex responses
                 // Extract JSON-like structure from the response if it contains backticks
                 let cleanedResponse = responseData;
-                
+
                 // Replace backtick-wrapped strings with properly escaped JSON strings
-                cleanedResponse = cleanedResponse.replace(/`([\s\S]*?)`/g, function(match, p1) {
+                cleanedResponse = cleanedResponse.replace(/`([\s\S]*?)`/g, function (match, p1) {
                   // Escape any double quotes and newlines in the content
                   return JSON.stringify(p1.replace(/\n\s*/g, ' ').trim());
                 });
-                
+
                 // Handle HTML content in component property by properly escaping it
                 const componentMatch = cleanedResponse.match(/"component"\s*:\s*(".*?"|'.*?'|\{.*?\}|\[.*?\])/s);
                 if (componentMatch) {
@@ -2655,61 +2658,61 @@ export default {
                     cleanedResponse = cleanedResponse.replace(componentMatch[0], `"component": ${escapedContent}`);
                   }
                 }
-                
+
                 // Try parsing the cleaned response
                 const parsedResponse = JSON.parse(cleanedResponse);
-                
+
                 // Extract the page data
                 if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
                   const newPage = parsedResponse.pages[0];
-                  
+
                   // Rename the page if needed
                   if (!newPage.name.toLowerCase().includes('page')) {
                     newPage.name = newPage.name + ' Page';
                   }
-                  
+
                   // Add the new page to the project
                   projectData.pages.push(newPage);
-                  
+
                   // Save the updated project data
                   const updatedProjectData = JSON.stringify(projectData);
                   uni.setStorageSync('latest_7_overall_page', updatedProjectData);
-                  
+
                   // Save project to the cloud if logged in
                   this.saveProjectToCloud(projectData);
-                  
+
                   // Set flag to force regeneration of images
                   uni.setStorageSync('force_regeneration', 'true');
-                  
+
                   // Hide generation overlay
                   setTimeout(() => {
                     this.isGenerating = false;
-                    
+
                     // Refresh templates to show the new page
                     this.loadJsonTemplates();
                     this.updateLoadingStates();
-                    
+
                     // Force generation of new preview images
                     setTimeout(() => {
                       this.generatePreviewImages();
                     }, 100);
-                    
+
                     // Complete refresh after a delay
                     setTimeout(() => {
                       this.refreshTemplates();
                     }, 500);
-                    
+
                     // Show success message
                     // uni.showToast({
                     //   title: 'New page created successfully!',
                     //   icon: 'success',
                     //   duration: 2000
                     // });
-                    
+
                     // Navigate to editor with the new template ID
                     const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
                     uni.setStorageSync('selectedTemplateId', newTemplateId);
-                    
+
                     setTimeout(() => {
                       uni.switchTab({
                         url: '/pages/editor/editor'
@@ -2731,56 +2734,56 @@ export default {
                       <p>This is a simple page created from your description: "${this.pageDescription}"</p>
                     </div>`
                   };
-                  
+
                   // Add the simple page to the project
                   projectData.pages.push(simplifiedPage);
-                  
+
                   // Save the updated project data
                   const updatedProjectData = JSON.stringify(projectData);
                   uni.setStorageSync('latest_7_overall_page', updatedProjectData);
-                  
+
                   // Save project to the cloud if logged in
                   this.saveProjectToCloud(projectData);
-                  
+
                   // Set flag to force regeneration of images
                   uni.setStorageSync('force_regeneration', 'true');
-                  
+
                   // Hide generation overlay
                   setTimeout(() => {
                     this.isGenerating = false;
-                    
+
                     // Refresh templates to show the new page
                     this.loadJsonTemplates();
                     this.updateLoadingStates();
-                    
+
                     // Force generation of new preview images
                     setTimeout(() => {
                       this.generatePreviewImages();
                     }, 100);
-                    
+
                     // Complete refresh after a delay
                     setTimeout(() => {
                       this.refreshTemplates();
                     }, 500);
-                    
+
                     // Show success message
                     uni.showToast({
                       title: 'Simple page created (parsing failed)',
                       icon: 'success',
                       duration: 2000
                     });
-                    
+
                     // Navigate to editor with the new template ID
                     const newTemplateId = simplifiedPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
                     uni.setStorageSync('selectedTemplateId', newTemplateId);
-                    
+
                     setTimeout(() => {
                       uni.switchTab({
                         url: '/pages/editor/editor'
                       });
                     }, 500);
                   }, 1000);
-                  
+
                   console.error('Used fallback page creation due to parsing error:', parseError);
                 } catch (fallbackError) {
                   throw new Error(`JSON parsing failed: ${parseError.message}`);
@@ -2791,7 +2794,7 @@ export default {
             }
           } catch (error) {
             console.error('Error processing page data:', error);
-            
+
             // Handle error
             this.isGenerating = false;
             uni.showToast({
@@ -2806,10 +2809,10 @@ export default {
         fail: (error) => {
           // Stop the progress interval
           clearInterval(progressInterval);
-          
+
           // Log the error
           console.error('Error generating page:', error);
-          
+
           // Handle error
           this.isGenerating = false;
           uni.showToast({
@@ -2850,14 +2853,14 @@ export default {
         // Initialize model selection to gemini3
         this.selectedPageModel = 'gemini3';
       }
-      
+
       // Show delete pages dialog if delete nav item is clicked
       if (item === 'delete') {
         this.showDeleteDialog = true;
         this.pagesToDelete = [];
         this.errorMessage = '';
       }
-      
+
       // Show import dialog if import nav item is clicked
       if (item === 'import') {
         this.showImportDialog = true;
@@ -2889,7 +2892,7 @@ export default {
           templateId = String(template).toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
         }
       }
-      
+
       // Navigate to editor with the template ID as a parameter
       uni.switchTab({
         url: '/pages/editor/editor',
@@ -2908,29 +2911,29 @@ export default {
       try {
         let component = template.component;
         const templateId = 'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
-        
+
         // Clean up code block markers if present
         if (typeof component === 'string' && component.startsWith('```')) {
           component = component.replace(/^```(?:html|vue)?\s*/, '').replace(/```\s*$/, '');
         }
-        
+
         if (typeof component !== 'string') {
           return { html: '<div class="preview-placeholder">Invalid component format</div>', styles: '' };
         }
-        
+
         // Extract style tags
         const styleRegex = /<style[^>]*>([\s\S]*?)<\/style>/gi;
         let styles = '';
         let match;
         const styleMatches = [];
-        
+
         while ((match = styleRegex.exec(component)) !== null) {
           styleMatches.push(match[1]);
         }
-        
+
         // Remove style tags from HTML
         let html = component.replace(/<style[^>]*>[\s\S]*?<\/style>/gi, '');
-        
+
         // Scope the styles to this template's container
         if (styleMatches.length > 0) {
           const scopedStyles = styleMatches.map(styleContent => {
@@ -2938,36 +2941,36 @@ export default {
             // This ensures styles only apply within the template container
             return this.scopeCSS(styleContent, `#${templateId} .preview-content`);
           }).join('\n');
-          
+
           // Return styles as plain CSS (not wrapped in style tag)
           // We'll inject it dynamically via updated hook
           styles = scopedStyles;
         }
-        
+
         return { html, styles };
       } catch (e) {
         console.error('Error parsing template:', e);
         return { html: '<div class="preview-placeholder">Error rendering preview</div>', styles: '' };
       }
     },
-    
+
     // Scope CSS selectors to a specific container
     // This ensures styles only apply within the preview container, preventing global CSS leakage
     scopeCSS(css, scopeSelector) {
       if (!css || !scopeSelector) return css;
-      
+
       let scopedCSS = css;
-      
+
       // First, handle @media queries - extract and scope their content
       scopedCSS = scopedCSS.replace(/@media\s+([^{]+)\{([\s\S]*?)\}/g, (match, mediaQuery, content) => {
         // Scope all rules inside the media query
         const scopedContent = this.scopeCSSRules(content, scopeSelector);
         return `@media ${mediaQuery} {${scopedContent}}`;
       });
-      
+
       // Handle @keyframes - keep them as is (they don't need scoping)
       // But we'll scope any selectors that reference them
-      
+
       // Handle regular CSS rules - scope all selectors
       scopedCSS = scopedCSS.replace(/(^|\n|\r)([^{@\n\r]+)\{([^}]+)\}/gm, (match, prefix, selector, declarations) => {
         const trimmedSelector = selector.trim();
@@ -2988,24 +2991,24 @@ export default {
           }
           return `${scopeSelector} ${trimmed}`;
         }).join(', ');
-        
+
         return `${prefix}${scopedSelectors} {${declarations}}`;
       });
-      
+
       return scopedCSS;
     },
-    
+
     // Scope CSS rules within a block (like inside @media)
     scopeCSSRules(css, scopeSelector) {
       if (!css) return css;
-      
+
       // Handle nested rules and regular rules
       return css.replace(/(^|\n|\r)([^{@\n\r]+)\{([^}]+)\}/gm, (match, prefix, selector, declarations) => {
         const trimmedSelector = selector.trim();
         if (trimmedSelector.startsWith('@') || !trimmedSelector) {
           return match;
         }
-        
+
         // Handle multiple selectors separated by commas
         const scopedSelectors = trimmedSelector.split(',').map(s => {
           const trimmed = s.trim();
@@ -3014,28 +3017,28 @@ export default {
           }
           return `${scopeSelector} ${trimmed}`;
         }).join(', ');
-        
+
         return `${prefix}${scopedSelectors} {${declarations}}`;
       });
     },
-    
+
     // Get HTML content without styles
     getPreviewHTML(template) {
       const parsed = this.parseTemplate(template);
       return parsed.html;
     },
-    
+
     // Get scoped styles
     getScopedStyles(template) {
       const parsed = this.parseTemplate(template);
       return parsed.styles;
     },
-    
+
     // Legacy method for backward compatibility
     getSimplifiedPreview(template) {
       return this.getPreviewHTML(template);
     },
-    
+
     // Inject scoped styles dynamically into the page
     injectScopedStyles() {
       // Always start from a clean slate so no stale styles leak out
@@ -3046,26 +3049,26 @@ export default {
         injectors.forEach(injector => {
           const templateId = injector.getAttribute('data-template-id');
           const styles = injector.getAttribute('data-styles');
-          
+
           if (!templateId || !styles) return;
-          
+
           // Check if style already injected for this template
           const existingStyleId = `scoped-style-${templateId}`;
           let styleElement = document.getElementById(existingStyleId);
-          
+
           if (!styleElement) {
             // Create new style element
             styleElement = document.createElement('style');
             styleElement.id = existingStyleId;
             document.head.appendChild(styleElement);
           }
-          
+
           // Update style content
           styleElement.textContent = styles;
         });
       });
     },
-    
+
     // Clean up injected styles
     cleanupInjectedStyles() {
       const styleElements = document.querySelectorAll('[id^="scoped-style-"]');
@@ -3125,7 +3128,7 @@ export default {
           // console.error(`Failed to load image data for ${key} from local storage:`, e);
         }
       }
-      
+
       // Load dynamic template images
       for (const key of dynamicKeys) {
         try {
@@ -3165,10 +3168,10 @@ export default {
       // Determine if we have enough templates loaded to skip loading states
       const hasAllMainTemplates = mainLoadedCount >= mainTemplateKeys.length;
       const hasAllDynamicTemplates = dynamicKeys.length > 0 && dynamicLoadedCount >= dynamicKeys.length;
-      
+
       // If we're using dynamic templates and have them all, or we have all main templates when not using dynamic ones
-      if ((dynamicKeys.length > 0 && hasAllDynamicTemplates) || 
-          (dynamicKeys.length === 0 && hasAllMainTemplates)) {
+      if ((dynamicKeys.length > 0 && hasAllDynamicTemplates) ||
+        (dynamicKeys.length === 0 && hasAllMainTemplates)) {
         this.templatesLoading = false;
         // console.log('All required templates loaded from storage');
         return true;
@@ -3343,7 +3346,7 @@ export default {
       if (content && content.pages && content.pages.length > 0) {
         const firstPage = content.pages[0];
         const firstPageKey = firstPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
-        
+
         // Try to get the captured image from storage
         try {
           previewImage = uni.getStorageSync(`uigenius_image_${firstPageKey}`) || '';
@@ -3385,7 +3388,7 @@ export default {
           if (action === 'create' && res.result.project_id) {
             uni.setStorageSync('currentProjectId', res.result.project_id);
             console.log('Project created in cloud with ID:', res.result.project_id);
-            
+
             // Clear the preview update flag for the new project to allow preview update
             const previewUpdatedKey = `preview_updated_${res.result.project_id}`;
             uni.removeStorageSync(previewUpdatedKey);
@@ -3409,7 +3412,7 @@ export default {
     saveProjectThemeToCloud(themeColour) {
       // Check for existing project ID
       const currentProjectId = uni.getStorageSync('currentProjectId');
-      
+
       // If no project ID exists, cannot update theme
       if (!currentProjectId) {
         console.warn('No project ID found, cannot update theme color');
@@ -3675,27 +3678,27 @@ export default {
               // Add README file with basic instructions
               const readmeContent = `# ${projectName}\n\n${projectData.AIProjectDescription || ''}\n\n## Generated by UI Genius\n\nThis code was automatically generated by UI Genius.`;
               zip.file('README.md', readmeContent);
-              
+
               // Check if the response has multiple files
               if (res.data.multi_file && res.data.components) {
                 // It's a multi-file response with multiple components
-                
+
                 // Use the correct file extension based on the framework
                 const fileExtension = framework === 'react' ? '.jsx' : '.vue';
-                
+
                 // Add main app file
                 const mainFileName = `App${fileExtension}`;
                 zip.file(mainFileName, res.data.code || 'No code generated');
-                
+
                 // Create pages directory
                 const pagesFolder = zip.folder("pages");
-                
+
                 // Add individual component files
                 res.data.components.forEach(component => {
                   const componentFileName = `${component.name}${fileExtension}`;
                   pagesFolder.file(componentFileName, component.code || 'No code generated');
                 });
-                
+
                 // Add a basic package.json for the project
                 const packageJson = {
                   "name": projectName.toLowerCase().replace(/\s+/g, '-'),
@@ -3716,24 +3719,24 @@ export default {
                     "react-router-dom": framework === "react" ? "^6.8.0" : undefined
                   }
                 };
-                
+
                 // Remove undefined dependencies
                 Object.keys(packageJson.dependencies).forEach(key => {
                   if (packageJson.dependencies[key] === undefined) {
                     delete packageJson.dependencies[key];
                   }
                 });
-                
+
                 zip.file('package.json', JSON.stringify(packageJson, null, 2));
               } else {
                 // It's a single file response
                 // Use the correct file extension based on the framework
                 const fileExtension = framework === 'react' ? '.jsx' : '.vue';
                 const fileName = `index${fileExtension}`;
-                
+
                 // Get the component code from the response
                 const componentCode = res.data.code || 'No code generated';
-                
+
                 // Add the component file to the zip
                 zip.file(fileName, componentCode);
               }
@@ -3778,29 +3781,29 @@ export default {
     tryPageExample() {
       this.pageDescription = this.examplePageDescription;
     },
-    
+
     // Handle model selection for new page
     onPageModelChange(e) {
       this.selectedPageModel = e;
       console.log('Selected page model:', this.selectedPageModel);
     },
-    
+
     // Custom dropdown methods
     toggleModelDropdown() {
       this.showModelDropdown = !this.showModelDropdown;
     },
-    
+
     selectModel(value) {
       this.selectedPageModel = value;
       this.showModelDropdown = false;
       console.log('Selected page model:', this.selectedPageModel);
     },
-    
+
     getSelectedModelText() {
       const selectedOption = this.modelOptions.find(option => option.value === this.selectedPageModel);
       return selectedOption ? selectedOption.text : 'please select your AI model';
     },
-    
+
     handleClickOutside(event) {
       // Close dropdown if clicking outside
       if (this.showModelDropdown) {
@@ -3813,7 +3816,7 @@ export default {
     async createPage() {
       // Close the dialog immediately to provide better UX
       this.showCreatePageDialog = false;
-      
+
       // Validate the page description
       if (!this.pageDescription) {
         this.errorMessage = 'Please enter a page description';
@@ -3851,7 +3854,7 @@ export default {
           return; // Exit if not allowed
         }
       }
-      else{
+      else {
         // Check membership before proceeding
         const membershipCheck = await this.performMembershipCheck('create-page');
         if (!membershipCheck.allowed) {
@@ -3880,20 +3883,31 @@ export default {
 
       // Prepare form data for uni.request
       let prompt = this.pageDescription;
-      
+
       // If color card exists and toggle is enabled, append color information to the prompt
       if (this.useColor && this.colorCard) {
         const colorInstruction = `\n\nIMPORTANT COLOR SCHEME: Use the following 5 colors as the main color palette for this design: ${this.colorCard.join(', ')}. These colors should be prominently featured in the UI elements, backgrounds, buttons, headers, and other design components. Maintain visual consistency with these colors throughout the design.`;
         prompt += colorInstruction;
       }
 
-      
+
       const formData = {
         prompt: prompt,
         device_type: this.selectedDevice,
         model: this.selectedPageModel,
         num_pages: 1
       };
+
+      // If useColor is enabled, also pass the latest_7_overall_page data for context
+      if (this.useColor && existingProjectData) {
+        const projectData = typeof existingProjectData === 'string'
+          ? JSON.parse(existingProjectData)
+          : existingProjectData;
+        // Extract only the first page if it exists
+        if (projectData && projectData.pages && projectData.pages.length > 0) {
+          formData.latest_7_overall_page = JSON.stringify(projectData.pages[0]);
+        }
+      }
 
       // Show a toast to indicate a long wait
       uni.showToast({
@@ -3914,7 +3928,7 @@ export default {
         timeout: 1200000,
         success: (response) => {
           // console.log('API Response:', response);
-          
+
           // Stop the progress interval
           clearInterval(progressInterval);
           this.generationProgress = 100;
@@ -3933,76 +3947,76 @@ export default {
 
           const data = response.data;
           // console.log('Generated page data:', data);
-          
+
           try {
             // Process the response data - handle both string and object formats
             let responseData = data;
             console.log('responseData', responseData);
-            
+
             // If it's an object with a response property, extract it
             if (typeof data === 'object' && data.response) {
               responseData = data.response;
             }
-            
+
             // If responseData is already a parsed object, use it directly
             if (typeof responseData === 'object' && responseData.pages) {
               const parsedResponse = responseData;
-              
+
               // Extract the page data
               if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
                 const newPage = parsedResponse.pages[0];
-                
+
                 // Use AIProjectName directly as page name
                 newPage.name = parsedResponse.AIProjectName;
-                
+
                 // Add the new page to the project
                 projectData.pages.push(newPage);
-                
+
                 // Save the updated project data
                 const updatedProjectData = JSON.stringify(projectData);
                 uni.setStorageSync('latest_7_overall_page', updatedProjectData);
-                
+
                 // If useColor is enabled but colorCard doesn't exist, extract colors from the new page
                 // Note: This runs asynchronously in the background and doesn't block subsequent code execution
                 // if (this.useColor && (!this.colorCard || this.colorCard.length === 0)) {
                 //   this.extractColors(newPage);
                 // }
-                
+
                 // Save project to the cloud if logged in
                 this.saveProjectToCloud(projectData);
-                
+
                 // Set flag to force regeneration of images
                 uni.setStorageSync('force_regeneration', 'true');
-                
+
                 // Hide generation overlay
                 setTimeout(() => {
                   this.isGenerating = false;
-                  
+
                   // Refresh templates to show the new page
                   this.loadJsonTemplates();
                   this.updateLoadingStates();
-                  
+
                   // Force generation of new preview images
                   setTimeout(() => {
                     this.generatePreviewImages();
                   }, 100);
-                  
+
                   // Complete refresh after a delay
                   setTimeout(() => {
                     this.refreshTemplates();
                   }, 500);
-                  
+
                   // Show success message
                   // uni.showToast({
                   //   title: 'New page created successfully!',
                   //   icon: 'success',
                   //   duration: 2000
                   // });
-                  
+
                   // Navigate to editor with the new template ID
                   const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
                   uni.setStorageSync('selectedTemplateId', newTemplateId);
-                  
+
                   setTimeout(() => {
                     uni.switchTab({
                       url: '/pages/editor/editor'
@@ -4015,69 +4029,69 @@ export default {
             } else if (typeof responseData === 'string') {
               try {
                 // Try to clean up the response string for proper JSON parsing
-                
+
                 // First attempt: Try direct parsing - it might already be valid JSON
                 try {
                   const parsedResponse = JSON.parse(responseData);
                   // If we get here, parsing succeeded
-                  
+
                   // Continue with the same logic as above
                   if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
                     const newPage = parsedResponse.pages[0];
-                    
+
                     // Rename the page if needed
                     if (!newPage.name.toLowerCase().includes('page')) {
                       newPage.name = newPage.name + ' Page';
                     }
-                    
+
                     // Add the new page to the project
                     projectData.pages.push(newPage);
-                    
+
                     // Save the updated project data
                     const updatedProjectData = JSON.stringify(projectData);
                     uni.setStorageSync('latest_7_overall_page', updatedProjectData);
-                    
+
                     // If useColor is enabled but colorCard doesn't exist, extract colors from the new page
                     // Note: This runs asynchronously in the background and doesn't block subsequent code execution
                     // if (this.useColor && (!this.colorCard || this.colorCard.length === 0)) {
                     //   this.extractColors(newPage);
                     // }
-                    
+
                     // Save project to the cloud if logged in
                     this.saveProjectToCloud(projectData);
-                    
+
                     // Set flag to force regeneration of images
                     uni.setStorageSync('force_regeneration', 'true');
-                    
+
                     // Hide generation overlay
                     setTimeout(() => {
                       this.isGenerating = false;
-                      
+
                       // Refresh templates to show the new page
                       this.loadJsonTemplates();
                       this.updateLoadingStates();
-                      
+
                       // Force generation of new preview images
                       setTimeout(() => {
                         this.generatePreviewImages();
                       }, 100);
-                      
+
                       // Complete refresh after a delay
                       setTimeout(() => {
                         this.refreshTemplates();
                       }, 500);
-                      
+
                       // Show success message
                       // uni.showToast({
                       //   title: 'New page created successfully!',
                       //   icon: 'success',
                       //   duration: 2000
                       // });
-                      
+
                       // Navigate to editor with the new template ID
                       const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
                       uni.setStorageSync('selectedTemplateId', newTemplateId);
-                      
+
                       setTimeout(() => {
                         uni.switchTab({
                           url: '/pages/editor/editor'
@@ -4091,17 +4105,17 @@ export default {
                 } catch (initialParseError) {
                   // First attempt failed, continue with more robust cleaning
                 }
-                
+
                 // Second attempt: More thorough cleaning for complex responses
                 // Extract JSON-like structure from the response if it contains backticks
                 let cleanedResponse = responseData;
-                
+
                 // Replace backtick-wrapped strings with properly escaped JSON strings
-                cleanedResponse = cleanedResponse.replace(/`([\s\S]*?)`/g, function(match, p1) {
+                cleanedResponse = cleanedResponse.replace(/`([\s\S]*?)`/g, function (match, p1) {
                   // Escape any double quotes and newlines in the content
                   return JSON.stringify(p1.replace(/\n\s*/g, ' ').trim());
                 });
-                
+
                 // Handle HTML content in component property by properly escaping it
                 const componentMatch = cleanedResponse.match(/"component"\s*:\s*(".*?"|'.*?'|\{.*?\}|\[.*?\])/s);
                 if (componentMatch) {
@@ -4115,73 +4129,73 @@ export default {
                     cleanedResponse = cleanedResponse.replace(componentMatch[0], `"component": ${escapedContent}`);
                   }
                 }
-                
+
                 // Try parsing the cleaned response
                 const parsedResponse = JSON.parse(cleanedResponse);
-                
+
                 // Extract the page data
                 if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
                   const newPage = parsedResponse.pages[0];
-                  
+
                   // Rename the page if needed
                   if (!newPage.name.toLowerCase().includes('page')) {
                     newPage.name = newPage.name + ' Page';
                   }
-                  
+
                   // Add the new page to the project
                   projectData.pages.push(newPage);
-                  
+
                   // Save the updated project data
                   const updatedProjectData = JSON.stringify(projectData);
                   uni.setStorageSync('latest_7_overall_page', updatedProjectData);
-                  
+
                   // If useColor is enabled but colorCard doesn't exist, extract colors from the new page
                   // Note: This runs asynchronously in the background and doesn't block subsequent code execution
                   // if (this.useColor && (!this.colorCard || this.colorCard.length === 0)) {
                   //   this.extractColors(newPage);
                   // }
-                  
+
                   // Save project to the cloud if logged in
                   this.saveProjectToCloud(projectData);
-                  
+
                   // Set flag to force regeneration of images
                   uni.setStorageSync('force_regeneration', 'true');
-                  
+
                   // Hide generation overlay
                   setTimeout(() => {
                     this.isGenerating = false;
-                    
+
                     // Refresh templates to show the new page
-                      this.loadJsonTemplates();
-                      this.updateLoadingStates();
-                      
-                      // Force generation of new preview images
-                      setTimeout(() => {
-                        this.generatePreviewImages();
-                      }, 100);
-                      
-                      // Complete refresh after a delay
-                      setTimeout(() => {
-                        this.refreshTemplates();
-                      }, 500);
-                      
-                      // Show success message
-                      // uni.showToast({
-                      //   title: 'New page created successfully!',
-                      //   icon: 'success',
-                      //   duration: 2000
-                      // });
-                      
-                      // Navigate to editor with the new template ID
-                      const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
-                      uni.setStorageSync('selectedTemplateId', newTemplateId);
-                      
-                      setTimeout(() => {
-                        uni.switchTab({
-                          url: '/pages/editor/editor'
-                        });
-                      }, 500);
-                    }, 1000);
+                    this.loadJsonTemplates();
+                    this.updateLoadingStates();
+
+                    // Force generation of new preview images
+                    setTimeout(() => {
+                      this.generatePreviewImages();
+                    }, 100);
+
+                    // Complete refresh after a delay
+                    setTimeout(() => {
+                      this.refreshTemplates();
+                    }, 500);
+
+                    // Show success message
+                    // uni.showToast({
+                    //   title: 'New page created successfully!',
+                    //   icon: 'success',
+                    //   duration: 2000
+                    // });
+
+                    // Navigate to editor with the new template ID
+                    const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                    uni.setStorageSync('selectedTemplateId', newTemplateId);
+
+                    setTimeout(() => {
+                      uni.switchTab({
+                        url: '/pages/editor/editor'
+                      });
+                    }, 500);
+                  }, 1000);
                 } else {
                   throw new Error('No valid page data found in response');
                 }
@@ -4197,56 +4211,56 @@ export default {
                       <p>This is a simple page created from your description: "${this.pageDescription}"</p>
                     </div>`
                   };
-                  
+
                   // Add the simple page to the project
                   projectData.pages.push(simplifiedPage);
-                  
+
                   // Save the updated project data
                   const updatedProjectData = JSON.stringify(projectData);
                   uni.setStorageSync('latest_7_overall_page', updatedProjectData);
-                  
+
                   // Save project to the cloud if logged in
                   this.saveProjectToCloud(projectData);
-                  
+
                   // Set flag to force regeneration of images
                   uni.setStorageSync('force_regeneration', 'true');
-                  
+
                   // Hide generation overlay
                   setTimeout(() => {
                     this.isGenerating = false;
-                    
+
                     // Refresh templates to show the new page
                     this.loadJsonTemplates();
                     this.updateLoadingStates();
-                    
+
                     // Force generation of new preview images
                     setTimeout(() => {
                       this.generatePreviewImages();
                     }, 100);
-                    
+
                     // Complete refresh after a delay
                     setTimeout(() => {
                       this.refreshTemplates();
                     }, 500);
-                    
+
                     // Show success message
                     uni.showToast({
                       title: 'Simple page created (parsing failed)',
                       icon: 'success',
                       duration: 2000
                     });
-                    
+
                     // Navigate to editor with the new template ID
                     const newTemplateId = simplifiedPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
                     uni.setStorageSync('selectedTemplateId', newTemplateId);
-                    
+
                     setTimeout(() => {
                       uni.switchTab({
                         url: '/pages/editor/editor'
                       });
                     }, 500);
                   }, 1000);
-                  
+
                   console.error('Used fallback page creation due to parsing error:', parseError);
                 } catch (fallbackError) {
                   throw new Error(`JSON parsing failed: ${parseError.message}`);
@@ -4257,7 +4271,7 @@ export default {
             }
           } catch (error) {
             console.error('Error processing page data:', error);
-            
+
             // Handle error
             this.isGenerating = false;
             uni.showToast({
@@ -4272,10 +4286,10 @@ export default {
         fail: (error) => {
           // Stop the progress interval
           clearInterval(progressInterval);
-          
+
           // Log the error
           console.error('Error generating page:', error);
-          
+
           // Handle error
           this.isGenerating = false;
           uni.showToast({
@@ -4289,13 +4303,13 @@ export default {
     closeCreatePageDialog() {
       this.showCreatePageDialog = false;
     },
-    
+
     closeDeleteDialog() {
       this.showDeleteDialog = false;
       this.pagesToDelete = [];
       this.errorMessage = '';
     },
-    
+
     togglePageSelection(index) {
       const position = this.pagesToDelete.indexOf(index);
       if (position === -1) {
@@ -4306,7 +4320,7 @@ export default {
         this.pagesToDelete.splice(position, 1);
       }
     },
-    
+
     toggleSelectAll() {
       if (this.isAllSelected) {
         // If all are selected, deselect all
@@ -4316,65 +4330,65 @@ export default {
         this.pagesToDelete = this.jsonTemplates.map((_, index) => index);
       }
     },
-    
+
     deleteSelectedPages() {
       // Check if we have pages to delete
       if (this.pagesToDelete.length === 0) {
         this.errorMessage = 'Please select at least one page to delete';
         return;
       }
-      
+
       // Get existing project data
       const existingProjectData = uni.getStorageSync('latest_7_overall_page');
       if (!existingProjectData) {
         this.errorMessage = 'No project data found';
         return;
       }
-      
+
       // Parse the project data
       const projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
-      
+
       // Prevent deleting all pages
       if (this.pagesToDelete.length >= projectData.pages.length) {
         this.errorMessage = 'You must keep at least one page in your project';
         return;
       }
-      
+
       // Sort indices in descending order to avoid index shifting when removing items
       const sortedIndices = [...this.pagesToDelete].sort((a, b) => b - a);
-      
+
       // Remove pages from the project data
       sortedIndices.forEach(index => {
         projectData.pages.splice(index, 1);
       });
-      
+
       // Save the updated project data
       const updatedProjectData = JSON.stringify(projectData);
       uni.setStorageSync('latest_7_overall_page', updatedProjectData);
-      
+
       // Save project to the cloud if logged in
       this.saveProjectToCloud(projectData);
-      
+
       // Set flag to force regeneration of images
       uni.setStorageSync('force_regeneration', 'true');
-      
+
       // Close the dialog
       this.closeDeleteDialog();
-      
+
       // Refresh templates to show the updated pages
       this.loadJsonTemplates();
       this.updateLoadingStates();
-      
+
       // Force generation of new preview images
       setTimeout(() => {
         this.generatePreviewImages();
       }, 100);
-      
+
       // Complete refresh after a delay
       setTimeout(() => {
         this.refreshTemplates();
       }, 500);
-      
+
       // Show success message
       uni.showToast({
         title: 'Pages deleted successfully!',
@@ -4385,28 +4399,28 @@ export default {
     handleCaptureError(data) {
       // Extract the template name from the element ID
       const templateName = data.element.replace('template-', '');
-      
+
       // Set the loading state to false for this template
       if (this.templateLoadingStates[templateName]) {
         this.$set(this.templateLoadingStates, templateName, false);
       }
-      
+
       // Create a fallback image for the missing template
       if (data.error.includes('not found')) {
         console.log(`Creating fallback image for missing template: ${templateName}`);
-        
+
         // Set a placeholder image in capturedImages
         this.$set(this.capturedImages, templateName, '');
-        
+
         // Mark template as not loading
         this.$set(this.templateLoadingStates, templateName, false);
-        
+
         // If the template is in jsonTemplates but missing in DOM, try to fix it
         if (this.jsonTemplates.length > 0) {
-          const missingTemplate = this.jsonTemplates.find(t => 
+          const missingTemplate = this.jsonTemplates.find(t =>
             t.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-') === templateName
           );
-          
+
           if (missingTemplate) {
             console.log(`Found missing template in jsonTemplates: ${missingTemplate.name}`);
             // Force a re-render
@@ -4425,7 +4439,7 @@ export default {
       this.importError = '';
       this.selectedImportType = 'image';
     },
-    
+
     selectImportType(type) {
       this.selectedImportType = type;
       this.importFileList = [];
@@ -4434,7 +4448,7 @@ export default {
       this.htmlFiles = [];
       this.importError = '';
     },
-    
+
     onImportFileDelete(e) {
       console.log('File deleted:', e);
       // Remove only the specific item that was deleted
@@ -4454,7 +4468,7 @@ export default {
         this.importFileList = [];
       }
     },
-    
+
     async importProject() {
       if (this.selectedImportType === 'html') {
         if (!this.htmlFiles || this.htmlFiles.length === 0) {
@@ -4480,7 +4494,7 @@ export default {
       // Show import progress overlay
       this.isImporting = true;
       this.importProgress = 0;
-      
+
       // Set up progress interval - evenly distributed over 3 minutes (180 seconds)
       const progressInterval = setInterval(() => {
         if (this.importProgress < 98) {
@@ -4490,7 +4504,7 @@ export default {
           this.importProgress += increment;
         }
       }, 1000);
-      
+
       // Only check membership for image imports, not HTML imports
       if (this.selectedImportType === 'image') {
         // Check special user limitation first
@@ -4520,26 +4534,26 @@ export default {
         this.handleHtmlImport(progressInterval);
         return;
       }
-      
+
       // Prepare files data for backend
       const filesData = this.importFileList.map(file => {
         return {
           url: file.url,
         };
-      });      
+      });
       // Prepare request data
       const requestData = {
         files: filesData,
         importType: this.selectedImportType
       };
-      
+
       // Show a toast to indicate processing
       uni.showToast({
         title: 'Processing imported files...',
         icon: 'none',
         duration: 3000
       });
-      
+
       // Make the API call
       uni.request({
         url: `${API_BASE_URL}/import-project`,
@@ -4553,30 +4567,30 @@ export default {
           // Stop the progress interval
           clearInterval(progressInterval);
           this.importProgress = 100;
-          
+
           const data = response.data;
-          
+
           try {
             // Process the response data - handle both string and object formats
             let responseData = data;
-            
+
             // If it's an object with a response property, extract it
             if (typeof data === 'object' && data.response) {
               responseData = data.response;
             }
-            
+
             // If responseData is already a parsed object, use it directly
             if (typeof responseData === 'object' && responseData.pages) {
               const parsedResponse = responseData;
-              
+
               // Extract the page data
               if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
                 const newPage = parsedResponse.pages[0];
-                
+
                 // Get existing project data
                 const existingProjectData = uni.getStorageSync('latest_7_overall_page');
                 let projectData;
-                
+
                 if (existingProjectData) {
                   projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
                 } else {
@@ -4586,19 +4600,19 @@ export default {
                     AIProjectName: 'UI Genius Project',
                   };
                 }
-                
+
                 // Add the new page to the project
                 projectData.pages.push(newPage);
-                
+
                 // Generate title and description for imported project
                 const currentProjectId = uni.getStorageSync('currentProjectId');
                 let projectTitle, projectDescription;
-                
+
                 if (!currentProjectId) {
                   // Creating a new project - generate title and description
-                  const importDate = new Date().toLocaleString('en-US', { 
-                    year: 'numeric', 
-                    month: 'short', 
+                  const importDate = new Date().toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
                     day: 'numeric'
                   });
                   const fileNames = this.importFileList.map(f => {
@@ -4612,33 +4626,33 @@ export default {
                   projectTitle = projectData.AIProjectName || 'Imported Image Project';
                   projectDescription = projectData.AIProjectDescription || 'Project updated with imported image';
                 }
-                
+
                 // Save the updated project data
                 const updatedProjectData = JSON.stringify(projectData);
                 uni.setStorageSync('latest_7_overall_page', updatedProjectData);
-                
+
                 // Set flag to force regeneration of images
                 uni.setStorageSync('force_regeneration', 'true');
-                
+
                 // Hide import overlay
                 setTimeout(() => {
                   this.isImporting = false;
-                  
+
                   // Close import dialog
                   this.closeImportDialog();
-                  
+
                   // Refresh templates to show the new page
                   this.loadJsonTemplates();
                   this.updateLoadingStates();
-                  
+
                   // Force generation of new preview images
                   setTimeout(() => {
                     this.generatePreviewImages();
-                    
+
                     // After preview images are generated, update the project preview image and save to cloud
                     setTimeout(() => {
                       this.updateImportedProjectPreview(projectData);
-                      
+
                       // Save project to the cloud if logged in
                       this.saveProjectToCloud(projectData, projectTitle, projectDescription)
                         .then(() => {
@@ -4650,23 +4664,23 @@ export default {
                         });
                     }, 2000);
                   }, 100);
-                  
+
                   // Complete refresh after a delay
                   setTimeout(() => {
                     this.refreshTemplates();
                   }, 500);
-                  
+
                   // Show success message
                   // uni.showToast({
                   //   title: 'Files imported successfully!',
                   //   icon: 'success',
                   //   duration: 2000
                   // });
-                  
+
                   // Navigate to editor with the new template ID
                   const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
                   uni.setStorageSync('selectedTemplateId', newTemplateId);
-                  
+
                   setTimeout(() => {
                     uni.switchTab({
                       url: '/pages/editor/editor'
@@ -4679,19 +4693,19 @@ export default {
             } else if (typeof responseData === 'string') {
               try {
                 // Try to clean up the response string for proper JSON parsing
-                
+
                 // First attempt: Try direct parsing - it might already be valid JSON
                 try {
                   const parsedResponse = JSON.parse(responseData);
-                  
+
                   // Continue with the same logic as above
                   if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
                     const newPage = parsedResponse.pages[0];
-                    
+
                     // Get existing project data
                     const existingProjectData = uni.getStorageSync('latest_7_overall_page');
                     let projectData;
-                    
+
                     if (existingProjectData) {
                       projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
                     } else {
@@ -4701,19 +4715,19 @@ export default {
                         AIProjectName: 'UI Genius Project',
                       };
                     }
-                    
+
                     // Add the new page to the project
                     projectData.pages.push(newPage);
-                    
+
                     // Generate title and description for imported project
                     const currentProjectId = uni.getStorageSync('currentProjectId');
                     let projectTitle, projectDescription;
-                    
+
                     if (!currentProjectId) {
                       // Creating a new project - generate title and description
-                      const importDate = new Date().toLocaleString('en-US', { 
-                        year: 'numeric', 
-                        month: 'short', 
+                      const importDate = new Date().toLocaleString('en-US', {
+                        year: 'numeric',
+                        month: 'short',
                         day: 'numeric'
                       });
                       const fileNames = this.importFileList.map(f => {
@@ -4727,33 +4741,33 @@ export default {
                       projectTitle = projectData.AIProjectName || 'Imported Image Project';
                       projectDescription = projectData.AIProjectDescription || 'Project updated with imported image';
                     }
-                    
+
                     // Save the updated project data
                     const updatedProjectData = JSON.stringify(projectData);
                     uni.setStorageSync('latest_7_overall_page', updatedProjectData);
-                    
+
                     // Set flag to force regeneration of images
                     uni.setStorageSync('force_regeneration', 'true');
-                    
+
                     // Hide import overlay
                     setTimeout(() => {
                       this.isImporting = false;
-                      
+
                       // Close import dialog
                       this.closeImportDialog();
-                      
+
                       // Refresh templates to show the new page
                       this.loadJsonTemplates();
                       this.updateLoadingStates();
-                      
+
                       // Force generation of new preview images
                       setTimeout(() => {
                         this.generatePreviewImages();
-                        
+
                         // After preview images are generated, update the project preview image and save to cloud
                         setTimeout(() => {
                           this.updateImportedProjectPreview(projectData);
-                          
+
                           // Save project to the cloud if logged in
                           this.saveProjectToCloud(projectData, projectTitle, projectDescription)
                             .then(() => {
@@ -4765,45 +4779,45 @@ export default {
                             });
                         }, 2000);
                       }, 100);
-                      
+
                       // Complete refresh after a delay
                       setTimeout(() => {
                         this.refreshTemplates();
                       }, 500);
-                      
-                                        // Show success message
-                  // uni.showToast({
-                  //   title: 'Files imported successfully!',
-                  //   icon: 'success',
-                  //   duration: 2000
-                  // });
-                  
-                  // Navigate to editor with the new template ID
-                  const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
-                  uni.setStorageSync('selectedTemplateId', newTemplateId);
-                  
-                  setTimeout(() => {
-                    uni.switchTab({
-                      url: '/pages/editor/editor'
-                    });
-                  }, 500);
-                }, 1000);
-              } else {
-                throw new Error('No valid page data found in response');
-              }
-              return; // Exit early if first attempt succeeded
+
+                      // Show success message
+                      // uni.showToast({
+                      //   title: 'Files imported successfully!',
+                      //   icon: 'success',
+                      //   duration: 2000
+                      // });
+
+                      // Navigate to editor with the new template ID
+                      const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                      uni.setStorageSync('selectedTemplateId', newTemplateId);
+
+                      setTimeout(() => {
+                        uni.switchTab({
+                          url: '/pages/editor/editor'
+                        });
+                      }, 500);
+                    }, 1000);
+                  } else {
+                    throw new Error('No valid page data found in response');
+                  }
+                  return; // Exit early if first attempt succeeded
                 } catch (initialParseError) {
                   // First attempt failed, continue with more robust cleaning
                 }
-                
+
                 // Second attempt: More thorough cleaning for complex responses
                 let cleanedResponse = responseData;
-                
+
                 // Replace backtick-wrapped strings with properly escaped JSON strings
-                cleanedResponse = cleanedResponse.replace(/`([\s\S]*?)`/g, function(match, p1) {
+                cleanedResponse = cleanedResponse.replace(/`([\s\S]*?)`/g, function (match, p1) {
                   return JSON.stringify(p1.replace(/\n\s*/g, ' ').trim());
                 });
-                
+
                 // Handle HTML content in component property by properly escaping it
                 const componentMatch = cleanedResponse.match(/"component"\s*:\s*(".*?"|'.*?'|\{.*?\}|\[.*?\])/s);
                 if (componentMatch) {
@@ -4814,18 +4828,18 @@ export default {
                     cleanedResponse = cleanedResponse.replace(componentMatch[0], `"component": ${escapedContent}`);
                   }
                 }
-                
+
                 // Try parsing the cleaned response
                 const parsedResponse = JSON.parse(cleanedResponse);
-                
+
                 // Extract the page data
                 if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
                   const newPage = parsedResponse.pages[0];
-                  
+
                   // Get existing project data
                   const existingProjectData = uni.getStorageSync('latest_7_overall_page');
                   let projectData;
-                  
+
                   if (existingProjectData) {
                     projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
                   } else {
@@ -4835,19 +4849,19 @@ export default {
                       AIProjectName: 'UI Genius Project',
                     };
                   }
-                  
+
                   // Add the new page to the project
                   projectData.pages.push(newPage);
-                  
+
                   // Generate title and description for imported project
                   const currentProjectId = uni.getStorageSync('currentProjectId');
                   let projectTitle, projectDescription;
-                  
+
                   if (!currentProjectId) {
                     // Creating a new project - generate title and description
-                    const importDate = new Date().toLocaleString('en-US', { 
-                      year: 'numeric', 
-                      month: 'short', 
+                    const importDate = new Date().toLocaleString('en-US', {
+                      year: 'numeric',
+                      month: 'short',
                       day: 'numeric'
                     });
                     const fileNames = this.importFileList.map(f => {
@@ -4861,33 +4875,33 @@ export default {
                     projectTitle = projectData.AIProjectName || 'Imported Image Project';
                     projectDescription = projectData.AIProjectDescription || 'Project updated with imported image';
                   }
-                  
+
                   // Save the updated project data
                   const updatedProjectData = JSON.stringify(projectData);
                   uni.setStorageSync('latest_7_overall_page', updatedProjectData);
-                  
+
                   // Set flag to force regeneration of images
                   uni.setStorageSync('force_regeneration', 'true');
-                  
+
                   // Hide import overlay
                   setTimeout(() => {
                     this.isImporting = false;
-                    
+
                     // Close import dialog
                     this.closeImportDialog();
-                    
+
                     // Refresh templates to show the new page
                     this.loadJsonTemplates();
                     this.updateLoadingStates();
-                    
+
                     // Force generation of new preview images
                     setTimeout(() => {
                       this.generatePreviewImages();
-                      
+
                       // After preview images are generated, update the project preview image and save to cloud
                       setTimeout(() => {
                         this.updateImportedProjectPreview(projectData);
-                        
+
                         // Save project to the cloud if logged in
                         this.saveProjectToCloud(projectData, projectTitle, projectDescription)
                           .then(() => {
@@ -4899,33 +4913,33 @@ export default {
                           });
                       }, 2000);
                     }, 100);
-                    
+
                     // Complete refresh after a delay
                     setTimeout(() => {
                       this.refreshTemplates();
                     }, 500);
-                    
-                                      // Show success message
-                  // uni.showToast({
-                  //   title: 'Files imported successfully!',
-                  //   icon: 'success',
-                  //   duration: 2000
-                  // });
-                  
-                  // Navigate to editor with the new template ID
-                  const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
-                  uni.setStorageSync('selectedTemplateId', newTemplateId);
-                  
-                  setTimeout(() => {
-                    uni.switchTab({
-                      url: '/pages/editor/editor'
-                    });
-                  }, 500);
-                }, 1000);
-              } else {
-                throw new Error('No valid page data found in response');
-              }
-            } catch (parseError) {
+
+                    // Show success message
+                    // uni.showToast({
+                    //   title: 'Files imported successfully!',
+                    //   icon: 'success',
+                    //   duration: 2000
+                    // });
+
+                    // Navigate to editor with the new template ID
+                    const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                    uni.setStorageSync('selectedTemplateId', newTemplateId);
+
+                    setTimeout(() => {
+                      uni.switchTab({
+                        url: '/pages/editor/editor'
+                      });
+                    }, 500);
+                  }, 1000);
+                } else {
+                  throw new Error('No valid page data found in response');
+                }
+              } catch (parseError) {
                 // If all parsing attempts fail, try to extract and create a page manually
                 try {
                   // Create a simple page object based on the imported files
@@ -4938,11 +4952,11 @@ export default {
                       <p>Files imported: ${this.importFileList.map(f => f.name).join(', ')}</p>
                     </div>`
                   };
-                  
+
                   // Get existing project data
                   const existingProjectData = uni.getStorageSync('latest_7_overall_page');
                   let projectData;
-                  
+
                   if (existingProjectData) {
                     projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
                   } else {
@@ -4952,65 +4966,65 @@ export default {
                       AIProjectName: 'UI Genius Project',
                     };
                   }
-                  
+
                   // Add the simple page to the project
                   projectData.pages.push(simplifiedPage);
-                  
+
                   // Save the updated project data
                   const updatedProjectData = JSON.stringify(projectData);
                   uni.setStorageSync('latest_7_overall_page', updatedProjectData);
-                  
+
                   // Set flag to force regeneration of images
                   uni.setStorageSync('force_regeneration', 'true');
-                  
+
                   // Hide import overlay
                   setTimeout(() => {
                     this.isImporting = false;
-                    
+
                     // Close import dialog
                     this.closeImportDialog();
-                    
+
                     // Refresh templates to show the new page
                     this.loadJsonTemplates();
                     this.updateLoadingStates();
-                    
+
                     // Force generation of new preview images
                     setTimeout(() => {
                       this.generatePreviewImages();
-                      
+
                       // After preview images are generated, update the project preview image and save to cloud
                       setTimeout(() => {
                         this.updateImportedProjectPreview(projectData);
-                        
+
                         // Save project to the cloud if logged in
                         this.saveProjectToCloud(projectData);
                       }, 2000);
                     }, 100);
-                    
+
                     // Complete refresh after a delay
                     setTimeout(() => {
                       this.refreshTemplates();
                     }, 500);
-                    
-                                      // Show success message
-                  uni.showToast({
-                    title: 'Simple page created (parsing failed)',
-                    icon: 'success',
-                    duration: 2000
-                  });
-                  
-                  // Navigate to editor with the new template ID
-                  const newTemplateId = simplifiedPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
-                  uni.setStorageSync('selectedTemplateId', newTemplateId);
-                  
-                  setTimeout(() => {
-                    uni.switchTab({
-                      url: '/pages/editor/editor'
+
+                    // Show success message
+                    uni.showToast({
+                      title: 'Simple page created (parsing failed)',
+                      icon: 'success',
+                      duration: 2000
                     });
-                  }, 500);
-                }, 1000);
-                
-                console.error('Used fallback page creation due to parsing error:', parseError);
+
+                    // Navigate to editor with the new template ID
+                    const newTemplateId = simplifiedPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                    uni.setStorageSync('selectedTemplateId', newTemplateId);
+
+                    setTimeout(() => {
+                      uni.switchTab({
+                        url: '/pages/editor/editor'
+                      });
+                    }, 500);
+                  }, 1000);
+
+                  console.error('Used fallback page creation due to parsing error:', parseError);
                 } catch (fallbackError) {
                   throw new Error(`JSON parsing failed: ${parseError.message}`);
                 }
@@ -5020,7 +5034,7 @@ export default {
             }
           } catch (error) {
             console.error('Error processing import data:', error);
-            
+
             // Handle error
             this.isImporting = false;
             uni.showToast({
@@ -5033,10 +5047,10 @@ export default {
         fail: (error) => {
           // Stop the progress interval
           clearInterval(progressInterval);
-          
+
           // Log the error
           console.error('Error importing files:', error);
-          
+
           // Handle error
           this.isImporting = false;
           uni.showToast({
@@ -5047,7 +5061,7 @@ export default {
         }
       });
     },
-    
+
     getFileNameWithoutExt(pathStr) {
       try {
         const parts = String(pathStr).split(/[\\/]/);
@@ -5057,7 +5071,7 @@ export default {
         return 'Imported';
       }
     },
-    
+
     mimeTypeFromExt(ext) {
       switch (ext) {
         case 'png': return 'image/png';
@@ -5069,7 +5083,7 @@ export default {
         default: return 'application/octet-stream';
       }
     },
-    
+
     escapeHtml(str) {
       return String(str)
         .replace(/&/g, '&amp;')
@@ -5078,7 +5092,7 @@ export default {
         .replace(/"/g, '&quot;')
         .replace(/'/g, '&#039;');
     },
-    
+
     getFileTypeFromName(filename) {
       if (!filename) return 'unknown';
       const ext = filename.split('.').pop().toLowerCase();
@@ -5102,15 +5116,15 @@ export default {
           return 'unknown';
       }
     },
-    successUploadFiles(){
-      console.log('successUploadFiles',this.importFileList);
+    successUploadFiles() {
+      console.log('successUploadFiles', this.importFileList);
     },
     handleHtmlImport(progressInterval) {
       try {
         // Stop the progress interval
         clearInterval(progressInterval);
         this.importProgress = 100;
-        
+
         const filesToImport = (this.htmlFiles && this.htmlFiles.length)
           ? this.htmlFiles
           : (this.htmlFileContent ? [{ name: this.htmlFileName || 'Imported.html', content: this.htmlFileContent }] : []);
@@ -5118,11 +5132,11 @@ export default {
           throw new Error('No HTML files to import');
         }
         console.log('Importing HTML files count:', filesToImport.length);
-        
+
         // Get existing project data
         const existingProjectData = uni.getStorageSync('latest_7_overall_page');
         let projectData;
-        
+
         if (existingProjectData) {
           projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
         } else {
@@ -5132,7 +5146,7 @@ export default {
             AIProjectName: 'UI Genius Project',
           };
         }
-        
+
         // Add a new page to the project for each HTML file
         filesToImport.forEach(f => {
           const nameBase = f.name ? f.name.replace(/\.(html?|HTML?)$/, '') : 'HTML';
@@ -5140,16 +5154,16 @@ export default {
           const pageName = f.name ? `Imported ${nameBase}` : `Imported HTML ${timestamp}`;
           projectData.pages.push({ name: pageName, component: f.content });
         });
-        
+
         // Generate title and description for imported project
         const currentProjectId = uni.getStorageSync('currentProjectId');
         let projectTitle, projectDescription;
-        
+
         if (!currentProjectId) {
           // Creating a new project - generate title and description
-          const importDate = new Date().toLocaleString('en-US', { 
-            year: 'numeric', 
-            month: 'short', 
+          const importDate = new Date().toLocaleString('en-US', {
+            year: 'numeric',
+            month: 'short',
             day: 'numeric'
           });
           const fileNames = filesToImport.map(f => {
@@ -5163,11 +5177,11 @@ export default {
           projectTitle = projectData.AIProjectName || 'Imported HTML Project';
           projectDescription = projectData.AIProjectDescription || 'Project updated with imported HTML';
         }
-        
+
         // Save the updated project data
         const updatedProjectData = JSON.stringify(projectData);
         uni.setStorageSync('latest_7_overall_page', updatedProjectData);
-        
+
         // Save project to the cloud if logged in
         this.saveProjectToCloud(projectData, projectTitle, projectDescription)
           .then(() => {
@@ -5177,21 +5191,21 @@ export default {
           .catch((err) => {
             console.error('Failed to save project to cloud:', err);
           });
-        
+
         // Set flag to force regeneration of images
         uni.setStorageSync('force_regeneration', 'true');
-        
+
         // Hide import overlay
         setTimeout(() => {
           this.isImporting = false;
-          
+
           // Close import dialog
           this.closeImportDialog();
-          
+
           // Refresh templates to show the new page
           this.loadJsonTemplates();
           this.updateLoadingStates();
-          
+
           // Force generation of new preview images
           setTimeout(() => {
             this.generatePreviewImages();
@@ -5214,9 +5228,9 @@ export default {
           }, 500);
         }, 1000);
 
-        } catch (error) {
+      } catch (error) {
         console.error('Error processing HTML import:', error);
-        
+
         // Handle error
         this.isImporting = false;
         uni.showToast({
@@ -5226,14 +5240,14 @@ export default {
         });
       }
     },
-    
+
     // Choose HTML file using FileReader API (H5 compatible)
     chooseHtmlFile() {
       // Clear previous HTML content first
       this.htmlFileContent = '';
       this.htmlFileName = '';
       this.htmlFiles = [];
-      
+
       const input = document.createElement('input');
       input.type = 'file';
       input.accept = '.html'; // 限制为HTML文件
@@ -5243,16 +5257,16 @@ export default {
         if (files.length) {
           this.readMultipleFiles(files);
         }
-         // Clear the input value to allow selecting the same file again
-         input.value = '';
+        // Clear the input value to allow selecting the same file again
+        input.value = '';
       };
       input.click();
     },
-    
+
     // Read HTML file content using FileReader
     readFileContent(file) {
       console.log('Reading file:', file.name, 'Size:', file.size);
-      
+
       const reader = new FileReader();
       reader.onload = (event) => {
         const content = event.target.result;
@@ -5262,7 +5276,7 @@ export default {
         console.log('HTML file content loaded:', file.name);
         console.log('Content length:', this.htmlFileContent.length);
         console.log('First 100 characters:', this.htmlFileContent.substring(0, 100));
-        
+
         // Validate that it's actually HTML content
         if (this.htmlFileContent && this.htmlFileContent.trim()) {
           uni.showToast({
@@ -5281,7 +5295,7 @@ export default {
           });
         }
       };
-      
+
       reader.onerror = () => {
         console.error('读取文件失败');
         this.htmlFileContent = '';
@@ -5292,7 +5306,7 @@ export default {
           duration: 2000
         });
       };
-      
+
       reader.readAsText(file, 'UTF-8'); // 以文本形式读取
     },
     // Read multiple HTML files as text and populate htmlFiles
@@ -5325,7 +5339,7 @@ export default {
     },
     tryImportByProjectId(projectId) {
       if (!projectId) return;
-      
+
       // Check if this shared project has already been imported
       // let importedProjectsMap = {};
       // try {
@@ -5336,12 +5350,12 @@ export default {
       // } catch (e) {
       //   console.error('Failed to parse importedShareProjectsMap:', e);
       // }
-      
+
       // If already imported, load the existing project instead of push the uid to the project's share uid list
       // if (importedProjectsMap[projectId]) {
       //   const existingProjectId = importedProjectsMap[projectId];
       //   console.log('Project already imported. Loading existing project:', existingProjectId);
-        
+
       //   uni.showLoading({ title: 'Loading imported project...' });
       //   uniCloud.callFunction({
       //     name: 'generated-overall-pages',
@@ -5356,18 +5370,18 @@ export default {
       //       uni.setStorageSync('latest_7_overall_page', JSON.stringify(projectData));
       //       uni.setStorageSync('currentProjectId', existingProjectId);
       //       uni.setStorageSync('force_regeneration', 'true');
-            
+
       //       this.loadJsonTemplates();
       //       this.updateLoadingStates();
       //       setTimeout(() => {
       //         this.generatePreviewImages();
-              
+
       //         // Update preview image after images are generated
       //         setTimeout(() => {
       //           this.updateImportedProjectPreview(projectData);
       //         }, 2000);
       //       }, 100);
-            
+
       //       uni.showToast({ title: 'Loaded previously imported project', icon: 'success', duration: 2000 });
       //     } else {
       //       uni.showToast({ title: 'Failed to load existing project', icon: 'none', duration: 2000 });
@@ -5379,7 +5393,7 @@ export default {
       //   });
       //   return;
       // }
-      
+
       // If not imported before, proceed with import
       uni.showLoading({ title: 'Loading project...' });
       uniCloud.callFunction({
@@ -5400,7 +5414,7 @@ export default {
           setTimeout(() => {
             this.generatePreviewImages();
             this.refreshTemplates();
-            
+
             // After preview images are generated, update the project preview image
             // Wait longer to ensure images are captured
             setTimeout(() => {
@@ -5412,14 +5426,14 @@ export default {
           // Clear the existing project ID to force creation of a new project
           // const originalProjectId = uni.getStorageSync('currentProjectId');
           // uni.removeStorageSync('currentProjectId');
-          
+
           // Check if current user is the project owner
           const currentUid = uni.getStorageSync('uid') || uni.getStorageSync('userInfo')?.uid;
           if (currentUid == '123bcbfeqqaeabfaf5a') {
             uni.hideLoading();
             return
           }
-          
+
           uniCloud.callFunction({
             name: 'user-project',
             data: {
@@ -5430,7 +5444,7 @@ export default {
             // Only call shareProjectUpdateUidArray if current user is not the project owner
             if (uidRes.result && uidRes.result.success && uidRes.result.data) {
               const projectOwnerUid = uidRes.result.data.uid;
-              
+
               if (projectOwnerUid !== currentUid) {
                 // Call shareProjectUpdate to add current user to the shared project's shareProjectUidArray
                 uniCloud.callFunction({
@@ -5454,7 +5468,7 @@ export default {
           }).catch(uidErr => {
             console.error('Failed to retrieve project owner UID:', uidErr);
           });
-          
+
           // Prepare project title and description for imported project
           // const importedProjectTitle = 'Shared project from other users';
           // const importDate = new Date().toLocaleString('en-US', { 
@@ -5465,7 +5479,7 @@ export default {
           //   minute: '2-digit' 
           // });
           // const importedProjectDescription = `Imported shared project on ${importDate}`;
-          
+
           // No longer need to create a new project - user now has direct access via shareProjectUpdate
           // The shared project is added to the current user's accessible projects through shareProjectUidArray
           /*
@@ -5503,20 +5517,20 @@ export default {
         console.error('Cloud function error:', err);
       });
     },
-    
+
     pullRefreshProject() {
       // Get the current project ID from storage
       const currentProjectId = uni.getStorageSync('currentProjectId');
-      
+
       if (!currentProjectId) {
         // If no current project ID, fall back to regular refresh
         this.refreshDataLocal();
         return;
       }
-      
+
       // Show loading indicator
       uni.showLoading({ title: 'Refreshing project...' });
-      
+
       // Call the cloud function to get the latest project data
       uniCloud.callFunction({
         name: 'generated-overall-pages',
@@ -5530,24 +5544,24 @@ export default {
           // Update the project data with the latest version
           uni.setStorageSync('latest_7_overall_page', JSON.stringify(res.result.data));
           // uni.setStorageSync('force_regeneration', 'true');
-          
+
           // Clear stored images to force regeneration
           this.clearStoredImages();
-          
+
           // Reset all loading states
           this.templatesLoading = true;
-          
+
           // Load the updated JSON templates
           // this.loadJsonTemplates();
           // this.updateLoadingStates();
-          
+
           // Generate new preview images
           setTimeout(() => {
             this.generatePreviewImages();
             // Load the newly generated images after a delay
             this.loadImagesFromStorage();
           }, 100);
-          
+
           // Start revealing templates with staggered timing
           const keys = Object.keys(this.templateLoadingStates);
           keys.forEach((key, index) => {
@@ -5558,7 +5572,7 @@ export default {
               }
             }, 1500 + (index * 300));
           });
-          
+
           uni.showToast({ title: 'Project refreshed', icon: 'success', duration: 2000 });
         } else {
           // If cloud refresh fails, fall back to regular refresh
@@ -5568,7 +5582,7 @@ export default {
       }).catch(err => {
         uni.hideLoading();
         console.error('Cloud function error during refresh:', err);
-        
+
         // If cloud refresh fails, fall back to regular refresh
         console.warn('Cloud refresh failed, falling back to local refresh');
         this.refreshDataLocal();
@@ -5605,7 +5619,7 @@ export default {
           try {
             const data = res && res.data ? res.data : {};
             // Try several common shapes
-            const optimized = data.optimized_description  || '';
+            const optimized = data.optimized_description || '';
             if (typeof optimized === 'string' && optimized.trim().length > 0) {
               this.pageDescription = optimized.trim();
               uni.showToast({ title: 'Prompt improved', icon: 'success', duration: 1500 });
@@ -5657,45 +5671,45 @@ export default {
               if (data.success && data.colors && Array.isArray(data.colors) && data.colors.length === 5) {
                 // Store color card in component data
                 this.colorCard = data.colors;
-                
+
                 // Store color card in localStorage
                 uni.setStorageSync('colorCard', JSON.stringify(data.colors));
-                
+
                 // If color palette is open, update selected colors from colorCard
                 if (this.showColorPalette && this.colorCard.length > 0) {
                   this.colorCard = [...this.colorCard];
                   this.previewColor = this.colorCard[0];
                   this.customColor = '';
                 }
-                
+
                 // Save extracted colors to cloud
                 this.saveProjectThemeToCloud(this.colorCard).catch(err => {
                   console.error('Failed to save extracted colors to cloud:', err);
                 });
-                
-                uni.showToast({ 
-                  title: 'Color card extracted successfully!', 
-                  icon: 'success', 
-                  duration: 2000 
+
+                uni.showToast({
+                  title: 'Color card extracted successfully!',
+                  icon: 'success',
+                  duration: 2000
                 });
               } else {
                 throw new Error('Invalid color data returned from server');
               }
             } catch (e) {
               console.error('Error processing color extraction response:', e);
-              uni.showToast({ 
-                title: 'Failed to extract colors: ' + e.message, 
-                icon: 'none', 
-                duration: 2000 
+              uni.showToast({
+                title: 'Failed to extract colors: ' + e.message,
+                icon: 'none',
+                duration: 2000
               });
             }
           },
           fail: (err) => {
             console.error('Color extraction request failed:', err);
-            uni.showToast({ 
-              title: `Color extraction error: ${err.errMsg || 'Request failed'}`, 
-              icon: 'none', 
-              duration: 2500 
+            uni.showToast({
+              title: `Color extraction error: ${err.errMsg || 'Request failed'}`,
+              icon: 'none',
+              duration: 2500
             });
           },
           complete: () => {
@@ -5704,10 +5718,10 @@ export default {
         });
       } catch (error) {
         console.error('Error in extractColors:', error);
-        uni.showToast({ 
-          title: 'Error: ' + error.message, 
-          icon: 'none', 
-          duration: 2000 
+        uni.showToast({
+          title: 'Error: ' + error.message,
+          icon: 'none',
+          duration: 2000
         });
         this.isExtractingColors = false;
       }
@@ -5720,10 +5734,10 @@ export default {
       this.colorCard = [];
       this.customColor = '';
       this.previewColor = this.coolColors[0].hex;
-      uni.showToast({ 
-        title: 'Color card cleared', 
-        icon: 'success', 
-        duration: 1500 
+      uni.showToast({
+        title: 'Color card cleared',
+        icon: 'success',
+        duration: 1500
       });
     },
 
@@ -5742,7 +5756,7 @@ export default {
           // Clear colorCard if no stored color card exists
           this.colorCard = [];
         }
-        
+
         // Load the toggle state (default to true if not set)
         const storedToggleState = uni.getStorageSync('useColor');
         if (storedToggleState !== null && storedToggleState !== undefined && storedToggleState !== '') {
@@ -5811,7 +5825,7 @@ export default {
       try {
         // First check membership
         const membershipData = await this.checkMembership();
-        
+
         if (membershipData.hasMembership) {
           // User has membership, allow the action
           return { allowed: true, reason: 'membership', membershipData };
@@ -5836,21 +5850,21 @@ export default {
         }
 
         const freeUsageData = await this.checkFreeUsage(usageType);
-        
+
         if (!freeUsageData.allowed) {
           // Show membership upgrade dialog or message
           const usageTypeText = usageType === 0 ? 'UI generation' : 'screenshot conversion';
           const message = `You have reached your free ${usageTypeText} limit. Please upgrade to continue.`;
-          
+
           // Use custom modal instead of uni.showModal
           this.showCustomUpgradeModal(message);
-          
+
           return { allowed: false, reason: freeUsageData.reason, freeUsageData };
         }
 
         // Free usage allowed
         return { allowed: true, reason: 'free_usage', freeUsageData };
-        
+
       } catch (error) {
         console.error('Error performing membership check:', error);
         uni.showToast({
@@ -5877,7 +5891,7 @@ export default {
       // Navigate to membership page
       try {
         uni.setStorageSync('dashboardNavItem', 'membership');
-      } catch (e) {}
+      } catch (e) { }
       uni.switchTab({
         url: '/pages/dashboard/dashboard'
       });
@@ -5886,7 +5900,7 @@ export default {
       this.useColor = !this.useColor;
       try {
         uni.setStorageSync('useColor', this.useColor);
-      } catch (e) {}
+      } catch (e) { }
     },
     // Color palette methods
     selectColor(color) {
@@ -5894,10 +5908,10 @@ export default {
       if (!this.colorCard) {
         this.colorCard = [];
       }
-      
+
       // Check if color is already selected
       const index = this.colorCard.indexOf(color);
-      
+
       if (index > -1) {
         // If already selected, remove it (toggle off)
         this.colorCard.splice(index, 1);
@@ -5914,14 +5928,14 @@ export default {
           return;
         }
       }
-      
+
       // Update preview color to the first selected color or default
       if (this.colorCard.length > 0) {
         this.previewColor = this.colorCard[0];
       } else {
         this.previewColor = '#86E3CE';
       }
-      
+
       this.customColor = '';
       this.colorPaletteError = '';
     },
@@ -5965,7 +5979,7 @@ export default {
           this.colorCard.push(this.customColor);
         }
       }
-      
+
       // Check if we have at least one color selected(don't check anymore)
       // if (!this.colorCard || this.colorCard.length === 0) {
       //   this.colorPaletteError = 'Please select at least one color or enter a valid custom color.';
@@ -6014,17 +6028,17 @@ export default {
         // Get the current usage count for this special user
         const usageKey = 'special_user_usage';
         let currentUsage = uni.getStorageSync(usageKey) || 0;
-        
+
         // Check if user has reached the limit (3 times total)
         if (currentUsage >= 3) {
           uni.showToast({
             title: 'You have reached your limit of 3 operations, please login to get 10 more operations',
             icon: 'none',
             duration: 4000
-          });          
+          });
           return { allowed: false, reason: 'limit_reached', currentUsage: currentUsage };
         }
-        
+
         // Check if the action type is one of the limited actions
         const limitedActions = ['generate-ui', 'create-page', 'import-project'];
         if (limitedActions.includes(actionType)) {
@@ -6035,10 +6049,10 @@ export default {
           const remaining = 3 - currentUsage;
           return { allowed: true, reason: 'special_user', currentUsage: currentUsage, remaining: remaining };
         }
-        
+
         // For non-limited actions, allow the action
         return { allowed: true, reason: 'normal_action' };
-        
+
       } catch (error) {
         console.error('Error checking special user limitation:', error);
         // If there's an error, allow the action to proceed
@@ -6312,76 +6326,76 @@ export default {
 
   .icon {
     width: 20px;
-  height: 20px;
-  object-fit: contain;
-  cursor: pointer;
-}
-
-.separator {
-  width: 1px;
-  height: 24px;
-  background-color: #eaeaea;
-  margin: 0 4px;
-}
-
-.tool-button {
-  padding: 6px 10px;
-  cursor: pointer;
-  border-radius: 4px;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: #f5f5f5;
+    height: 20px;
+    object-fit: contain;
+    cursor: pointer;
   }
 
-  .button-text {
-    font-size: 14px;
-    color: #333;
-  }
-}
-
-.preview-button {
-  display: flex;
-  align-items: center;
-  height: 10%;
-  gap: 6px;
-  background-color: #e53935;
-  padding: 7px 14px;
-  margin-bottom: 7px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-
-  &:hover {
-    background-color: #c62828;
+  .separator {
+    width: 1px;
+    height: 24px;
+    background-color: #eaeaea;
+    margin: 0 4px;
   }
 
-  .icon {
-    width: 16px;
-    height: 16px;
+  .tool-button {
+    padding: 6px 10px;
+    cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #f5f5f5;
+    }
+
+    .button-text {
+      font-size: 14px;
+      color: #333;
+    }
   }
 
-  .preview-text {
-    font-size: 14px;
-    font-weight: 500;
-    color: #fff;
-  }
-}
+  .preview-button {
+    display: flex;
+    align-items: center;
+    height: 10%;
+    gap: 6px;
+    background-color: #e53935;
+    padding: 7px 14px;
+    margin-bottom: 7px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
 
-.action-button {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 32px;
-  height: 32px;
-  border-radius: 4px;
-  cursor: pointer;
-  transition: background-color 0.2s;
+    &:hover {
+      background-color: #c62828;
+    }
 
-  &:hover {
-    background-color: #f5f5f5;
+    .icon {
+      width: 16px;
+      height: 16px;
+    }
+
+    .preview-text {
+      font-size: 14px;
+      font-weight: 500;
+      color: #fff;
+    }
   }
-}
+
+  .action-button {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    border-radius: 4px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+
+    &:hover {
+      background-color: #f5f5f5;
+    }
+  }
 }
 
 .section {
@@ -6452,7 +6466,7 @@ export default {
 .add-template-item {
   border: 2px dashed #ddd;
   background-color: #f9f9f9;
-  
+
   &:hover {
     border-color: #e53935;
     background-color: #fff;
@@ -6472,7 +6486,7 @@ export default {
   color: #aaa;
   font-weight: 300;
   transition: color 0.3s ease;
-  
+
   .add-template-item:hover & {
     color: #e53935;
   }
@@ -6643,11 +6657,13 @@ export default {
 }
 
 .preview-scoped-styles {
-  display: none; /* Hide the style container, styles will still apply */
+  display: none;
+  /* Hide the style container, styles will still apply */
 }
 
 .preview-style-injector {
-  display: none; /* Hidden element used for style injection via data attributes */
+  display: none;
+  /* Hidden element used for style injection via data attributes */
 }
 
 .preview-content {
@@ -7170,7 +7186,7 @@ export default {
   transition: background-color 0.3s;
   cursor: pointer;
   flex-shrink: 0;
-  
+
   &.active {
     background-color: #f44336;
   }
@@ -7336,7 +7352,7 @@ export default {
   align-items: center;
   padding: 10px;
   border-bottom: 1px solid #f0f0f0;
-  
+
   &:last-child {
     border-bottom: none;
   }
@@ -7360,7 +7376,8 @@ export default {
   margin-top: 20px;
 }
 
-.delete-btn, .cancel-btn {
+.delete-btn,
+.cancel-btn {
   padding: 10px 20px;
   border: none;
   border-radius: 10px;
@@ -7372,11 +7389,11 @@ export default {
 .delete-btn {
   background-color: #e53935;
   color: #fff;
-  
+
   &:hover {
     background-color: #d32f2f;
   }
-  
+
   &:disabled {
     background-color: #ffcdd2;
     cursor: not-allowed;
@@ -7386,7 +7403,7 @@ export default {
 .cancel-btn {
   background-color: #f5f5f5;
   color: #333;
-  
+
   &:hover {
     background-color: #e0e0e0;
   }
@@ -7394,10 +7411,11 @@ export default {
 
 /* Custom Checkbox Styles */
 .custom-checkbox {
+
   /* Override default checkbox styles */
   /deep/ .uni-checkbox-input {
     border-color: #e0e0e0;
-    
+
     &.uni-checkbox-input-checked {
       background-color: #e53935 !important;
       border-color: #e53935 !important;
@@ -7565,6 +7583,7 @@ export default {
   0% {
     box-shadow: 0 2px 4px rgba(255, 107, 53, 0.3);
   }
+
   100% {
     box-shadow: 0 2px 8px rgba(255, 107, 53, 0.6);
   }
@@ -7587,6 +7606,7 @@ export default {
   gap: 8px;
   margin: 8px 0 12px;
 }
+
 .import-type-tab {
   padding: 6px 10px;
   border-radius: 6px;
@@ -7594,21 +7614,25 @@ export default {
   color: #333;
   font-size: 12px;
 }
+
 .import-type-tab.active {
   background: #e53935;
   color: #fff;
 }
+
 .import-name-container {
   display: flex;
   align-items: center;
   gap: 8px;
   margin-bottom: 10px;
 }
+
 .import-name-label {
   width: 90px;
   font-size: 12px;
   color: #555;
 }
+
 .import-name-input {
   flex: 1;
   padding: 8px 10px;
@@ -7690,12 +7714,19 @@ export default {
 }
 
 @keyframes bounce {
-  0%, 20%, 50%, 80%, 100% {
+
+  0%,
+  20%,
+  50%,
+  80%,
+  100% {
     transform: translateY(0);
   }
+
   40% {
     transform: translateY(-8px);
   }
+
   60% {
     transform: translateY(-4px);
   }
@@ -7758,7 +7789,8 @@ export default {
   margin-top: 20px;
 }
 
-.import-btn, .cancel-btn {
+.import-btn,
+.cancel-btn {
   padding: 12px 24px;
   border: none;
   border-radius: 8px;
@@ -7840,6 +7872,7 @@ export default {
   margin-top: auto;
   padding-top: 16px;
 }
+
 /* Toast Overlay */
 .toast-overlay {
   position: fixed;
@@ -7851,6 +7884,7 @@ export default {
   pointer-events: none;
   /* Allow clicks to pass through except on the toast itself */
 }
+
 /* Custom Toast styles */
 .custom-toast {
   position: fixed;
@@ -7890,12 +7924,16 @@ export default {
   }
 }
 
-.file-list-item { margin-top: 2px; }
+.file-list-item {
+  margin-top: 2px;
+}
+
 .file-list-item-header {
   display: flex;
   align-items: center;
   justify-content: space-between;
 }
+
 .remove-file-btn {
   background-color: #f5f5f5;
   color: #e53935;
@@ -7905,7 +7943,10 @@ export default {
   cursor: pointer;
   font-size: 12px;
 }
-.remove-file-btn:hover { background-color: #ffecec; }
+
+.remove-file-btn:hover {
+  background-color: #ffecec;
+}
 
 /* Custom Upgrade Modal Styles */
 .upgrade-modal-overlay {
@@ -7962,7 +8003,8 @@ export default {
   margin-top: 16px;
 }
 
-.upgrade-modal-cancel, .upgrade-modal-confirm {
+.upgrade-modal-cancel,
+.upgrade-modal-confirm {
   padding: 10px 20px;
   border: none;
   border-radius: 8px;
@@ -7982,8 +8024,8 @@ export default {
   color: #fff;
 }
 
-.upgrade-modal-cancel:hover, .upgrade-modal-confirm:hover {
+.upgrade-modal-cancel:hover,
+.upgrade-modal-confirm:hover {
   opacity: 0.9;
 }
-
 </style>
