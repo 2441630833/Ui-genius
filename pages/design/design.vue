@@ -536,8 +536,8 @@
     </view>
 
     <!-- Color Palette Overlay -->
-    <view v-if="showColorPalette" class="color-palette-overlay">
-      <view class="color-palette-container">
+    <view v-if="showColorPalette" class="color-palette-overlay" @click="cancelColorSelection">
+      <view class="color-palette-container" @click.stop>
         <text class="color-palette-title" style="display: block;">Select Theme Color For Your Project</text>
 
 
