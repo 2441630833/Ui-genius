@@ -26,27 +26,11 @@
     <!-- Hidden Template Previews for html2canvas -->
     <view class="hidden-templates">
       <!-- Dynamic Templates from JSON -->
-      <template v-if="jsonTemplates.length > 0">
-        <!-- Render all templates -->
-        <view v-for="(template, index) in jsonTemplates" :key="index"
-          :id="'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')"
-          class="template-preview-content">
-          <view class="preview-header">
-            <text class="preview-title">{{ template.name.replace(/ Page/i, '') }}</text>
-          </view>
-          <view class="preview-content-wrapper">
-            <!-- HTML content without style tags -->
-            <view class="preview-content" v-html="getPreviewHTML(template)"></view>
-          </view>
-          <!-- Inject scoped styles dynamically -->
-          <view v-if="getScopedStyles(template)" class="preview-style-injector" :data-styles="getScopedStyles(template)"
-            :data-template-id="'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')">
-          </view>
-        </view>
-      </template>
+      <!-- Dynamic Templates from JSON - REMOVED to prevent DOM pollution -->
+      <!-- We now use an iframe in generatePreviewImages to render these -->
 
       <!-- Fallback Static Templates -->
-      <template v-else>
+      <template v-if="jsonTemplates.length === 0">
         <!-- Signup Template Preview -->
         <view id="template-signup" class="template-preview-content">
           <view class="preview-header">
@@ -2273,25 +2257,115 @@ export default {
       }
     },
 
-    generatePreviewImages() {
-      // console.log('Generating preview images');
-
-      // Use dynamic template IDs if available, otherwise use static ones
-      let templateIds = [];
-
+    async generatePreviewImages() {
+      // Use iframe isolation for dynamic templates to prevent style leakage
       if (this.jsonTemplates.length > 0) {
-        // Use template IDs for all templates
-        templateIds = this.jsonTemplates.map(template =>
-          'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')
-        );
+        const templatesToGenerate = this.jsonTemplates.filter(template => {
+          const key = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+          let hasImage = false;
+          try {
+            hasImage = !!uni.getStorageSync('uigenius_image_' + key);
+          } catch (e) { }
+          return !hasImage;
+        });
 
-        // Store the template IDs for later use
-        this.dynamicTemplateIds = templateIds.filter(id => id.startsWith('template-'));
+        if (templatesToGenerate.length === 0) {
+          return;
+        }
 
-        // console.log('Using dynamic template IDs:', templateIds);
+        this._showLoading(`Generating ${templatesToGenerate.length} previews...`);
+
+        // Create a hidden iframe
+        const iframe = document.createElement('iframe');
+        iframe.style.position = 'absolute';
+        iframe.style.left = '-9999px';
+        iframe.style.top = '-9999px';
+        iframe.style.width = '1440px';
+        iframe.style.height = '1200px';
+        iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
+        document.body.appendChild(iframe);
+
+        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+        iframeDoc.open();
+        iframeDoc.write('<!DOCTYPE html><html><head><meta charset="utf-8" /><style>* { box-sizing: border-box; } body { margin: 0; background: #fff; font-family: sans-serif; }</style></head><body></body></html>');
+        iframeDoc.close();
+
+        // Sequential generation
+        const processNext = async (index) => {
+          if (index >= templatesToGenerate.length) {
+            document.body.removeChild(iframe);
+            uni.hideLoading();
+            return;
+          }
+
+          const template = templatesToGenerate[index];
+          const key = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+          const templateId = 'template-' + key;
+
+          // Reset iframe content
+          // We need to keep the head styles that we might have added? No, we should clear specific styles but keep base.
+          // Re-writing body is safer.
+          iframeDoc.body.innerHTML = '';
+
+          // Remove any previous custom styles from head
+          const oldStyles = iframeDoc.head.querySelectorAll('style[data-custom="true"]');
+          oldStyles.forEach(s => s.remove());
+
+          const wrapper = iframeDoc.createElement('div');
+          wrapper.id = templateId;
+          wrapper.style.width = '100%';
+          wrapper.style.backgroundColor = '#fff';
+          wrapper.style.overflow = 'hidden';
+
+          // Inject content
+          const parsed = this.parseTemplate(template);
+          const contentDiv = iframeDoc.createElement('div');
+          contentDiv.className = 'preview-content';
+          contentDiv.innerHTML = (parsed && parsed.html) || '';
+          wrapper.appendChild(contentDiv);
+
+          // Inject styles
+          if (parsed && parsed.styles) {
+            const styleEl = iframeDoc.createElement('style');
+            styleEl.setAttribute('data-custom', 'true');
+            // We might not need scoping inside iframe as it's isolated, but keeping it doesn't hurt
+            styleEl.textContent = parsed.styles;
+            iframeDoc.head.appendChild(styleEl);
+          }
+
+          iframeDoc.body.appendChild(wrapper);
+
+          // Wait for render
+          await new Promise(r => setTimeout(r, 150));
+
+          try {
+            // Check if content exists/has size
+            const rect = wrapper.getBoundingClientRect();
+            if (rect.height > 0 && rect.width > 0) {
+              const canvas = await html2canvas(wrapper, {
+                width: rect.width,
+                height: rect.height,
+                scale: 1,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff'
+              });
+
+              const imageData = canvas.toDataURL('image/png', 0.8);
+              this.receiveImageData({ element: templateId, imageData: imageData });
+            }
+          } catch (e) {
+            console.error('Preview generation failed for ' + key, e);
+          }
+
+          processNext(index + 1);
+        };
+
+        processNext(0);
+
       } else {
-        // Fallback to static template IDs
-        templateIds = [
+        // Fallback to static template IDs (DOM based)
+        const templateIds = [
           'template-signup',
           'template-home',
           'template-notification',
@@ -2299,89 +2373,42 @@ export default {
           'template-settings'
         ];
 
-        // console.log('Using static template IDs:', templateIds);
-      }
+        // Filter out templates that already have images in storage
+        const templatesToGenerate = templateIds.filter(id => {
+          const key = id.replace('template-', '');
+          try {
+            const imageData = uni.getStorageSync(`uigenius_image_${key}`);
+            return !imageData;
+          } catch (e) {
+            return true;
+          }
+        });
 
-      // Filter out templates that already have images in storage
-      const templatesToGenerate = templateIds.filter(id => {
-        // Get the key for storage lookup
-        let key;
-        if (id.startsWith('template-')) {
-          key = id.replace('template-', '');
-        } else if (id.startsWith('proposal-')) {
-          key = id.replace('proposal-', '');
-        }
-
-        try {
-          const imageData = uni.getStorageSync(`uigenius_image_${key}`);
-          return !imageData; // Only include templates that don't have images
-        } catch (e) {
-          return true; // If there's an error, include the template
-        }
-      });
-
-      if (templatesToGenerate.length === 0) {
-        // console.log('All templates already have images in storage, skipping generation');
-        return;
-      }
-
-      // console.log(`Generating ${templatesToGenerate.length} templates:`, templatesToGenerate);
-
-      // Show loading indicator
-      this._showLoading(`Generating ${templatesToGenerate.length} images...`);
-
-      // First check if elements exist in DOM before trying to capture
-      const elementsToCapture = [];
-      for (let i = 0; i < templatesToGenerate.length; i++) {
-        const id = templatesToGenerate[i];
-        // Check if element exists in DOM
-        if (document.getElementById(id)) {
-          elementsToCapture.push(id);
-        } else {
-          console.warn(`Element not found in DOM: ${id}, skipping capture`);
-        }
-      }
-
-      if (elementsToCapture.length === 0) {
-        uni.hideLoading();
-        // uni.showToast({
-        //   title: 'No elements found to capture',
-        //   icon: 'none',
-        //   duration: 2000
-        // });
-        return;
-      }
-
-      // Capture elements sequentially with a shorter delay
-      const captureSequentially = (index) => {
-        if (index >= elementsToCapture.length) {
-          uni.hideLoading();
+        if (templatesToGenerate.length === 0) {
           return;
         }
 
-        const id = elementsToCapture[index];
+        this._showLoading(`Generating ${templatesToGenerate.length} images...`);
 
-        // Double check if element exists before trying to capture it
-        const element = document.getElementById(id);
-        if (!element) {
-          console.warn(`Element disappeared: ${id}, skipping capture`);
-          // Move to next element
+        // Capture elements sequentially
+        const captureSequentially = (index) => {
+          if (index >= templatesToGenerate.length) {
+            uni.hideLoading();
+            return;
+          }
+
+          const id = templatesToGenerate[index];
+          if (document.getElementById(id)) {
+            uni.$emit('capture-element', { elementId: id });
+          }
+
           setTimeout(() => {
             captureSequentially(index + 1);
-          }, 20); // Reduced from 50ms
-          return;
-        }
+          }, 150);
+        };
 
-        uni.$emit('capture-element', { elementId: id });
-
-        // Move to next element after a short delay
-        setTimeout(() => {
-          captureSequentially(index + 1);
-        }, 150); // Reduced from 300ms
-      };
-
-      // Start the sequential capture
-      captureSequentially(0);
+        captureSequentially(0);
+      }
     },
 
     async generateUI() {
@@ -6325,6 +6352,7 @@ export default {
   flex-direction: column;
   padding: 20px 0;
   box-shadow: 2px 0 5px rgba(0, 0, 0, 0.05);
+  flex-shrink: 0;
 }
 
 .logo-container {
