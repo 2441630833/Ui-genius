@@ -2526,8 +2526,8 @@ export default {
                     console.error('Failed to save project to cloud:', err);
                   });
 
-                // Extract colors from the new page
-                this.extractColors(newPage);
+                // Do not Extract colors anymore
+                // this.extractColors(newPage);
 
 
                 // Set flag to force regeneration of images
@@ -4094,7 +4094,6 @@ export default {
                 // If useColor is enabled but colorCard doesn't exist, extract colors from the new page
                 // Note: This runs asynchronously in the background and doesn't block subsequent code execution
                 // if (this.useColor && (!this.colorCard || this.colorCard.length === 0)) {
-                //   this.extractColors(newPage);
                 // }
 
                 // Save project to the cloud if logged in
@@ -5754,93 +5753,93 @@ export default {
       });
     },
 
-    async extractColors(page = null) {
-      // If no page is provided, just return
-      if (!page || !page.component) {
-        return;
-      }
+    // async extractColors(page = null) {
+    //   // If no page is provided, just return
+    //   if (!page || !page.component) {
+    //     return;
+    //   }
 
-      this.isExtractingColors = true;
-      uni.showToast({ title: 'Extracting colors...', icon: 'none', duration: 1500 });
+    //   this.isExtractingColors = true;
+    //   uni.showToast({ title: 'Extracting colors...', icon: 'none', duration: 1500 });
 
-      try {
-        const htmlCode = page.component;
+    //   try {
+    //     const htmlCode = page.component;
 
-        if (!htmlCode) {
-          throw new Error('No HTML code found in the page');
-        }
+    //     if (!htmlCode) {
+    //       throw new Error('No HTML code found in the page');
+    //     }
 
-        // Call the backend API to extract colors
-        uni.request({
-          url: `${API_BASE_URL}/extract-colors`,
-          method: 'POST',
-          header: { 'content-type': 'application/json' },
-          data: {
-            code: htmlCode,
-            model: this.selectedPageModel || 'gemini2.5'
-          },
-          timeout: 60000,
-          success: (res) => {
-            try {
-              const data = res && res.data ? res.data : {};
-              if (data.success && data.colors && Array.isArray(data.colors) && data.colors.length === 5) {
-                // Store color card in component data
-                this.colorCard = data.colors;
+    //     // Call the backend API to extract colors
+    //     uni.request({
+    //       url: `${API_BASE_URL}/extract-colors`,
+    //       method: 'POST',
+    //       header: { 'content-type': 'application/json' },
+    //       data: {
+    //         code: htmlCode,
+    //         model: this.selectedPageModel || 'gemini2.5'
+    //       },
+    //       timeout: 60000,
+    //       success: (res) => {
+    //         try {
+    //           const data = res && res.data ? res.data : {};
+    //           if (data.success && data.colors && Array.isArray(data.colors) && data.colors.length === 5) {
+    //             // Store color card in component data
+    //             this.colorCard = data.colors;
 
-                // Store color card in localStorage
-                uni.setStorageSync('colorCard', JSON.stringify(data.colors));
+    //             // Store color card in localStorage
+    //             uni.setStorageSync('colorCard', JSON.stringify(data.colors));
 
-                // If color palette is open, update selected colors from colorCard
-                if (this.showColorPalette && this.colorCard.length > 0) {
-                  this.colorCard = [...this.colorCard];
-                  this.previewColor = this.colorCard[0];
-                  this.customColor = '';
-                }
+    //             // If color palette is open, update selected colors from colorCard
+    //             if (this.showColorPalette && this.colorCard.length > 0) {
+    //               this.colorCard = [...this.colorCard];
+    //               this.previewColor = this.colorCard[0];
+    //               this.customColor = '';
+    //             }
 
-                // Save extracted colors to cloud
-                this.saveProjectThemeToCloud(this.colorCard).catch(err => {
-                  console.error('Failed to save extracted colors to cloud:', err);
-                });
+    //             // Save extracted colors to cloud
+    //             this.saveProjectThemeToCloud(this.colorCard).catch(err => {
+    //               console.error('Failed to save extracted colors to cloud:', err);
+    //             });
 
-                uni.showToast({
-                  title: 'Color card extracted successfully!',
-                  icon: 'success',
-                  duration: 2000
-                });
-              } else {
-                throw new Error('Invalid color data returned from server');
-              }
-            } catch (e) {
-              console.error('Error processing color extraction response:', e);
-              uni.showToast({
-                title: 'Failed to extract colors: ' + e.message,
-                icon: 'none',
-                duration: 2000
-              });
-            }
-          },
-          fail: (err) => {
-            console.error('Color extraction request failed:', err);
-            uni.showToast({
-              title: `Color extraction error: ${err.errMsg || 'Request failed'}`,
-              icon: 'none',
-              duration: 2500
-            });
-          },
-          complete: () => {
-            this.isExtractingColors = false;
-          }
-        });
-      } catch (error) {
-        console.error('Error in extractColors:', error);
-        uni.showToast({
-          title: 'Error: ' + error.message,
-          icon: 'none',
-          duration: 2000
-        });
-        this.isExtractingColors = false;
-      }
-    },
+    //             uni.showToast({
+    //               title: 'Color card extracted successfully!',
+    //               icon: 'success',
+    //               duration: 2000
+    //             });
+    //           } else {
+    //             throw new Error('Invalid color data returned from server');
+    //           }
+    //         } catch (e) {
+    //           console.error('Error processing color extraction response:', e);
+    //           uni.showToast({
+    //             title: 'Failed to extract colors: ' + e.message,
+    //             icon: 'none',
+    //             duration: 2000
+    //           });
+    //         }
+    //       },
+    //       fail: (err) => {
+    //         console.error('Color extraction request failed:', err);
+    //         uni.showToast({
+    //           title: `Color extraction error: ${err.errMsg || 'Request failed'}`,
+    //           icon: 'none',
+    //           duration: 2500
+    //         });
+    //       },
+    //       complete: () => {
+    //         this.isExtractingColors = false;
+    //       }
+    //     });
+    //   } catch (error) {
+    //     console.error('Error in extractColors:', error);
+    //     uni.showToast({
+    //       title: 'Error: ' + error.message,
+    //       icon: 'none',
+    //       duration: 2000
+    //     });
+    //     this.isExtractingColors = false;
+    //   }
+    // },
 
     clearColorCard() {
       this.colorCard = [];
