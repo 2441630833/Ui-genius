@@ -142,6 +142,13 @@
           </image>
         </view>
 
+        <view class="nav-item template_guide"
+          :class="{ active: activeNavItem === 'template' || isTemplateSelectionMode }" @click="navigateTo('template')">
+          <image class="nav-icon"
+            :src="activeNavItem === 'template' || isTemplateSelectionMode ? '/static/dashboard_white.png' : '/static/dashboard.png'">
+          </image>
+        </view>
+
         <view class="nav-item delete_guide" :class="{ active: activeNavItem === 'delete' }"
           @click="navigateTo('delete')">
           <image class="nav-icon" :src="activeNavItem === 'delete' ? '/static/delete_white.png' : '/static/delete.png'">
@@ -152,21 +159,6 @@
           <image class="nav-icon" :src="activeNavItem === 'guide' ? '/static/guide_white.png' : '/static/guide.png'">
           </image>
         </view>
-
-        <!-- <view class="nav-item" :class="{ active: activeNavItem === 'magic' }" @click="navigateTo('magic')">
-          <image class="nav-icon" :src="activeNavItem === 'magic' ? '/static/magic_white.png' : '/static/magic.png'">
-          </image>
-        </view> -->
-
-
-
-        <!-- <view class="nav-item" :class="{ active: activeNavItem === 'profile' }" @click="navigateTo('profile')">
-          <image class="nav-icon" :src="activeNavItem === 'profile' ? '/static/profile_white.png' : '/static/profile.png'"></image>
-        </view>
-        
-        <view class="nav-item" :class="{ active: activeNavItem === 'settings' }" @click="navigateTo('settings')">
-          <image class="nav-icon" :src="activeNavItem === 'settings' ? '/static/settings_white.png' : '/static/settings.png'"></image>
-        </view> -->
       </view>
     </view>
 
@@ -242,15 +234,23 @@
               <!-- Filter to only show the 5 main templates -->
               <x-skeleton v-for="(template, index) in filteredTemplates" :key="index" type="banner"
                 :loading="templateLoadingStates[template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')]">
-                <view class="template-item" @click="navigateToEditor(template)">
+                <view class="template-item"
+                  :class="{ 'template-selected': selectedTemplatePageIndex === index && useColor }"
+                  @click="handleTemplateClick(template, index)">
                   <view class="template-preview"
                     :id="'template-' + template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')">
                     <image class="template-image"
                       :src="capturedImages[template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-')] || ''"
                       mode="aspectFill"></image>
+                    <!-- Selected indicator -->
+                    <view v-if="selectedTemplatePageIndex === index && useColor" class="template-selected-indicator">
+                      <text class="template-selected-check">✓</text>
+                    </view>
                   </view>
                   <view class="template-label">
                     <text class="template-name">{{ template.name.replace(/ Page/i, '') }}</text>
+                    <text v-if="selectedTemplatePageIndex === index && useColor"
+                      class="template-selected-badge">Template</text>
                   </view>
                 </view>
               </x-skeleton>
@@ -403,6 +403,12 @@
                 <view class="toggle-slider"></view>
               </view>
             </view>
+          </view>
+
+          <!-- Selected Template Info (show which template is selected) -->
+          <view v-if="useColor && availableTemplatePages.length > 0" class="selected-template-info">
+            <text class="model-selection-label">Reference Template: {{ getSelectedTemplatePageText() }}</text>
+            <text class="template-hint">Click the template icon in sidebar to change</text>
           </view>
 
           <view class="try-example-container">
@@ -798,6 +804,10 @@ export default {
       isExtractingColors: false,
       colorCard: [],
       useColor: true, // Default is open/enabled
+      // Template page selector properties
+      selectedTemplatePageIndex: 0, // Default to first page
+      availableTemplatePages: [], // Will be populated from latest_7_overall_page
+      isTemplateSelectionMode: false, // Toggle template selection mode from sidebar
       guideSteps: [
         {
           target: '.plus_guide',
@@ -2826,6 +2836,11 @@ export default {
     navigateTo(item) {
       this.activeNavItem = item;
 
+      // Disable template selection mode when clicking other nav items (not template)
+      if (item !== 'template' && this.isTemplateSelectionMode) {
+        this.isTemplateSelectionMode = false;
+      }
+
       // Show color palette if color nav item is clicked
       if (item === 'color') {
         this.showColorPalette = true;
@@ -2852,6 +2867,31 @@ export default {
         this.errorMessage = '';
         // Initialize model selection to gemini3
         this.selectedPageModel = 'gemini3';
+
+        // Populate available template pages from latest_7_overall_page (but DON'T reset selectedTemplatePageIndex)
+        const existingProjectData = uni.getStorageSync('latest_7_overall_page');
+        if (existingProjectData) {
+          try {
+            const projectData = typeof existingProjectData === 'string'
+              ? JSON.parse(existingProjectData)
+              : existingProjectData;
+
+            if (projectData && projectData.pages && projectData.pages.length > 0) {
+              this.availableTemplatePages = projectData.pages;
+              // Only set to 0 if current index is out of bounds
+              if (this.selectedTemplatePageIndex >= projectData.pages.length) {
+                this.selectedTemplatePageIndex = 0;
+              }
+            } else {
+              this.availableTemplatePages = [];
+            }
+          } catch (e) {
+            console.error('Error parsing project data:', e);
+            this.availableTemplatePages = [];
+          }
+        } else {
+          this.availableTemplatePages = [];
+        }
       }
 
       // Show delete pages dialog if delete nav item is clicked
@@ -2870,6 +2910,41 @@ export default {
       }
       if (item === 'guide') {
         this.startGuide();
+      }
+
+      // Toggle template selection mode
+      if (item === 'template') {
+        this.isTemplateSelectionMode = !this.isTemplateSelectionMode;
+
+        // Populate available template pages
+        const existingProjectData = uni.getStorageSync('latest_7_overall_page');
+        if (existingProjectData) {
+          try {
+            const projectData = typeof existingProjectData === 'string'
+              ? JSON.parse(existingProjectData)
+              : existingProjectData;
+
+            if (projectData && projectData.pages && projectData.pages.length > 0) {
+              this.availableTemplatePages = projectData.pages;
+            }
+          } catch (e) {
+            console.error('Error parsing project data:', e);
+          }
+        }
+
+        if (this.isTemplateSelectionMode) {
+          uni.showToast({
+            title: 'Click a template to select it as reference',
+            icon: 'none',
+            duration: 2000
+          });
+        } else {
+          uni.showToast({
+            title: 'Template selection mode disabled',
+            icon: 'none',
+            duration: 1500
+          });
+        }
       }
     },
     selectTemplate(template) {
@@ -3813,6 +3888,42 @@ export default {
         }
       }
     },
+
+    // Template page selection methods
+    handleTemplateClick(template, index) {
+      if (this.isTemplateSelectionMode) {
+        // In template selection mode, select this template
+        this.selectedTemplatePageIndex = index;
+        // Stay in template selection mode - user can click multiple times to change selection
+        // User needs to click another nav item to exit template selection mode
+
+        // Show confirmation toast
+        const templateName = template.name ? template.name.replace(/ Page/i, '') : `Page ${index + 1}`;
+        uni.showToast({
+          title: `"${templateName}" selected as reference`,
+          icon: 'none',
+          duration: 1500
+        });
+
+        console.log('Selected template page index:', this.selectedTemplatePageIndex);
+      } else {
+        // Normal mode, navigate to editor
+        this.navigateToEditor(template);
+      }
+    },
+
+    selectTemplatePage(index) {
+      this.selectedTemplatePageIndex = index;
+      console.log('Selected template page index:', this.selectedTemplatePageIndex);
+    },
+
+    getSelectedTemplatePageText() {
+      if (this.availableTemplatePages.length === 0) {
+        return 'No template selected';
+      }
+      const selectedPage = this.availableTemplatePages[this.selectedTemplatePageIndex];
+      return selectedPage ? (selectedPage.name || `Page ${this.selectedTemplatePageIndex + 1}`) : 'Select a template page';
+    },
     async createPage() {
       // Close the dialog immediately to provide better UX
       this.showCreatePageDialog = false;
@@ -3903,9 +4014,13 @@ export default {
         const projectData = typeof existingProjectData === 'string'
           ? JSON.parse(existingProjectData)
           : existingProjectData;
-        // Extract only the first page if it exists
+        // Extract the selected page based on selectedTemplatePageIndex
         if (projectData && projectData.pages && projectData.pages.length > 0) {
-          formData.latest_7_overall_page = JSON.stringify(projectData.pages[0]);
+          // Use the selected template page index, or default to 0 if index is out of bounds
+          const pageIndex = this.selectedTemplatePageIndex < projectData.pages.length
+            ? this.selectedTemplatePageIndex
+            : 0;
+          formData.latest_7_overall_page = JSON.stringify(projectData.pages[pageIndex]);
         }
       }
 
@@ -8027,5 +8142,59 @@ export default {
 .upgrade-modal-cancel:hover,
 .upgrade-modal-confirm:hover {
   opacity: 0.9;
+}
+
+/* Template Selection Mode Styles */
+.template-selected {
+  position: relative;
+  border: 3px solid #e53935 !important;
+  border-radius: 12px;
+  box-shadow: 0 0 12px rgba(229, 57, 53, 0.4);
+}
+
+.template-selected-indicator {
+  position: absolute;
+  top: 10px;
+  right: 10px;
+  width: 32px;
+  height: 32px;
+  background: linear-gradient(135deg, #e53935, #c62828);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 2px 8px rgba(229, 57, 53, 0.5);
+  z-index: 10;
+}
+
+.template-selected-check {
+  color: white;
+  font-size: 18px;
+  font-weight: bold;
+}
+
+.template-selected-badge {
+  background: linear-gradient(135deg, #e53935, #c62828);
+  color: white;
+  font-size: 10px;
+  padding: 2px 8px;
+  border-radius: 10px;
+  margin-left: 8px;
+  font-weight: 600;
+}
+
+.selected-template-info {
+  background-color: #fff3e0;
+  border: 1px solid #ffcc80;
+  border-radius: 8px;
+  padding: 12px 15px;
+  margin-bottom: 15px;
+}
+
+.template-hint {
+  display: block;
+  font-size: 12px;
+  color: #888;
+  margin-top: 4px;
 }
 </style>
