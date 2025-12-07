@@ -8146,40 +8146,39 @@ export default {
 /* Template Selection Mode Styles */
 .template-selected {
   position: relative;
-  border: 3px solid #e53935 !important;
   border-radius: 12px;
-  box-shadow: 0 0 12px rgba(229, 57, 53, 0.4);
+  box-shadow: 0 0 8px rgba(239, 154, 154, 0.3);
 }
 
 .template-selected-indicator {
   position: absolute;
-  top: 10px;
-  right: 10px;
-  width: 32px;
-  height: 32px;
-  background: linear-gradient(135deg, #e53935, #c62828);
+  top: 8px;
+  right: 8px;
+  width: 26px;
+  height: 26px;
+  background: linear-gradient(135deg, #e53935, #e57373);
   border-radius: 50%;
   display: flex;
   align-items: center;
   justify-content: center;
-  box-shadow: 0 2px 8px rgba(229, 57, 53, 0.5);
+  box-shadow: 0 2px 6px rgba(229, 115, 115, 0.35);
   z-index: 10;
 }
 
 .template-selected-check {
   color: white;
-  font-size: 18px;
+  font-size: 14px;
   font-weight: bold;
 }
 
 .template-selected-badge {
-  background: linear-gradient(135deg, #e53935, #c62828);
+  background: linear-gradient(135deg, #e53935, #e57373);
   color: white;
   font-size: 10px;
   padding: 2px 8px;
   border-radius: 10px;
   margin-left: 8px;
-  font-weight: 600;
+  font-weight: 500;
 }
 
 .selected-template-info {
