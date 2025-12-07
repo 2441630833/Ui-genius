@@ -115,6 +115,13 @@
           </image>
         </view>
 
+        <view class="nav-item template_guide"
+          :class="{ active: activeNavItem === 'template' || isTemplateSelectionMode }" @click="navigateTo('template')">
+          <image class="nav-icon"
+            :src="activeNavItem === 'template' || isTemplateSelectionMode ? '/static/template_white.png' : '/static/template.png'">
+          </image>
+        </view>
+
         <view class="nav-item import_guide" :class="{ active: activeNavItem === 'import' }"
           @click="navigateTo('import')">
           <image class="nav-icon" :src="activeNavItem === 'import' ? '/static/import_white.png' : '/static/import.png'">
@@ -123,13 +130,6 @@
 
         <view class="nav-item" :class="{ active: activeNavItem === 'color' }" @click="navigateTo('color')">
           <image class="nav-icon" :src="activeNavItem === 'color' ? '/static/color_white.png' : '/static/color.png'">
-          </image>
-        </view>
-
-        <view class="nav-item template_guide"
-          :class="{ active: activeNavItem === 'template' || isTemplateSelectionMode }" @click="navigateTo('template')">
-          <image class="nav-icon"
-            :src="activeNavItem === 'template' || isTemplateSelectionMode ? '/static/dashboard_white.png' : '/static/dashboard.png'">
           </image>
         </view>
 
