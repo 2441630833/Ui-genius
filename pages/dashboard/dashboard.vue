@@ -621,6 +621,7 @@ export default {
       selectedProjects: [], // Array of selected project IDs
       isMultipleDelete: false, // Flag for multiple delete
       projectsToDelete: [], // Array of projects to delete
+      currentUserId: uni.getStorageSync('uid'), // Track current user ID to detect account changes
     }
   },
   watch: {
@@ -725,9 +726,14 @@ export default {
     setActiveNavItem(item) {
       this.activeNavItem = item;
 
-      // Refresh projects when switching to dashboard
+      // Refresh projects when switching to dashboard if account has changed
       if (item === 'dashboard') {
-        // this.refreshProjects();
+        const newUserId = uni.getStorageSync('uid');
+        if (newUserId && newUserId !== this.currentUserId) {
+          // Account has changed, refresh projects
+          this.currentUserId = newUserId;
+          this.refreshProjects();
+        }
       }
     },
     jumpToDesign(project) {
@@ -1619,6 +1625,10 @@ export default {
 
       uni.removeStorageSync('latest_7_overall_page');
       uni.removeStorageSync('currentProjectId');
+      
+      // Clear user projects from the component state
+      this.userProjects = [];
+      
       uni.navigateTo({
         url: '/pages/login/login'
       });
