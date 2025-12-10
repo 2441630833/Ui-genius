@@ -3431,11 +3431,11 @@ export default {
       this.templateVersions = {};
 
       // Show toast
-      uni.showToast({
-        title: 'Images cleared',
-        icon: 'none',
-        duration: 2000
-      });
+      // uni.showToast({
+      //   title: 'Images cleared',
+      //   icon: 'none',
+      //   duration: 2000
+      // });
     },
     saveProjectToCloud(content, projectTitle, projectDescription) {
       // Check for existing project ID
