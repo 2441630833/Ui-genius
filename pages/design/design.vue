@@ -994,6 +994,12 @@ export default {
     this.cleanupInjectedStyles();
   },
   onLoad(options) {
+    // Initialize project_id from storage
+    const storedProjectId = uni.getStorageSync('currentProjectId');
+    if (storedProjectId) {
+      this.project_id = storedProjectId;
+    }
+
     this.checkAndStartGuide();
     // Also handle shared content if navigating normally (non-H5)
     if (options && options.pid) {
@@ -1003,6 +1009,15 @@ export default {
     }
   },
   onShow() {
+    // Check for project switch
+    const storedProjectId = uni.getStorageSync('currentProjectId');
+    if (storedProjectId && storedProjectId !== this.project_id) {
+      this.project_id = storedProjectId;
+      // Refresh local data (silently) because keys are shared between projects
+      // This clears images and resets loading states
+      this.refreshDataLocal(false);
+    }
+
     // Load images from local storage first
     this.loadImagesFromStorage();
 
@@ -2030,9 +2045,9 @@ export default {
       // Note: generatePreviewImages() is handled by pullRefreshProject()
     },
 
-    refreshDataLocal() {
+    refreshDataLocal(showToast = true) {
       // Clear stored images first
-      this.clearStoredImages();
+      this.clearStoredImages(showToast);
 
       // Reset all loading states
       this.templatesLoading = true;
@@ -2273,7 +2288,7 @@ export default {
           return;
         }
 
-        this._showLoading(`Generating ${templatesToGenerate.length} previews...`);
+        // this._showLoading(`Generating ${templatesToGenerate.length} previews...`);
 
         // Create a hidden iframe
         const iframe = document.createElement('iframe');
@@ -3391,7 +3406,8 @@ export default {
       // console.log(`Needs generation: ${needsGeneration}`);
       return needsGeneration;
     },
-    clearStoredImages() {
+
+    clearStoredImages(showToast = true) {
       // console.log('Clearing stored images');
 
       // Define the main template keys we need
@@ -3431,12 +3447,15 @@ export default {
       this.templateVersions = {};
 
       // Show toast
-      // uni.showToast({
-      //   title: 'Images cleared',
-      //   icon: 'none',
-      //   duration: 2000
-      // });
+      // if (showToast) {
+      //   uni.showToast({
+      //     title: 'Images cleared',
+      //     icon: 'none',
+      //     duration: 2000
+      //   });
+      // }
     },
+
     saveProjectToCloud(content, projectTitle, projectDescription) {
       // Check for existing project ID
       const currentProjectId = uni.getStorageSync('currentProjectId');
