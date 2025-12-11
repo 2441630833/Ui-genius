@@ -128,11 +128,8 @@ export function saveCurrentTab(pagePath) {
   }
 
   try {
-    // Don't save login page as it's not a tab page and shouldn't be auto-restored
-    if (normalizedPath === 'pages/login/login') {
-      return
-    }
-    
+
+
     if (isKnownPage(normalizedPath)) {
       uni.setStorageSync(STORAGE_KEY, normalizedPath)
     }
@@ -160,12 +157,12 @@ export function getLastTab() {
  */
 export function restoreLastTab(delay = 500) {
   const lastTab = getLastTab()
-  
+
   // Prevent multiple simultaneous restoration attempts
   if (isRestoring) {
     return
   }
-  
+
   if (lastTab) {
     isRestoring = true
     setTimeout(() => {
@@ -175,7 +172,7 @@ export function restoreLastTab(delay = 500) {
         try {
           const hash = window.location.hash || ''
           const search = window.location.search || ''
-          
+
           // Check query parameters in hash (uni-app H5 mode)
           const hashQueryIndex = hash.indexOf('?')
           if (hashQueryIndex !== -1) {
@@ -187,7 +184,7 @@ export function restoreLastTab(delay = 500) {
               return
             }
           }
-          
+
           // Also check standard search parameters
           if (search) {
             const params = new URLSearchParams(search)
@@ -201,7 +198,7 @@ export function restoreLastTab(delay = 500) {
           // Silent error handling
         }
       }
-      
+
       // Check if current page is already the target page
       const pages = getCurrentPages()
       let currentRoute = null
@@ -233,7 +230,7 @@ export function restoreLastTab(delay = 500) {
 
         try {
           if (typeof uni.reLaunch === 'function') {
-            uni.reLaunch({ 
+            uni.reLaunch({
               url: targetUrl,
               success: () => {
                 isRestoring = false
@@ -243,7 +240,7 @@ export function restoreLastTab(delay = 500) {
               }
             })
           } else if (typeof uni.redirectTo === 'function') {
-            uni.redirectTo({ 
+            uni.redirectTo({
               url: targetUrl,
               success: () => {
                 isRestoring = false
@@ -253,7 +250,7 @@ export function restoreLastTab(delay = 500) {
               }
             })
           } else if (typeof uni.navigateTo === 'function') {
-            uni.navigateTo({ 
+            uni.navigateTo({
               url: targetUrl,
               success: () => {
                 isRestoring = false
