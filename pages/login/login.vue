@@ -37,7 +37,7 @@ const uniIdCo = uniCloud.importObject("uni-id-co", {
 })
 // Import token management functions
 import { setTokenWithExpiration, setGoogleTokenWithExpiration, isTokenExpired, isGoogleTokenExpired } from '@/common/permission.js'
-// 添加一个简单的 URLSearchParams polyfill
+// Add a simple URLSearchParams polyfill
 // #ifndef H5
 class URLSearchParamsPolyfill {
   constructor(searchString) {
@@ -47,10 +47,10 @@ class URLSearchParamsPolyfill {
       return;
     }
 
-    // 移除开头的 '?' 符号
+    // Remove leading '?' symbol
     const search = searchString.startsWith('?') ? searchString.substring(1) : searchString;
 
-    // 解析参数
+    // Parse parameters
     const pairs = search.split('&');
     for (const pair of pairs) {
       if (!pair) continue;
@@ -74,7 +74,7 @@ class URLSearchParamsPolyfill {
   }
 }
 
-// 如果平台不支持 URLSearchParams，则使用 polyfill
+// Use polyfill if platform doesn't support URLSearchParams
 if (typeof URLSearchParams === 'undefined') {
   globalThis.URLSearchParams = URLSearchParamsPolyfill;
 }
@@ -93,6 +93,7 @@ export default {
       },
       needCaptcha: false,
       rememberPsw: true,
+      isProcessingGoogleLogin: false,
       fakeToken: {
         newToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9M',
         uid: '123bcbfeqqaeabfaf5a'
@@ -100,8 +101,9 @@ export default {
     }
   },
   mounted() {
-    this.getUserInfo()
     this.restoreFormData()
+    // Only process Google login if there's a code in the URL
+    this.checkAndProcessGoogleLogin()
   },
   watch: {
     'user.email'(newVal) {
@@ -112,6 +114,35 @@ export default {
     }
   },
   methods: {
+    checkAndProcessGoogleLogin() {
+      let code = null;
+
+      // #ifdef H5
+      // Get code parameter from URL in H5 environment
+      const urlParams = new URLSearchParams(window.location.search);
+      code = urlParams.get('code');
+      // #endif
+
+      // #ifdef MP-WEIXIN || MP-ALIPAY || MP-BAIDU || MP-TOUTIAO || MP-QQ || MP-KUAISHOU
+      // Get code from page parameters in mini-program environment
+      if (this.$mp && this.$mp.query && this.$mp.query.code) {
+        code = this.$mp.query.code;
+      }
+      // #endif
+
+      // #ifdef APP-PLUS
+      // Get code from page parameters in App environment
+      const pages = getCurrentPages();
+      const currentPage = pages[pages.length - 1];
+      if (currentPage && currentPage.options && currentPage.options.code) {
+        code = currentPage.options.code;
+      }
+      // #endif
+
+      if (code) {
+        this.getUserInfo();
+      }
+    },
     restoreFormData() {
       // Retrieve stored email and password
       const userEmail = uni.getStorageSync('userEmail')
@@ -267,7 +298,7 @@ export default {
         //   console.log('captcha required')
 
         // } else if (this.needCaptcha) {
-        //   //登录失败，自动重新获取验证码
+        //   // Login failed, automatically re-fetch captcha
         //   this.$refs.captcha.getImageCaptcha()
         // }
       })
@@ -325,23 +356,29 @@ export default {
     },
 
     getUserInfo() {
+      // Prevent duplicate Google login processing
+      if (this.isProcessingGoogleLogin) {
+        console.log('Google login already in progress, skipping duplicate call');
+        return;
+      }
+
       let code = null;
 
       // #ifdef H5
-      // H5 环境下从 URL 获取 code 参数
+      // Get code parameter from URL in H5 environment
       const urlParams = new URLSearchParams(window.location.search);
       code = urlParams.get('code');
       // #endif
 
       // #ifdef MP-WEIXIN || MP-ALIPAY || MP-BAIDU || MP-TOUTIAO || MP-QQ || MP-KUAISHOU
-      // 小程序环境从页面参数获取 code
+      // Get code from page parameters in mini-program environment
       if (this.$mp && this.$mp.query && this.$mp.query.code) {
         code = this.$mp.query.code;
       }
       // #endif
 
       // #ifdef APP-PLUS
-      // App 环境从页面参数获取 code
+      // Get code from page parameters in App environment
       const pages = getCurrentPages();
       const currentPage = pages[pages.length - 1];
       if (currentPage && currentPage.options && currentPage.options.code) {
@@ -354,7 +391,10 @@ export default {
         uni.hideLoading();
         return;
       }
-      // 获取 access_token
+
+      // Mark that we're processing Google login
+      this.isProcessingGoogleLogin = true;
+      // Get access_token
       uni.request({
         url: 'https://oauth2.googleapis.com/token',
         method: 'POST',
@@ -370,7 +410,7 @@ export default {
           if (tokenRes.statusCode === 200 && tokenRes.data.access_token) {
             const googleToken = tokenRes.data.access_token;
 
-            // 获取用户信息
+            // Get user info
             uni.request({
               url: 'https://www.googleapis.com/oauth2/v2/userinfo',
               method: 'GET',
@@ -416,21 +456,14 @@ export default {
                   }).catch(err => {
                     console.error('Error storing Google user info:', err)
                     console.error('Error details:', err.message || err)
-
-                    // If direct params failed, try with nested params
-                    console.log('Retrying with nested params')
-                    uniIdCo.loginByGoogle({ googleInfo }).then(result => {
-                      console.log('Google login success with nested params:', result)
-                      this.googleLoginSuccess(result)
-                    }).catch(nestedErr => {
-                      console.error('Error with nested params too:', nestedErr)
-                      uni.showToast({
-                        title: 'Failed to login with Google',
-                        icon: 'none',
-                        duration: 3000
-                      })
-                      uni.hideLoading()
+                    uni.showToast({
+                      title: 'Failed to login with Google',
+                      icon: 'none',
+                      duration: 3000
                     })
+                    uni.hideLoading()
+                    // Reset the processing flag on error
+                    this.isProcessingGoogleLogin = false
                   })
                 } else {
                   uni.showToast({
@@ -439,6 +472,7 @@ export default {
                     duration: 3000
                   });
                   uni.hideLoading();
+                  this.isProcessingGoogleLogin = false;
                 }
               },
               fail: (error) => {
@@ -449,6 +483,7 @@ export default {
                   duration: 3000
                 });
                 uni.hideLoading();
+                this.isProcessingGoogleLogin = false;
               }
             });
           } else {
@@ -458,6 +493,7 @@ export default {
               duration: 3000
             });
             uni.hideLoading();
+            this.isProcessingGoogleLogin = false;
           }
         },
         fail: (error) => {
@@ -468,12 +504,13 @@ export default {
             duration: 3000
           });
           uni.hideLoading();
+          this.isProcessingGoogleLogin = false;
         }
       });
 
     }
   },
-  // 添加 onLoad 生命周期钩子，确保在小程序环境下也能正确获取参数
+  // Add onLoad lifecycle hook to ensure correct parameter retrieval in mini-program environment
   onLoad(options) {
     if (options && options.code) {
       this.getUserInfo();
