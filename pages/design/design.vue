@@ -128,7 +128,7 @@
           </image>
         </view>
 
-        <view class="nav-item" :class="{ active: activeNavItem === 'color' }" @click="navigateTo('color')">
+        <view class="nav-item color_guide" :class="{ active: activeNavItem === 'color' }" @click="navigateTo('color')">
           <image class="nav-icon" :src="activeNavItem === 'color' ? '/static/color_white.png' : '/static/color.png'">
           </image>
         </view>
@@ -806,15 +806,27 @@ export default {
           position: 'right'
         },
         {
-          target: '.import_guide',
+          target: '.template_guide',
           title: 'Third Step',
-          content: 'This is the third step of the guide - click the import button to import a new page to your project',
+          content: 'This is the third step of the guide - click the template button to select a template for your project',
+          position: 'right'
+        },
+        {
+          target: '.import_guide',
+          title: 'Fourth Step',
+          content: 'This is the fourth step of the guide - click the import button to import a new page to your project',
           position: 'right'
         },
         {
           target: '.import-dialog',
-          title: 'Fourth Step',
-          content: 'This is the fourth step of the guide - You can import file from here, the imported images or html will be automatic convert the editable prototype, you can do the second edit base on the imported prototype',
+          title: 'Fifth Step',
+          content: 'This is the fifth step of the guide - You can import file from here, the imported images or html will be automatic convert the editable prototype, you can do the second edit base on the imported prototype',
+          position: 'right'
+        },
+        {
+          target: '.color_guide',
+          title: 'Sixth Step',
+          content: 'This is the sixth step of the guide - click the color button to select theme colour manually',
           position: 'right'
         },
         // {
@@ -837,32 +849,32 @@ export default {
         // },
         {
           target: '.delete_guide',
-          title: 'Fifth Step',
-          content: 'This is the fifth step of the guide - You can delete the page by click this icon',
+          title: 'Seventh Step',
+          content: 'This is the seventh step of the guide - You can delete the page by click this icon',
           position: 'right'
         },
         {
           target: '.deleteDialogGuide',
-          title: 'Sixth Step',
-          content: 'This is the sixth step of the guide - You can delete the page from here',
+          title: 'Eighth Step',
+          content: 'This is the eighth step of the guide - You can delete the page from here',
           position: 'right'
         },
         {
           target: '.export-button',
-          title: 'Seventh Step',
-          content: 'This is the seventh step of the guide - You can export the project as images, html, vue2, vue3, react',
+          title: 'Ninth Step',
+          content: 'This is the ninth step of the guide - You can export the project as images, html, vue2, vue3, react',
           position: 'left'
         },
         {
           target: '.refresh-button',
-          title: 'Eighth Step',
-          content: 'This is the eighth step of the guide - You can refresh the page from here',
+          title: 'Tenth Step',
+          content: 'This is the tenth step of the guide - You can refresh the page from here',
           position: 'left'
         },
         {
           target: '.share-button',
-          title: 'Ninth Step',
-          content: 'This is the ninth step of the guide - You can share the project to your colleague to work collaboratively together',
+          title: 'Eleventh Step',
+          content: 'This is the eleventh step of the guide - You can share the project to your colleague to work collaboratively together',
           position: 'left'
         },
       ],
@@ -1153,31 +1165,38 @@ export default {
       this.showCustomToast('Already Skip Guide', 'none');
     },
     onGuideStepChange(index) {
-      // When moving from step 0 to step 1 (i.e., after first Next click), open the dialog
-      if (index === 1) {
+      // Make step-change behavior work for BOTH directions by driving UI from the current step.
+      const shouldShowCreatePageDialog = index === 1;
+      const shouldShowImportDialog = index === 4;
+      const shouldShowDeleteDialog = index === 7;
+
+      // Close dialogs when the new step shouldn't show them (covers going backwards).
+      if (!shouldShowCreatePageDialog && this.showCreatePageDialog) {
+        this.showCreatePageDialog = false;
+      }
+      if (!shouldShowImportDialog && this.showImportDialog) {
+        this.closeImportDialog();
+      }
+      if (!shouldShowDeleteDialog && this.showDeleteDialog) {
+        this.closeDeleteDialog();
+      }
+
+      // Open/init dialogs only when entering their steps.
+      if (shouldShowCreatePageDialog && !this.showCreatePageDialog) {
         this.showCreatePageDialog = true;
         this.pageDescription = '';
         this.errorMessage = '';
         // Initialize model selection to gemini3
         this.selectedPageModel = 'gemini3';
       }
-      else if (index === 2) {
-        this.showCreatePageDialog = false;
-      }
-      else if (index === 3) {
+      if (shouldShowImportDialog && !this.showImportDialog) {
         this.showImportDialog = true;
         this.importFileList = [];
         this.importError = '';
         this.selectedImportType = 'image';
       }
-      else if (index === 4) {
-        this.closeImportDialog();
-      }
-      else if (index === 5) {
+      if (shouldShowDeleteDialog && !this.showDeleteDialog) {
         this.showDeleteDialog = true;
-      }
-      else if (index === 6) {
-        this.closeDeleteDialog();
       }
     },
     shareProject() {
