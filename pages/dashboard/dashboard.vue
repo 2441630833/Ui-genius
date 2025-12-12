@@ -574,6 +574,7 @@ export default {
       showModelDropdown: false,
       // Longze Guide
       guideTheme: 'dark',
+      prevGuideStepIndex: -1,
       guideSteps: [
         {
           target: '.create-project-btn',
@@ -1806,11 +1807,23 @@ export default {
       this.showCustomToast('Already Skip Guide', 'none');
     },
     onGuideStepChange(index) {
-      // When moving from step 0 to step 1 (i.e., after first Next click), open the dialog
-      if (index === 1) {
+      const previousIndex = this.prevGuideStepIndex;
+      this.prevGuideStepIndex = index;
+
+      const shouldShowCreateProjectDialog = index >= 1;
+      if (shouldShowCreateProjectDialog && !this.showCreateProjectDialog) {
         this.openCreateProjectDialog();
       }
-      else if (index === 2) {
+      if (!shouldShowCreateProjectDialog && this.showCreateProjectDialog) {
+        this.closeCreateProjectDialog();
+      }
+
+      // Only run side-effect actions when moving forward.
+      if (previousIndex !== -1 && index <= previousIndex) {
+        return;
+      }
+
+      if (index === 2) {
         this.selectDevice('desktop');
       }
       else if (index === 3) {
