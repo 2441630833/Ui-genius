@@ -565,12 +565,17 @@ export default {
       passwordStrengthText: '',
       // Model selection
       modelOptions: [
-        { value: 'gemini3', text: 'gemini3 (recommended 1 minute)', isPro: true },
-        { value: 'gemini2.5', text: 'gemini2.5 (recommended 1 minute)', isPro: true },
-        { value: 'uigenius5:latest', text: 'uigenius5:latest (recommended 3 minutes)', isPro: true },
-        { value: 'uigenius3:basic', text: 'uigenius3:basic (free basic model, 3 minutes)', isPro: false},
+        { value: 'google/gemini-3-flash-preview', text: 'google/gemini3', isPro: true },
+        { value: 'anthropic/claude-opus-4.5', text: 'anthropic/claude-opus-4.5', isPro: true },
+        { value: 'deepseek/deepseek-chat-v3-0324', text: 'deepseek/deepseek-chat-v3-0324', isPro: true },
+        { value: 'openai/gpt-oss-120b', text: 'openai/gpt-oss-120b', isPro: true },
+        { value: 'uigenius5:latest', text: 'uigenius/uigenius5:latest', isPro: false },
+        { value: 'alibaba/tongyi-deepresearch-30b-a3b:free', text: 'alibaba/tongyi-deepresearch-30b-a3b:free', isPro: false },
+        { value: 'mistralai/devstral-2512:free', text: 'mistralai/devstral-2512:free', isPro: false },
+        { value: 'kwaipilot/kat-coder-pro:free', text: 'kwaipilot/kat-coder-pro:free', isPro: false },
+        { value: 'google/gemma-3-27b-it:free', text: 'google/gemma-3-27b-it:free', isPro: false },
       ],
-      selectedModel: 'gemini3',
+      selectedModel: 'google/gemini-3-flash-preview',
       showModelDropdown: false,
       // Longze Guide
       guideTheme: 'dark',
@@ -939,8 +944,8 @@ export default {
       };
 
       // Check connection and proceed if successful
-      const isConnected = await checkApiConnection();
-      if (!isConnected) return;
+      // const isConnected = await checkApiConnection();
+      // if (!isConnected) return;
 
       // If we reach here, connection is good
       // Clear all storage that stored before
