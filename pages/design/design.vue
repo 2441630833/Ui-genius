@@ -1587,305 +1587,290 @@ export default {
       });
     },
 
-    exportHTML() {
-      // Show loading toast
-      uni.showLoading({
-        title: 'Preparing HTML...',
-        mask: true
-      });
+//     exportHTML() {
+//       // Show loading toast
+//       uni.showLoading({
+//         title: 'Preparing HTML...',
+//         mask: true
+//       });
 
-      try {
-        // Get project data from storage
-        const jsonData = uni.getStorageSync('latest_7_overall_page');
-        if (!jsonData) {
-          uni.hideLoading();
-          uni.showToast({
-            title: 'No project data found',
-            icon: 'none',
-            duration: 2000
-          });
-          return;
-        }
+//       try {
+//         // Get project data from storage
+//         const jsonData = uni.getStorageSync('latest_7_overall_page');
+//         if (!jsonData) {
+//           uni.hideLoading();
+//           uni.showToast({
+//             title: 'No project data found',
+//             icon: 'none',
+//             duration: 2000
+//           });
+//           return;
+//         }
 
-        // Parse the JSON data
-        const projectData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+//         // Parse the JSON data
+//         const projectData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
 
-        // Extract page components
-        if (!projectData.pages || !projectData.pages.length) {
-          uni.hideLoading();
-          uni.showToast({
-            title: 'No pages found in project',
-            icon: 'none',
-            duration: 2000
-          });
-          return;
-        }
+//         // Extract page components
+//         if (!projectData.pages || !projectData.pages.length) {
+//           uni.hideLoading();
+//           uni.showToast({
+//             title: 'No pages found in project',
+//             icon: 'none',
+//             duration: 2000
+//           });
+//           return;
+//         }
 
-        // For mobile, save to file directly
-        if (uni.getSystemInfoSync().platform !== 'web') {
-          this.exportHTMLMobile(projectData);
-          return;
-        }
+//         // For mobile, save to file directly
+//         if (uni.getSystemInfoSync().platform !== 'web') {
+//           this.exportHTMLMobile(projectData);
+//           return;
+//         }
 
-        // For web, try to create a zip file using the imported libraries
-        try {
-          // Use the imported JSZip and saveAs
-          if (typeof JSZip !== 'function' || typeof saveAs !== 'function') {
-            // Fallback to a simple HTML download if libraries aren't available
-            this.exportHTMLSimple(projectData);
-            return;
-          }
+//         // For web, try to create a zip file using the imported libraries
+//         try {
+//           // Use the imported JSZip and saveAs
+//           if (typeof JSZip !== 'function' || typeof saveAs !== 'function') {
+//             // Fallback to a simple HTML download if libraries aren't available
+//             this.exportHTMLSimple(projectData);
+//             return;
+//           }
 
-          const zip = new JSZip();
+//           const zip = new JSZip();
 
-          // Project name for zip file name
-          const projectName = projectData.AIProjectName || 'ui_genius_project';
+//           // Project name for zip file name
+//           const projectName = projectData.AIProjectName || 'ui_genius_project';
 
-          // Basic HTML template
-          const htmlTemplate = (title, content) => `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title}</title>
-  <style>
-    /* Reset styles */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; line-height: 1.6; }
-  </style>
-</head>
-<body>
-  ${content}
-</body>
-</html>`;
+//           // Basic HTML template
+//           const htmlTemplate = (content) => `${content}`;
 
-          // Create an index.html with links to all pages
-          let indexContent = `<div style="max-width: 800px; margin: 0 auto; padding: 20px;">
-  <h1 style="color: var(--theme-color); margin-bottom: 20px;">${projectName}</h1>
-  <p style="margin-bottom: 20px;">${projectData.AIProjectDescription || ''}</p>
-  <h2 style="margin-bottom: 15px;">Pages:</h2>
-  <ul style="list-style: none;">`;
+//           // Create an index.html with links to all pages
+//           let indexContent = `<div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+//   <h1 style="color: var(--theme-color); margin-bottom: 20px;">${projectName}</h1>
+//   <p style="margin-bottom: 20px;">${projectData.AIProjectDescription || ''}</p>
+//   <h2 style="margin-bottom: 15px;">Pages:</h2>
+//   <ul style="list-style: none;">`;
 
-          // Add each page to the zip and create link in index
-          projectData.pages.forEach((page) => {
-            const pageName = page.name.replace(/ Page/i, '');
-            const fileName = pageName.toLowerCase().replace(/\s+/g, '-') + '.html';
+//           // Add each page to the zip and create link in index
+//           projectData.pages.forEach((page) => {
+//             const pageName = page.name.replace(/ Page/i, '');
+//             const fileName = pageName.toLowerCase().replace(/\s+/g, '-') + '.html';
 
-            // Create HTML file for the page
-            const pageContent = page.component || '<div>No content available</div>';
-            const fullHtml = htmlTemplate(pageName, pageContent);
-            zip.file(fileName, fullHtml);
+//             // Create HTML file for the page
+//             const pageContent = page.component || '<div>No content available</div>';
+//             const fullHtml = htmlTemplate(pageContent);
+//             zip.file(fileName, fullHtml);
 
-            // Add link to index
-            indexContent += `<li style="margin-bottom: 10px;">
-      <a href="${fileName}" style="color: var(--theme-color); text-decoration: none; font-weight: bold; padding: 5px 0; display: inline-block;">
-        ${pageName}
-      </a>
-    </li>`;
-          });
+//             // Add link to index
+//             indexContent += `<li style="margin-bottom: 10px;">
+//       <a href="${fileName}" style="color: var(--theme-color); text-decoration: none; font-weight: bold; padding: 5px 0; display: inline-block;">
+//         ${pageName}
+//       </a>
+//     </li>`;
+//           });
 
-          // Close the index HTML
-          indexContent += `</ul></div>`;
+//           // Close the index HTML
+//           indexContent += `</ul></div>`;
 
-          // Add index.html to zip
-          zip.file('index.html', htmlTemplate(projectName, indexContent));
+//           // Add index.html to zip
+//           zip.file('index.html', htmlTemplate(indexContent));
 
-          // Generate and save the zip
-          zip.generateAsync({ type: "blob" }).then((content) => {
-            saveAs(content, `${projectName.toLowerCase().replace(/\s+/g, '-')}_html.zip`);
-            uni.hideLoading();
-            uni.showToast({
-              title: 'HTML exported successfully!',
-              icon: 'success',
-              duration: 2000
-            });
-          });
-        } catch (error) {
-          // Fallback to simple HTML export
-          this.exportHTMLSimple(projectData);
-        }
-      } catch (error) {
-        uni.hideLoading();
-        uni.showToast({
-          title: 'Error exporting HTML',
-          icon: 'none',
-          duration: 2000
-        });
-        console.error('Error exporting HTML:', error);
-      }
-    },
+//           // Generate and save the zip
+//           zip.generateAsync({ type: "blob" }).then((content) => {
+//             saveAs(content, `${projectName.toLowerCase().replace(/\s+/g, '-')}_html.zip`);
+//             uni.hideLoading();
+//             uni.showToast({
+//               title: 'HTML exported successfully!',
+//               icon: 'success',
+//               duration: 2000
+//             });
+//           });
+//         } catch (error) {
+//           // Fallback to simple HTML export
+//           this.exportHTMLSimple(projectData);
+//         }
+//       } catch (error) {
+//         uni.hideLoading();
+//         uni.showToast({
+//           title: 'Error exporting HTML',
+//           icon: 'none',
+//           duration: 2000
+//         });
+//         console.error('Error exporting HTML:', error);
+//       }
+//     },
 
-    exportHTMLMobile(projectData) {
-      // Create a single HTML file with all pages for mobile platforms
-      const projectName = projectData.AIProjectName || 'ui_genius_project';
-      let content = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${projectName}</title>
-  <style>
-    /* Reset styles */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; line-height: 1.6; }
-    /* Navigation */
-    .nav { background: var(--theme-color); padding: 10px; position: sticky; top: 0; z-index: 100; }
-    .nav ul { display: flex; list-style: none; overflow-x: auto; white-space: nowrap; }
-    .nav a { color: white; text-decoration: none; padding: 10px 15px; display: inline-block; }
-    .page { padding: 20px; min-height: 100vh; }
-    h1 { margin-bottom: 20px; }
-  </style>
-</head>
-<body>
-  <nav class="nav">
-    <ul>`;
+//     exportHTMLMobile(projectData) {
+//       // Create a single HTML file with all pages for mobile platforms
+//       const projectName = projectData.AIProjectName || 'ui_genius_project';
+//       let content = `<!DOCTYPE html>
+// <html lang="en">
+// <head>
+//   <meta charset="UTF-8">
+//   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+//   <title>${projectName}</title>
+//   <style>
+//     /* Reset styles */
+//     * { margin: 0; padding: 0; box-sizing: border-box; }
+//     body { font-family: Arial, sans-serif; line-height: 1.6; }
+//     /* Navigation */
+//     .nav { background: var(--theme-color); padding: 10px; position: sticky; top: 0; z-index: 100; }
+//     .nav ul { display: flex; list-style: none; overflow-x: auto; white-space: nowrap; }
+//     .nav a { color: white; text-decoration: none; padding: 10px 15px; display: inline-block; }
+//     .page { padding: 20px; min-height: 100vh; }
+//     h1 { margin-bottom: 20px; }
+//   </style>
+// </head>
+// <body>
+//   <nav class="nav">
+//     <ul>`;
 
-      // Add navigation links
-      projectData.pages.forEach((page) => {
-        const pageName = page.name.replace(/ Page/i, '');
-        const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
-        content += `<li><a href="#${pageId}">${pageName}</a></li>`;
-      });
+//       // Add navigation links
+//       projectData.pages.forEach((page) => {
+//         const pageName = page.name.replace(/ Page/i, '');
+//         const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
+//         content += `<li><a href="#${pageId}">${pageName}</a></li>`;
+//       });
 
-      content += `</ul>
-  </nav>
-  <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
-    <h1 style="color: var(--theme-color);">${projectName}</h1>
-    <p style="margin-bottom: 30px;">${projectData.AIProjectDescription || ''}</p>
-  </div>`;
+//       content += `</ul>
+//   </nav>
+//   <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+//     <h1 style="color: var(--theme-color);">${projectName}</h1>
+//     <p style="margin-bottom: 30px;">${projectData.AIProjectDescription || ''}</p>
+//   </div>`;
 
-      // Add each page
-      projectData.pages.forEach((page) => {
-        const pageName = page.name.replace(/ Page/i, '');
-        const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
-        const pageContent = page.component || '<div>No content available</div>';
+//       // Add each page
+//       projectData.pages.forEach((page) => {
+//         const pageName = page.name.replace(/ Page/i, '');
+//         const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
+//         const pageContent = page.component || '<div>No content available</div>';
 
-        content += `<div id="${pageId}" class="page">
-    <h2 style="color: var(--theme-color); margin-bottom: 20px;">${pageName}</h2>
-    ${pageContent}
-  </div>`;
-      });
+//         content += `<div id="${pageId}" class="page">
+//     <h2 style="color: var(--theme-color); margin-bottom: 20px;">${pageName}</h2>
+//     ${pageContent}
+//   </div>`;
+//       });
 
-      content += `</body></html>`;
+//       content += `</body></html>`;
 
-      // Save the file
-      const filePath = `${uni.env.USER_DATA_PATH}/${projectName.toLowerCase().replace(/\s+/g, '-')}.html`;
-      const fs = uni.getFileSystemManager();
+//       // Save the file
+//       const filePath = `${uni.env.USER_DATA_PATH}/${projectName.toLowerCase().replace(/\s+/g, '-')}.html`;
+//       const fs = uni.getFileSystemManager();
 
-      fs.writeFile({
-        filePath: filePath,
-        data: content,
-        encoding: 'utf8',
-        success: () => {
-          uni.hideLoading();
-          uni.showToast({
-            title: 'HTML file saved',
-            icon: 'success',
-            duration: 2000
-          });
+//       fs.writeFile({
+//         filePath: filePath,
+//         data: content,
+//         encoding: 'utf8',
+//         success: () => {
+//           uni.hideLoading();
+//           uni.showToast({
+//             title: 'HTML file saved',
+//             icon: 'success',
+//             duration: 2000
+//           });
 
-          // Open the file if possible
-          uni.openDocument({
-            filePath: filePath,
-            showMenu: true,
-            fail: () => {
-              console.log('Unable to open HTML file');
-            }
-          });
-        },
-        fail: (error) => {
-          uni.hideLoading();
-          uni.showToast({
-            title: 'Failed to save HTML file',
-            icon: 'none',
-            duration: 2000
-          });
-          console.error('Failed to save HTML file:', error);
-        }
-      });
-    },
+//           // Open the file if possible
+//           uni.openDocument({
+//             filePath: filePath,
+//             showMenu: true,
+//             fail: () => {
+//               console.log('Unable to open HTML file');
+//             }
+//           });
+//         },
+//         fail: (error) => {
+//           uni.hideLoading();
+//           uni.showToast({
+//             title: 'Failed to save HTML file',
+//             icon: 'none',
+//             duration: 2000
+//           });
+//           console.error('Failed to save HTML file:', error);
+//         }
+//       });
+//     },
 
-    exportHTMLSimple(projectData) {
-      // Create a single HTML file for all pages
-      const projectName = projectData.AIProjectName || 'ui_genius_project';
-      let content = `<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${projectName}</title>
-  <style>
-    /* Reset styles */
-    * { margin: 0; padding: 0; box-sizing: border-box; }
-    body { font-family: Arial, sans-serif; line-height: 1.6; }
-    /* Navigation */
-    .nav { background: var(--theme-color); padding: 10px; position: sticky; top: 0; z-index: 100; }
-    .nav ul { display: flex; list-style: none; overflow-x: auto; white-space: nowrap; }
-    .nav a { color: white; text-decoration: none; padding: 10px 15px; display: inline-block; }
-    .page { padding: 20px; min-height: 100vh; }
-    h1 { margin-bottom: 20px; }
-  </style>
-</head>
-<body>
-  <nav class="nav">
-    <ul>`;
+//     exportHTMLSimple(projectData) {
+//       // Create a single HTML file for all pages
+//       const projectName = projectData.AIProjectName || 'ui_genius_project';
+//       let content = `<!DOCTYPE html>
+// <html lang="en">
+// <head>
+//   <meta charset="UTF-8">
+//   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+//   <title>${projectName}</title>
+//   <style>
+//     /* Reset styles */
+//     * { margin: 0; padding: 0; box-sizing: border-box; }
+//     body { font-family: Arial, sans-serif; line-height: 1.6; }
+//     /* Navigation */
+//     .nav { background: var(--theme-color); padding: 10px; position: sticky; top: 0; z-index: 100; }
+//     .nav ul { display: flex; list-style: none; overflow-x: auto; white-space: nowrap; }
+//     .nav a { color: white; text-decoration: none; padding: 10px 15px; display: inline-block; }
+//     .page { padding: 20px; min-height: 100vh; }
+//     h1 { margin-bottom: 20px; }
+//   </style>
+// </head>
+// <body>
+//   <nav class="nav">
+//     <ul>`;
 
-      // Add navigation links
-      projectData.pages.forEach((page) => {
-        const pageName = page.name.replace(/ Page/i, '');
-        const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
-        content += `<li><a href="#${pageId}">${pageName}</a></li>`;
-      });
+//       // Add navigation links
+//       projectData.pages.forEach((page) => {
+//         const pageName = page.name.replace(/ Page/i, '');
+//         const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
+//         content += `<li><a href="#${pageId}">${pageName}</a></li>`;
+//       });
 
-      content += `</ul>
-  </nav>
-  <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
-    <h1 style="color: var(--theme-color);">${projectName}</h1>
-    <p style="margin-bottom: 30px;">${projectData.AIProjectDescription || ''}</p>
-  </div>`;
+//       content += `</ul>
+//   </nav>
+//   <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+//     <h1 style="color: var(--theme-color);">${projectName}</h1>
+//     <p style="margin-bottom: 30px;">${projectData.AIProjectDescription || ''}</p>
+//   </div>`;
 
-      // Add each page
-      projectData.pages.forEach((page) => {
-        const pageName = page.name.replace(/ Page/i, '');
-        const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
-        const pageContent = page.component || '<div>No content available</div>';
+//       // Add each page
+//       projectData.pages.forEach((page) => {
+//         const pageName = page.name.replace(/ Page/i, '');
+//         const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
+//         const pageContent = page.component || '<div>No content available</div>';
 
-        content += `<div id="${pageId}" class="page">
-    <h2 style="color: var(--theme-color); margin-bottom: 20px;">${pageName}</h2>
-    ${pageContent}
-  </div>`;
-      });
+//         content += `<div id="${pageId}" class="page">
+//     <h2 style="color: var(--theme-color); margin-bottom: 20px;">${pageName}</h2>
+//     ${pageContent}
+//   </div>`;
+//       });
 
-      content += `</body></html>`;
+//       content += `</body></html>`;
 
-      // Download the file
-      try {
-        const blob = new Blob([content], { type: 'text/html' });
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `${projectName.toLowerCase().replace(/\s+/g, '-')}.html`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        URL.revokeObjectURL(url);
+//       // Download the file
+//       try {
+//         const blob = new Blob([content], { type: 'text/html' });
+//         const url = URL.createObjectURL(blob);
+//         const a = document.createElement('a');
+//         a.href = url;
+//         a.download = `${projectName.toLowerCase().replace(/\s+/g, '-')}.html`;
+//         document.body.appendChild(a);
+//         a.click();
+//         document.body.removeChild(a);
+//         URL.revokeObjectURL(url);
 
-        uni.hideLoading();
-        uni.showToast({
-          title: 'HTML exported successfully!',
-          icon: 'success',
-          duration: 2000
-        });
-      } catch (error) {
-        uni.hideLoading();
-        uni.showToast({
-          title: 'Error downloading HTML',
-          icon: 'none',
-          duration: 2000
-        });
-        console.error('Error downloading HTML:', error);
-      }
-    },
+//         uni.hideLoading();
+//         uni.showToast({
+//           title: 'HTML exported successfully!',
+//           icon: 'success',
+//           duration: 2000
+//         });
+//       } catch (error) {
+//         uni.hideLoading();
+//         uni.showToast({
+//           title: 'Error downloading HTML',
+//           icon: 'none',
+//           duration: 2000
+//         });
+//         console.error('Error downloading HTML:', error);
+//       }
+//     },
     selectDevice(device) {
       this.selectedDevice = device;
       // Save selected device to storage
@@ -3691,32 +3676,7 @@ export default {
         const projectName = projectData.AIProjectName || 'ui_genius_project';
 
         // Basic HTML template
-        const htmlTemplate = (title, content, cssStyles) => `
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>${title}</title>
-  <style>
-    /* Reset styles */
-    * {
-      margin: 0;
-      padding: 0;
-      box-sizing: border-box;
-    }
-    body {
-      font-family: Arial, sans-serif;
-      line-height: 1.6;
-    }
-    /* Additional styles */
-    ${cssStyles || ''}
-  </style>
-</head>
-<body>
-  ${content}
-</body>
-</html>`;
+        const htmlTemplate = (content) => `${content}`;
 
         // Create an index.html with links to all pages
         let indexContent = `
@@ -3733,7 +3693,7 @@ export default {
 
           // Create HTML file for the page
           const pageContent = page.component || '<div>No content available</div>';
-          const fullHtml = htmlTemplate(pageName, pageContent);
+          const fullHtml = htmlTemplate(pageContent);
           zip.file(fileName, fullHtml);
 
           // Add link to index
@@ -3749,7 +3709,7 @@ export default {
         indexContent += `</ul></div>`;
 
         // Add index.html to zip
-        zip.file('index.html', htmlTemplate(projectName, indexContent));
+        zip.file('index.html', htmlTemplate(indexContent));
 
         // Generate and save the zip
         zip.generateAsync({ type: "blob" }).then((content) => {
