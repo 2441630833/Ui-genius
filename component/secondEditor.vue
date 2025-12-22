@@ -187,7 +187,7 @@ export default {
                             // }
                             
                             // 移除可能导致问题的脚本标签
-                            componentHtml = componentHtml.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+                            // componentHtml = componentHtml.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
                         } catch (sanitizeError) {
                             console.error('净化HTML内容时出错:', sanitizeError);
                         }
