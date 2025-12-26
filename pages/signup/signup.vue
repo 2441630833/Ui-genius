@@ -7,29 +7,29 @@
                     <image :src="logo"></image>
                 </view> -->
                 <!-- Top text -->
-                <text class="login-title">Sign Up</text>
+                <text class="login-title">{{$t('signup.title')}}</text>
             </match-media>
             <uni-forms ref="form" :value="formData" :rules="rules" validate-trigger="submit" err-show-type="toast">
                 <uni-forms-item name="email" required>
                     <uni-easyinput :inputBorder="false" :focus="focusEmail" @blur="focusEmail = false"
-                        class="login-input" placeholder="Email address" v-model="formData.email" trim="both" />
+                        class="login-input" :placeholder="$t('signup.email')" v-model="formData.email" trim="both" />
                 </uni-forms-item>
 
                 <uni-forms-item name="nickname" required>
                     <uni-easyinput :inputBorder="false" :focus="focusNickname" @blur="focusNickname = false"
-                        class="login-input" placeholder="Username" v-model="formData.nickname" trim="both" />
+                        class="login-input" :placeholder="$t('signup.nickname')" v-model="formData.nickname" trim="both" />
                 </uni-forms-item>
 
                 <uni-forms-item name="password" v-model="formData.password" required>
                     <uni-easyinput :inputBorder="false" :focus="focusPassword" @blur="focusPassword = false"
                         class="login-input" maxlength="20"
-                        :placeholder="'Password (' + (config.passwordStrength == 'weak' ? '6' : '8') + '-16 characters)'"
+                        :placeholder="$t('signup.password') + ' (' + (config.passwordStrength == 'weak' ? '6' : '8') + '-16 characters)'"
                         type="password" v-model="formData.password" trim="both" />
                 </uni-forms-item>
 
                 <uni-forms-item name="password2" v-model="formData.password2" required>
                     <uni-easyinput :inputBorder="false" :focus="focusPassword2" @blur="focusPassword2 = false"
-                        class="login-input" placeholder="Confirm password" maxlength="20" type="password"
+                        class="login-input" :placeholder="$t('signup.passwordConfirm')" maxlength="20" type="password"
                         v-model="formData.password2" trim="both" />
                 </uni-forms-item>
 
@@ -44,8 +44,8 @@
 
                 <!-- <uni-id-pages-agreements scope="register" ref="agreements"></uni-id-pages-agreements> -->
 
-                <button class="main-btn" type="primary" @click="submit">Sign Up</button>
-                <button @click="navigateBack" class="secondary-btn">Back</button>
+                <button class="main-btn" type="primary" @click="submit">{{$t('signup.button')}}</button>
+                <button @click="navigateBack" class="secondary-btn">{{$t('signup.back')}}</button>
 
                 <!-- <match-media :min-width="690">
                     <view class="link-box">
@@ -87,7 +87,7 @@ export default {
                 email: {
                     rules: [{
                         required: true,
-                        errorMessage: 'Please enter your email',
+                        errorMessage: this.$t ? this.$t('signup.email') : 'Please enter your email',
                     }, {
                         format: 'email',
                         errorMessage: 'Invalid email format',
@@ -174,7 +174,7 @@ export default {
             uniIdCo.registerUserByEmail(this.formData).then(e => {
 
                 uni.showToast({
-                    title: 'Sign up successfully!',
+                    title: this.$t('signup.success'),
                     icon: 'success'
                 })
 

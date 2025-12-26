@@ -9,14 +9,28 @@
           </a>
           <nav class="nav-menu">
             <ul>
-              <li><a @click.prevent="goToHome">HOME</a></li>
-              <li><a @click.prevent="goToAbout">ABOUT US</a></li>
-              <li><a @click.prevent="goToCareers">CAREERS</a></li>
-              <li><a @click.prevent="goToContact">CONTACT</a></li>
+              <li><a @click.prevent="goToHome">{{$t('common.nav.home')}}</a></li>
+              <li><a @click.prevent="goToAbout">{{$t('common.nav.about')}}</a></li>
+              <li><a @click.prevent="goToCareers">{{$t('common.nav.careers')}}</a></li>
+              <li><a @click.prevent="goToContact">{{$t('common.nav.contact')}}</a></li>
             </ul>
             <div class="try-free" @click="goToLogin">
-              <span>Try</span>
-              <span>Free</span>
+              <span>{{$t('common.try')}}</span>
+              <span>{{$t('common.free')}}</span>
+            </div>
+            <div class="language-selector" @click.stop>
+              <div class="language-dropdown" @click.stop="toggleLanguageDropdown($event)">
+                <i class="fas fa-globe"></i>
+                <span>{{ currentLanguageName }}</span>
+                <i class="fas fa-chevron-down" :class="{ 'rotate': showLanguageDropdown }"></i>
+              </div>
+              <ul class="language-dropdown-menu" v-if="showLanguageDropdown" @click.stop>
+                <li v-for="lang in availableLanguages" :key="lang.code" 
+                    @click.stop="selectLanguage(lang.code)"
+                    :class="{ 'active': currentLocale === lang.code }">
+                  {{ lang.name }}
+                </li>
+              </ul>
             </div>
           </nav>
         </div>
@@ -26,45 +40,45 @@
     <main>
       <section class="hero-section">
         <div class="container">
-          <h1>Terms of Service</h1>
-          <p class="hero-subtitle">Clear guidelines that ensure we deliver a safe, reliable, and fair experience for every creator</p>
-          <p class="last-updated">Last updated: November 5, 2025</p>
+          <h1>{{$t('terms.hero.title')}}</h1>
+          <p class="hero-subtitle">{{$t('terms.hero.subtitle')}}</p>
+          <p class="last-updated">{{$t('terms.hero.lastUpdated')}}</p>
         </div>
       </section>
 
       <section class="intro-section">
         <div class="container">
           <div class="intro-content">
-            <h2>Welcome to Uigenius</h2>
-            <p>These Terms of Service ("Terms") govern your access to and use of the Uigenius platform, including our website, products, and services. By accessing or using Uigenius, you agree to be bound by these Terms and any additional policies referenced herein.</p>
-            <p>If you are using the platform on behalf of a company or organization, you represent that you have the authority to bind that entity to these Terms. Please read them carefully.</p>
+            <h2>{{$t('terms.intro.title')}}</h2>
+            <p>{{$t('terms.intro.p1')}}</p>
+            <p>{{$t('terms.intro.p2')}}</p>
           </div>
         </div>
       </section>
 
       <section class="terms-section">
         <div class="container">
-          <h2 class="section-title text-center">Using Our Services</h2>
+          <h2 class="section-title text-center">{{$t('terms.using.title')}}</h2>
           <div class="terms-grid">
             <div class="terms-card">
               <span class="terms-number">01</span>
-              <h3>Account Eligibility</h3>
-              <p>You must be at least 18 years old to create an account. You are responsible for maintaining the confidentiality of your login credentials and for any activity that occurs under your account.</p>
+              <h3>{{$t('terms.using.account.title')}}</h3>
+              <p>{{$t('terms.using.account.desc')}}</p>
             </div>
             <div class="terms-card">
               <span class="terms-number">02</span>
-              <h3>Acceptable Use</h3>
-              <p>Use Uigenius only for lawful purposes and in accordance with our guidelines. Do not attempt to misuse the platform, interfere with its operations, or infringe on the rights of others.</p>
+              <h3>{{$t('terms.using.acceptable.title')}}</h3>
+              <p>{{$t('terms.using.acceptable.desc')}}</p>
             </div>
             <div class="terms-card">
               <span class="terms-number">03</span>
-              <h3>Subscriptions & Billing</h3>
-              <p>Certain features may require payment. All fees are non-refundable unless otherwise stated. You agree to provide accurate billing information and authorize us to charge for subscribed services.</p>
+              <h3>{{$t('terms.using.billing.title')}}</h3>
+              <p>{{$t('terms.using.billing.desc')}}</p>
             </div>
             <div class="terms-card">
               <span class="terms-number">04</span>
-              <h3>Service Availability</h3>
-              <p>We strive to provide uninterrupted access, but we may suspend or modify the service for maintenance, updates, or unforeseen issues. We will make reasonable efforts to notify you of significant changes.</p>
+              <h3>{{$t('terms.using.availability.title')}}</h3>
+              <p>{{$t('terms.using.availability.desc')}}</p>
             </div>
           </div>
         </div>
@@ -74,16 +88,16 @@
         <div class="container">
           <div class="content-wrapper">
             <div class="text-content">
-              <h2>Intellectual Property & Content</h2>
-              <p>All platform technology, features, and branding are owned by Uigenius and protected by applicable intellectual property laws. You may not copy, distribute, or create derivative works without our permission.</p>
-              <p>You retain ownership of content you upload or generate. By sharing content, you grant Uigenius a limited license to host, display, and use it solely to operate and improve the service.</p>
+              <h2>{{$t('terms.rights.title')}}</h2>
+              <p>{{$t('terms.rights.p1')}}</p>
+              <p>{{$t('terms.rights.p2')}}</p>
             </div>
             <div class="list-content">
-              <h3>Your Responsibilities</h3>
+              <h3>{{$t('terms.rights.responsibilities')}}</h3>
               <ul>
-                <li>Ensure you have the necessary rights for any content you submit.</li>
-                <li>Avoid uploading malicious code or content that violates third-party rights.</li>
-                <li>Respect intellectual property and privacy of other users.</li>
+                <li>{{$t('terms.rights.resp1')}}</li>
+                <li>{{$t('terms.rights.resp2')}}</li>
+                <li>{{$t('terms.rights.resp3')}}</li>
               </ul>
             </div>
           </div>
@@ -92,23 +106,23 @@
 
       <section class="compliance-section">
         <div class="container">
-          <h2 class="section-title text-center">Compliance & Enforcement</h2>
+          <h2 class="section-title text-center">{{$t('terms.compliance.title')}}</h2>
           <div class="compliance-grid">
             <div class="compliance-card">
-              <h3>Suspension & Termination</h3>
-              <p>We may suspend or terminate access if you violate these Terms or engage in harmful conduct. You may terminate your account at any time by contacting our support team.</p>
+              <h3>{{$t('terms.compliance.suspension.title')}}</h3>
+              <p>{{$t('terms.compliance.suspension.desc')}}</p>
             </div>
             <div class="compliance-card">
-              <h3>Third-Party Services</h3>
-              <p>Uigenius may integrate with third-party tools. We are not responsible for third-party services or their terms. Use them at your own discretion.</p>
+              <h3>{{$t('terms.compliance.thirdParty.title')}}</h3>
+              <p>{{$t('terms.compliance.thirdParty.desc')}}</p>
             </div>
             <div class="compliance-card">
-              <h3>Disclaimer & Liability</h3>
-              <p>Uigenius is provided "as is" without warranties of any kind. To the fullest extent permitted by law, we disclaim liability for indirect or consequential damages arising from your use of the platform.</p>
+              <h3>{{$t('terms.compliance.disclaimer.title')}}</h3>
+              <p>{{$t('terms.compliance.disclaimer.desc')}}</p>
             </div>
             <div class="compliance-card">
-              <h3>Governing Law</h3>
-              <p>These Terms are governed by the laws of the jurisdiction where Uigenius is headquartered, without regard to conflict of law principles.</p>
+              <h3>{{$t('terms.compliance.governing.title')}}</h3>
+              <p>{{$t('terms.compliance.governing.desc')}}</p>
             </div>
           </div>
         </div>
@@ -118,19 +132,19 @@
         <div class="container">
           <div class="support-wrapper">
             <div class="support-text">
-              <h2>Need Clarification?</h2>
-              <p>If you have questions about these Terms or need additional support, reach out to our team. We are committed to helping you understand your rights and responsibilities.</p>
+              <h2>{{$t('terms.support.title')}}</h2>
+              <p>{{$t('terms.support.p1')}}</p>
               <div class="support-actions">
-                <button class="btn btn-primary" @click="contactSupport">Contact Support</button>
-                <button class="btn btn-secondary" @click="goToPrivacy">View Privacy Policy</button>
+                <button class="btn btn-primary" @click="contactSupport">{{$t('terms.support.button1')}}</button>
+                <button class="btn btn-secondary" @click="goToPrivacy">{{$t('terms.support.button2')}}</button>
               </div>
             </div>
             <div class="support-highlight">
-              <h3>Key Takeaways</h3>
+              <h3>{{$t('terms.support.takeaways')}}</h3>
               <ul>
-                <li>Use the platform responsibly and within legal boundaries.</li>
-                <li>Protect your account credentials and personal data.</li>
-                <li>Contact us if you believe your rights have been infringed.</li>
+                <li>{{$t('terms.support.takeaway1')}}</li>
+                <li>{{$t('terms.support.takeaway2')}}</li>
+                <li>{{$t('terms.support.takeaway3')}}</li>
               </ul>
             </div>
           </div>
@@ -139,9 +153,9 @@
 
       <section class="cta-section">
         <div class="container">
-          <h2>Continuing With Uigenius</h2>
-          <p>By using Uigenius you agree to these Terms. We appreciate your trust and are dedicated to building tools that amplify your creativity.</p>
-          <button class="btn btn-primary" @click="goToLogin">Access Your Account</button>
+          <h2>{{$t('terms.cta.title')}}</h2>
+          <p>{{$t('terms.cta.description')}}</p>
+          <button class="btn btn-primary" @click="goToLogin">{{$t('terms.cta.button')}}</button>
         </div>
       </section>
     </main>
@@ -153,31 +167,31 @@
             <img src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Icon paint brush.png" alt="Uigenius Logo">
             Uigenius
           </a>
-          <p>AI-powered UX/UI design tool that quickly generates prototypes for apps and websites from simple text descriptions.</p>
+          <p>{{$t('common.footer.description')}}</p>
         </div>
         <div class="footer-links">
-          <h4>Product</h4>
+          <h4>{{$t('common.footer.product')}}</h4>
           <ul>
-            <li><a @click.prevent="goToFeatures">Features</a></li>
-            <li><a @click.prevent="goToPricing">Pricing</a></li>
+            <li><a @click.prevent="goToFeatures">{{$t('common.footer.features')}}</a></li>
+            <li><a @click.prevent="goToPricing">{{$t('common.footer.pricing')}}</a></li>
           </ul>
         </div>
         <div class="footer-links">
-          <h4>Company</h4>
+          <h4>{{$t('common.footer.company')}}</h4>
           <ul>
-            <li><a @click.prevent="goToAbout">About Us</a></li>
-            <li><a @click.prevent="goToCareers">Careers</a></li>
-            <li><a @click.prevent="goToContact">Contact</a></li>
+            <li><a @click.prevent="goToAbout">{{$t('common.footer.aboutUs')}}</a></li>
+            <li><a @click.prevent="goToCareers">{{$t('common.footer.careers')}}</a></li>
+            <li><a @click.prevent="goToContact">{{$t('common.footer.contact')}}</a></li>
           </ul>
         </div>
         <div class="footer-links">
-          <h4>Connect with us</h4>
+          <h4>{{$t('common.footer.connect')}}</h4>
           <div class="social-icons">
             <a href="https://x.com/Uigenius13952" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
           </div>
         </div>
         <div class="footer-links">
-          <h4>Customer Support</h4>
+          <h4>{{$t('common.footer.support')}}</h4>
           <div class="support-email">
             <a href="mailto:support@uigenius.top"><i class="fas fa-envelope"></i> support@uigenius.top</a>
           </div>
@@ -185,11 +199,11 @@
       </div>
       <div class="footer-bottom">
         <div class="container">
-          <p>© 2025 Uigenius. All rights reserved.</p>
+          <p>{{$t('common.footer.copyright')}}</p>
           <div class="footer-legal-links">
-            <a @click.prevent="goToTerms">Terms of Service</a>
+            <a @click.prevent="goToTerms">{{$t('common.footer.terms')}}</a>
             <span class="separator">|</span>
-            <a @click.prevent="goToPrivacy">Privacy Policy</a>
+            <a @click.prevent="goToPrivacy">{{$t('common.footer.privacy')}}</a>
           </div>
         </div>
       </div>
@@ -206,16 +220,126 @@ export default {
   name: 'TermsPage',
   data() {
     return {
-      showScrollTop: false
+      showScrollTop: false,
+      showLanguageDropdown: false,
+      currentLocale: 'en'
     }
   },
+  watch: {
+    currentLocale() {
+      this.showLanguageDropdown = false;
+    }
+  },
+  computed: {
+    availableLanguages() {
+      return [
+        { code: 'en', name: this.$t('locale.en') },
+        { code: 'zh-Hans', name: this.$t('locale.zh-hans') },
+        { code: 'zh-Hant', name: this.$t('locale.zh-hant') },
+        { code: 'ja', name: this.$t('locale.ja') },
+        { code: 'ko', name: this.$t('locale.ko') },
+        { code: 'ru', name: this.$t('locale.ru') },
+        { code: 'es', name: this.$t('locale.es') },
+        { code: 'fr', name: this.$t('locale.fr') },
+        { code: 'de', name: this.$t('locale.de') },
+        { code: 'it', name: this.$t('locale.it') },
+        { code: 'pt', name: this.$t('locale.pt') },
+        { code: 'ar', name: this.$t('locale.ar') },
+        { code: 'hi', name: this.$t('locale.hi') },
+        { code: 'th', name: this.$t('locale.th') },
+        { code: 'vi', name: this.$t('locale.vi') },
+        { code: 'id', name: this.$t('locale.id') },
+        { code: 'nl', name: this.$t('locale.nl') },
+        { code: 'pl', name: this.$t('locale.pl') },
+        { code: 'tr', name: this.$t('locale.tr') },
+        { code: 'sv', name: this.$t('locale.sv') },
+        { code: 'da', name: this.$t('locale.da') },
+        { code: 'fi', name: this.$t('locale.fi') },
+        { code: 'no', name: this.$t('locale.no') }
+      ]
+    },
+    currentLanguageName() {
+      const lang = this.availableLanguages.find(l => l.code === this.currentLocale)
+      return lang ? lang.name : this.$t('locale.en')
+    }
+  },
+  onShow() {
+    this.loadSavedLanguage();
+  },
   mounted() {
+    this.loadSavedLanguage();
     window.addEventListener('scroll', this.handleScroll);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('click', this.handleClickOutside);
+    }
   },
   beforeDestroy() {
     window.removeEventListener('scroll', this.handleScroll);
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('click', this.handleClickOutside);
+    }
   },
   methods: {
+    loadSavedLanguage() {
+      try {
+        const savedLocale = uni.getStorageSync('appLocale');
+        if (savedLocale) {
+          this.currentLocale = savedLocale;
+          uni.setLocale(savedLocale);
+          if (this.$i18n) {
+            this.$i18n.locale = savedLocale;
+          }
+        } else {
+          const currentLocale = uni.getLocale();
+          if (currentLocale) {
+            this.currentLocale = currentLocale;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading saved language:', error);
+      }
+    },
+    toggleLanguageDropdown(event) {
+      this.showLanguageDropdown = !this.showLanguageDropdown;
+    },
+    selectLanguage(localeCode) {
+      this.showLanguageDropdown = false;
+      if (this.currentLocale === localeCode) {
+        return;
+      }
+      setTimeout(() => {
+        this.showLanguageDropdown = false;
+      }, 0);
+      try {
+        uni.setLocale(localeCode);
+        if (this.$i18n) {
+          this.$i18n.locale = localeCode;
+        }
+        this.currentLocale = localeCode;
+        uni.setStorageSync('appLocale', localeCode);
+        this.$nextTick(() => {
+          this.showLanguageDropdown = false;
+          this.$forceUpdate();
+        });
+      } catch (error) {
+        console.error('Error setting language:', error);
+        this.showLanguageDropdown = false;
+        uni.showToast({
+          title: 'Failed to change language',
+          icon: 'none',
+          duration: 2000
+        });
+      }
+    },
+    handleClickOutside(event) {
+      if (typeof document === 'undefined') {
+        return;
+      }
+      const languageSelector = this.$el?.querySelector('.language-selector');
+      if (languageSelector && !languageSelector.contains(event.target)) {
+        this.showLanguageDropdown = false;
+      }
+    },
     handleScroll() {
       this.showScrollTop = window.scrollY > 300;
     },
@@ -423,6 +547,84 @@ ul {
 .try-free:hover {
   background-color: var(--primary-red);
   color: var(--background-white);
+}
+
+.language-selector {
+  position: relative;
+  margin-left: 15px;
+}
+
+.language-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: var(--background-white);
+  font-size: 14px;
+  color: var(--light-text);
+}
+
+.language-dropdown:hover {
+  border-color: var(--primary-red);
+  color: var(--primary-red);
+}
+
+.language-dropdown i.fa-globe {
+  font-size: 16px;
+}
+
+.language-dropdown i.fa-chevron-down {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.language-dropdown i.fa-chevron-down.rotate {
+  transform: rotate(180deg);
+}
+
+.language-selector .language-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 5px;
+  background-color: var(--background-white);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  min-width: 180px;
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 1001;
+  list-style: none;
+  padding: 5px 0;
+  display: block !important;
+}
+
+.language-selector .language-dropdown-menu li {
+  display: block !important;
+  width: 100%;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  color: var(--dark-text);
+  font-size: 14px;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.language-dropdown-menu li:hover {
+  background-color: var(--light-gray-bg);
+}
+
+.language-dropdown-menu li.active {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--primary-red);
+  font-weight: 500;
 }
 
 .hero-section {

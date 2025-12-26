@@ -9,14 +9,28 @@
           </a>
           <nav class="nav-menu">
             <ul>
-              <li><a @click.prevent="goToHome">HOME</a></li>
-              <li><a @click.prevent="goToAbout">ABOUT US</a></li>
-              <li><a @click.prevent="goToCareers">CAREERS</a></li>
-              <li><a @click.prevent="goToContact">CONTACT</a></li>
+              <li><a @click.prevent="goToHome">{{$t('common.nav.home')}}</a></li>
+              <li><a @click.prevent="goToAbout">{{$t('common.nav.about')}}</a></li>
+              <li><a @click.prevent="goToCareers">{{$t('common.nav.careers')}}</a></li>
+              <li><a @click.prevent="goToContact">{{$t('common.nav.contact')}}</a></li>
             </ul>
             <div class="try-free" @click="goToLogin">
-              <span>Try</span>
-              <span>Free</span>
+              <span>{{$t('common.try')}}</span>
+              <span>{{$t('common.free')}}</span>
+            </div>
+            <div class="language-selector" @click.stop>
+              <div class="language-dropdown" @click.stop="toggleLanguageDropdown($event)">
+                <i class="fas fa-globe"></i>
+                <span>{{ currentLanguageName }}</span>
+                <i class="fas fa-chevron-down" :class="{ 'rotate': showLanguageDropdown }"></i>
+              </div>
+              <ul class="language-dropdown-menu" v-if="showLanguageDropdown" @click.stop>
+                <li v-for="lang in availableLanguages" :key="lang.code" 
+                    @click.stop="selectLanguage(lang.code)"
+                    :class="{ 'active': currentLocale === lang.code }">
+                  {{ lang.name }}
+                </li>
+              </ul>
             </div>
           </nav>
         </div>
@@ -26,8 +40,8 @@
     <main>
       <section class="hero-section">
         <div class="container">
-          <h1>About Uigenius</h1>
-          <p class="hero-subtitle">Transforming Ideas into Beautiful Designs with AI</p>
+          <h1>{{$t('about.hero.title')}}</h1>
+          <p class="hero-subtitle">{{$t('about.hero.subtitle')}}</p>
         </div>
       </section>
 
@@ -35,9 +49,9 @@
         <div class="container">
           <div class="content-wrapper">
             <div class="text-content">
-              <h2>Our Mission</h2>
-              <p>At Uigenius, we're on a mission to democratize design and make professional UI/UX creation accessible to everyone. We believe that great design shouldn't require years of training or expensive tools.</p>
-              <p>Our AI-powered platform empowers creators, entrepreneurs, and teams to bring their ideas to life faster and more efficiently than ever before.</p>
+              <h2>{{$t('about.mission.title')}}</h2>
+              <p>{{$t('about.mission.p1')}}</p>
+              <p>{{$t('about.mission.p2')}}</p>
             </div>
             <div class="image-content">
               <div class="placeholder-image">
@@ -57,9 +71,9 @@
               </div>
             </div>
             <div class="text-content">
-              <h2>Who We Are</h2>
-              <p>We're a team of passionate designers, developers, and AI enthusiasts who came together to solve a common problem: the time-consuming nature of traditional design processes.</p>
-              <p>Our diverse team brings together expertise in artificial intelligence, user experience design, and software development to create a tool that bridges the gap between imagination and implementation.</p>
+              <h2>{{$t('about.story.title')}}</h2>
+              <p>{{$t('about.story.p1')}}</p>
+              <p>{{$t('about.story.p2')}}</p>
             </div>
           </div>
         </div>
@@ -69,9 +83,9 @@
         <div class="container">
           <div class="content-wrapper">
             <div class="text-content">
-              <h2>Our Vision</h2>
-              <p>We envision a world where anyone with an idea can transform it into a beautiful, functional design within minutes. By leveraging the power of AI, we're breaking down barriers and empowering creators worldwide.</p>
-              <p>Our goal is to become the go-to platform for rapid prototyping, helping teams focus on what matters most: innovation and user experience.</p>
+              <h2>{{$t('about.vision.title')}}</h2>
+              <p>{{$t('about.vision.p1')}}</p>
+              <p>{{$t('about.vision.p2')}}</p>
             </div>
             <div class="image-content">
               <div class="placeholder-image">
@@ -84,27 +98,27 @@
 
       <section class="stats-section">
         <div class="container">
-          <h2 class="section-title text-center">Our Impact</h2>
+          <h2 class="section-title text-center">{{$t('about.stats.title')}}</h2>
           <div class="stats-grid">
             <div class="stat-item">
               <div class="stat-number">10,000+</div>
-              <div class="stat-label">Active Users</div>
-              <p>Designers and creators worldwide</p>
+              <div class="stat-label">{{$t('about.stats.users')}}</div>
+              <p>{{$t('about.stats.usersDesc')}}</p>
             </div>
             <div class="stat-item">
               <div class="stat-number">50,000+</div>
-              <div class="stat-label">Designs Created</div>
-              <p>Beautiful interfaces generated</p>
+              <div class="stat-label">{{$t('about.stats.designs')}}</div>
+              <p>{{$t('about.stats.designsDesc')}}</p>
             </div>
             <div class="stat-item">
               <div class="stat-number">95%</div>
-              <div class="stat-label">Customer Satisfaction</div>
-              <p>Users love our platform</p>
+              <div class="stat-label">{{$t('about.stats.satisfaction')}}</div>
+              <p>{{$t('about.stats.satisfactionDesc')}}</p>
             </div>
             <div class="stat-item">
               <div class="stat-number">24/7</div>
-              <div class="stat-label">Support Available</div>
-              <p>We're always here to help</p>
+              <div class="stat-label">{{$t('about.stats.support')}}</div>
+              <p>{{$t('about.stats.supportDesc')}}</p>
             </div>
           </div>
         </div>
@@ -112,35 +126,35 @@
 
       <section class="values-section">
         <div class="container">
-          <h2 class="section-title text-center">Our Values</h2>
+          <h2 class="section-title text-center">{{$t('about.values.title')}}</h2>
           <div class="values-grid">
             <div class="value-item">
               <div class="icon">
                 <i class="fas fa-heart"></i>
               </div>
-              <h3>User-Centric</h3>
-              <p>Every decision we make is guided by what's best for our users. We listen, learn, and evolve based on your feedback.</p>
+              <h3>{{$t('about.values.userCentric.title')}}</h3>
+              <p>{{$t('about.values.userCentric.desc')}}</p>
             </div>
             <div class="value-item">
               <div class="icon">
                 <i class="fas fa-rocket"></i>
               </div>
-              <h3>Innovation</h3>
-              <p>We're constantly pushing boundaries and exploring new ways to make design more accessible and efficient.</p>
+              <h3>{{$t('about.values.innovation.title')}}</h3>
+              <p>{{$t('about.values.innovation.desc')}}</p>
             </div>
             <div class="value-item">
               <div class="icon">
                 <i class="fas fa-handshake"></i>
               </div>
-              <h3>Collaboration</h3>
-              <p>Great things happen when people work together. We build tools that enable seamless teamwork.</p>
+              <h3>{{$t('about.values.collaboration.title')}}</h3>
+              <p>{{$t('about.values.collaboration.desc')}}</p>
             </div>
             <div class="value-item">
               <div class="icon">
                 <i class="fas fa-shield-alt"></i>
               </div>
-              <h3>Trust & Security</h3>
-              <p>Your data and privacy are our top priorities. We maintain the highest standards of security.</p>
+              <h3>{{$t('about.values.trust.title')}}</h3>
+              <p>{{$t('about.values.trust.desc')}}</p>
             </div>
           </div>
         </div>
@@ -148,9 +162,9 @@
 
       <section class="cta-section">
         <div class="container">
-          <h2>Ready to Transform Your Design Process?</h2>
-          <p>Join thousands of creators who are already using Uigenius to bring their ideas to life.</p>
-          <button class="btn btn-primary" @click="goToLogin">Get Started Free</button>
+          <h2>{{$t('about.cta.title')}}</h2>
+          <p>{{$t('about.cta.description')}}</p>
+          <button class="btn btn-primary" @click="goToLogin">{{$t('about.cta.button')}}</button>
         </div>
       </section>
     </main>
@@ -162,31 +176,31 @@
             <img src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Icon paint brush.png" alt="Uigenius Logo">
             Uigenius
           </a>
-          <p>AI-powered UX/UI design tool that quickly generates prototypes for apps and websites from simple text descriptions.</p>
+          <p>{{$t('common.footer.description')}}</p>
         </div>
         <div class="footer-links">
-          <h4>Product</h4>
+          <h4>{{$t('common.footer.product')}}</h4>
           <ul>
-            <li><a @click.prevent="goToFeatures">Features</a></li>
-            <li><a @click.prevent="goToPricing">Pricing</a></li>
+            <li><a @click.prevent="goToFeatures">{{$t('common.footer.features')}}</a></li>
+            <li><a @click.prevent="goToPricing">{{$t('common.footer.pricing')}}</a></li>
           </ul>
         </div>
         <div class="footer-links">
-          <h4>Company</h4>
+          <h4>{{$t('common.footer.company')}}</h4>
           <ul>
-            <li><a @click.prevent="goToAbout">About Us</a></li>
-            <li><a @click.prevent="goToCareers">Careers</a></li>
-            <li><a @click.prevent="goToContact">Contact</a></li>
+            <li><a @click.prevent="goToAbout">{{$t('common.footer.aboutUs')}}</a></li>
+            <li><a @click.prevent="goToCareers">{{$t('common.footer.careers')}}</a></li>
+            <li><a @click.prevent="goToContact">{{$t('common.footer.contact')}}</a></li>
           </ul>
         </div>
         <div class="footer-links">
-          <h4>Connect with us</h4>
+          <h4>{{$t('common.footer.connect')}}</h4>
           <div class="social-icons">
             <a href="https://x.com/Uigenius13952" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
           </div>
         </div>
         <div class="footer-links">
-          <h4>Customer Support</h4>
+          <h4>{{$t('common.footer.support')}}</h4>
           <div class="support-email">
             <a href="mailto:support@uigenius.top"><i class="fas fa-envelope"></i> support@uigenius.top</a>
           </div>
@@ -194,11 +208,11 @@
       </div>
       <div class="footer-bottom">
         <div class="container">
-          <p>© 2025 Uigenius. All rights reserved.</p>
+          <p>{{$t('common.footer.copyright')}}</p>
           <div class="footer-legal-links">
-            <a href="#terms">Terms of Service</a>
+            <a @click.prevent="goToTerms">{{$t('common.footer.terms')}}</a>
             <span class="separator">|</span>
-            <a href="#privacy">Privacy Policy</a>
+            <a @click.prevent="goToPrivacy">{{$t('common.footer.privacy')}}</a>
           </div>
         </div>
       </div>
@@ -215,16 +229,126 @@ export default {
   name: 'AboutPage',
   data() {
     return {
-      showScrollTop: false
+      showScrollTop: false,
+      showLanguageDropdown: false,
+      currentLocale: 'en'
     }
   },
+  watch: {
+    currentLocale() {
+      this.showLanguageDropdown = false;
+    }
+  },
+  computed: {
+    availableLanguages() {
+      return [
+        { code: 'en', name: this.$t('locale.en') },
+        { code: 'zh-Hans', name: this.$t('locale.zh-hans') },
+        { code: 'zh-Hant', name: this.$t('locale.zh-hant') },
+        { code: 'ja', name: this.$t('locale.ja') },
+        { code: 'ko', name: this.$t('locale.ko') },
+        { code: 'ru', name: this.$t('locale.ru') },
+        { code: 'es', name: this.$t('locale.es') },
+        { code: 'fr', name: this.$t('locale.fr') },
+        { code: 'de', name: this.$t('locale.de') },
+        { code: 'it', name: this.$t('locale.it') },
+        { code: 'pt', name: this.$t('locale.pt') },
+        { code: 'ar', name: this.$t('locale.ar') },
+        { code: 'hi', name: this.$t('locale.hi') },
+        { code: 'th', name: this.$t('locale.th') },
+        { code: 'vi', name: this.$t('locale.vi') },
+        { code: 'id', name: this.$t('locale.id') },
+        { code: 'nl', name: this.$t('locale.nl') },
+        { code: 'pl', name: this.$t('locale.pl') },
+        { code: 'tr', name: this.$t('locale.tr') },
+        { code: 'sv', name: this.$t('locale.sv') },
+        { code: 'da', name: this.$t('locale.da') },
+        { code: 'fi', name: this.$t('locale.fi') },
+        { code: 'no', name: this.$t('locale.no') }
+      ]
+    },
+    currentLanguageName() {
+      const lang = this.availableLanguages.find(l => l.code === this.currentLocale)
+      return lang ? lang.name : this.$t('locale.en')
+    }
+  },
+  onShow() {
+    this.loadSavedLanguage();
+  },
   mounted() {
+    this.loadSavedLanguage();
     window.addEventListener('scroll', this.handleScroll);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('click', this.handleClickOutside);
+    }
   },
   beforeDestroy() {
     window.removeEventListener('scroll', this.handleScroll);
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('click', this.handleClickOutside);
+    }
   },
   methods: {
+    loadSavedLanguage() {
+      try {
+        const savedLocale = uni.getStorageSync('appLocale');
+        if (savedLocale) {
+          this.currentLocale = savedLocale;
+          uni.setLocale(savedLocale);
+          if (this.$i18n) {
+            this.$i18n.locale = savedLocale;
+          }
+        } else {
+          const currentLocale = uni.getLocale();
+          if (currentLocale) {
+            this.currentLocale = currentLocale;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading saved language:', error);
+      }
+    },
+    toggleLanguageDropdown(event) {
+      this.showLanguageDropdown = !this.showLanguageDropdown;
+    },
+    selectLanguage(localeCode) {
+      this.showLanguageDropdown = false;
+      if (this.currentLocale === localeCode) {
+        return;
+      }
+      setTimeout(() => {
+        this.showLanguageDropdown = false;
+      }, 0);
+      try {
+        uni.setLocale(localeCode);
+        if (this.$i18n) {
+          this.$i18n.locale = localeCode;
+        }
+        this.currentLocale = localeCode;
+        uni.setStorageSync('appLocale', localeCode);
+        this.$nextTick(() => {
+          this.showLanguageDropdown = false;
+          this.$forceUpdate();
+        });
+      } catch (error) {
+        console.error('Error setting language:', error);
+        this.showLanguageDropdown = false;
+        uni.showToast({
+          title: 'Failed to change language',
+          icon: 'none',
+          duration: 2000
+        });
+      }
+    },
+    handleClickOutside(event) {
+      if (typeof document === 'undefined') {
+        return;
+      }
+      const languageSelector = this.$el?.querySelector('.language-selector');
+      if (languageSelector && !languageSelector.contains(event.target)) {
+        this.showLanguageDropdown = false;
+      }
+    },
     handleScroll() {
       this.showScrollTop = window.scrollY > 300;
     },
@@ -257,6 +381,12 @@ export default {
           uni.setStorageSync('scrollToSection', 'pricing');
         }
       });
+    },
+    goToTerms() {
+      uni.navigateTo({ url: '/pages/terms/terms' });
+    },
+    goToPrivacy() {
+      uni.navigateTo({ url: '/pages/privacy/privacy' });
     },
     goToContact() {
       // Navigate to intro page and scroll to contact section
@@ -423,6 +553,84 @@ ul {
 .try-free:hover {
   background-color: var(--primary-red);
   color: var(--background-white);
+}
+
+.language-selector {
+  position: relative;
+  margin-left: 15px;
+}
+
+.language-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: var(--background-white);
+  font-size: 14px;
+  color: var(--light-text);
+}
+
+.language-dropdown:hover {
+  border-color: var(--primary-red);
+  color: var(--primary-red);
+}
+
+.language-dropdown i.fa-globe {
+  font-size: 16px;
+}
+
+.language-dropdown i.fa-chevron-down {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.language-dropdown i.fa-chevron-down.rotate {
+  transform: rotate(180deg);
+}
+
+.language-selector .language-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 5px;
+  background-color: var(--background-white);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  min-width: 180px;
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 1001;
+  list-style: none;
+  padding: 5px 0;
+  display: block !important;
+}
+
+.language-selector .language-dropdown-menu li {
+  display: block !important;
+  width: 100%;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  color: var(--dark-text);
+  font-size: 14px;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.language-dropdown-menu li:hover {
+  background-color: var(--light-gray-bg);
+}
+
+.language-dropdown-menu li.active {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--primary-red);
+  font-weight: 500;
 }
 
 /* Hero Section */

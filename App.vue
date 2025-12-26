@@ -7,12 +7,27 @@ import { saveCurrentTab, restoreLastTab, isTabPage } from './common/tabStorage.j
       console.log('App Launch')
       initPermission()
       
-      // 强制设置默认语言为英语
+      // Load saved language preference
       try {
-        uni.setLocale('en')
-        console.log('Default locale set to English')
+        const savedLocale = uni.getStorageSync('appLocale')
+        if (savedLocale) {
+          uni.setLocale(savedLocale)
+          console.log('Loaded saved locale:', savedLocale)
+        } else {
+          // If no saved locale, use system default or 'en'
+          const systemLocale = uni.getSystemInfoSync().language
+          const defaultLocale = systemLocale || 'en'
+          uni.setLocale(defaultLocale)
+          console.log('Using default locale:', defaultLocale)
+        }
       } catch (error) {
-        console.error('Failed to set default locale:', error)
+        console.error('Failed to load saved locale:', error)
+        // Fallback to English
+        try {
+          uni.setLocale('en')
+        } catch (e) {
+          console.error('Failed to set default locale:', e)
+        }
       }
       
       // 恢复上次访问的标签页

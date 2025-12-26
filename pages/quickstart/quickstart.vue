@@ -9,14 +9,28 @@
           </a>
           <nav class="nav-menu">
             <ul>
-              <li><a @click.prevent="goToHome">HOME</a></li>
-              <li><a @click.prevent="goToQuickStart">QUICK START</a></li>
-              <li><a @click.prevent="goToAbout">ABOUT US</a></li>
-              <li><a @click.prevent="goToPricing">PRICING</a></li>
+              <li><a @click.prevent="goToHome">{{$t('common.nav.home')}}</a></li>
+              <li><a @click.prevent="goToQuickStart">{{$t('common.nav.quickStart')}}</a></li>
+              <li><a @click.prevent="goToAbout">{{$t('common.nav.about')}}</a></li>
+              <li><a @click.prevent="goToPricing">{{$t('common.nav.pricing')}}</a></li>
             </ul>
             <div class="try-free" @click="goToLogin">
-              <span>Try</span>
-              <span>Free</span>
+              <span>{{$t('common.try')}}</span>
+              <span>{{$t('common.free')}}</span>
+            </div>
+            <div class="language-selector" @click.stop>
+              <div class="language-dropdown" @click.stop="toggleLanguageDropdown($event)">
+                <i class="fas fa-globe"></i>
+                <span>{{ currentLanguageName }}</span>
+                <i class="fas fa-chevron-down" :class="{ 'rotate': showLanguageDropdown }"></i>
+              </div>
+              <ul class="language-dropdown-menu" v-if="showLanguageDropdown" @click.stop>
+                <li v-for="lang in availableLanguages" :key="lang.code" 
+                    @click.stop="selectLanguage(lang.code)"
+                    :class="{ 'active': currentLocale === lang.code }">
+                  {{ lang.name }}
+                </li>
+              </ul>
             </div>
           </nav>
         </div>
@@ -26,25 +40,24 @@
     <main>
       <section class="hero-section">
         <div class="container">
-          <h1>Quick Start Guide</h1>
-          <p class="hero-subtitle">Learn how to go from idea to generated UI in a few simple steps.</p>
-          <button class="btn btn-primary" @click="goToLogin">Start Designing Now</button>
+          <h1>{{$t('quickstart.hero.title')}}</h1>
+          <p class="hero-subtitle">{{$t('quickstart.hero.subtitle')}}</p>
+          <button class="btn btn-primary" @click="goToLogin">{{$t('quickstart.hero.button')}}</button>
         </div>
       </section>
 
       <section class="steps-section">
         <div class="container">
-          <h2 class="section-title text-center">1. Sign in and open the Dashboard</h2>
+          <h2 class="section-title text-center">{{$t('quickstart.step1.title')}}</h2>
           <div class="content-wrapper">
             <div class="text-content">
               <p>
-                After you log in, you will land on the <strong>Dashboard</strong>. Here you can see your existing
-                projects or start a new one.
+                {{$t('quickstart.step1.p1')}}
               </p>
               <ul class="steps-list">
-                <li><strong>Create Project</strong> button in the left sidebar opens the project creation dialog.</li>
-                <li><strong>Dashboard</strong> shows all your projects as cards with title and description.</li>
-                <li>Click any project card to continue designing it in the Design page.</li>
+                <li>{{$t('quickstart.step1.item1')}}</li>
+                <li>{{$t('quickstart.step1.item2')}}</li>
+                <li>{{$t('quickstart.step1.item3')}}</li>
               </ul>
             </div>
             <div class="image-content">
@@ -56,7 +69,7 @@
 
       <section class="steps-section alt">
         <div class="container">
-          <h2 class="section-title text-center">2. Create a new project</h2>
+          <h2 class="section-title text-center">{{$t('quickstart.step2.title')}}</h2>
           <div class="content-wrapper reverse">
             <div class="image-content">
               <div class="placeholder-image">
@@ -65,12 +78,12 @@
             </div>
             <div class="text-content">
               <ul class="steps-list">
-                <li>Click <strong>Create Project</strong> in the Dashboard sidebar.</li>
-                <li>Choose the target device: <strong>Mobile</strong> or <strong>Desktop</strong>.</li>
-                <li>Select an <strong>AI Model</strong> based on speed and quality requirements.</li>
-                <li>Describe your project in plain English in the description box.</li>
-                <li>You can click <strong>Try example</strong> or <strong>Improve with AI</strong> to optimize the prompt.</li>
-                <li>Click <strong>Continue</strong> to generate your first version of the UI.</li>
+                <li>{{$t('quickstart.step2.item1')}}</li>
+                <li>{{$t('quickstart.step2.item2')}}</li>
+                <li>{{$t('quickstart.step2.item3')}}</li>
+                <li>{{$t('quickstart.step2.item4')}}</li>
+                <li>{{$t('quickstart.step2.item5')}}</li>
+                <li>{{$t('quickstart.step2.item6')}}</li>
               </ul>
             </div>
           </div>
@@ -79,18 +92,17 @@
 
       <section class="steps-section">
         <div class="container">
-          <h2 class="section-title text-center">3. Work in the Design page</h2>
+          <h2 class="section-title text-center">{{$t('quickstart.step3.title')}}</h2>
           <div class="content-wrapper">
             <div class="text-content">
               <p>
-                The <strong>Design</strong> page is your main AI design workspace. It uses your project description
-                or uploaded assets to generate UI layouts.
+                {{$t('quickstart.step3.p1')}}
               </p>
               <ul class="steps-list">
-                <li>Use text prompts, screenshots, or sketches to generate designs.</li>
-                <li>Adjust <strong>colors</strong>, <strong>layout</strong>, and <strong>components</strong> as needed.</li>
-                <li>Preview different pages and sections of the generated UI.</li>
-                <li>When you are satisfied, you can <strong>export</strong> the design to code.</li>
+                <li>{{$t('quickstart.step3.item1')}}</li>
+                <li>{{$t('quickstart.step3.item2')}}</li>
+                <li>{{$t('quickstart.step3.item3')}}</li>
+                <li>{{$t('quickstart.step3.item4')}}</li>
               </ul>
             </div>
             <div class="image-content">
@@ -104,17 +116,17 @@
 
       <section class="steps-section">
         <div class="container">
-          <h2 class="section-title text-center">4. Use the Editor to Refine Your Design</h2>
+          <h2 class="section-title text-center">{{$t('quickstart.step4.title')}}</h2>
           <div class="content-wrapper">
             <div class="text-content">
               <p>
-                The <strong>Editor</strong> is where you can manually refine the AI-generated UI. It provides a rich set of tools to modify the design to your exact specifications.
+                {{$t('quickstart.step4.p1')}}
               </p>
               <ul class="steps-list">
-                <li><strong>Real-time Preview:</strong> See your changes live as you make them.</li>
-                <li><strong>Component Palette:</strong> Drag and drop new elements like buttons, forms, and containers.</li>
-                <li><strong>Style Editor:</strong> Adjust colors, fonts, spacing, and other CSS properties.</li>
-                <li><strong>Save Page:</strong> When you're happy with the design, you can save it to update your project.</li>
+                <li>{{$t('quickstart.step4.item1')}}</li>
+                <li>{{$t('quickstart.step4.item2')}}</li>
+                <li>{{$t('quickstart.step4.item3')}}</li>
+                <li>{{$t('quickstart.step4.item4')}}</li>
               </ul>
             </div>
             <div class="image-content">
@@ -128,7 +140,7 @@
 
       <section class="steps-section alt">
         <div class="container">
-          <h2 class="section-title text-center">5. Manage and iterate on projects</h2>
+          <h2 class="section-title text-center">{{$t('quickstart.step5.title')}}</h2>
           <div class="content-wrapper reverse">
             <div class="image-content">
               <div class="placeholder-image">
@@ -137,10 +149,10 @@
             </div>
             <div class="text-content">
               <ul class="steps-list">
-                <li>All generated designs are saved as <strong>projects</strong> in the Dashboard.</li>
-                <li>You can reopen any project from the Dashboard project cards.</li>
-                <li>Use <strong>Delete Projects</strong> in the sidebar if you need to clean up old work.</li>
-                <li>Visit <strong>Membership</strong> to upgrade and unlock more generation capacity and models.</li>
+                <li>{{$t('quickstart.step5.item1')}}</li>
+                <li>{{$t('quickstart.step5.item2')}}</li>
+                <li>{{$t('quickstart.step5.item3')}}</li>
+                <li>{{$t('quickstart.step5.item4')}}</li>
               </ul>
             </div>
           </div>
@@ -149,23 +161,23 @@
 
       <section class="tips-section">
         <div class="container">
-          <h2 class="section-title text-center">Tips for better results</h2>
+          <h2 class="section-title text-center">{{$t('quickstart.tips.title')}}</h2>
           <div class="tips-grid">
             <div class="tip-item">
-              <h3>Be specific in your prompt</h3>
-              <p>Describe layout, target audience, style (e.g. "SaaS dashboard, dark theme, 2-column layout").</p>
+              <h3>{{$t('quickstart.tips.specific.title')}}</h3>
+              <p>{{$t('quickstart.tips.specific.desc')}}</p>
             </div>
             <div class="tip-item">
-              <h3>Start simple</h3>
-              <p>Generate a basic version first, then iterate with more detailed prompts.</p>
+              <h3>{{$t('quickstart.tips.simple.title')}}</h3>
+              <p>{{$t('quickstart.tips.simple.desc')}}</p>
             </div>
             <div class="tip-item">
-              <h3>Use examples</h3>
-              <p>Reference known products ("similar to Apple Store page") to guide the AI faster.</p>
+              <h3>{{$t('quickstart.tips.examples.title')}}</h3>
+              <p>{{$t('quickstart.tips.examples.desc')}}</p>
             </div>
             <div class="tip-item">
-              <h3>Refine and export</h3>
-              <p>Use the Design page to tweak details, then export code when you are happy with the result.</p>
+              <h3>{{$t('quickstart.tips.refine.title')}}</h3>
+              <p>{{$t('quickstart.tips.refine.desc')}}</p>
             </div>
           </div>
         </div>
@@ -173,9 +185,9 @@
 
       <section class="cta-section">
         <div class="container">
-          <h2>Ready to build your first UI?</h2>
-          <p>Log in, create a project on the Dashboard, and generate your first design in minutes.</p>
-          <button class="btn btn-primary" @click="goToLogin">Go to App</button>
+          <h2>{{$t('quickstart.cta.title')}}</h2>
+          <p>{{$t('quickstart.cta.description')}}</p>
+          <button class="btn btn-primary" @click="goToLogin">{{$t('quickstart.cta.button')}}</button>
         </div>
       </section>
     </main>
@@ -187,32 +199,32 @@
             <img src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Icon paint brush.png" alt="Uigenius Logo">
             Uigenius
           </a>
-          <p>AI-powered UX/UI design tool that quickly generates prototypes for apps and websites from simple text descriptions.</p>
+          <p>{{$t('common.footer.description')}}</p>
         </div>
         <div class="footer-links">
-          <h4>Product</h4>
+          <h4>{{$t('common.footer.product')}}</h4>
           <ul>
-            <li><a @click.prevent="goToHome">Overview</a></li>
-            <li><a @click.prevent="goToQuickStart">Quick Start</a></li>
-            <li><a @click.prevent="goToPricing">Pricing</a></li>
+            <li><a @click.prevent="goToHome">{{$t('quickstart.footer.overview')}}</a></li>
+            <li><a @click.prevent="goToQuickStart">{{$t('quickstart.footer.quickStart')}}</a></li>
+            <li><a @click.prevent="goToPricing">{{$t('common.footer.pricing')}}</a></li>
           </ul>
         </div>
         <div class="footer-links">
-          <h4>Company</h4>
+          <h4>{{$t('common.footer.company')}}</h4>
           <ul>
-            <li><a @click.prevent="goToAbout">About Us</a></li>
-            <li><a @click.prevent="goToCareers">Careers</a></li>
-            <li><a @click.prevent="goToContact">Contact</a></li>
+            <li><a @click.prevent="goToAbout">{{$t('common.footer.aboutUs')}}</a></li>
+            <li><a @click.prevent="goToCareers">{{$t('common.footer.careers')}}</a></li>
+            <li><a @click.prevent="goToContact">{{$t('common.footer.contact')}}</a></li>
           </ul>
         </div>
         <div class="footer-links">
-          <h4>Connect with us</h4>
+          <h4>{{$t('common.footer.connect')}}</h4>
           <div class="social-icons">
             <a href="https://x.com/Uigenius13952" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
           </div>
         </div>
         <div class="footer-links">
-          <h4>Customer Support</h4>
+          <h4>{{$t('common.footer.support')}}</h4>
           <div class="support-email">
             <a href="mailto:support@uigenius.top"><i class="fas fa-envelope"></i> support@uigenius.top</a>
           </div>
@@ -220,7 +232,7 @@
       </div>
       <div class="footer-bottom">
         <div class="container">
-          <p>© 2025 Uigenius. All rights reserved.</p>
+          <p>{{$t('common.footer.copyright')}}</p>
         </div>
       </div>
     </footer>
@@ -236,16 +248,126 @@ export default {
   name: 'QuickStartPage',
   data() {
     return {
-      showScrollTop: false
+      showScrollTop: false,
+      showLanguageDropdown: false,
+      currentLocale: 'en'
     }
   },
+  watch: {
+    currentLocale() {
+      this.showLanguageDropdown = false;
+    }
+  },
+  computed: {
+    availableLanguages() {
+      return [
+        { code: 'en', name: this.$t('locale.en') },
+        { code: 'zh-Hans', name: this.$t('locale.zh-hans') },
+        { code: 'zh-Hant', name: this.$t('locale.zh-hant') },
+        { code: 'ja', name: this.$t('locale.ja') },
+        { code: 'ko', name: this.$t('locale.ko') },
+        { code: 'ru', name: this.$t('locale.ru') },
+        { code: 'es', name: this.$t('locale.es') },
+        { code: 'fr', name: this.$t('locale.fr') },
+        { code: 'de', name: this.$t('locale.de') },
+        { code: 'it', name: this.$t('locale.it') },
+        { code: 'pt', name: this.$t('locale.pt') },
+        { code: 'ar', name: this.$t('locale.ar') },
+        { code: 'hi', name: this.$t('locale.hi') },
+        { code: 'th', name: this.$t('locale.th') },
+        { code: 'vi', name: this.$t('locale.vi') },
+        { code: 'id', name: this.$t('locale.id') },
+        { code: 'nl', name: this.$t('locale.nl') },
+        { code: 'pl', name: this.$t('locale.pl') },
+        { code: 'tr', name: this.$t('locale.tr') },
+        { code: 'sv', name: this.$t('locale.sv') },
+        { code: 'da', name: this.$t('locale.da') },
+        { code: 'fi', name: this.$t('locale.fi') },
+        { code: 'no', name: this.$t('locale.no') }
+      ]
+    },
+    currentLanguageName() {
+      const lang = this.availableLanguages.find(l => l.code === this.currentLocale)
+      return lang ? lang.name : this.$t('locale.en')
+    }
+  },
+  onShow() {
+    this.loadSavedLanguage();
+  },
   mounted() {
+    this.loadSavedLanguage();
     window.addEventListener('scroll', this.handleScroll);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('click', this.handleClickOutside);
+    }
   },
   beforeDestroy() {
     window.removeEventListener('scroll', this.handleScroll);
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('click', this.handleClickOutside);
+    }
   },
   methods: {
+    loadSavedLanguage() {
+      try {
+        const savedLocale = uni.getStorageSync('appLocale');
+        if (savedLocale) {
+          this.currentLocale = savedLocale;
+          uni.setLocale(savedLocale);
+          if (this.$i18n) {
+            this.$i18n.locale = savedLocale;
+          }
+        } else {
+          const currentLocale = uni.getLocale();
+          if (currentLocale) {
+            this.currentLocale = currentLocale;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading saved language:', error);
+      }
+    },
+    toggleLanguageDropdown(event) {
+      this.showLanguageDropdown = !this.showLanguageDropdown;
+    },
+    selectLanguage(localeCode) {
+      this.showLanguageDropdown = false;
+      if (this.currentLocale === localeCode) {
+        return;
+      }
+      setTimeout(() => {
+        this.showLanguageDropdown = false;
+      }, 0);
+      try {
+        uni.setLocale(localeCode);
+        if (this.$i18n) {
+          this.$i18n.locale = localeCode;
+        }
+        this.currentLocale = localeCode;
+        uni.setStorageSync('appLocale', localeCode);
+        this.$nextTick(() => {
+          this.showLanguageDropdown = false;
+          this.$forceUpdate();
+        });
+      } catch (error) {
+        console.error('Error setting language:', error);
+        this.showLanguageDropdown = false;
+        uni.showToast({
+          title: 'Failed to change language',
+          icon: 'none',
+          duration: 2000
+        });
+      }
+    },
+    handleClickOutside(event) {
+      if (typeof document === 'undefined') {
+        return;
+      }
+      const languageSelector = this.$el?.querySelector('.language-selector');
+      if (languageSelector && !languageSelector.contains(event.target)) {
+        this.showLanguageDropdown = false;
+      }
+    },
     handleScroll() {
       this.showScrollTop = window.scrollY > 300;
     },
@@ -387,6 +509,84 @@ ul {
 .try-free:hover {
   background-color: var(--primary-red);
   color: var(--background-white);
+}
+
+.language-selector {
+  position: relative;
+  margin-left: 15px;
+}
+
+.language-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: var(--background-white);
+  font-size: 14px;
+  color: var(--light-text);
+}
+
+.language-dropdown:hover {
+  border-color: var(--primary-red);
+  color: var(--primary-red);
+}
+
+.language-dropdown i.fa-globe {
+  font-size: 16px;
+}
+
+.language-dropdown i.fa-chevron-down {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.language-dropdown i.fa-chevron-down.rotate {
+  transform: rotate(180deg);
+}
+
+.language-selector .language-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 5px;
+  background-color: var(--background-white);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  min-width: 180px;
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 1001;
+  list-style: none;
+  padding: 5px 0;
+  display: block !important;
+}
+
+.language-selector .language-dropdown-menu li {
+  display: block !important;
+  width: 100%;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  color: var(--dark-text);
+  font-size: 14px;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.language-dropdown-menu li:hover {
+  background-color: var(--light-gray-bg);
+}
+
+.language-dropdown-menu li.active {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--primary-red);
+  font-weight: 500;
 }
 
 .hero-section {

@@ -9,17 +9,31 @@
                 </a>
                 <nav class="nav-menu">
                     <ul>
-                        <li><a @click.prevent="scrollToSection('home')">HOME</a></li>
-                        <li><a @click.prevent="goToQuickStart">QUICK START</a></li>
-                        <li><a @click.prevent="scrollToSection('features')">FEATURES</a></li>
-                        <li><a @click.prevent="scrollToSection('why-choose')">WHY UIGENIUS</a></li>
-                        <li><a @click.prevent="scrollToSection('testimonial')">TESTIMONIAL</a></li>
-                        <li><a @click.prevent="scrollToSection('pricing')">PRICING</a></li>
-                        <li><a @click.prevent="scrollToSection('contact')">CONTACT</a></li>
+                        <li><a @click.prevent="scrollToSection('home')">{{$t('intro.nav.home')}}</a></li>
+                        <li><a @click.prevent="goToQuickStart">{{$t('intro.nav.quickStart')}}</a></li>
+                        <li><a @click.prevent="scrollToSection('features')">{{$t('intro.nav.features')}}</a></li>
+                        <li><a @click.prevent="scrollToSection('why-choose')">{{$t('intro.nav.whyChoose')}}</a></li>
+                        <li><a @click.prevent="scrollToSection('testimonial')">{{$t('intro.nav.testimonial')}}</a></li>
+                        <li><a @click.prevent="scrollToSection('pricing')">{{$t('intro.nav.pricing')}}</a></li>
+                        <li><a @click.prevent="scrollToSection('contact')">{{$t('intro.nav.contact')}}</a></li>
                     </ul>
                     <div class="try-free" @click="goToLogin">
-                        <span>Try</span>
-                        <span>Free</span>
+                        <span>{{$t('intro.try')}}</span>
+                        <span>{{$t('intro.free')}}</span>
+                    </div>
+                    <div class="language-selector" @click.stop>
+                        <div class="language-dropdown" @click.stop="toggleLanguageDropdown($event)">
+                            <i class="fas fa-globe"></i>
+                            <span>{{ currentLanguageName }}</span>
+                            <i class="fas fa-chevron-down" :class="{ 'rotate': showLanguageDropdown }"></i>
+                        </div>
+                        <ul class="language-dropdown-menu" v-if="showLanguageDropdown" @click.stop>
+                            <li v-for="lang in availableLanguages" :key="lang.code" 
+                                @click.stop="selectLanguage(lang.code)"
+                                :class="{ 'active': currentLocale === lang.code }">
+                                {{ lang.name }}
+                            </li>
+                        </ul>
                     </div>
                 </nav>
             </div>
@@ -29,11 +43,11 @@
     <main>
         <section id="home" class="hero">
             <div class="container hero-content">
-                <h1>AI-powered UX/UI Design Tool<br> For Rapid Prototyping</h1>
+                <h1>{{$t('intro.hero.title')}}<br> {{$t('intro.hero.subtitle')}}</h1>
                 <div class="hero-buttons">
-                    <a href="#" class="btn btn-primary" @click.prevent="goToLogin">Try Uigenius Now</a>
+                    <a href="#" class="btn btn-primary" @click.prevent="goToLogin">{{$t('intro.hero.tryNow')}}</a>
                     <a href="https://apps.microsoft.com/detail/9P7XBXGZN5JS" class="btn btn-secondary">
-                        <i class="fab fa-windows"></i> Download for Windows
+                        <i class="fab fa-windows"></i> {{$t('intro.hero.downloadWindows')}}
                     </a>
                 </div>
             </div>
@@ -45,37 +59,37 @@
 
         <section id="features" class="features">
             <div class="container">
-                <h2 class="section-title text-center mb-6">Key Features</h2>
+                <h2 class="section-title text-center mb-6">{{$t('intro.features.title')}}</h2>
                 <div class="features-grid">
                     <div class="feature-item">
                         <div class="icon"><i class="fas fa-font"></i></div>
-                        <h3>TEXT-TO-DESIGN</h3>
-                        <p>Simply input text descriptions and watch as our AI automatically generates beautiful, functional designs for your apps and websites.</p>
+                        <h3>{{$t('intro.features.textToDesign.title')}}</h3>
+                        <p>{{$t('intro.features.textToDesign.description')}}</p>
                     </div>
                     <div class="feature-item">
                         <div class="icon"><i class="fas fa-users"></i></div>
-                        <h3>REAL-TIME COLLABORATION</h3>
-                        <p>Work together with your team in real-time, making design iterations faster and more efficient than ever before.</p>
+                        <h3>{{$t('intro.features.collaboration.title')}}</h3>
+                        <p>{{$t('intro.features.collaboration.description')}}</p>
                     </div>
                     <div class="feature-item">
                         <div class="icon"><i class="fas fa-camera"></i></div>
-                        <h3>SCREENSHOT CONVERSION</h3>
-                        <p>Upload screenshots or any images and our AI will convert them into editable design components that you can customize to your needs.</p>
+                        <h3>{{$t('intro.features.screenshot.title')}}</h3>
+                        <p>{{$t('intro.features.screenshot.description')}}</p>
                     </div>
                     <div class="feature-item">
                         <div class="icon"><i class="fas fa-pencil-ruler"></i></div>
-                        <h3>SKETCH DIGITIZATION</h3>
-                        <p>Transform your hand-drawn sketches into professional digital designs with our advanced AI recognition technology.</p>
+                        <h3>{{$t('intro.features.sketch.title')}}</h3>
+                        <p>{{$t('intro.features.sketch.description')}}</p>
                     </div>
                     <div class="feature-item">
                         <div class="icon"><i class="fas fa-cloud"></i></div>
-                        <h3>CLOUD-BASED PLATFORM</h3>
-                        <p>Access your designs from anywhere with our cloud-based platform. No downloads or installations required.</p>
+                        <h3>{{$t('intro.features.cloud.title')}}</h3>
+                        <p>{{$t('intro.features.cloud.description')}}</p>
                     </div>
                     <div class="feature-item">
                         <div class="icon"><i class="fas fa-mobile-alt"></i></div>
-                        <h3>MULTI-PLATFORM SUPPORT</h3>
-                        <p>Design for multiple platforms simultaneously. Create responsive websites and apps that work across all devices.</p>
+                        <h3>{{$t('intro.features.multiPlatform.title')}}</h3>
+                        <p>{{$t('intro.features.multiPlatform.description')}}</p>
                     </div>
                 </div>
             </div>
@@ -83,27 +97,27 @@
 
         <section id="why-choose" class="why-choose">
             <div class="why-choose-container">
-                <h2 class="section-title text-center mb-6">Why Choose Uigenius</h2>
+                <h2 class="section-title text-center mb-6">{{$t('intro.whyChoose.title')}}</h2>
                 <div class="why-choose-grid">
                     <div class="why-choose-item">
                         <div class="icon"><i class="fas fa-rocket"></i></div>
-                        <h3>Rapid Prototyping</h3>
-                        <p>Create functional prototypes in minutes instead of hours or days. Speed up your design process dramatically.</p>
+                        <h3>{{$t('intro.whyChoose.rapidPrototyping.title')}}</h3>
+                        <p>{{$t('intro.whyChoose.rapidPrototyping.description')}}</p>
                     </div>
                     <div class="why-choose-item">
                         <div class="icon"><i class="fas fa-user-check"></i></div>
-                        <h3>No Design Skills Required</h3>
-                        <p>Our AI handles the design work, making it accessible to product managers, developers, and non-designers.</p>
+                        <h3>{{$t('intro.whyChoose.noDesignSkills.title')}}</h3>
+                        <p>{{$t('intro.whyChoose.noDesignSkills.description')}}</p>
                     </div>
                     <div class="why-choose-item">
                         <div class="icon"><i class="fas fa-cogs"></i></div>
-                        <h3>Intuitive Interface</h3>
-                        <p>Get started quickly with our user-friendly interface. No steep learning curve or complex tools.</p>
+                        <h3>{{$t('intro.whyChoose.intuitiveInterface.title')}}</h3>
+                        <p>{{$t('intro.whyChoose.intuitiveInterface.description')}}</p>
                     </div>
                     <div class="why-choose-item">
                         <div class="icon"><i class="fas fa-code"></i></div>
-                        <h3>Export-Ready Designs</h3>
-                        <p>Export your designs in multiple formats, ready for development or further refinement in other design tools.</p>
+                        <h3>{{$t('intro.whyChoose.exportReady.title')}}</h3>
+                        <p>{{$t('intro.whyChoose.exportReady.description')}}</p>
                     </div>
                 </div>
                 <div class="why-choose-illustration"></div>
@@ -112,7 +126,7 @@
 
         <section class="as-seen-on">
             <div class="container">
-                <h2 class="section-title text-center">As Seen On</h2>
+                <h2 class="section-title text-center">{{$t('intro.asSeenOn.title')}}</h2>
                 <div class="company-logos">
                     <div class="company-logo-item">
                         <a href="https://www.producthunt.com/products/uigenius?embed=true&utm_source=badge-featured&utm_medium=badge&utm_source=badge-uigenius" target="_blank"><img src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1042924&theme=light&t=1764212733379" alt="Uigenius - Uigenius: AI-Powered UI/UX Design Tools | Product Hunt" style="width: 250px; height: 54px;" width="250" height="54" /></a>
@@ -128,11 +142,11 @@
         <section id="testimonial" class="testimonial">
             <div class="container">
                 <div class="testimonial-card">
-                    <p>"Uigenius has helped us create beautiful and functional designs for our AI projects. It's a great tool for quickly prototyping and iterating on designs. Save us time and effort."</p>
+                    <p>"{{$t('intro.testimonial.quote')}}"</p>
                     <div class="testimonial-author">
                         <img src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/avatar.png" alt="Fajar Profile Picture">
-                        <span class="name">Belal Alsinglawi</span>
-                        <span class="title">CEO, Innovalab.ai</span>
+                        <span class="name">{{$t('intro.testimonial.author')}}</span>
+                        <span class="title">{{$t('intro.testimonial.title')}}</span>
                     </div>
                 </div>
             </div>
@@ -140,46 +154,46 @@
 
         <section id="pricing" class="pricing">
             <div class="container">
-                <h2 class="section-title text-center">Choose Your Plan</h2>
-                <p class="section-subtitle text-center">Select the perfect plan for your design needs</p>
+                <h2 class="section-title text-center">{{$t('intro.pricing.title')}}</h2>
+                <p class="section-subtitle text-center">{{$t('intro.pricing.subtitle')}}</p>
                 <div class="pricing-card-wrapper">
                     <div class="pricing-card" style="margin-right: 25px; width: 450px;">
-                        <div class="label">Free</div>
-                        <span class="price">$0<span>/ Month</span></span>
+                        <div class="label">{{$t('intro.pricing.free.label')}}</div>
+                        <span class="price">$0<span> {{$t('intro.pricing.free.period')}}</span></span>
                         <ul>
-                            <li>10 UI generation&nbsp;request</li>
-                            <li>3 screenshot convertion</li>
-                            <li>Free AI model</li>
+                            <li>{{$t('intro.pricing.free.feature1')}}</li>
+                            <li>{{$t('intro.pricing.free.feature2')}}</li>
+                            <li>{{$t('intro.pricing.free.feature3')}}</li>
                         </ul>
-                        <a href="#" class="btn btn-primary" @click.prevent="goToLogin">Try Free Now</a>
+                        <a href="#" class="btn btn-primary" @click.prevent="goToLogin">{{$t('intro.pricing.free.button')}}</a>
                     </div><div class="pricing-card" style="margin-right: 25px; width: 450px;">
-                        <div class="label">PRO</div>
-                        <span class="price">$12<span>/ Month</span></span>
+                        <div class="label">{{$t('intro.pricing.pro.label')}}</div>
+                        <span class="price">$12<span> {{$t('intro.pricing.pro.period')}}</span></span>
                         <ul>
-                            <li>Unlimited UI generation&nbsp;request</li>
-                            <li>Unlimited screenshot convertion</li><li>Pro AI model</li>
-                            <li>Unlimited storage</li>
-                            <li>Priority support</li>
+                            <li>{{$t('intro.pricing.pro.feature1')}}</li>
+                            <li>{{$t('intro.pricing.pro.feature2')}}</li><li>{{$t('intro.pricing.pro.feature3')}}</li>
+                            <li>{{$t('intro.pricing.pro.feature4')}}</li>
+                            <li>{{$t('intro.pricing.pro.feature5')}}</li>
                         </ul>
-                        <a href="#" class="btn btn-primary" @click.prevent="handleProPayment('prod_23PrXe2PUsElWYj1C7cKqf')">Buy Now</a>
+                        <a href="#" class="btn btn-primary" @click.prevent="handleProPayment('prod_23PrXe2PUsElWYj1C7cKqf')">{{$t('intro.pricing.pro.button')}}</a>
                     </div><div class="pricing-card" style="width: 450px;">
-                        <div class="label">Lifetime Deals</div>
-                        <span class="price">$79<span>/ Lifetime</span></span>
+                        <div class="label">{{$t('intro.pricing.lifetime.label')}}</div>
+                        <span class="price">$79<span> {{$t('intro.pricing.lifetime.period')}}</span></span>
                         <ul>
-                            <li>Unlimited&nbsp;UI generation&nbsp;request</li>
-                            <li>Unlimited screenshot convertion</li><li>Unlimited prompt limatation&nbsp;</li><li>Pro AI model</li>
-                            <li>Unlimited storage</li>
-                            <li>Priority support</li>
-                            <li>Dedicated account manager</li>
+                            <li>{{$t('intro.pricing.lifetime.feature1')}}</li>
+                            <li>{{$t('intro.pricing.lifetime.feature2')}}</li><li>{{$t('intro.pricing.lifetime.feature3')}}</li><li>{{$t('intro.pricing.lifetime.feature4')}}</li>
+                            <li>{{$t('intro.pricing.lifetime.feature5')}}</li>
+                            <li>{{$t('intro.pricing.lifetime.feature6')}}</li>
+                            <li>{{$t('intro.pricing.lifetime.feature7')}}</li>
                         </ul>
-                        <a href="#" class="btn btn-primary" @click.prevent="handleLifetimePayment('prod_7m7FLqGesIUZD6MstjzOLR')">Buy Now</a>
+                        <a href="#" class="btn btn-primary" @click.prevent="handleLifetimePayment('prod_7m7FLqGesIUZD6MstjzOLR')">{{$t('intro.pricing.lifetime.button')}}</a>
                     </div>
                 </div>
             </div>
         </section>
 
         <section class="image-showcase">
-            <div class="container"><h1>AI Design Example<br><br></h1>
+            <div class="container"><h1>{{$t('intro.imageShowcase.title')}}<br><br></h1>
                 <div class="image-showcase-grid">
                     <div class="image-showcase-item">
                         <img src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/test01.png" alt="Design Example 1">
@@ -196,31 +210,31 @@
 
         <section class="start-for-free">
             <div class="container">
-                <h2 class="section-title">Start For Free</h2>
-                <p>Skip login user can get 3 times free trial.<br>Login user can get 10 times free trial.</p>
+                <h2 class="section-title">{{$t('intro.startForFree.title')}}</h2>
+                <p>{{$t('intro.startForFree.description')}}</p>
             </div>
         </section>
 
         <section id="contact" class="contact">
             <div class="container">
-                <h2 class="section-title text-center mb-6">Contact</h2>
+                <h2 class="section-title text-center mb-6">{{$t('intro.contact.title')}}</h2>
                 <form class="contact-form">
                     <div class="form-row">
                         <div class="form-group">
                             <!-- <input name="test" style="border: solid 1px #999999;height: 40px;" type="text" @input="onInput" :value="value" /> -->
-                            <input type="text" id="name" name="name" placeholder="Name" v-model="form.name" :disabled="submitting" required>
+                            <input type="text" id="name" name="name" :placeholder="$t('intro.contact.name')" v-model="form.name" :disabled="submitting" required>
                         </div>
                         <div class="form-group">
-                            <input type="email" id="email" name="email" placeholder="Email" v-model="form.email" :disabled="submitting" required>
+                            <input type="email" id="email" name="email" :placeholder="$t('intro.contact.email')" v-model="form.email" :disabled="submitting" required>
                         </div>
                     </div>
                     <div class="form-group">
-                        <input type="text" id="subject" name="subject" placeholder="Subject" v-model="form.subject" :disabled="submitting" required>
+                        <input type="text" id="subject" name="subject" :placeholder="$t('intro.contact.subject')" v-model="form.subject" :disabled="submitting" required>
                     </div>
                     <div class="form-group">
-                        <textarea id="message" name="message" rows="6" placeholder="Message" v-model="form.message" :disabled="submitting"></textarea>
+                        <textarea id="message" name="message" rows="6" :placeholder="$t('intro.contact.message')" v-model="form.message" :disabled="submitting"></textarea>
                     </div>
-                    <button type="button" class="btn btn-primary" :disabled="submitting" @click="submitForm">{{ submitting ? 'Sending...' : 'Send Message' }}</button>
+                    <button type="button" class="btn btn-primary" :disabled="submitting" @click="submitForm">{{ submitting ? $t('intro.contact.sending') : $t('intro.contact.send') }}</button>
                 </form>
             </div>
         </section>
@@ -233,32 +247,32 @@
                     <img src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Icon paint brush.png" alt="Uigenius Logo">
                     Uigenius
                 </a>
-                <p>AI-powered UX/UI design tool that quickly generates prototypes for apps and websites from simple text descriptions.</p>
+                <p>{{$t('intro.footer.description')}}</p>
             </div>
             <div class="footer-links">
-                <h4>Product</h4>
+                <h4>{{$t('intro.footer.product')}}</h4>
                 <ul>
-                    <li><a @click.prevent="scrollToSection('features')">Features</a></li>
-                    <li><a @click.prevent="scrollToSection('pricing')">Pricing</a></li>
+                    <li><a @click.prevent="scrollToSection('features')">{{$t('intro.footer.features')}}</a></li>
+                    <li><a @click.prevent="scrollToSection('pricing')">{{$t('intro.footer.pricing')}}</a></li>
                     <!-- <li><a href="#">Tutorials</a></li> -->
                 </ul>
             </div>
             <div class="footer-links">
-                <h4>Company</h4>
+                <h4>{{$t('intro.footer.company')}}</h4>
                 <ul>
-                    <li><a @click.prevent="goToAboutUs">About Us</a></li>
-                    <li><a @click.prevent="goToCareers">Careers</a></li>
-                    <li><a @click.prevent="scrollToSection('contact')">Contact</a></li>
+                    <li><a @click.prevent="goToAboutUs">{{$t('intro.footer.aboutUs')}}</a></li>
+                    <li><a @click.prevent="goToCareers">{{$t('intro.footer.careers')}}</a></li>
+                    <li><a @click.prevent="scrollToSection('contact')">{{$t('intro.footer.contact')}}</a></li>
                 </ul>
             </div>
             <div class="footer-links">
-                <h4>Connect with us</h4>
+                <h4>{{$t('intro.footer.connect')}}</h4>
                 <div class="social-icons">
                     <a href="https://x.com/Uigenius13952" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
                 </div>
             </div>
             <div class="footer-links">
-                <h4>Customer Support</h4>
+                <h4>{{$t('intro.footer.support')}}</h4>
                 <div class="support-email">
                     <a href="mailto:support@uigenius.top"><i class="fas fa-envelope"></i> support@uigenius.top</a>
                 </div>
@@ -266,11 +280,11 @@
         </div>
         <div class="footer-bottom">
             <div class="container">
-                <p> 2025 Uigenius. All rights reserved.</p>
+                <p> {{$t('intro.footer.copyright')}}</p>
                 <div class="footer-legal-links">
-                    <a @click.prevent="goToTerms">Terms of Service</a>
+                    <a @click.prevent="goToTerms">{{$t('intro.footer.terms')}}</a>
                     <span class="separator">|</span>
-                    <a @click.prevent="goToPrivacy">Privacy Policy</a>
+                    <a @click.prevent="goToPrivacy">{{$t('intro.footer.privacy')}}</a>
                 </div>
             </div>
         </div>
@@ -289,11 +303,55 @@ export default {
         subject: '',
         message: ''
       },
-      submitting: false
+      submitting: false,
+      showLanguageDropdown: false,
+      currentLocale: 'en'
+    }
+  },
+  watch: {
+    currentLocale() {
+      // Close dropdown when locale changes
+      this.showLanguageDropdown = false;
+    }
+  },
+  computed: {
+    availableLanguages() {
+      return [
+        { code: 'en', name: this.$t('locale.en') },
+        { code: 'zh-Hans', name: this.$t('locale.zh-hans') },
+        { code: 'zh-Hant', name: this.$t('locale.zh-hant') },
+        { code: 'ja', name: this.$t('locale.ja') },
+        { code: 'ko', name: this.$t('locale.ko') },
+        { code: 'ru', name: this.$t('locale.ru') },
+        { code: 'es', name: this.$t('locale.es') },
+        { code: 'fr', name: this.$t('locale.fr') },
+        { code: 'de', name: this.$t('locale.de') },
+        { code: 'it', name: this.$t('locale.it') },
+        { code: 'pt', name: this.$t('locale.pt') },
+        { code: 'ar', name: this.$t('locale.ar') },
+        { code: 'hi', name: this.$t('locale.hi') },
+        { code: 'th', name: this.$t('locale.th') },
+        { code: 'vi', name: this.$t('locale.vi') },
+        { code: 'id', name: this.$t('locale.id') },
+        { code: 'nl', name: this.$t('locale.nl') },
+        { code: 'pl', name: this.$t('locale.pl') },
+        { code: 'tr', name: this.$t('locale.tr') },
+        { code: 'sv', name: this.$t('locale.sv') },
+        { code: 'da', name: this.$t('locale.da') },
+        { code: 'fi', name: this.$t('locale.fi') },
+        { code: 'no', name: this.$t('locale.no') }
+      ]
+    },
+    currentLanguageName() {
+      const lang = this.availableLanguages.find(l => l.code === this.currentLocale)
+      return lang ? lang.name : this.$t('locale.en')
     }
   },
 
   onShow() {
+    // Load saved language preference
+    this.loadSavedLanguage();
+    
     // Check if we need to scroll to a specific section
     const scrollToSection = uni.getStorageSync('scrollToSection');
     if (scrollToSection) {
@@ -305,8 +363,102 @@ export default {
       }, 300);
     }
   },
+  mounted() {
+    // Load saved language preference on mount
+    this.loadSavedLanguage();
+    
+    // Close dropdown when clicking outside (only if document is available)
+    if (typeof document !== 'undefined') {
+      document.addEventListener('click', this.handleClickOutside);
+    }
+  },
+  beforeDestroy() {
+    // Remove event listener (only if document is available)
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('click', this.handleClickOutside);
+    }
+  },
 
   methods: {
+    loadSavedLanguage() {
+      try {
+        const savedLocale = uni.getStorageSync('appLocale');
+        if (savedLocale) {
+          this.currentLocale = savedLocale;
+          uni.setLocale(savedLocale);
+          // Also update i18n locale if available
+          if (this.$i18n) {
+            this.$i18n.locale = savedLocale;
+          }
+        } else {
+          // Get current locale from uni-app
+          const currentLocale = uni.getLocale();
+          if (currentLocale) {
+            this.currentLocale = currentLocale;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading saved language:', error);
+      }
+    },
+    toggleLanguageDropdown(event) {
+      // Toggle dropdown - @click.stop on menu items prevents bubbling
+      this.showLanguageDropdown = !this.showLanguageDropdown;
+    },
+    selectLanguage(localeCode) {
+      // Close dropdown immediately
+      this.showLanguageDropdown = false;
+      
+      if (this.currentLocale === localeCode) {
+        return;
+      }
+      
+      // Use setTimeout to ensure dropdown closes after any potential re-renders
+      setTimeout(() => {
+        this.showLanguageDropdown = false;
+      }, 0);
+      
+      try {
+        // Set the locale
+        uni.setLocale(localeCode);
+        
+        // Update i18n locale if available
+        if (this.$i18n) {
+          this.$i18n.locale = localeCode;
+        }
+        
+        // Update current locale
+        this.currentLocale = localeCode;
+        
+        // Save to local storage
+        uni.setStorageSync('appLocale', localeCode);
+        
+        // Ensure dropdown is closed after locale change
+        this.$nextTick(() => {
+          this.showLanguageDropdown = false;
+          // Force page refresh to apply language changes
+          this.$forceUpdate();
+        });
+      } catch (error) {
+        console.error('Error setting language:', error);
+        this.showLanguageDropdown = false;
+        uni.showToast({
+          title: 'Failed to change language',
+          icon: 'none',
+          duration: 2000
+        });
+      }
+    },
+    handleClickOutside(event) {
+      // Only handle if document is available (web platform)
+      if (typeof document === 'undefined') {
+        return;
+      }
+      const languageSelector = this.$el?.querySelector('.language-selector');
+      if (languageSelector && !languageSelector.contains(event.target)) {
+        this.showLanguageDropdown = false;
+      }
+    },
     scrollToTop() {
       window.scrollTo({ top: 0, behavior: 'smooth' });
     },
@@ -339,7 +491,7 @@ export default {
     async checkMembershipBeforePayment(productId) {
       try {
         uni.showLoading({
-          title: 'Checking membership...'
+          title: this.$t('intro.payment.checking')
         });
 
         // Get user ID from storage
@@ -348,7 +500,7 @@ export default {
         if (!uid) {
           uni.hideLoading();
           uni.showToast({
-            title: 'User ID not found',
+            title: this.$t('intro.payment.error.noUserId'),
             icon: 'none',
             duration: 2000
           });
@@ -380,7 +532,7 @@ export default {
           // Check if user already has membership
           if (membershipData.hasMembership) {
             uni.showToast({
-              title: 'You already have an active membership',
+              title: this.$t('intro.payment.error.hasMembership'),
               icon: 'none',
               duration: 2000
             });
@@ -391,7 +543,7 @@ export default {
           this.redirectToPayment(productId);
         } else {
           uni.showToast({
-            title: result.result?.message || 'Failed to check membership',
+            title: result.result?.message || this.$t('intro.payment.error.checkFailed'),
             icon: 'none',
             duration: 2000
           });
@@ -399,7 +551,7 @@ export default {
       } catch (error) {
         uni.hideLoading();
         uni.showToast({
-          title: 'Error checking membership',
+          title: this.$t('intro.payment.error.checkError'),
           icon: 'none',
           duration: 2000
         });
@@ -431,12 +583,12 @@ export default {
     async submitForm() {
       if (this.submitting) return;
       if (!this.form.name || !this.form.email || !this.form.subject || !this.form.message) {
-        uni.showToast({ title: 'Please fill all fields', icon: 'none' });
+        uni.showToast({ title: this.$t('intro.contact.error.fillAll'), icon: 'none' });
         return;
       }
       const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(this.form.email);
       if (!emailValid) {
-        uni.showToast({ title: 'Invalid email', icon: 'none' });
+        uni.showToast({ title: this.$t('intro.contact.error.invalidEmail'), icon: 'none' });
         return;
       }
       try {
@@ -451,15 +603,15 @@ export default {
           }
         });
         if (res && res.result && res.result.code === 0) {
-          uni.showToast({ title: 'Message received. Thank you!', icon: 'success' });
+          uni.showToast({ title: this.$t('intro.contact.success'), icon: 'success' });
           this.form = { name: '', email: '', subject: '', message: '' };
         } else {
-          const msg = (res && res.result && res.result.msg) || 'Send failed';
+          const msg = (res && res.result && res.result.msg) || this.$t('intro.contact.error.sendFailed');
           uni.showToast({ title: msg, icon: 'none' });
         }
       } catch (error) {
         console.error(error);
-        uni.showToast({ title: 'Send failed', icon: 'none' });
+        uni.showToast({ title: this.$t('intro.contact.error.sendFailed'), icon: 'none' });
       } finally {
         this.submitting = false;
       }
@@ -586,7 +738,7 @@ ul {
 .nav-menu {
     display: flex;
     align-items: center;
-    gap: 20px; /* Space between nav items */
+    gap: 13px; /* Space between nav items */
 }
 
 .nav-menu ul {
@@ -602,6 +754,87 @@ ul {
 
 .nav-menu a:hover {
     color: var(--primary-red);
+}
+
+.language-selector {
+    position: relative;
+    margin-left: 15px;
+}
+
+.language-dropdown {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 15px;
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    background-color: var(--background-white);
+    font-size: 14px;
+    color: var(--light-text);
+}
+
+.language-dropdown:hover {
+    border-color: var(--primary-red);
+    color: var(--primary-red);
+}
+
+.language-dropdown i.fa-globe {
+    font-size: 16px;
+}
+
+.language-dropdown i.fa-chevron-down {
+    font-size: 12px;
+    transition: transform 0.3s ease;
+}
+
+.language-dropdown i.fa-chevron-down.rotate {
+    transform: rotate(180deg);
+}
+
+.language-selector .language-dropdown-menu {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 5px;
+    background-color: var(--background-white);
+    border: 1px solid var(--border-color);
+    border-radius: 5px;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    min-width: 180px;
+    max-height: 300px;
+    overflow-y: auto;
+    overflow-x: hidden;
+    z-index: 1001;
+    list-style: none;
+    padding: 5px 0;
+    display: block !important;
+    flex-direction: column;
+}
+
+.language-selector .language-dropdown-menu li {
+    display: block !important;
+    width: 100%;
+    padding: 10px 20px;
+    cursor: pointer;
+    transition: background-color 0.2s ease;
+    color: var(--dark-text);
+    font-size: 14px;
+    white-space: nowrap;
+    box-sizing: border-box;
+    float: none;
+    clear: both;
+}
+
+.language-dropdown-menu li:hover {
+    background-color: var(--light-gray-bg);
+}
+
+.language-dropdown-menu li.active {
+    background-color: rgba(239, 68, 68, 0.1);
+    color: var(--primary-red);
+    font-weight: 500;
 }
 
 .try-free {
@@ -1488,6 +1721,9 @@ ul {
     }
     .nav-menu {
         gap: 15px;
+    }
+    .language-dropdown span {
+        display: none; /* Hide language name on smaller screens, show only icon */
     }
     .hero h1 {
         font-size: 48px;

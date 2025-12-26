@@ -9,14 +9,28 @@
           </a>
           <nav class="nav-menu">
             <ul>
-              <li><a @click.prevent="goToHome">HOME</a></li>
-              <li><a @click.prevent="goToAbout">ABOUT US</a></li>
-              <li><a @click.prevent="goToCareers">CAREERS</a></li>
-              <li><a @click.prevent="goToContact">CONTACT</a></li>
+              <li><a @click.prevent="goToHome">{{$t('common.nav.home')}}</a></li>
+              <li><a @click.prevent="goToAbout">{{$t('common.nav.about')}}</a></li>
+              <li><a @click.prevent="goToCareers">{{$t('common.nav.careers')}}</a></li>
+              <li><a @click.prevent="goToContact">{{$t('common.nav.contact')}}</a></li>
             </ul>
             <div class="try-free" @click="goToLogin">
-              <span>Try</span>
-              <span>Free</span>
+              <span>{{$t('common.try')}}</span>
+              <span>{{$t('common.free')}}</span>
+            </div>
+            <div class="language-selector" @click.stop>
+              <div class="language-dropdown" @click.stop="toggleLanguageDropdown($event)">
+                <i class="fas fa-globe"></i>
+                <span>{{ currentLanguageName }}</span>
+                <i class="fas fa-chevron-down" :class="{ 'rotate': showLanguageDropdown }"></i>
+              </div>
+              <ul class="language-dropdown-menu" v-if="showLanguageDropdown" @click.stop>
+                <li v-for="lang in availableLanguages" :key="lang.code" 
+                    @click.stop="selectLanguage(lang.code)"
+                    :class="{ 'active': currentLocale === lang.code }">
+                  {{ lang.name }}
+                </li>
+              </ul>
             </div>
           </nav>
         </div>
@@ -26,37 +40,37 @@
     <main>
       <section class="hero-section">
         <div class="container">
-          <h1>Join Our Team</h1>
-          <p class="hero-subtitle">Help us shape the future of AI-powered design</p>
+          <h1>{{$t('careers.hero.title')}}</h1>
+          <p class="hero-subtitle">{{$t('careers.hero.subtitle')}}</p>
         </div>
       </section>
 
       <section class="intro-section">
         <div class="container">
           <div class="intro-content">
-            <h2>Build the Future of Design with Us</h2>
-            <p>We're always looking for talented individuals who are passionate about design, technology, and innovation. At Uigenius, you'll work with a diverse team of creative minds, tackle challenging problems, and have the opportunity to make a real impact on how people design and create.</p>
-            <p>Whether you're a developer, designer, or AI enthusiast, we'd love to hear from you. Join us in our mission to democratize design and empower creators worldwide.</p>
+            <h2>{{$t('careers.intro.title')}}</h2>
+            <p>{{$t('careers.intro.p1')}}</p>
+            <p>{{$t('careers.intro.p2')}}</p>
           </div>
         </div>
       </section>
 
       <section class="positions-section">
         <div class="container">
-          <h2 class="section-title text-center">Open Positions</h2>
+          <h2 class="section-title text-center">{{$t('careers.positions.title')}}</h2>
           <div class="positions-grid">
             <div class="position-card">
               <div class="position-header">
                 <h3>Senior Frontend Developer</h3>
-                <span class="position-badge">Engineering</span>
+                <span class="position-badge">{{$t('careers.positions.engineering')}}</span>
               </div>
               <div class="position-meta">
-                <span class="position-location"><i class="fas fa-map-marker-alt"></i> Remote / San Francisco</span>
-                <span class="position-type"><i class="fas fa-clock"></i> Full-time</span>
+                <span class="position-location"><i class="fas fa-map-marker-alt"></i> {{$t('careers.positions.remote')}} / San Francisco</span>
+                <span class="position-type"><i class="fas fa-clock"></i> {{$t('careers.positions.fullTime')}}</span>
               </div>
               <p>We're looking for an experienced frontend developer to help build and scale our AI-powered design platform. You'll work on cutting-edge web technologies and create beautiful, performant user interfaces.</p>
               <div class="position-requirements">
-                <h4>Requirements:</h4>
+                <h4>{{$t('careers.positions.requirements')}}</h4>
                 <ul>
                   <li>5+ years of experience with Vue.js, React, or similar frameworks</li>
                   <li>Strong knowledge of HTML, CSS, and JavaScript</li>
@@ -64,21 +78,21 @@
                   <li>Understanding of web performance optimization</li>
                 </ul>
               </div>
-              <button class="btn btn-primary" @click="applyForJob('Senior Frontend Developer')">Apply Now</button>
+              <button class="btn btn-primary" @click="applyForJob('Senior Frontend Developer')">{{$t('careers.positions.apply')}}</button>
             </div>
 
             <div class="position-card">
               <div class="position-header">
                 <h3>AI/ML Engineer</h3>
-                <span class="position-badge">AI & Research</span>
+                <span class="position-badge">{{$t('careers.positions.ai')}}</span>
               </div>
               <div class="position-meta">
-                <span class="position-location"><i class="fas fa-map-marker-alt"></i> Remote / New York</span>
-                <span class="position-type"><i class="fas fa-clock"></i> Full-time</span>
+                <span class="position-location"><i class="fas fa-map-marker-alt"></i> {{$t('careers.positions.remote')}} / New York</span>
+                <span class="position-type"><i class="fas fa-clock"></i> {{$t('careers.positions.fullTime')}}</span>
               </div>
               <p>Join our AI team to develop and improve our machine learning models for design generation and recognition. You'll work on innovative projects that push the boundaries of what's possible with AI.</p>
               <div class="position-requirements">
-                <h4>Requirements:</h4>
+                <h4>{{$t('careers.positions.requirements')}}</h4>
                 <ul>
                   <li>MS or PhD in Computer Science, AI, or related field</li>
                   <li>Experience with deep learning frameworks (TensorFlow, PyTorch)</li>
@@ -86,21 +100,21 @@
                   <li>Published research in relevant conferences is a plus</li>
                 </ul>
               </div>
-              <button class="btn btn-primary" @click="applyForJob('AI/ML Engineer')">Apply Now</button>
+              <button class="btn btn-primary" @click="applyForJob('AI/ML Engineer')">{{$t('careers.positions.apply')}}</button>
             </div>
 
             <div class="position-card">
               <div class="position-header">
                 <h3>Product Designer</h3>
-                <span class="position-badge">Design</span>
+                <span class="position-badge">{{$t('careers.positions.design')}}</span>
               </div>
               <div class="position-meta">
-                <span class="position-location"><i class="fas fa-map-marker-alt"></i> Remote / London</span>
-                <span class="position-type"><i class="fas fa-clock"></i> Full-time</span>
+                <span class="position-location"><i class="fas fa-map-marker-alt"></i> {{$t('careers.positions.remote')}} / London</span>
+                <span class="position-type"><i class="fas fa-clock"></i> {{$t('careers.positions.fullTime')}}</span>
               </div>
               <p>Help us create intuitive and delightful user experiences for designers and non-designers alike. You'll lead design projects from concept to implementation.</p>
               <div class="position-requirements">
-                <h4>Requirements:</h4>
+                <h4>{{$t('careers.positions.requirements')}}</h4>
                 <ul>
                   <li>4+ years of product design experience</li>
                   <li>Strong portfolio showcasing UI/UX design work</li>
@@ -108,21 +122,21 @@
                   <li>Experience with design systems and user research</li>
                 </ul>
               </div>
-              <button class="btn btn-primary" @click="applyForJob('Product Designer')">Apply Now</button>
+              <button class="btn btn-primary" @click="applyForJob('Product Designer')">{{$t('careers.positions.apply')}}</button>
             </div>
 
             <div class="position-card">
               <div class="position-header">
                 <h3>Customer Success Manager</h3>
-                <span class="position-badge">Customer Success</span>
+                <span class="position-badge">{{$t('careers.positions.customerSuccess')}}</span>
               </div>
               <div class="position-meta">
-                <span class="position-location"><i class="fas fa-map-marker-alt"></i> Remote</span>
-                <span class="position-type"><i class="fas fa-clock"></i> Full-time</span>
+                <span class="position-location"><i class="fas fa-map-marker-alt"></i> {{$t('careers.positions.remote')}}</span>
+                <span class="position-type"><i class="fas fa-clock"></i> {{$t('careers.positions.fullTime')}}</span>
               </div>
               <p>Be the bridge between our users and our product team, ensuring customer satisfaction and success. You'll help users get the most value from our platform.</p>
               <div class="position-requirements">
-                <h4>Requirements:</h4>
+                <h4>{{$t('careers.positions.requirements')}}</h4>
                 <ul>
                   <li>3+ years in customer success or account management</li>
                   <li>Excellent communication and problem-solving skills</li>
@@ -130,21 +144,21 @@
                   <li>Passion for helping users succeed</li>
                 </ul>
               </div>
-              <button class="btn btn-primary" @click="applyForJob('Customer Success Manager')">Apply Now</button>
+              <button class="btn btn-primary" @click="applyForJob('Customer Success Manager')">{{$t('careers.positions.apply')}}</button>
             </div>
 
             <div class="position-card">
               <div class="position-header">
                 <h3>Backend Engineer</h3>
-                <span class="position-badge">Engineering</span>
+                <span class="position-badge">{{$t('careers.positions.engineering')}}</span>
               </div>
               <div class="position-meta">
-                <span class="position-location"><i class="fas fa-map-marker-alt"></i> Remote / Seattle</span>
-                <span class="position-type"><i class="fas fa-clock"></i> Full-time</span>
+                <span class="position-location"><i class="fas fa-map-marker-alt"></i> {{$t('careers.positions.remote')}} / Seattle</span>
+                <span class="position-type"><i class="fas fa-clock"></i> {{$t('careers.positions.fullTime')}}</span>
               </div>
               <p>Build robust and scalable backend systems that power our AI design platform. You'll work on APIs, databases, and cloud infrastructure.</p>
               <div class="position-requirements">
-                <h4>Requirements:</h4>
+                <h4>{{$t('careers.positions.requirements')}}</h4>
                 <ul>
                   <li>5+ years of backend development experience</li>
                   <li>Proficiency in Python, Node.js, or Go</li>
@@ -152,21 +166,21 @@
                   <li>Knowledge of microservices architecture</li>
                 </ul>
               </div>
-              <button class="btn btn-primary" @click="applyForJob('Backend Engineer')">Apply Now</button>
+              <button class="btn btn-primary" @click="applyForJob('Backend Engineer')">{{$t('careers.positions.apply')}}</button>
             </div>
 
             <div class="position-card">
               <div class="position-header">
                 <h3>Marketing Manager</h3>
-                <span class="position-badge">Marketing</span>
+                <span class="position-badge">{{$t('careers.positions.marketing')}}</span>
               </div>
               <div class="position-meta">
-                <span class="position-location"><i class="fas fa-map-marker-alt"></i> Remote / Austin</span>
-                <span class="position-type"><i class="fas fa-clock"></i> Full-time</span>
+                <span class="position-location"><i class="fas fa-map-marker-alt"></i> {{$t('careers.positions.remote')}} / Austin</span>
+                <span class="position-type"><i class="fas fa-clock"></i> {{$t('careers.positions.fullTime')}}</span>
               </div>
               <p>Drive our marketing strategy and help us reach more creators and designers worldwide. You'll lead campaigns, content, and growth initiatives.</p>
               <div class="position-requirements">
-                <h4>Requirements:</h4>
+                <h4>{{$t('careers.positions.requirements')}}</h4>
                 <ul>
                   <li>4+ years of marketing experience in tech/SaaS</li>
                   <li>Strong understanding of digital marketing channels</li>
@@ -174,7 +188,7 @@
                   <li>Experience with content marketing and SEO</li>
                 </ul>
               </div>
-              <button class="btn btn-primary" @click="applyForJob('Marketing Manager')">Apply Now</button>
+              <button class="btn btn-primary" @click="applyForJob('Marketing Manager')">{{$t('careers.positions.apply')}}</button>
             </div>
           </div>
         </div>
@@ -182,49 +196,49 @@
 
       <section class="benefits-section">
         <div class="container">
-          <h2 class="section-title text-center">Why Work With Us?</h2>
+          <h2 class="section-title text-center">{{$t('careers.benefits.title')}}</h2>
           <div class="benefits-grid">
             <div class="benefit-item">
               <div class="icon">
                 <i class="fas fa-laptop-house"></i>
               </div>
-              <h3>Remote First</h3>
-              <p>Work from anywhere in the world. We believe in flexibility and trust.</p>
+              <h3>{{$t('careers.benefits.remote.title')}}</h3>
+              <p>{{$t('careers.benefits.remote.desc')}}</p>
             </div>
             <div class="benefit-item">
               <div class="icon">
                 <i class="fas fa-heart"></i>
               </div>
-              <h3>Health & Wellness</h3>
-              <p>Comprehensive health insurance for you and your family.</p>
+              <h3>{{$t('careers.benefits.health.title')}}</h3>
+              <p>{{$t('careers.benefits.health.desc')}}</p>
             </div>
             <div class="benefit-item">
               <div class="icon">
                 <i class="fas fa-umbrella-beach"></i>
               </div>
-              <h3>Unlimited PTO</h3>
-              <p>Take time off when you need it. We value work-life balance.</p>
+              <h3>{{$t('careers.benefits.pto.title')}}</h3>
+              <p>{{$t('careers.benefits.pto.desc')}}</p>
             </div>
             <div class="benefit-item">
               <div class="icon">
                 <i class="fas fa-graduation-cap"></i>
               </div>
-              <h3>Learning Budget</h3>
-              <p>Annual budget for courses, conferences, and professional development.</p>
+              <h3>{{$t('careers.benefits.learning.title')}}</h3>
+              <p>{{$t('careers.benefits.learning.desc')}}</p>
             </div>
             <div class="benefit-item">
               <div class="icon">
                 <i class="fas fa-dollar-sign"></i>
               </div>
-              <h3>Competitive Salary</h3>
-              <p>Industry-leading compensation and equity packages.</p>
+              <h3>{{$t('careers.benefits.salary.title')}}</h3>
+              <p>{{$t('careers.benefits.salary.desc')}}</p>
             </div>
             <div class="benefit-item">
               <div class="icon">
                 <i class="fas fa-users"></i>
               </div>
-              <h3>Amazing Team</h3>
-              <p>Work with talented, passionate people from around the world.</p>
+              <h3>{{$t('careers.benefits.team.title')}}</h3>
+              <p>{{$t('careers.benefits.team.desc')}}</p>
             </div>
           </div>
         </div>
@@ -232,23 +246,23 @@
 
       <section class="culture-section">
         <div class="container">
-          <h2 class="section-title text-center">Our Culture</h2>
+          <h2 class="section-title text-center">{{$t('careers.culture.title')}}</h2>
           <div class="culture-grid">
             <div class="culture-item">
-              <h3><i class="fas fa-rocket"></i> Innovation First</h3>
-              <p>We encourage experimentation and embrace new ideas. Every team member has the freedom to innovate.</p>
+              <h3><i class="fas fa-rocket"></i> {{$t('careers.culture.innovation.title')}}</h3>
+              <p>{{$t('careers.culture.innovation.desc')}}</p>
             </div>
             <div class="culture-item">
-              <h3><i class="fas fa-handshake"></i> Collaboration</h3>
-              <p>We believe great work happens when people work together. Our culture is built on trust and transparency.</p>
+              <h3><i class="fas fa-handshake"></i> {{$t('careers.culture.collaboration.title')}}</h3>
+              <p>{{$t('careers.culture.collaboration.desc')}}</p>
             </div>
             <div class="culture-item">
-              <h3><i class="fas fa-balance-scale"></i> Work-Life Balance</h3>
-              <p>We support flexible schedules and encourage taking time off to recharge and stay healthy.</p>
+              <h3><i class="fas fa-balance-scale"></i> {{$t('careers.culture.balance.title')}}</h3>
+              <p>{{$t('careers.culture.balance.desc')}}</p>
             </div>
             <div class="culture-item">
-              <h3><i class="fas fa-globe"></i> Diversity & Inclusion</h3>
-              <p>We're committed to building a diverse team and creating an inclusive environment for everyone.</p>
+              <h3><i class="fas fa-globe"></i> {{$t('careers.culture.diversity.title')}}</h3>
+              <p>{{$t('careers.culture.diversity.desc')}}</p>
             </div>
           </div>
         </div>
@@ -256,9 +270,9 @@
 
       <section class="cta-section">
         <div class="container">
-          <h2>Don't See the Right Position?</h2>
-          <p>We're always looking for talented people. Send us your resume and let us know what you're passionate about.</p>
-          <button class="btn btn-primary" @click="contactHR">Send General Application</button>
+          <h2>{{$t('careers.cta.title')}}</h2>
+          <p>{{$t('careers.cta.description')}}</p>
+          <button class="btn btn-primary" @click="contactHR">{{$t('careers.cta.button')}}</button>
         </div>
       </section>
     </main>
@@ -270,31 +284,31 @@
             <img src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Icon paint brush.png" alt="Uigenius Logo">
             Uigenius
           </a>
-          <p>AI-powered UX/UI design tool that quickly generates prototypes for apps and websites from simple text descriptions.</p>
+          <p>{{$t('common.footer.description')}}</p>
         </div>
         <div class="footer-links">
-          <h4>Product</h4>
+          <h4>{{$t('common.footer.product')}}</h4>
           <ul>
-            <li><a @click.prevent="goToFeatures">Features</a></li>
-            <li><a @click.prevent="goToPricing">Pricing</a></li>
+            <li><a @click.prevent="goToFeatures">{{$t('common.footer.features')}}</a></li>
+            <li><a @click.prevent="goToPricing">{{$t('common.footer.pricing')}}</a></li>
           </ul>
         </div>
         <div class="footer-links">
-          <h4>Company</h4>
+          <h4>{{$t('common.footer.company')}}</h4>
           <ul>
-            <li><a @click.prevent="goToAbout">About Us</a></li>
-            <li><a @click.prevent="goToCareers">Careers</a></li>
-            <li><a @click.prevent="goToContact">Contact</a></li>
+            <li><a @click.prevent="goToAbout">{{$t('common.footer.aboutUs')}}</a></li>
+            <li><a @click.prevent="goToCareers">{{$t('common.footer.careers')}}</a></li>
+            <li><a @click.prevent="goToContact">{{$t('common.footer.contact')}}</a></li>
           </ul>
         </div>
         <div class="footer-links">
-          <h4>Connect with us</h4>
+          <h4>{{$t('common.footer.connect')}}</h4>
           <div class="social-icons">
             <a href="https://x.com/Uigenius13952" target="_blank" aria-label="Twitter"><i class="fab fa-twitter"></i></a>
           </div>
         </div>
         <div class="footer-links">
-          <h4>Customer Support</h4>
+          <h4>{{$t('common.footer.support')}}</h4>
           <div class="support-email">
             <a href="mailto:support@uigenius.top"><i class="fas fa-envelope"></i> support@uigenius.top</a>
           </div>
@@ -302,11 +316,11 @@
       </div>
       <div class="footer-bottom">
         <div class="container">
-          <p>© 2025 Uigenius. All rights reserved.</p>
+          <p>{{$t('common.footer.copyright')}}</p>
           <div class="footer-legal-links">
-            <a href="#terms">Terms of Service</a>
+            <a @click.prevent="goToTerms">{{$t('common.footer.terms')}}</a>
             <span class="separator">|</span>
-            <a href="#privacy">Privacy Policy</a>
+            <a @click.prevent="goToPrivacy">{{$t('common.footer.privacy')}}</a>
           </div>
         </div>
       </div>
@@ -323,16 +337,126 @@ export default {
   name: 'CareersPage',
   data() {
     return {
-      showScrollTop: false
+      showScrollTop: false,
+      showLanguageDropdown: false,
+      currentLocale: 'en'
     }
   },
+  watch: {
+    currentLocale() {
+      this.showLanguageDropdown = false;
+    }
+  },
+  computed: {
+    availableLanguages() {
+      return [
+        { code: 'en', name: this.$t('locale.en') },
+        { code: 'zh-Hans', name: this.$t('locale.zh-hans') },
+        { code: 'zh-Hant', name: this.$t('locale.zh-hant') },
+        { code: 'ja', name: this.$t('locale.ja') },
+        { code: 'ko', name: this.$t('locale.ko') },
+        { code: 'ru', name: this.$t('locale.ru') },
+        { code: 'es', name: this.$t('locale.es') },
+        { code: 'fr', name: this.$t('locale.fr') },
+        { code: 'de', name: this.$t('locale.de') },
+        { code: 'it', name: this.$t('locale.it') },
+        { code: 'pt', name: this.$t('locale.pt') },
+        { code: 'ar', name: this.$t('locale.ar') },
+        { code: 'hi', name: this.$t('locale.hi') },
+        { code: 'th', name: this.$t('locale.th') },
+        { code: 'vi', name: this.$t('locale.vi') },
+        { code: 'id', name: this.$t('locale.id') },
+        { code: 'nl', name: this.$t('locale.nl') },
+        { code: 'pl', name: this.$t('locale.pl') },
+        { code: 'tr', name: this.$t('locale.tr') },
+        { code: 'sv', name: this.$t('locale.sv') },
+        { code: 'da', name: this.$t('locale.da') },
+        { code: 'fi', name: this.$t('locale.fi') },
+        { code: 'no', name: this.$t('locale.no') }
+      ]
+    },
+    currentLanguageName() {
+      const lang = this.availableLanguages.find(l => l.code === this.currentLocale)
+      return lang ? lang.name : this.$t('locale.en')
+    }
+  },
+  onShow() {
+    this.loadSavedLanguage();
+  },
   mounted() {
+    this.loadSavedLanguage();
     window.addEventListener('scroll', this.handleScroll);
+    if (typeof document !== 'undefined') {
+      document.addEventListener('click', this.handleClickOutside);
+    }
   },
   beforeDestroy() {
     window.removeEventListener('scroll', this.handleScroll);
+    if (typeof document !== 'undefined') {
+      document.removeEventListener('click', this.handleClickOutside);
+    }
   },
   methods: {
+    loadSavedLanguage() {
+      try {
+        const savedLocale = uni.getStorageSync('appLocale');
+        if (savedLocale) {
+          this.currentLocale = savedLocale;
+          uni.setLocale(savedLocale);
+          if (this.$i18n) {
+            this.$i18n.locale = savedLocale;
+          }
+        } else {
+          const currentLocale = uni.getLocale();
+          if (currentLocale) {
+            this.currentLocale = currentLocale;
+          }
+        }
+      } catch (error) {
+        console.error('Error loading saved language:', error);
+      }
+    },
+    toggleLanguageDropdown(event) {
+      this.showLanguageDropdown = !this.showLanguageDropdown;
+    },
+    selectLanguage(localeCode) {
+      this.showLanguageDropdown = false;
+      if (this.currentLocale === localeCode) {
+        return;
+      }
+      setTimeout(() => {
+        this.showLanguageDropdown = false;
+      }, 0);
+      try {
+        uni.setLocale(localeCode);
+        if (this.$i18n) {
+          this.$i18n.locale = localeCode;
+        }
+        this.currentLocale = localeCode;
+        uni.setStorageSync('appLocale', localeCode);
+        this.$nextTick(() => {
+          this.showLanguageDropdown = false;
+          this.$forceUpdate();
+        });
+      } catch (error) {
+        console.error('Error setting language:', error);
+        this.showLanguageDropdown = false;
+        uni.showToast({
+          title: 'Failed to change language',
+          icon: 'none',
+          duration: 2000
+        });
+      }
+    },
+    handleClickOutside(event) {
+      if (typeof document === 'undefined') {
+        return;
+      }
+      const languageSelector = this.$el?.querySelector('.language-selector');
+      if (languageSelector && !languageSelector.contains(event.target)) {
+        this.showLanguageDropdown = false;
+      }
+    },
     handleScroll() {
       this.showScrollTop = window.scrollY > 300;
     },
@@ -367,17 +491,18 @@ export default {
       });
     },
     goToContact() {
-      // Navigate to intro page and scroll to contact section
-      // First, navigate to the page
       uni.switchTab({
         url: '/pages/intro/intro',
         success: () => {
-          // Use event bus or global method to scroll to contact section
-          // Since we can't pass parameters with switchTab, we'll use a different approach
-          // Store the target section in storage
           uni.setStorageSync('scrollToSection', 'contact');
         }
       });
+    },
+    goToTerms() {
+      uni.navigateTo({ url: '/pages/terms/terms' });
+    },
+    goToPrivacy() {
+      uni.navigateTo({ url: '/pages/privacy/privacy' });
     },
     goToLogin() {
       uni.switchTab({
@@ -541,6 +666,84 @@ ul {
 .try-free:hover {
   background-color: var(--primary-red);
   color: var(--background-white);
+}
+
+.language-selector {
+  position: relative;
+  margin-left: 15px;
+}
+
+.language-dropdown {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 8px 15px;
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  cursor: pointer;
+  transition: all 0.3s ease;
+  background-color: var(--background-white);
+  font-size: 14px;
+  color: var(--light-text);
+}
+
+.language-dropdown:hover {
+  border-color: var(--primary-red);
+  color: var(--primary-red);
+}
+
+.language-dropdown i.fa-globe {
+  font-size: 16px;
+}
+
+.language-dropdown i.fa-chevron-down {
+  font-size: 12px;
+  transition: transform 0.3s ease;
+}
+
+.language-dropdown i.fa-chevron-down.rotate {
+  transform: rotate(180deg);
+}
+
+.language-selector .language-dropdown-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 5px;
+  background-color: var(--background-white);
+  border: 1px solid var(--border-color);
+  border-radius: 5px;
+  box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+  min-width: 180px;
+  max-height: 300px;
+  overflow-y: auto;
+  overflow-x: hidden;
+  z-index: 1001;
+  list-style: none;
+  padding: 5px 0;
+  display: block !important;
+}
+
+.language-selector .language-dropdown-menu li {
+  display: block !important;
+  width: 100%;
+  padding: 10px 20px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  color: var(--dark-text);
+  font-size: 14px;
+  white-space: nowrap;
+  box-sizing: border-box;
+}
+
+.language-dropdown-menu li:hover {
+  background-color: var(--light-gray-bg);
+}
+
+.language-dropdown-menu li.active {
+  background-color: rgba(239, 68, 68, 0.1);
+  color: var(--primary-red);
+  font-weight: 500;
 }
 
 /* Hero Section */
