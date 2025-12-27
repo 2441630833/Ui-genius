@@ -33,13 +33,13 @@
         <view class="nav-item" :class="{ active: activeNavItem === 'membership' }" @click="setActiveNavItem('membership')">
           <image class="sidebar-icon"
             :src="activeNavItem === 'membership' ? '../../static/membership_white.png' : '../../static/membership.png'"></image>
-          <text class="nav-text">Membership</text>
+          <text class="nav-text">{{$t('dashboard.nav.membership')}}</text>
         </view>
         <!-- Invitecode nav item -->
         <view class="nav-item" :class="{ active: activeNavItem === 'inviteCode' }" @click="setActiveNavItem('inviteCode')">
           <image class="sidebar-icon"
             :src="activeNavItem === 'inviteCode' ? '../../static/inviteCode_white.png' : '../../static/inviteCode.png'"></image>
-          <text class="nav-text">Invite Code</text>
+          <text class="nav-text">{{$t('dashboard.nav.inviteCode')}}</text>
         </view>
         <!-- Settings nav item -->
         <!-- <view class="nav-item" :class="{ active: activeNavItem === 'settings' }" @click="setActiveNavItem('settings')">
@@ -52,13 +52,13 @@
         <view class="nav-item" :class="{ active: activeNavItem === 'guide' }" @click="startGuide()">
           <image class="sidebar-icon"
             :src="activeNavItem === 'guide' ? '../../static/guide_white.png' : '../../static/guide.png'"></image>
-          <text class="nav-text">Guide</text>
+          <text class="nav-text">{{$t('dashboard.nav.guide')}}</text>
         </view>
         <!-- Delete Projects nav item -->
         <view class="nav-item" :class="{ active: activeNavItem === 'delete' }" @click="setActiveNavItem('delete')">
           <image class="sidebar-icon delete-icon"
             :src="activeNavItem === 'delete' ? '../../static/delete_white.png' : '../../static/delete.png'"></image>
-          <text class="nav-text">Delete Projects</text>
+          <text class="nav-text">{{$t('dashboard.nav.deleteProjects')}}</text>
         </view>
         <!-- Newly added Share nav item -->
         <!-- <view class="nav-item" :class="{ active: activeNavItem === 'share' }" @click="setActiveNavItem('share')">
@@ -164,61 +164,61 @@
 
           <view class="form-row">
             <view class="form-group">
-              <text class="form-label">First name</text>
-              <input class="form-input" type="text" v-model="accountSettings.firstName" placeholder="First name" />
+              <text class="form-label">{{$t('dashboard.account.profile.firstName')}}</text>
+              <input class="form-input" type="text" v-model="accountSettings.firstName" :placeholder="$t('dashboard.account.profile.firstName')" />
             </view>
 
             <view class="form-group">
-              <text class="form-label">Last name</text>
-              <input class="form-input" type="text" v-model="accountSettings.lastName" placeholder="Last name" />
+              <text class="form-label">{{$t('dashboard.account.profile.lastName')}}</text>
+              <input class="form-input" type="text" v-model="accountSettings.lastName" :placeholder="$t('dashboard.account.profile.lastName')" />
             </view>
           </view>
 
           <view class="form-group">
-            <text class="form-label">Profile photo</text>
+            <text class="form-label">{{$t('dashboard.account.profile.photo')}}</text>
             <view class="profile-photo-container">
               <view class="profile-photo" @click="chooseProfilePhoto">
                 <image v-if="accountSettings.photoUrl" class="profile-photo-image" :src="accountSettings.photoUrl"></image>
                 <image v-else class="upload-icon" src="../../static/account.png"></image>
               </view>
-              <text class="photo-hint">Click to upload a photo</text>
+              <text class="photo-hint">{{$t('dashboard.account.profile.photoHint')}}</text>
             </view>
           </view>
 
-          <button class="save-btn" @click="saveProfileChanges">Save changes</button>
+          <button class="save-btn" @click="saveProfileChanges">{{$t('dashboard.account.profile.saveChanges')}}</button>
         </view>
 
         <!-- Email Section -->
         <view class="settings-section">
-          <text class="section-title">Email</text>
-          <text class="section-description">You can change your email below</text>
+          <text class="section-title">{{$t('dashboard.account.email.title')}}</text>
+          <text class="section-description">{{$t('dashboard.account.email.description')}}</text>
 
           <view class="form-group">
-            <text class="form-label">Current email address</text>
+            <text class="form-label">{{$t('dashboard.account.email.current')}}</text>
             <text class="current-email">{{ currentEmail }}</text>
           </view>
 
           <view class="form-group">
-            <text class="form-label">New email address</text>
-            <input class="form-input" type="email" v-model="accountSettings.email" placeholder="New email address" />
+            <text class="form-label">{{$t('dashboard.account.email.new')}}</text>
+            <input class="form-input" type="email" v-model="accountSettings.email" :placeholder="$t('dashboard.account.email.new')" />
           </view>
 
-          <button class="save-btn" @click="changeEmail">Change email</button>
+          <button class="save-btn" @click="changeEmail">{{$t('dashboard.account.email.change')}}</button>
         </view>
 
         <!-- Password Section -->
         <view class="settings-section">
-          <text class="section-title">Password</text>
-          <text class="section-description">You can change your password below</text>
+          <text class="section-title">{{$t('dashboard.account.password.title')}}</text>
+          <text class="section-description">{{$t('dashboard.account.password.description')}}</text>
 
           <view class="form-group">
-            <text class="form-label">New password</text>
+            <text class="form-label">{{$t('dashboard.account.password.new')}}</text>
             <input class="form-input" type="password" v-model="accountSettings.newPassword"
-              placeholder="New password" />
+              :placeholder="$t('dashboard.account.password.new')" />
           </view>
 
           <view class="form-group">
-            <text class="form-label">Repeat new password</text>
+            <text class="form-label">{{$t('dashboard.account.password.repeat')}}</text>
             <input class="form-input" type="password" v-model="accountSettings.confirmPassword"
               placeholder="********" />
           </view>
@@ -227,62 +227,62 @@
             <view class="strength-bar">
               <view class="strength-indicator" :style="{ width: passwordStrength + '%' }"></view>
             </view>
-            <text class="strength-text">Password is {{ passwordStrengthText }}</text>
+            <text class="strength-text">{{$t('dashboard.account.password.strengthLabel')}} {{ passwordStrengthText }}</text>
           </view>
 
-          <button class="save-btn" @click="changePassword">Change password</button>
+          <button class="save-btn" @click="changePassword">{{$t('dashboard.account.password.change')}}</button>
         </view>
 
         <view class="settings-section">
-          <text class="section-title">Change Account</text>
-          <text class="section-description">You can change your account below</text>
-          <button class="logout-btn" @click="changeAccount">Change Account</button>
+          <text class="section-title">{{$t('dashboard.account.changeAccount.title')}}</text>
+          <text class="section-description">{{$t('dashboard.account.changeAccount.description')}}</text>
+          <button class="logout-btn" @click="changeAccount">{{$t('dashboard.account.changeAccount.button')}}</button>
         </view>
         <!-- Logout Section -->
         <view class="settings-section">
-          <text class="section-title">Logout</text>
-          <text class="section-description">You can logout from your account below</text>
-          <button class="logout-btn" @click="logout">Logout</button>
+          <text class="section-title">{{$t('dashboard.account.logout.title')}}</text>
+          <text class="section-description">{{$t('dashboard.account.logout.description')}}</text>
+          <button class="logout-btn" @click="logout">{{$t('dashboard.account.logout.button')}}</button>
         </view>
       </view>
 
       <!-- Settings Content (placeholder for future implementation) -->
       <view v-if="activeNavItem === 'settings'" class="settings-content">
         <view class="header">
-          <text class="title">Settings</text>
+          <text class="title">{{$t('dashboard.settings.title')}}</text>
         </view>
-        <text>Settings page content will be implemented here.</text>
+        <text>{{$t('dashboard.settings.placeholder')}}</text>
       </view>
 
       <!-- Delete Projects Content -->
       <view v-if="activeNavItem === 'delete'" class="settings-content">
         <view class="header">
-          <text class="title">Delete Projects</text>
+          <text class="title">{{$t('dashboard.delete.title')}}</text>
           <view class="header-actions" v-if="userProjects && userProjects.length > 0">
             <button class="select-all-btn" @click="toggleSelectAll">
-              {{ selectedProjects.length === userProjects.length ? 'Deselect All' : 'Select All' }}
+              {{ selectedProjects.length === userProjects.length ? $t('dashboard.delete.deselectAll') : $t('dashboard.delete.selectAll') }}
             </button>
             <button 
               class="delete-selected-btn" 
               :disabled="selectedProjects.length === 0"
               @click="confirmDeleteSelectedProjects"
             >
-              Delete Selected ({{ selectedProjects.length }})
+              {{$t('dashboard.delete.deleteSelected')}} ({{ selectedProjects.length }})
             </button>
           </view>
         </view>
         <view class="settings-section">
-          <text class="section-title">Manage Your Projects</text>
-          <text class="section-description">Select projects below to delete them permanently. This action cannot be undone.</text>
+          <text class="section-title">{{$t('dashboard.delete.sectionTitle')}}</text>
+          <text class="section-description">{{$t('dashboard.delete.sectionDescription')}}</text>
 
           <!-- Loading state -->
           <view v-if="deleteProjectsLoading" class="loading-container">
-            <text class="loading-text">Loading projects...</text>
+            <text class="loading-text">{{$t('dashboard.delete.loading')}}</text>
           </view>
 
           <!-- No projects state -->
           <view v-else-if="!userProjects || userProjects.length === 0" class="no-projects-container">
-            <text class="no-projects-text">No projects found</text>
+            <text class="no-projects-text">{{$t('dashboard.delete.noProjects')}}</text>
           </view>
 
           <!-- Projects list -->
@@ -303,7 +303,7 @@
                 <text class="project-name">{{ project.projectTitle }}</text>
                 <text class="project-desc">{{ project.projectDescription }}</text>
               </view>
-              <button class="delete-project-btn" @click.stop="confirmDeleteProject(project)">Delete</button>
+              <button class="delete-project-btn" @click.stop="confirmDeleteProject(project)">{{$t('dashboard.delete.deleteBtn')}}</button>
             </view>
           </view>
         </view>
@@ -312,11 +312,11 @@
       <!-- Share Content (Import HTML in main area) -->
       <view v-if="activeNavItem === 'share'" class="settings-content">
         <view class="header">
-          <text class="title">Share</text>
+          <text class="title">{{$t('dashboard.share.title')}}</text>
         </view>
         <view class="settings-section">
-          <text class="section-title">Import HTML Files</text>
-          <text class="section-description">Select one or more HTML files to add as pages to your current project.</text>
+          <text class="section-title">{{$t('dashboard.share.sectionTitle')}}</text>
+          <text class="section-description">{{$t('dashboard.share.sectionDescription')}}</text>
 
           <!-- Replaced basic input with design page's HTML file picker -->
           <view class="file-upload-container">
@@ -329,11 +329,11 @@
                   </view>
                   <view class="upload-arrow">↑</view>
                 </view>
-                <text class="upload-text">Click to select HTML file(s)</text>
-                <text class="upload-hint">Allowed: .html</text>
+                <text class="upload-text">{{$t('dashboard.share.uploadText')}}</text>
+                <text class="upload-hint">{{$t('dashboard.share.uploadHint')}}</text>
               </view>
               <view v-if="htmlFiles && htmlFiles.length" class="html-file-info">
-                <text class="file-info-text">{{ htmlFiles.length }} HTML file(s) loaded:</text>
+                <text class="file-info-text">{{ htmlFiles.length }} {{$t('dashboard.share.filesLoaded')}}</text>
                 <view v-for="(f, i) in htmlFiles" :key="i" class="file-list-item">
                   <view class="file-list-item-header">
                     <text class="file-info-text">- {{ f.name }}</text>
@@ -362,12 +362,12 @@
     <view class="dialog-overlay" v-if="showDeleteDialog" @click="closeDeleteDialog">
       <view class="dialog-container delete-dialog" @click.stop>
         <view class="dialog-content">
-          <text class="dialog-title">Confirm Delete</text>
+          <text class="dialog-title">{{$t('dashboard.delete.confirmTitle')}}</text>
           <text class="delete-warning" v-if="!isMultipleDelete">
-            Are you sure you want to delete this project? This action cannot be undone.
+            {{$t('dashboard.delete.confirmSingle')}}
           </text>
           <text class="delete-warning" v-else>
-            Are you sure you want to delete {{ projectsToDelete.length }} project(s)? This action cannot be undone.
+            {{$t('dashboard.delete.confirmMultiple').replace('{count}', projectsToDelete.length)}}
           </text>
           
           <!-- Single project delete -->
@@ -389,9 +389,9 @@
           </view>
           
           <view class="delete-dialog-actions">
-            <button class="cancel-btn" @click="closeDeleteDialog">Cancel</button>
+            <button class="cancel-btn" @click="closeDeleteDialog">{{$t('dashboard.delete.cancel')}}</button>
             <button class="confirm-delete-btn" @click="deleteProjects" :disabled="isDeletingProject">
-              {{ isDeletingProject ? 'Deleting...' : 'Delete' }}
+              {{ isDeletingProject ? $t('dashboard.delete.deleting') : $t('dashboard.delete.deleteBtn') }}
             </button>
           </view>
         </view>
@@ -402,7 +402,7 @@
     <view class="dialog-overlay" v-if="showCreateProjectDialog" @click="closeCreateProjectDialog">
       <view class="dialog-container" @click.stop>
         <view class="dialog-content">
-          <text class="dialog-title">Which device are you designing for?</text>
+          <text class="dialog-title">{{$t('dashboard.createProject.title')}}</text>
 
           <!-- Error notification -->
           <view class="error-notification" v-if="errorMessage">
@@ -413,19 +413,19 @@
             <view class="device-option" :class="{ 'selected': selectedDevice === 'mobile' }"
               @click="selectDevice('mobile')">
               <image class="device-icon" src="../../static/mobile.png"></image>
-              <text>Mobile</text>
+              <text>{{$t('dashboard.createProject.mobile')}}</text>
             </view>
 
             <view class="device-option" :class="{ 'selected': selectedDevice === 'desktop' }"
               @click="selectDevice('desktop')">
               <image class="device-icon" src="../../static/desktop.png"></image>
-              <text>Desktop</text>
+              <text>{{$t('dashboard.createProject.desktop')}}</text>
             </view>
           </view>
 
           <!-- Model Selection -->
           <view class="model-selection-container">
-            <text class="model-selection-label">Select AI Model</text>
+            <text class="model-selection-label">{{$t('dashboard.createProject.selectModel')}}</text>
             <view class="model-selector">
               <view class="custom-dropdown" @click="toggleModelDropdown">
                 <view class="dropdown-display">
@@ -453,12 +453,12 @@
           
           <div class="description-container-overall">
           <view class="try-example-container">
-            <text class="description-label">Describe your project in plain English</text>
-            <button class="try-example-btn" @click="tryExample">Try example</button>
-            <button class="try-example-btn" :disabled="!projectDescription || isOptimizingPrompt" @click="optimizeProjectDescription">{{ isOptimizingPrompt ? 'Optimizing...' : 'Improve with AI' }}</button>
+            <text class="description-label">{{$t('dashboard.createProject.describeLabel')}}</text>
+            <button class="try-example-btn" @click="tryExample">{{$t('dashboard.createProject.tryExample')}}</button>
+            <button class="try-example-btn" :disabled="!projectDescription || isOptimizingPrompt" @click="optimizeProjectDescription">{{ isOptimizingPrompt ? $t('dashboard.createProject.optimizing') : $t('dashboard.createProject.improveWithAI') }}</button>
           </view>
           <view class="description-container">
-            <textarea class="project-description-input" placeholder="Enter your project description"
+            <textarea class="project-description-input" :placeholder="$t('dashboard.createProject.placeholder')"
               v-model="projectDescription" maxlength="7000"></textarea>
             <text class="char-count">{{ projectDescription.length }}/7000</text>
           </view>
@@ -471,7 +471,7 @@
               :value="numPages" @change="onNumPagesChange" />
           </view> -->
 
-          <button class="continue-btn" @click="createProject">Continue</button>
+          <button class="continue-btn" @click="createProject">{{$t('dashboard.createProject.continue')}}</button>
         </view>
       </view>
     </view>
@@ -584,38 +584,6 @@ export default {
       // Longze Guide
       guideTheme: 'dark',
       prevGuideStepIndex: -1,
-      guideSteps: [
-        {
-          target: '.create-project-btn',
-          title: 'First Step',
-          content: 'This is the first step of the guide - click here to create a new project',
-          position: 'bottom'
-        },
-        {
-          target: '.device-options',
-          title: 'Second Step',
-          content: 'This is the second step of the guide - select the device type you are designing for',
-          position: 'right'
-        },
-        {
-          target: '.model-selection-container',
-          title: 'Third Step',
-          content: 'This is the third step of the guide - select the AI model you want to use',
-          position: 'right'
-        },
-        {
-          target: '.description-container-overall',
-          title: 'Fourth Step',
-          content: 'This is the fourth step of the guide - enter your project description',
-          position: 'right'
-        },
-        {
-          target: '.continue-btn',
-          title: 'Final Step',
-          content: 'This is the final step of the guide - click the continue button to start generating your project',
-          position: 'right'
-        }
-      ],
       // Import / Share state
       isImporting: false,
       importProgress: 0,
@@ -632,6 +600,42 @@ export default {
       isMultipleDelete: false, // Flag for multiple delete
       projectsToDelete: [], // Array of projects to delete
       currentUserId: uni.getStorageSync('uid'), // Track current user ID to detect account changes
+    }
+  },
+  computed: {
+    guideSteps() {
+      return [
+        {
+          target: '.create-project-btn',
+          title: this.$t('dashboard.guide.step1.title'),
+          content: this.$t('dashboard.guide.step1.content'),
+          position: 'bottom'
+        },
+        {
+          target: '.device-options',
+          title: this.$t('dashboard.guide.step2.title'),
+          content: this.$t('dashboard.guide.step2.content'),
+          position: 'right'
+        },
+        {
+          target: '.model-selection-container',
+          title: this.$t('dashboard.guide.step3.title'),
+          content: this.$t('dashboard.guide.step3.content'),
+          position: 'right'
+        },
+        {
+          target: '.description-container-overall',
+          title: this.$t('dashboard.guide.step4.title'),
+          content: this.$t('dashboard.guide.step4.content'),
+          position: 'right'
+        },
+        {
+          target: '.continue-btn',
+          title: this.$t('dashboard.guide.step5.title'),
+          content: this.$t('dashboard.guide.step5.content'),
+          position: 'right'
+        }
+      ];
     }
   },
   watch: {
@@ -665,6 +669,9 @@ export default {
 
   },
   mounted() {
+    // Load saved language preference
+    this.loadSavedLanguage();
+    
     // Staggered loading for projects
     setTimeout(() => {
       this.projectLoadingStates.alpha = false;
@@ -693,6 +700,27 @@ export default {
     document.removeEventListener('click', this.handleClickOutside);
   },
   methods: {
+    // Load saved language preference from storage
+    loadSavedLanguage() {
+      try {
+        const savedLocale = uni.getStorageSync('appLocale');
+        if (savedLocale) {
+          uni.setLocale(savedLocale);
+          // Also update i18n locale if available
+          if (this.$i18n) {
+            this.$i18n.locale = savedLocale;
+          }
+          console.log('Dashboard: Loaded saved locale:', savedLocale);
+        } else {
+          // Get current locale from uni-app
+          const currentLocale = uni.getLocale();
+          console.log('Dashboard: Using current locale:', currentLocale);
+        }
+      } catch (error) {
+        console.error('Dashboard: Error loading saved language:', error);
+      }
+    },
+    
     checkAndStartGuide() {
       const hasGuideShown = uni.getStorageSync('hasUserGuideShown'); // 或 localStorage.getItem('hasUserGuideShown')
       if (!hasGuideShown) {
@@ -1787,7 +1815,7 @@ export default {
     
     getSelectedModelText() {
       const selectedOption = this.modelOptions.find(option => option.value === this.selectedModel);
-      return selectedOption ? selectedOption.text : 'please select your AI model';
+      return selectedOption ? selectedOption.text : this.$t('dashboard.createProject.selectModelPlaceholder');
     },
     
     handleClickOutside(event) {
@@ -1809,11 +1837,11 @@ export default {
     },
 
     onGuideComplete() {
-      this.showCustomToast('Finish Guide！', 'success');
+      this.showCustomToast(this.$t('dashboard.guide.complete'), 'success');
     },
 
     onGuideSkip() {
-      this.showCustomToast('Already Skip Guide', 'none');
+      this.showCustomToast(this.$t('dashboard.guide.skip'), 'none');
     },
     onGuideStepChange(index) {
       const previousIndex = this.prevGuideStepIndex;

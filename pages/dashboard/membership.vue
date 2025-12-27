@@ -2,8 +2,8 @@
   <div class="container">
     <header class="header">
       <div class="container">
-        <h1 class="header__title">Choose Your Plan</h1>
-        <p class="header__subtitle">Unlock unlimited features and supercharge your workflow with our flexible pricing options.</p>
+        <h1 class="header__title">{{$t('dashboard.membership.title')}}</h1>
+        <p class="header__subtitle">{{$t('dashboard.membership.subtitle')}}</p>
       </div>
     </header>
 
@@ -12,64 +12,58 @@
         <!-- PRO Card -->
         <div class="pricing-card">
           <div>
-            <h2 class="pricing-card__label" style="color: rgb(229, 57, 53);">PRO</h2>
-            <p class="pricing-card__price">$12 <span>/ Month</span></p>
+            <h2 class="pricing-card__label" style="color: rgb(229, 57, 53);">{{$t('dashboard.membership.pro')}}</h2>
+            <p class="pricing-card__price">{{$t('dashboard.membership.proPrice')}} <span>{{$t('dashboard.membership.perMonth')}}</span></p>
             <ul class="pricing-card__features">
-              <li>Unlimited UI generation request</li>
-              <li>Unlimited screenshot conversion</li>
-              <li>Pro AI model</li>
-              <li>Unlimited storage</li>
-              <li>Priority support</li>
+              <li>{{$t('dashboard.membership.proFeature1')}}</li>
+              <li>{{$t('dashboard.membership.proFeature2')}}</li>
+              <li>{{$t('dashboard.membership.proFeature3')}}</li>
+              <li>{{$t('dashboard.membership.proFeature4')}}</li>
+              <li>{{$t('dashboard.membership.proFeature5')}}</li>
             </ul>
           </div>
-          <button class="btn btn--primary" @click="handleProPayment('prod_23PrXe2PUsElWYj1C7cKqf')" style="background-color: rgb(229, 57, 53);">Buy PRO</button>
+          <button class="btn btn--primary" @click="handleProPayment('prod_23PrXe2PUsElWYj1C7cKqf')" style="background-color: rgb(229, 57, 53);">{{$t('dashboard.membership.buyPro')}}</button>
         </div>
 
         <!-- Lifetime Deals Card (Highlighted "Best Value") -->
         <div class="pricing-card pricing-card--best-value">
           <div>
-            <h2 class="pricing-card__label" style="color: rgb(229, 57, 53);">Lifetime Deals</h2>
-            <p class="pricing-card__price">$79 <span>/ Lifetime</span></p>
+            <h2 class="pricing-card__label" style="color: rgb(229, 57, 53);">{{$t('dashboard.membership.lifetime')}}</h2>
+            <p class="pricing-card__price">{{$t('dashboard.membership.lifetimePrice')}} <span>{{$t('dashboard.membership.perLifetime')}}</span></p>
             <ul class="pricing-card__features">
-              <li>Unlimited UI generation request</li>
-              <li>Unlimited screenshot conversion</li>
-              <li>Unlimited prompt limitation</li>
-              <li>Pro AI model</li>
-              <li>Unlimited storage</li>
-              <li>Priority support</li>
-              <li><strong>Dedicated account manager</strong></li>
+              <li>{{$t('dashboard.membership.lifetimeFeature1')}}</li>
+              <li>{{$t('dashboard.membership.lifetimeFeature2')}}</li>
+              <li>{{$t('dashboard.membership.lifetimeFeature3')}}</li>
+              <li>{{$t('dashboard.membership.lifetimeFeature4')}}</li>
+              <li>{{$t('dashboard.membership.lifetimeFeature5')}}</li>
+              <li>{{$t('dashboard.membership.lifetimeFeature6')}}</li>
+              <li><strong>{{$t('dashboard.membership.lifetimeFeature7')}}</strong></li>
             </ul>
           </div>
-          <button class="btn btn--primary" @click="handleLifetimePayment('prod_7m7FLqGesIUZD6MstjzOLR')" style="background-color: rgb(229, 57, 53);">Buy Lifetime Deals</button>
+          <button class="btn btn--primary" @click="handleLifetimePayment('prod_7m7FLqGesIUZD6MstjzOLR')" style="background-color: rgb(229, 57, 53);">{{$t('dashboard.membership.buyLifetime')}}</button>
         </div>
       </div>
     </main>
-
-    <!-- <footer class="footer">
-      <div class="container">
-        &copy; 2023 Your Company. All rights reserved.
-      </div>
-    </footer> -->
 
     <!-- Contact Sales Modal -->
     <div id="contactModal" class="modal" :class="{ 'is-open': isModalOpen }" role="dialog" aria-modal="true" aria-labelledby="modalTitle" @click.self="closeModal">
       <div class="modal-content">
         <button type="button" class="modal-close" aria-label="Close contact form" @click="closeModal">×</button>
-        <h3 id="modalTitle">Contact Our Sales Team</h3>
+        <h3 id="modalTitle">{{$t('dashboard.membership.contactSales')}}</h3>
         <form class="modal-form" @submit.prevent="submitForm">
           <div class="form-group">
-            <label for="name">Name:</label>
+            <label for="name">{{$t('dashboard.membership.name')}}:</label>
             <input type="text" id="name" name="name" required="" aria-required="true">
           </div>
           <div class="form-group">
-            <label for="email">Email:</label>
+            <label for="email">{{$t('dashboard.membership.email')}}:</label>
             <input type="email" id="email" name="email" required="" aria-required="true">
           </div>
           <div class="form-group">
-            <label for="message">Message:</label>
+            <label for="message">{{$t('dashboard.membership.message')}}:</label>
             <textarea id="message" name="message" rows="5" required="" aria-required="true"></textarea>
           </div>
-          <button type="submit" class="btn btn--primary">Send Message</button>
+          <button type="submit" class="btn btn--primary">{{$t('dashboard.membership.sendMessage')}}</button>
         </form>
       </div>
     </div>
@@ -113,7 +107,7 @@ export default {
     async checkMembershipBeforePayment(productId) {
       try {
         uni.showLoading({
-          title: 'Checking membership...'
+          title: this.$t('dashboard.membership.checkingMembership')
         });
 
         // Get user ID from storage
@@ -121,7 +115,7 @@ export default {
         if (!uid) {
           uni.hideLoading();
           uni.showToast({
-            title: 'User ID not found',
+            title: this.$t('dashboard.membership.userIdNotFound'),
             icon: 'none',
             duration: 2000
           });
@@ -151,7 +145,7 @@ export default {
           // Check if user already has membership
           if (membershipData.hasMembership) {
             uni.showToast({
-              title: 'You already have an active membership,don\'t need to buy again~',
+              title: this.$t('dashboard.membership.alreadyHasMembership'),
               icon: 'none',
               duration: 2000
             });
@@ -162,7 +156,7 @@ export default {
           this.redirectToPayment(productId);
         } else {
           uni.showToast({
-            title: result.result?.message || 'Failed to check membership',
+            title: result.result?.message || this.$t('dashboard.membership.checkFailed'),
             icon: 'none',
             duration: 2000
           });
@@ -170,7 +164,7 @@ export default {
       } catch (error) {
         uni.hideLoading();
         uni.showToast({
-          title: 'Error checking membership',
+          title: this.$t('dashboard.membership.checkError'),
           icon: 'none',
           duration: 2000
         });

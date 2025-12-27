@@ -2,38 +2,38 @@
     <div class="container">
       <meta charset="UTF-8">
       <meta name="viewport" content="width=device-width, initial-scale=1.0">
-      <title>Invite &amp; Earn - Get Free Membership!</title>
+      <title>{{$t('dashboard.inviteCode.title')}}</title>
   
       <main>
           <!-- Hero Section -->
           <section class="hero-section">
-              <h1>Unlock Exclusive Rewards: Invite Friends, Get Free Membership!</h1>
-              <p>Share the benefits of our platform with your network and earn free monthly or even lifetime access.</p>
+              <h1>{{$t('dashboard.inviteCode.heroTitle')}}</h1>
+              <p>{{$t('dashboard.inviteCode.heroSubtitle')}}</p>
   
               <div class="offer-cards-container">
                   <div class="offer-card">
-                      <h3>Invite 1 Friend</h3>
-                      <p>Get 1 Month FREE PRO Membership</p>
+                      <h3>{{$t('dashboard.inviteCode.invite1Friend')}}</h3>
+                      <p>{{$t('dashboard.inviteCode.get1Month')}}</p>
                   </div>
                   <div class="offer-card">
-                      <h3>Invite 4 Friends</h3>
-                      <p>Get Lifetime Membership Access</p>
+                      <h3>{{$t('dashboard.inviteCode.invite4Friends')}}</h3>
+                      <p>{{$t('dashboard.inviteCode.getLifetime')}}</p>
                   </div>
               </div>
   
-              <button type="button" class="btn btn-primary hero-cta" @click="startInviting">Start Inviting Now</button>
+              <button type="button" class="btn btn-primary hero-cta" @click="startInviting">{{$t('dashboard.inviteCode.startInviting')}}</button>
           </section>
           
           <!-- Received an Invitation? Section -->
           <section class="received-invite-section">
-              <h2>Got an Invite Code?</h2>
-              <p>Enter the special code you received from a friend to claim your exclusive joining offer.</p>
+              <h2>{{$t('dashboard.inviteCode.gotCode')}}</h2>
+              <p>{{$t('dashboard.inviteCode.enterCode')}}</p>
   
               <div class="invite-code-form">
                   <div class="input-group">
-                      <input type="text" id="invitationCode" class="input-field" placeholder="e.g., jbi8lT7cdFgIklEP" aria-label="Invitation Code"
+                      <input type="text" id="invitationCode" class="input-field" :placeholder="$t('dashboard.inviteCode.placeholder')" aria-label="Invitation Code"
                              v-model="invitationCode" :class="{ error: isCodeValid === false, success: isCodeValid === true }">
-                      <button type="button" class="btn btn-secondary" id="applyCodeBtn" @click="applyInvitationCode">Apply Code</button>
+                      <button type="button" class="btn btn-secondary" id="applyCodeBtn" @click="applyInvitationCode">{{$t('dashboard.inviteCode.applyCode')}}</button>
                   </div>
                   <div id="validationMessage" class="form-message" :class="{ show: showValidationMessage, success: isCodeValid === true, error: isCodeValid === false }" role="alert" aria-live="assertive">{{ validationMessage }}</div>
               </div>
@@ -65,7 +65,7 @@ export default {
         console.log('userData', userData);
         
         if (!userData) {
-          this.showErrorMessage('User information not found, please login first');
+          this.showErrorMessage(this.$t('dashboard.inviteCode.userNotFound'));
           return;
         }
 
@@ -81,7 +81,7 @@ export default {
         
       } catch (error) {
         console.error('Failed to generate invite code:', error);
-        this.showErrorMessage('Failed to generate invite code, please try again');
+        this.showErrorMessage(this.$t('dashboard.inviteCode.generateFailed'));
       }
     },
 
@@ -160,7 +160,7 @@ export default {
           this.showCopySuccess();
         },
         fail: () => {
-          this.showErrorMessage('Copy failed, please copy manually');
+          this.showErrorMessage(this.$t('dashboard.inviteCode.copyFailed'));
         }
       });
       // #endif
@@ -172,7 +172,7 @@ export default {
           this.showCopySuccess();
         },
         fail: () => {
-          this.showErrorMessage('Copy failed, please copy manually');
+          this.showErrorMessage(this.$t('dashboard.inviteCode.copyFailed'));
         }
       });
       // #endif
@@ -193,7 +193,7 @@ export default {
         document.execCommand('copy');
         this.showCopySuccess();
       } catch (err) {
-        this.showErrorMessage('Copy failed, please copy manually');
+        this.showErrorMessage(this.$t('dashboard.inviteCode.copyFailed'));
       }
       
       document.body.removeChild(textArea);
@@ -201,7 +201,7 @@ export default {
 
     // Show copy success message
     showCopySuccess() {
-      this.copySuccessMessage = 'Invite code has been copied to clipboard!';
+      this.copySuccessMessage = this.$t('dashboard.inviteCode.codeCopied');
       uni.showToast({
         title: this.copySuccessMessage,
         icon: 'success',
@@ -233,7 +233,7 @@ export default {
       // Simulate real invite code validation logic
       if (!this.invitationCode || this.invitationCode.trim() === '') {
         this.isCodeValid = false;
-        this.validationMessage = 'Please enter an invitation code.';
+        this.validationMessage = this.$t('dashboard.inviteCode.enterCodeError');
         this.showValidationMessage = true;
         setTimeout(() => {
           this.showValidationMessage = false;
@@ -251,7 +251,7 @@ export default {
         // Get current user ID
         const currentUserId = uni.getStorageSync('uid');
         if (!currentUserId) {
-          this.showErrorMessage('User information not found, please login first');
+          this.showErrorMessage(this.$t('dashboard.inviteCode.userNotFound'));
           return;
         }
 
@@ -261,7 +261,7 @@ export default {
       } catch (error) {
         console.error('Failed to convert invite code:', error);
         this.isCodeValid = false;
-        this.validationMessage = 'Invalid invitation code format. Please check and try again.';
+        this.validationMessage = this.$t('dashboard.inviteCode.invalidFormat');
         this.showValidationMessage = true;
         setTimeout(() => {
           this.showValidationMessage = false;
@@ -289,11 +289,11 @@ export default {
           this.isCodeValid = true;
           const data = result.result.data;
           
-          let successMessage = 'Invitation code applied successfully! You have received 1 month of free Pro membership!';
+          let successMessage = this.$t('dashboard.inviteCode.applySuccess');
           if (data.membershipBenefit === '1_month_pro') {
-            successMessage += ' The inviter has also received 1 month of free Pro membership!';
+            successMessage += ' ' + this.$t('dashboard.inviteCode.inviterGot1Month');
           } else if (data.membershipBenefit === 'lifetime') {
-            successMessage += ' The inviter has received lifetime membership!';
+            successMessage += ' ' + this.$t('dashboard.inviteCode.inviterGotLifetime');
           }
           
           this.validationMessage = successMessage;
@@ -301,7 +301,7 @@ export default {
           
           // Show success toast
           uni.showToast({
-            title: 'Invitation code applied successfully! You got 1 month Pro membership!',
+            title: this.$t('dashboard.inviteCode.applySuccess'),
             icon: 'success',
             duration: 4000
           });
@@ -313,12 +313,12 @@ export default {
           }, 5000);
         } else {
           this.isCodeValid = false;
-          this.validationMessage = result.result.message || 'Invalid invitation code.';
+          this.validationMessage = result.result.message || this.$t('dashboard.inviteCode.invalidCode');
           this.showValidationMessage = true;
           
           // Show error toast
           uni.showToast({
-            title: result.result.message || 'Invalid invitation code',
+            title: result.result.message || this.$t('dashboard.inviteCode.invalidCode'),
             icon: 'error',
             duration: 3000
           });
@@ -332,12 +332,12 @@ export default {
       } catch (error) {
         console.error('Failed to validate invitation code:', error);
         this.isCodeValid = false;
-        this.validationMessage = 'Unable to verify invitation code. Please try again later.';
+        this.validationMessage = this.$t('dashboard.inviteCode.verifyFailed');
         this.showValidationMessage = true;
         
         // Show error toast
         uni.showToast({
-          title: 'Network error, please try again',
+          title: this.$t('dashboard.inviteCode.networkError'),
           icon: 'error',
           duration: 3000
         });
@@ -349,47 +349,6 @@ export default {
         }, 3000);
       }
     },
-    
-    // async simulateApiCall(code) {
-    //   // Simulate network delay
-    //   await new Promise(resolve => setTimeout(resolve, 1000));
-      
-    //   // Simulate some real validation logic
-    //   // 1. Check invite code format
-    //   if (!/^[A-Z0-9]{8,20}$/i.test(code)) {
-    //     return false;
-    //   }
-      
-    //   // 2. Simulate checking if invite code has been used
-    //   const usedCodes = ['USED123456', 'EXPIRED789'];
-    //   if (usedCodes.includes(code.toUpperCase())) {
-    //     return false;
-    //   }
-      
-    //   // 3. Simulate checking if invite code is expired
-    //   // Can add timestamp checking logic here
-      
-    //   // 4. Simulate valid invite codes
-    //   const validCodes = ['FRIEND2024', 'WELCOME123', 'INVITE456'];
-    //   return validCodes.includes(code.toUpperCase());
-    // },
-    
-    // onInvitationCodeSuccess(code) {
-    //   // Processing logic after successful invite code validation
-    //   console.log(`Invitation code ${code} applied successfully`);
-      
-    //   // Can do here:
-    //   // 1. Update user status
-    //   // 2. Show special offers
-    //   // 3. Record invitation relationship
-    //   // 4. Send welcome email, etc.
-      
-    //   // For example: show special offer popup
-    //   // this.showSpecialOffer = true;
-      
-    //   // Or: update user membership status
-    //   // this.userMembershipStatus = 'premium';
-    // }
   }
 };
 </script>
