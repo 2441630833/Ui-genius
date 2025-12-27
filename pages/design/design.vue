@@ -209,8 +209,8 @@
 
       <!-- Templates Grid -->
       <view class="section">
-        <text class="section-title">Project Prototypes <span class="template-count">({{ jsonTemplates.length }}
-            pages)</span></text>
+        <text class="section-title">{{$t('design.sectionTitle')}} <span class="template-count">({{ jsonTemplates.length }}
+            {{$t('design.pagesLabel')}})</span></text>
         <view class="templates-grid-container">
           <view class="templates-grid">
             <!-- Dynamic Templates from JSON -->
@@ -335,7 +335,7 @@
     <view class="dialog-overlay" v-if="showCreatePageDialog" @click="closeCreatePageDialog">
       <view class="dialog-container create-page-dialog" @click.stop>
         <view class="dialog-content">
-          <text class="dialog-title">Create a New Page</text>
+          <text class="dialog-title">{{$t('design.dialogTitle')}}</text>
 
           <!-- Error notification -->
           <view class="error-notification" v-if="errorMessage">
@@ -490,8 +490,8 @@
                   </view>
                   <view class="upload-arrow">↑</view>
                 </view>
-                <text class="upload-text">Click to select HTML file</text>
-                <text class="upload-hint">Allowed: .html</text>
+            <text class="upload-text">{{$t('design.upload.clickToSelectHtmlFile')}}</text>
+            <text class="upload-hint">{{$t('design.upload.allowedHtml')}}</text>
               </view>
               <view v-if="htmlFiles && htmlFiles.length" class="html-file-info">
                 <text class="file-info-text">{{ htmlFiles.length }} HTML file(s) loaded:</text>

@@ -1,22 +1,21 @@
 <template>
   <div class="login-bg">
     <div class="login-card">
-      <h2 class="login-title">Login to UiGenius</h2>
-      <input type="text" class="login-input" placeholder="Email" v-model="user.email" />
-      <input type="password" class="login-input" placeholder="Password" v-model="user.password" />
-      <button class="main-btn" @click="login">Login</button>
-      <button class="secondary-btn" @click="signup">Sign Up</button>
+      <h2 class="login-title">{{$t('login.title')}}</h2>
+      <input type="text" class="login-input" :placeholder="$t('login.email')" v-model="user.email" />
+      <input type="password" class="login-input" :placeholder="$t('login.password')" v-model="user.password" />
+      <button class="main-btn" @click="login">{{$t('login.loginBtn')}}</button>
+      <button class="secondary-btn" @click="signup">{{$t('login.signupBtn')}}</button>
       <div class="google-login" @click="auth">
         <img src="https://www.gstatic.com/firebasejs/ui/2.0.0/images/auth/google.svg" class="google-icon" />
-        <span>Continue with Google</span>
+        <span>{{$t('login.continueWithGoogle')}}</span>
       </div>
       <!-- skip login -->
-      <div class="skip-login" @click="skipLogin">Skip Login</div>
+      <div class="skip-login" @click="skipLogin">{{$t('login.skipLogin')}}</div>
       <div class="remember-link">
         <checkbox-group>
           <label>
-            <checkbox value="psw" :checked='rememberPsw' @tap="rememberPsw = !rememberPsw" color="#e53935" />Remember
-            email and password
+            <checkbox value="psw" :checked='rememberPsw' @tap="rememberPsw = !rememberPsw" color="#e53935" />{{$t('login.rememberMe')}}
           </label>
         </checkbox-group>
       </div>
@@ -27,9 +26,9 @@
 
 <script>
 const uniIdCo = uniCloud.importObject("uni-id-co", {
-  loadingOptions: { // loading 
+  loadingOptions: { // loading
     title: 'logging in...',
-    mask: true // 
+    mask: true //
   },
   errorOptions: {
     type: 'toast'
@@ -169,7 +168,7 @@ export default {
         
         // Show success toast first
         uni.showToast({
-          title: 'Login successful',
+          title: this.$t('login.success.login'),
           icon: 'success'
         })
         
@@ -227,7 +226,7 @@ export default {
 
       // Show success toast first
       uni.showToast({
-        title: 'Login successful',
+        title: this.$t('login.success.login'),
         icon: 'success'
       })
 
@@ -247,7 +246,7 @@ export default {
 
       // Show success toast first
       uni.showToast({
-        title: 'Google login successful',
+        title: this.$t('login.success.googleLogin'),
         icon: 'success'
       })
 
@@ -262,7 +261,7 @@ export default {
       if (!this.user.password.length) {
         this.focusPassword = true
         return uni.showToast({
-          title: 'password is required',
+          title: this.$t('login.error.passwordRequired'),
           icon: 'none',
           duration: 3000
         });
@@ -270,7 +269,7 @@ export default {
       if (!this.user.email.length) {
         this.focusUsername = true
         return uni.showToast({
-          title: 'email is required',
+          title: this.$t('login.error.emailRequired'),
           icon: 'none',
           duration: 3000
         });
@@ -315,7 +314,7 @@ export default {
 
       if (hasValidGoogleToken) {
         uni.showToast({
-          title: 'You are already logged in with Google',
+          title: this.$t('login.error.alreadyLoggedInGoogle'),
           icon: 'none',
           duration: 3000
         });
@@ -329,7 +328,7 @@ export default {
 
       // Show loading toast
       uni.showLoading({
-        title: 'Logging in...',
+        title: this.$t('login.loading.loggingIn'),
         mask: true
       })
 
@@ -457,7 +456,7 @@ export default {
                     console.error('Error storing Google user info:', err)
                     console.error('Error details:', err.message || err)
                     uni.showToast({
-                      title: 'Failed to login with Google',
+                      title: this.$t('login.error.googleLoginFailed'),
                       icon: 'none',
                       duration: 3000
                     })
@@ -467,7 +466,7 @@ export default {
                   })
                 } else {
                   uni.showToast({
-                    title: 'Failed to get user info: ' + userRes.statusCode,
+                    title: this.$t('login.error.getUserInfoFailed', { statusCode: userRes.statusCode }),
                     icon: 'none',
                     duration: 3000
                   });
@@ -478,7 +477,7 @@ export default {
               fail: (error) => {
                 console.error('Error getting user info:', error);
                 uni.showToast({
-                  title: 'Failed to get user info',
+                  title: this.$t('login.error.getUserInfoFailed'),
                   icon: 'none',
                   duration: 3000
                 });
@@ -488,7 +487,7 @@ export default {
             });
           } else {
             uni.showToast({
-              title: 'Failed to get access token: ' + (tokenRes.statusCode || 'unknown error'),
+              title: this.$t('login.error.getAccessTokenFailed', { statusCode: tokenRes.statusCode || 'unknown error' }),
               icon: 'none',
               duration: 3000
             });
@@ -499,7 +498,7 @@ export default {
         fail: (error) => {
           console.error('Error during authentication:', error);
           uni.showToast({
-            title: 'Authentication failed',
+            title: this.$t('login.error.authenticationFailed'),
             icon: 'none',
             duration: 3000
           });

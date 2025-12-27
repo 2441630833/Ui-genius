@@ -14,20 +14,20 @@
         <view class="nav-item create-project-btn" :class="{ active: activeNavItem === 'plus' }" @click="openCreateProjectDialog">
           <image class="sidebar-icon"
             :src="activeNavItem === 'plus' ? '../../static/plus_white.png' : '../../static/plus.png'"></image>
-          <text class="nav-text">Create Project</text>
+          <text class="nav-text">{{$t('dashboard.nav.createProject')}}</text>
         </view>
         <view class="nav-item" :class="{ active: activeNavItem === 'dashboard' }"
           @click="setActiveNavItem('dashboard')">
           <image class="sidebar-icon dashboard-icon"
             :src="activeNavItem === 'dashboard' ? '../../static/dashboard_white.png' : '../../static/dashboard.png'">
           </image>
-          <text class="nav-text">Dashboard</text>
+          <text class="nav-text">{{$t('dashboard.nav.dashboard')}}</text>
         </view>
 
         <view class="nav-item" :class="{ active: activeNavItem === 'account' }" @click="setActiveNavItem('account')">
           <image class="sidebar-icon"
             :src="activeNavItem === 'account' ? '../../static/account_white.png' : '../../static/account.png'"></image>
-          <text class="nav-text">Account</text>
+          <text class="nav-text">{{$t('dashboard.nav.account')}}</text>
         </view>
         <!-- Membership nav item -->
         <view class="nav-item" :class="{ active: activeNavItem === 'membership' }" @click="setActiveNavItem('membership')">
@@ -74,7 +74,7 @@
       <!-- Dashboard Content -->
       <view v-if="activeNavItem === 'dashboard'">
         <view class="header">
-          <text class="title">Dashboard</text>
+          <text class="title">{{$t('dashboard.header.title')}}</text>
           <view class="user-actions">
             <!-- <button class="refresh-btn" @click="refreshProjects">Refresh Projects</button> -->
             <image v-if="activeNavItem === 'dashboard'" class="refresh-icon" src="../../static/refresh.png" @click="refreshProjects"></image>
@@ -154,13 +154,13 @@
       <!-- Account Settings Content -->
       <view v-if="activeNavItem === 'account'" class="account-settings">
         <view class="header">
-          <text class="title">User Settings</text>
+          <text class="title">{{$t('dashboard.account.title')}}</text>
         </view>
 
         <!-- Profile Section -->
         <view class="settings-section">
-          <text class="section-title">Profile</text>
-          <text class="section-description">You can change your profile information below</text>
+          <text class="section-title">{{$t('dashboard.account.profile.title')}}</text>
+          <text class="section-description">{{$t('dashboard.account.profile.description')}}</text>
 
           <view class="form-row">
             <view class="form-group">
