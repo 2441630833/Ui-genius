@@ -3,24 +3,24 @@
     <!-- Progress Bar Overlay -->
     <view v-if="isGenerating" class="progress-overlay">
       <view class="progress-container">
-        <text class="progress-title">Generating UI Design</text>
+        <text class="progress-title">{{ $t('design.progress.generatingUI') }}</text>
         <view class="progress-bar-container">
           <view class="progress-bar" :style="{ width: generationProgress + '%' }"></view>
         </view>
         <text class="progress-percentage">{{ Math.floor(generationProgress) }}%</text>
-        <text class="progress-message">Please wait, this may take a moment...</text>
+        <text class="progress-message">{{ $t('design.progress.pleaseWait') }}</text>
       </view>
     </view>
 
     <!-- Import Progress Bar Overlay -->
     <view v-if="isImporting" class="progress-overlay">
       <view class="progress-container">
-        <text class="progress-title">Importing Files</text>
+        <text class="progress-title">{{ $t('design.progress.importingFiles') }}</text>
         <view class="progress-bar-container">
           <view class="progress-bar" :style="{ width: importProgress + '%' }"></view>
         </view>
         <text class="progress-percentage">{{ Math.floor(importProgress) }}%</text>
-        <text class="progress-message">Processing imported files, please wait...</text>
+        <text class="progress-message">{{ $t('design.progress.processingFiles') }}</text>
       </view>
     </view>
     <!-- Hidden Template Previews for html2canvas -->
@@ -34,7 +34,7 @@
         <!-- Signup Template Preview -->
         <view id="template-signup" class="template-preview-content">
           <view class="preview-header">
-            <text class="preview-title">Signup</text>
+            <text class="preview-title">{{ $t('design.templates.signup') }}</text>
           </view>
           <view class="preview-form">
             <view class="preview-input"></view>
@@ -46,7 +46,7 @@
         <!-- Home Template Preview -->
         <view id="template-home" class="template-preview-content">
           <view class="preview-header">
-            <text class="preview-title">Home</text>
+            <text class="preview-title">{{ $t('design.templates.home') }}</text>
           </view>
           <view class="preview-content">
             <view class="preview-card"></view>
@@ -58,7 +58,7 @@
         <!-- notification Template Preview -->
         <view id="template-notification" class="template-preview-content">
           <view class="preview-header">
-            <text class="preview-title">notification</text>
+            <text class="preview-title">{{ $t('design.templates.notification') }}</text>
           </view>
           <view class="preview-list">
             <view class="preview-list-item"></view>
@@ -71,7 +71,7 @@
         <view id="template-profile" class="template-preview-content">
           <view class="preview-avatar"></view>
           <view class="preview-header">
-            <text class="preview-title">Profile</text>
+            <text class="preview-title">{{ $t('design.templates.profile') }}</text>
           </view>
           <view class="preview-info">
             <view class="preview-info-item"></view>
@@ -82,7 +82,7 @@
         <!-- Settings Template Preview -->
         <view id="template-settings" class="template-preview-content">
           <view class="preview-header">
-            <text class="preview-title">Settings</text>
+            <text class="preview-title">{{ $t('design.templates.settings') }}</text>
           </view>
           <view class="preview-settings">
             <view class="preview-settings-item"></view>
@@ -95,7 +95,7 @@
       <!-- Always include a simple template for testing -->
       <view id="template-simple" class="template-preview-content">
         <view class="preview-header">
-          <text class="preview-title">Simple</text>
+          <text class="preview-title">{{ $t('design.templates.simple') }}</text>
         </view>
         <view class="preview-content">
           <view class="preview-card"></view>
@@ -189,7 +189,7 @@
             <text class="button-text">Comments</text>
           </view> -->
           <view class="tool-button share-button" @click="shareProject">
-            <text class="button-text" @click="shareProject">Share</text>
+            <text class="button-text" @click="shareProject">{{ $t('design.header.share') }}</text>
           </view>
           <!-- <view class="tool-button">
             <text class="button-text">Export</text>
@@ -197,20 +197,22 @@
 
           <!-- Refresh Button -->
           <view class="tool-button refresh-button" @click="refreshData">
-            <text class="button-text">Refresh</text>
+            <text class="button-text">{{ $t('design.header.refresh') }}</text>
           </view>
 
           <view class="preview-button export-button" @click="exportProject">
             <image class="icon" src="/static/export_white.png"></image>
-            <text class="preview-text">Export</text>
+            <text class="preview-text">{{ $t('design.header.export') }}</text>
           </view>
         </view>
       </view>
 
       <!-- Templates Grid -->
       <view class="section">
-        <text class="section-title">{{$t('design.sectionTitle')}} <span class="template-count">({{ jsonTemplates.length }}
-            {{$t('design.pagesLabel')}})</span></text>
+        <text class="section-title">{{ $t('design.sectionTitle') }} <span class="template-count">({{
+          jsonTemplates.length
+        }}
+            {{ $t('design.pagesLabel') }})</span></text>
         <view class="templates-grid-container">
           <view class="templates-grid">
             <!-- Dynamic Templates from JSON -->
@@ -245,7 +247,7 @@
                   <view class="add-icon">+</view>
                 </view>
                 <view class="template-label">
-                  <text class="template-name">Add New Page</text>
+                  <text class="template-name">{{ $t('design.addNewPage') }}</text>
                 </view>
               </view>
             </template>
@@ -322,12 +324,12 @@
     <!-- Custom Action Sheet Component -->
     <view v-if="showCustomActionSheet" class="custom-action-sheet-overlay" @click="closeCustomActionSheet">
       <view class="custom-action-sheet" @click.stop>
-        <view class="custom-action-sheet-title">Export Options</view>
+        <view class="custom-action-sheet-title">{{ $t('design.export.title') }}</view>
         <view v-for="(option, index) in actionSheetOptions" :key="index" class="custom-action-sheet-item"
           @click="handleActionSheetSelection(index)">
           {{ option }}
         </view>
-        <view class="custom-action-sheet-cancel" @click="closeCustomActionSheet">Cancel</view>
+        <view class="custom-action-sheet-cancel" @click="closeCustomActionSheet">{{ $t('design.export.cancel') }}</view>
       </view>
     </view>
 
@@ -335,7 +337,7 @@
     <view class="dialog-overlay" v-if="showCreatePageDialog" @click="closeCreatePageDialog">
       <view class="dialog-container create-page-dialog" @click.stop>
         <view class="dialog-content">
-          <text class="dialog-title">{{$t('design.dialogTitle')}}</text>
+          <text class="dialog-title">{{ $t('design.dialogTitle') }}</text>
 
           <!-- Error notification -->
           <view class="error-notification" v-if="errorMessage">
@@ -346,19 +348,19 @@
             <view class="device-option" :class="{ 'selected': selectedDevice === 'mobile' }"
               @click="selectDevice('mobile')">
               <image class="device-icon" src="../../static/mobile.png"></image>
-              <text>Mobile</text>
+              <text>{{ $t('design.createPage.mobile') }}</text>
             </view>
 
             <view class="device-option" :class="{ 'selected': selectedDevice === 'desktop' }"
               @click="selectDevice('desktop')">
               <image class="device-icon" src="../../static/desktop.png"></image>
-              <text>Desktop</text>
+              <text>{{ $t('design.createPage.desktop') }}</text>
             </view>
           </view>
 
           <!-- Model Selection -->
           <view class="model-selection-container">
-            <text class="model-selection-label">Select AI Model</text>
+            <text class="model-selection-label">{{ $t('design.model.selectModel') }}</text>
             <view class="model-selector">
               <view class="custom-dropdown" @click="toggleModelDropdown">
                 <view class="dropdown-display">
@@ -382,7 +384,7 @@
           <!-- Apply Colors Switch and uniform style-->
           <view class="extract-colors-container">
             <view class="extract-colors-row">
-              <text class="model-selection-label">Uniform style and use project theme colour</text>
+              <text class="model-selection-label">{{ $t('design.createPage.uniformStyle') }}</text>
               <view class="toggle-switch" :class="{ 'active': useColor }" @click="toggleuseColor">
                 <view class="toggle-slider"></view>
               </view>
@@ -391,23 +393,25 @@
 
           <!-- Selected Template Info (show which template is selected) -->
           <view v-if="useColor && availableTemplatePages.length > 0" class="selected-template-info">
-            <text class="model-selection-label">Reference Template: {{ getSelectedTemplatePageText() }}</text>
-            <text class="template-hint">Click the template icon in sidebar to change</text>
+            <text class="model-selection-label">{{ $t('design.createPage.referenceTemplate') }}: {{
+              getSelectedTemplatePageText() }}</text>
+            <text class="template-hint">{{ $t('design.createPage.templateHint') }}</text>
           </view>
 
           <view class="try-example-container">
-            <text class="description-label">Describe your page in plain English</text>
-            <button class="try-example-btn" @click="tryPageExample">Try example</button>
+            <text class="description-label">{{ $t('design.createPage.describeLabel') }}</text>
+            <button class="try-example-btn" @click="tryPageExample">{{ $t('design.createPage.tryExample') }}</button>
             <button class="try-example-btn" :disabled="!pageDescription || isOptimizingPrompt"
-              @click="optimizePageDescription">{{ isOptimizingPrompt ? 'Optimizing...' : 'Improve with AI' }}</button>
+              @click="optimizePageDescription">{{ isOptimizingPrompt ? $t('design.createPage.optimizing') :
+                $t('design.createPage.improveWithAI') }}</button>
           </view>
           <view class="description-container">
-            <textarea class="project-description-input" placeholder="Enter your page description"
+            <textarea class="project-description-input" :placeholder="$t('design.createPage.placeholder')"
               v-model="pageDescription" maxlength="7000"></textarea>
             <text class="char-count">{{ pageDescription.length }}/7000 </text>
           </view>
 
-          <button class="continue-btn" @click="createPage">Continue</button>
+          <button class="continue-btn" @click="createPage">{{ $t('design.createPage.continue') }}</button>
         </view>
       </view>
     </view>
@@ -416,7 +420,7 @@
     <view class="dialog-overlay" v-if="showDeleteDialog" @click="closeDeleteDialog">
       <view class="dialog-container deleteDialogGuide" @click.stop>
         <view class="dialog-content">
-          <text class="dialog-title">Delete Pages</text>
+          <text class="dialog-title">{{ $t('design.deletePage.title') }}</text>
 
           <!-- Error notification -->
           <view class="error-notification" v-if="errorMessage">
@@ -428,7 +432,7 @@
             <!-- Custom checkbox implementation -->
             <view class="checkbox-wrapper" @click="toggleSelectAll">
               <view class="checkbox-custom" :class="{ 'checked': isAllSelected }"></view>
-              <text class="select-all-text">Select All</text>
+              <text class="select-all-text">{{ $t('design.deletePage.selectAll') }}</text>
             </view>
           </view>
 
@@ -442,13 +446,13 @@
             </view>
           </view>
           <view class="empty-state" v-else>
-            <text>No pages available to delete</text>
+            <text>{{ $t('design.deletePage.noPages') }}</text>
           </view>
 
           <view class="delete-actions">
-            <button class="delete-btn" :disabled="pagesToDelete.length === 0" @click="deleteSelectedPages">Delete
-              Selected</button>
-            <button class="cancel-btn" @click="closeDeleteDialog">Cancel</button>
+            <button class="delete-btn" :disabled="pagesToDelete.length === 0" @click="deleteSelectedPages">{{
+              $t('design.deletePage.deleteSelected') }}</button>
+            <button class="cancel-btn" @click="closeDeleteDialog">{{ $t('design.deletePage.cancel') }}</button>
           </view>
         </view>
       </view>
@@ -458,7 +462,7 @@
     <view class="dialog-overlay" v-if="showImportDialog" @click="closeImportDialog">
       <view class="dialog-container import-dialog" @click.stop>
         <view class="dialog-content">
-          <text class="dialog-title">Import File</text>
+          <text class="dialog-title">{{ $t('design.import.title') }}</text>
 
           <!-- Error notification -->
           <view class="error-notification" v-if="importError">
@@ -469,12 +473,12 @@
           <view class="import-type-tabs">
             <view v-for="type in importTypeOptions" :key="type.value" class="import-type-tab"
               :class="{ active: selectedImportType === type.value }" @click="selectImportType(type.value)">
-              {{ type.label }}
+              {{ $t('design.import.type.' + type.value) }}
             </view>
           </view>
 
           <view class="import-description">
-            <text>{{ importDescription }}</text>
+            <text>{{ $t('design.import.description.' + selectedImportType) }}</text>
           </view>
 
 
@@ -490,15 +494,16 @@
                   </view>
                   <view class="upload-arrow">↑</view>
                 </view>
-            <text class="upload-text">{{$t('design.upload.clickToSelectHtmlFile')}}</text>
-            <text class="upload-hint">{{$t('design.upload.allowedHtml')}}</text>
+                <text class="upload-text">{{ $t('design.upload.clickToSelectHtmlFile') }}</text>
+                <text class="upload-hint">{{ $t('design.upload.allowedHtml') }}</text>
               </view>
               <view v-if="htmlFiles && htmlFiles.length" class="html-file-info">
-                <text class="file-info-text">{{ htmlFiles.length }} HTML file(s) loaded:</text>
+                <text class="file-info-text">{{ $t('design.import.htmlFilesCountLoaded', { count: htmlFiles.length })
+                }}</text>
                 <view v-for="(f, i) in htmlFiles" :key="i" class="file-list-item">
                   <view class="file-list-item-header">
                     <text class="file-info-text">- {{ f.name }}</text>
-                    <button class="remove-file-btn" @click.stop="removeHtmlFile(i)">Delete</button>
+                    <button class="remove-file-btn" @click.stop="removeHtmlFile(i)">{{ $t('common.delete') }}</button>
                   </view>
                   <!-- <text class="file-content-preview">{{ f.content.substring(0, 100) }}...</text> -->
                 </view>
@@ -517,8 +522,12 @@
                   </view>
                   <view class="upload-arrow">↑</view>
                 </view>
-                <text class="upload-text">Click to select file{{ selectedImportType === 'image' ? 's' : '' }}</text>
-                <text class="upload-hint">Allowed: {{ allowedExtensions.join(', ') }}</text>
+                <text class="upload-text">{{ selectedImportType === 'image' ? $t('design.upload.clickToSelectImages') :
+                  $t('design.upload.clickToSelectFile') }}</text>
+                <text class="upload-hint">{{ $t('design.upload.allowedFormats', {
+                  formats: allowedExtensions.join(', ')
+                })
+                }}</text>
               </view>
             </uni-file-picker>
           </view>
@@ -527,9 +536,9 @@
             <button class="import-btn"
               :disabled="selectedImportType === 'html' ? (htmlFiles.length === 0) : !importFileList.length"
               @click="importProject">
-              Import
+              {{ $t('common.import') }}
             </button>
-            <button class="cancel-btn" @click="closeImportDialog">Cancel</button>
+            <button class="cancel-btn" @click="closeImportDialog">{{ $t('common.cancel') }}</button>
           </view>
         </view>
       </view>
@@ -538,7 +547,7 @@
     <!-- Color Palette Overlay -->
     <view v-if="showColorPalette" class="color-palette-overlay" @click="cancelColorSelection">
       <view class="color-palette-container" @click.stop>
-        <text class="color-palette-title" style="display: block;">Select Theme Color For Your Project</text>
+        <text class="color-palette-title" style="display: block;">{{ $t('design.colorPalette.title') }}</text>
 
 
         <view v-if="colorPaletteError" class="color-palette-error">
@@ -585,7 +594,7 @@
 
         <!-- Color Card Colors Row (if colors exist and are not in preset lists) -->
         <view v-if="colorCard && colorCard.length > 0" class="color-palette-row">
-          <text class="color-card-label">Selected Colors:</text>
+          <text class="color-card-label">{{ $t('design.colorPalette.selectedColors') }}</text>
           <view v-for="(color, index) in colorCard" :key="'colorcard-' + index" class="color-swatch"
             :style="{ backgroundColor: color }" :class="{ 'selected': colorCard && colorCard.indexOf(color) > -1 }"
             @click="selectColor(color)">
@@ -596,12 +605,14 @@
 
         <!-- Selected Colors Counter -->
         <view v-if="colorCard && colorCard.length > 0" class="selected-colors-info">
-          <text class="selected-colors-text">Selected: {{ colorCard.length }}/5 colors</text>
+          <text class="selected-colors-text">{{ $t('design.colorPalette.selectedCounter', { count: colorCard.length })
+          }}</text>
         </view>
 
         <view class="color-input-container">
-          <text class="color-input-label">Custom Color:</text>
-          <input type="text" v-model="customColor" class="color-input" placeholder="#RRGGBB" @input="validateColorInput"
+          <text class="color-input-label">{{ $t('design.colorPalette.customColor') }}</text>
+          <input type="text" v-model="customColor" class="color-input"
+            :placeholder="$t('design.colorPalette.hexPlaceholder')" @input="validateColorInput"
             @confirm="addCustomColor" />
           <view class="color-preview-swatch"
             :style="{ backgroundColor: isValidColor(customColor) ? customColor : '#cccccc' }"
@@ -611,8 +622,8 @@
 
         <view class="color-actions">
           <button class="color-confirm" :style="{ backgroundColor: previewColor, color: '#ffffff' }"
-            @click="confirmColorSelection">Apply Theme</button>
-          <button class="color-cancel" @click="cancelColorSelection">Cancel</button>
+            @click="confirmColorSelection">{{ $t('design.colorPalette.apply') }}</button>
+          <button class="color-cancel" @click="cancelColorSelection">{{ $t('common.cancel') }}</button>
         </view>
       </view>
     </view>
@@ -632,14 +643,14 @@
     <view v-if="showUpgradeModal" class="upgrade-modal-overlay" @click="closeUpgradeModal">
       <view class="upgrade-modal-container" @click.stop>
         <view class="upgrade-modal-header">
-          <text class="upgrade-modal-title">Upgrade Required</text>
+          <text class="upgrade-modal-title">{{ $t('common.upgradeRequired') }}</text>
         </view>
         <view class="upgrade-modal-content">
           <text class="upgrade-modal-message">{{ upgradeModalMessage }}</text>
         </view>
         <view class="upgrade-modal-actions">
-          <button class="upgrade-modal-cancel" @click="closeUpgradeModal">Cancel</button>
-          <button class="upgrade-modal-confirm" @click="handleUpgradeConfirm">Upgrade</button>
+          <button class="upgrade-modal-cancel" @click="closeUpgradeModal">{{ $t('common.cancel') }}</button>
+          <button class="upgrade-modal-confirm" @click="handleUpgradeConfirm">{{ $t('common.upgrade') }}</button>
         </view>
       </view>
     </view>
@@ -742,10 +753,8 @@ export default {
 
       // Custom action sheet properties
       showCustomActionSheet: false,
-      actionSheetOptions: ['Export as Images', 'Export as HTML', 'Export as Vue 2', 'Export as Vue 3', 'Export as React'],
       showCreatePageDialog: false,
       pageDescription: '',
-      examplePageDescription: 'Generate one website as same as Apple Store page',
       // examplePageDescription: 'A modern contact page with a form and interactive map, including name, email, and message fields',
       showDeleteDialog: false,
       pagesToDelete: [],
@@ -773,12 +782,6 @@ export default {
       showImportDialog: false,
       importFileList: [],
       importError: '',
-      importTypeOptions: [
-        { value: 'image', label: 'Image' },
-        { value: 'html', label: 'HTML' }
-        //{ value: 'vue', label: 'Vue' },
-        //{ value: 'react', label: 'React' }
-      ],
       selectedImportType: 'image',
 
       // HTML file content
@@ -801,92 +804,6 @@ export default {
       selectedTemplatePageIndex: 0, // Default to first page
       availableTemplatePages: [], // Will be populated from latest_7_overall_page
       isTemplateSelectionMode: false, // Toggle template selection mode from sidebar
-      guideSteps: [
-        {
-          target: '.plus_guide',
-          title: 'First Step',
-          content: 'This is the first step of the guide - click the plus button to add a new page to your project',
-          position: 'bottom'
-        },
-        {
-          target: '.create-page-dialog',
-          title: 'Second Step',
-          content: 'This is the second step of the guide - As same as before create project process, you can create a new page for your project at here',
-          position: 'right'
-        },
-        {
-          target: '.template_guide',
-          title: 'Third Step',
-          content: 'This is the third step of the guide - click the template button to select a template for your project',
-          position: 'right'
-        },
-        {
-          target: '.import_guide',
-          title: 'Fourth Step',
-          content: 'This is the fourth step of the guide - click the import button to import a new page to your project',
-          position: 'right'
-        },
-        {
-          target: '.import-dialog',
-          title: 'Fifth Step',
-          content: 'This is the fifth step of the guide - You can import file from here, the imported images or html will be automatic convert the editable prototype, you can do the second edit base on the imported prototype',
-          position: 'right'
-        },
-        {
-          target: '.color_guide',
-          title: 'Sixth Step',
-          content: 'This is the sixth step of the guide - click the color button to select theme colour manually',
-          position: 'right'
-        },
-        // {
-        //   target: '.import-type-tabs',
-        //   title: 'Fifth Step',
-        //   content: 'This is the fifth step of the guide - You can select the type of file you want to import, choose the image or html file',
-        //   position: 'right'
-        // },
-        // {
-        //   target: '.file-upload-container',
-        //   title: 'Sixth Step',
-        //   content: 'This is the sixth step of the guide - You can upload the file from your computer',
-        //   position: 'right'
-        // },
-        // {
-        //   target: '.import-btn',
-        //   title: 'Fifth Step',
-        //   content: 'This is the fifth step of the guide -  Now click the import button to import the file',
-        //   position: 'right'
-        // },
-        {
-          target: '.delete_guide',
-          title: 'Seventh Step',
-          content: 'This is the seventh step of the guide - You can delete the page by click this icon',
-          position: 'right'
-        },
-        {
-          target: '.deleteDialogGuide',
-          title: 'Eighth Step',
-          content: 'This is the eighth step of the guide - You can delete the page from here',
-          position: 'right'
-        },
-        {
-          target: '.export-button',
-          title: 'Ninth Step',
-          content: 'This is the ninth step of the guide - You can export the project as images, html, vue2, vue3, react',
-          position: 'left'
-        },
-        {
-          target: '.refresh-button',
-          title: 'Tenth Step',
-          content: 'This is the tenth step of the guide - You can refresh the page from here',
-          position: 'left'
-        },
-        {
-          target: '.share-button',
-          title: 'Eleventh Step',
-          content: 'This is the eleventh step of the guide - You can share the project to your colleague to work collaboratively together',
-          position: 'left'
-        },
-      ],
       isOptimizingPrompt: false,
       showUpgradeModal: false,
       upgradeModalMessage: ''
@@ -894,6 +811,94 @@ export default {
   },
 
   computed: {
+    importTypeOptions() {
+      return [
+        { value: 'image', label: this.$t('design.import.type.image') },
+        { value: 'html', label: this.$t('design.import.type.html') }
+      ];
+    },
+    examplePageDescription() {
+      return this.$t('design.createPage.exampleAppleDescription');
+    },
+    guideSteps() {
+      return [
+        {
+          target: '.plus_guide',
+          title: this.$t('design.guide.step1.title'),
+          content: this.$t('design.guide.step1.content'),
+          position: 'bottom'
+        },
+        {
+          target: '.create-page-dialog',
+          title: this.$t('design.guide.step2.title'),
+          content: this.$t('design.guide.step2.content'),
+          position: 'right'
+        },
+        {
+          target: '.template_guide',
+          title: this.$t('design.guide.step3.title'),
+          content: this.$t('design.guide.step3.content'),
+          position: 'right'
+        },
+        {
+          target: '.import_guide',
+          title: this.$t('design.guide.step4.title'),
+          content: this.$t('design.guide.step4.content'),
+          position: 'right'
+        },
+        {
+          target: '.import-dialog',
+          title: this.$t('design.guide.step5.title'),
+          content: this.$t('design.guide.step5.content'),
+          position: 'right'
+        },
+        {
+          target: '.color_guide',
+          title: this.$t('design.guide.step6.title'),
+          content: this.$t('design.guide.step6.content'),
+          position: 'right'
+        },
+        {
+          target: '.delete_guide',
+          title: this.$t('design.guide.step7.title'),
+          content: this.$t('design.guide.step7.content'),
+          position: 'right'
+        },
+        {
+          target: '.deleteDialogGuide',
+          title: this.$t('design.guide.step8.title'),
+          content: this.$t('design.guide.step8.content'),
+          position: 'right'
+        },
+        {
+          target: '.export-button',
+          title: this.$t('design.guide.step9.title'),
+          content: this.$t('design.guide.step9.content'),
+          position: 'left'
+        },
+        {
+          target: '.refresh-button',
+          title: this.$t('design.guide.step10.title'),
+          content: this.$t('design.guide.step10.content'),
+          position: 'left'
+        },
+        {
+          target: '.share-button',
+          title: this.$t('design.guide.step11.title'),
+          content: this.$t('design.guide.step11.content'),
+          position: 'left'
+        },
+      ];
+    },
+    actionSheetOptions() {
+      return [
+        this.$t('design.export.asImages'),
+        this.$t('design.export.asHtml'),
+        this.$t('design.export.asVue2'),
+        this.$t('design.export.asVue3'),
+        this.$t('design.export.asReact')
+      ];
+    },
     filteredTemplates() {
       // Return all templates from jsonTemplates
       if (!this.jsonTemplates || this.jsonTemplates.length === 0) {
@@ -927,13 +932,13 @@ export default {
     importDescription() {
       switch (this.selectedImportType) {
         case 'image':
-          return 'Upload one or more images to your project assets. Supported formats: PNG, JPG, JPEG, GIF, WEBP, SVG.';
+          return this.$t('design.import.description.image');
         case 'html':
-          return 'Upload an HTML file.';
+          return this.$t('design.import.description.html');
         case 'vue':
-          return 'Upload a Vue Single File Component (.vue).';
+          return this.$t('design.import.description.vue');
         case 'react':
-          return 'Upload a React component file (.jsx/.tsx).';
+          return this.$t('design.import.description.react');
         default:
           return '';
       }
@@ -1015,6 +1020,7 @@ export default {
     this.cleanupInjectedStyles();
   },
   onLoad(options) {
+    this.loadSavedLanguage();
     // Initialize project_id from storage
     const storedProjectId = uni.getStorageSync('currentProjectId');
     if (storedProjectId) {
@@ -1030,6 +1036,7 @@ export default {
     }
   },
   onShow() {
+    // this.loadSavedLanguage();
     // Check for project switch
     const storedProjectId = uni.getStorageSync('currentProjectId');
     if (storedProjectId && storedProjectId !== this.project_id) {
@@ -1089,6 +1096,20 @@ export default {
     }
   },
   methods: {
+    loadSavedLanguage() {
+      try {
+        const savedLocale = uni.getStorageSync('appLocale');
+        if (savedLocale) {
+          uni.setLocale(savedLocale);
+          // Also update i18n locale if available
+          if (this.$i18n) {
+            this.$i18n.locale = savedLocale;
+          }
+        }
+      } catch (error) {
+        console.error('Design page: Error loading saved language:', error);
+      }
+    },
     // tryLoadSharedFromQuery() {
     //   // H5 only: parse params from hash URL
     //   // #ifdef H5
@@ -1168,10 +1189,10 @@ export default {
       }, 1000);
     },
     onGuideComplete() {
-      this.showCustomToast('Finish Guide！', 'success');
+      this.showCustomToast(this.$t('design.guide.finished'), 'success');
     },
     onGuideSkip() {
-      this.showCustomToast('Already Skip Guide', 'none');
+      this.showCustomToast(this.$t('design.guide.skipped'), 'none');
     },
     onGuideStepChange(index) {
       // Make step-change behavior work for BOTH directions by driving UI from the current step.
@@ -1217,7 +1238,7 @@ export default {
           const projectData = uni.getStorageSync('latest_7_overall_page');
           if (!projectData) {
             uni.showToast({
-              title: 'No project data found',
+              title: this.$t('design.toast.noProjectData'),
               icon: 'none',
               duration: 2000
             });
@@ -1226,7 +1247,7 @@ export default {
 
           // Show loading toast
           uni.showLoading({
-            title: 'Creating project...',
+            title: this.$t('design.toast.creatingProject'),
             mask: true
           });
 
@@ -1240,7 +1261,7 @@ export default {
               this.generateShareUrl(projectId);
             } else {
               uni.showToast({
-                title: 'Failed to create project',
+                title: this.$t('design.toast.createProjectFailed'),
                 icon: 'none',
                 duration: 2000
               });
@@ -1248,7 +1269,7 @@ export default {
           }).catch(error => {
             uni.hideLoading();
             uni.showToast({
-              title: 'Failed to create project',
+              title: this.$t('design.toast.createProjectFailed'),
               icon: 'none',
               duration: 2000
             });
@@ -1262,7 +1283,7 @@ export default {
 
       } catch (error) {
         uni.showToast({
-          title: 'Share failed',
+          title: this.$t('design.toast.shareProjectFailed'),
           icon: 'none',
           duration: 2000
         });
@@ -1285,14 +1306,14 @@ export default {
         data: shareUrl,
         success: () => {
           uni.showToast({
-            title: 'Share link copied',
+            title: this.$t('design.toast.shareLinkCopied'),
             icon: 'success',
             duration: 2000
           });
         },
         fail: () => {
           uni.showToast({
-            title: 'Copy failed',
+            title: this.$t('design.toast.copyFailed'),
             icon: 'none',
             duration: 2000
           });
@@ -1337,7 +1358,7 @@ export default {
       // Debounce protection
       if (this.isExporting) {
         uni.showToast({
-          title: 'Export already in progress',
+          title: this.$t('design.export.alreadyInProgress'),
           icon: 'none',
           duration: 2000
         });
@@ -1348,7 +1369,7 @@ export default {
 
       // Show loading toast
       uni.showLoading({
-        title: 'Preparing images...',
+        title: this.$t('design.export.preparingImages'),
         mask: true
       });
 
@@ -1358,7 +1379,7 @@ export default {
         if (!jsonData) {
           uni.hideLoading();
           uni.showToast({
-            title: 'No project data found',
+            title: this.$t('design.toast.noProjectData'),
             icon: 'none',
             duration: 2000
           });
@@ -1373,7 +1394,7 @@ export default {
         if (!projectData.pages || !projectData.pages.length) {
           uni.hideLoading();
           uni.showToast({
-            title: 'No pages found in project',
+            title: this.$t('design.export.noData'),
             icon: 'none',
             duration: 2000
           });
@@ -1433,7 +1454,7 @@ export default {
           const contentEl = iframeDoc.createElement('div');
           contentEl.className = 'preview-content';
           const parsed = this.parseTemplate(page);
-          contentEl.innerHTML = (parsed && parsed.html) || page.component || '<div>No content available</div>';
+          contentEl.innerHTML = (parsed && parsed.html) || page.component || `<div>${this.$t('design.export.noContent')}</div>`;
           root.appendChild(contentEl);
 
           // Inject scoped styles for this page into the iframe head
@@ -1479,7 +1500,7 @@ export default {
       } catch (error) {
         uni.hideLoading();
         uni.showToast({
-          title: 'Error exporting images',
+          title: this.$t('design.toast.errorExportingImages'),
           icon: 'none',
           duration: 2000
         });
@@ -1503,7 +1524,7 @@ export default {
           uni.hideLoading();
           // console.error('JSZip or saveAs is not available');
           uni.showToast({
-            title: 'Export libraries not available',
+            title: this.$t('design.export.librariesNotAvailable'),
             icon: 'none',
             duration: 2000
           });
@@ -1546,7 +1567,7 @@ export default {
 
         uni.hideLoading();
         uni.showToast({
-          title: 'Images exported successfully!',
+          title: this.$t('design.export.success'),
           icon: 'success',
           duration: 2000
         });
@@ -1555,7 +1576,7 @@ export default {
         uni.hideLoading();
         // console.error('Error exporting images:', error);
         uni.showToast({
-          title: 'Error exporting images',
+          title: this.$t('design.toast.errorExportingImages'),
           icon: 'none',
           duration: 2000
         });
@@ -1568,7 +1589,7 @@ export default {
     exportImagesIndividually(images) {
       // Fallback method to download images one by one
       uni.showToast({
-        title: 'Downloading images individually',
+        title: this.$t('design.export.downloadingIndividually'),
         icon: 'none',
         duration: 2000
       });
@@ -1587,290 +1608,290 @@ export default {
       });
     },
 
-//     exportHTML() {
-//       // Show loading toast
-//       uni.showLoading({
-//         title: 'Preparing HTML...',
-//         mask: true
-//       });
+    //     exportHTML() {
+    //       // Show loading toast
+    //       uni.showLoading({
+    //         title: 'Preparing HTML...',
+    //         mask: true
+    //       });
 
-//       try {
-//         // Get project data from storage
-//         const jsonData = uni.getStorageSync('latest_7_overall_page');
-//         if (!jsonData) {
-//           uni.hideLoading();
-//           uni.showToast({
-//             title: 'No project data found',
-//             icon: 'none',
-//             duration: 2000
-//           });
-//           return;
-//         }
+    //       try {
+    //         // Get project data from storage
+    //         const jsonData = uni.getStorageSync('latest_7_overall_page');
+    //         if (!jsonData) {
+    //           uni.hideLoading();
+    //           uni.showToast({
+    //             title: 'No project data found',
+    //             icon: 'none',
+    //             duration: 2000
+    //           });
+    //           return;
+    //         }
 
-//         // Parse the JSON data
-//         const projectData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+    //         // Parse the JSON data
+    //         const projectData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
 
-//         // Extract page components
-//         if (!projectData.pages || !projectData.pages.length) {
-//           uni.hideLoading();
-//           uni.showToast({
-//             title: 'No pages found in project',
-//             icon: 'none',
-//             duration: 2000
-//           });
-//           return;
-//         }
+    //         // Extract page components
+    //         if (!projectData.pages || !projectData.pages.length) {
+    //           uni.hideLoading();
+    //           uni.showToast({
+    //             title: 'No pages found in project',
+    //             icon: 'none',
+    //             duration: 2000
+    //           });
+    //           return;
+    //         }
 
-//         // For mobile, save to file directly
-//         if (uni.getSystemInfoSync().platform !== 'web') {
-//           this.exportHTMLMobile(projectData);
-//           return;
-//         }
+    //         // For mobile, save to file directly
+    //         if (uni.getSystemInfoSync().platform !== 'web') {
+    //           this.exportHTMLMobile(projectData);
+    //           return;
+    //         }
 
-//         // For web, try to create a zip file using the imported libraries
-//         try {
-//           // Use the imported JSZip and saveAs
-//           if (typeof JSZip !== 'function' || typeof saveAs !== 'function') {
-//             // Fallback to a simple HTML download if libraries aren't available
-//             this.exportHTMLSimple(projectData);
-//             return;
-//           }
+    //         // For web, try to create a zip file using the imported libraries
+    //         try {
+    //           // Use the imported JSZip and saveAs
+    //           if (typeof JSZip !== 'function' || typeof saveAs !== 'function') {
+    //             // Fallback to a simple HTML download if libraries aren't available
+    //             this.exportHTMLSimple(projectData);
+    //             return;
+    //           }
 
-//           const zip = new JSZip();
+    //           const zip = new JSZip();
 
-//           // Project name for zip file name
-//           const projectName = projectData.AIProjectName || 'ui_genius_project';
+    //           // Project name for zip file name
+    //           const projectName = projectData.AIProjectName || 'ui_genius_project';
 
-//           // Basic HTML template
-//           const htmlTemplate = (content) => `${content}`;
+    //           // Basic HTML template
+    //           const htmlTemplate = (content) => `${content}`;
 
-//           // Create an index.html with links to all pages
-//           let indexContent = `<div style="max-width: 800px; margin: 0 auto; padding: 20px;">
-//   <h1 style="color: var(--theme-color); margin-bottom: 20px;">${projectName}</h1>
-//   <p style="margin-bottom: 20px;">${projectData.AIProjectDescription || ''}</p>
-//   <h2 style="margin-bottom: 15px;">Pages:</h2>
-//   <ul style="list-style: none;">`;
+    //           // Create an index.html with links to all pages
+    //           let indexContent = `<div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    //   <h1 style="color: var(--theme-color); margin-bottom: 20px;">${projectName}</h1>
+    //   <p style="margin-bottom: 20px;">${projectData.AIProjectDescription || ''}</p>
+    //   <h2 style="margin-bottom: 15px;">Pages:</h2>
+    //   <ul style="list-style: none;">`;
 
-//           // Add each page to the zip and create link in index
-//           projectData.pages.forEach((page) => {
-//             const pageName = page.name.replace(/ Page/i, '');
-//             const fileName = pageName.toLowerCase().replace(/\s+/g, '-') + '.html';
+    //           // Add each page to the zip and create link in index
+    //           projectData.pages.forEach((page) => {
+    //             const pageName = page.name.replace(/ Page/i, '');
+    //             const fileName = pageName.toLowerCase().replace(/\s+/g, '-') + '.html';
 
-//             // Create HTML file for the page
-//             const pageContent = page.component || '<div>No content available</div>';
-//             const fullHtml = htmlTemplate(pageContent);
-//             zip.file(fileName, fullHtml);
+    //             // Create HTML file for the page
+    //             const pageContent = page.component || '<div>No content available</div>';
+    //             const fullHtml = htmlTemplate(pageContent);
+    //             zip.file(fileName, fullHtml);
 
-//             // Add link to index
-//             indexContent += `<li style="margin-bottom: 10px;">
-//       <a href="${fileName}" style="color: var(--theme-color); text-decoration: none; font-weight: bold; padding: 5px 0; display: inline-block;">
-//         ${pageName}
-//       </a>
-//     </li>`;
-//           });
+    //             // Add link to index
+    //             indexContent += `<li style="margin-bottom: 10px;">
+    //       <a href="${fileName}" style="color: var(--theme-color); text-decoration: none; font-weight: bold; padding: 5px 0; display: inline-block;">
+    //         ${pageName}
+    //       </a>
+    //     </li>`;
+    //           });
 
-//           // Close the index HTML
-//           indexContent += `</ul></div>`;
+    //           // Close the index HTML
+    //           indexContent += `</ul></div>`;
 
-//           // Add index.html to zip
-//           zip.file('index.html', htmlTemplate(indexContent));
+    //           // Add index.html to zip
+    //           zip.file('index.html', htmlTemplate(indexContent));
 
-//           // Generate and save the zip
-//           zip.generateAsync({ type: "blob" }).then((content) => {
-//             saveAs(content, `${projectName.toLowerCase().replace(/\s+/g, '-')}_html.zip`);
-//             uni.hideLoading();
-//             uni.showToast({
-//               title: 'HTML exported successfully!',
-//               icon: 'success',
-//               duration: 2000
-//             });
-//           });
-//         } catch (error) {
-//           // Fallback to simple HTML export
-//           this.exportHTMLSimple(projectData);
-//         }
-//       } catch (error) {
-//         uni.hideLoading();
-//         uni.showToast({
-//           title: 'Error exporting HTML',
-//           icon: 'none',
-//           duration: 2000
-//         });
-//         console.error('Error exporting HTML:', error);
-//       }
-//     },
+    //           // Generate and save the zip
+    //           zip.generateAsync({ type: "blob" }).then((content) => {
+    //             saveAs(content, `${projectName.toLowerCase().replace(/\s+/g, '-')}_html.zip`);
+    //             uni.hideLoading();
+    //             uni.showToast({
+    //               title: 'HTML exported successfully!',
+    //               icon: 'success',
+    //               duration: 2000
+    //             });
+    //           });
+    //         } catch (error) {
+    //           // Fallback to simple HTML export
+    //           this.exportHTMLSimple(projectData);
+    //         }
+    //       } catch (error) {
+    //         uni.hideLoading();
+    //         uni.showToast({
+    //           title: 'Error exporting HTML',
+    //           icon: 'none',
+    //           duration: 2000
+    //         });
+    //         console.error('Error exporting HTML:', error);
+    //       }
+    //     },
 
-//     exportHTMLMobile(projectData) {
-//       // Create a single HTML file with all pages for mobile platforms
-//       const projectName = projectData.AIProjectName || 'ui_genius_project';
-//       let content = `<!DOCTYPE html>
-// <html lang="en">
-// <head>
-//   <meta charset="UTF-8">
-//   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-//   <title>${projectName}</title>
-//   <style>
-//     /* Reset styles */
-//     * { margin: 0; padding: 0; box-sizing: border-box; }
-//     body { font-family: Arial, sans-serif; line-height: 1.6; }
-//     /* Navigation */
-//     .nav { background: var(--theme-color); padding: 10px; position: sticky; top: 0; z-index: 100; }
-//     .nav ul { display: flex; list-style: none; overflow-x: auto; white-space: nowrap; }
-//     .nav a { color: white; text-decoration: none; padding: 10px 15px; display: inline-block; }
-//     .page { padding: 20px; min-height: 100vh; }
-//     h1 { margin-bottom: 20px; }
-//   </style>
-// </head>
-// <body>
-//   <nav class="nav">
-//     <ul>`;
+    //     exportHTMLMobile(projectData) {
+    //       // Create a single HTML file with all pages for mobile platforms
+    //       const projectName = projectData.AIProjectName || 'ui_genius_project';
+    //       let content = `<!DOCTYPE html>
+    // <html lang="en">
+    // <head>
+    //   <meta charset="UTF-8">
+    //   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    //   <title>${projectName}</title>
+    //   <style>
+    //     /* Reset styles */
+    //     * { margin: 0; padding: 0; box-sizing: border-box; }
+    //     body { font-family: Arial, sans-serif; line-height: 1.6; }
+    //     /* Navigation */
+    //     .nav { background: var(--theme-color); padding: 10px; position: sticky; top: 0; z-index: 100; }
+    //     .nav ul { display: flex; list-style: none; overflow-x: auto; white-space: nowrap; }
+    //     .nav a { color: white; text-decoration: none; padding: 10px 15px; display: inline-block; }
+    //     .page { padding: 20px; min-height: 100vh; }
+    //     h1 { margin-bottom: 20px; }
+    //   </style>
+    // </head>
+    // <body>
+    //   <nav class="nav">
+    //     <ul>`;
 
-//       // Add navigation links
-//       projectData.pages.forEach((page) => {
-//         const pageName = page.name.replace(/ Page/i, '');
-//         const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
-//         content += `<li><a href="#${pageId}">${pageName}</a></li>`;
-//       });
+    //       // Add navigation links
+    //       projectData.pages.forEach((page) => {
+    //         const pageName = page.name.replace(/ Page/i, '');
+    //         const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
+    //         content += `<li><a href="#${pageId}">${pageName}</a></li>`;
+    //       });
 
-//       content += `</ul>
-//   </nav>
-//   <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
-//     <h1 style="color: var(--theme-color);">${projectName}</h1>
-//     <p style="margin-bottom: 30px;">${projectData.AIProjectDescription || ''}</p>
-//   </div>`;
+    //       content += `</ul>
+    //   </nav>
+    //   <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    //     <h1 style="color: var(--theme-color);">${projectName}</h1>
+    //     <p style="margin-bottom: 30px;">${projectData.AIProjectDescription || ''}</p>
+    //   </div>`;
 
-//       // Add each page
-//       projectData.pages.forEach((page) => {
-//         const pageName = page.name.replace(/ Page/i, '');
-//         const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
-//         const pageContent = page.component || '<div>No content available</div>';
+    //       // Add each page
+    //       projectData.pages.forEach((page) => {
+    //         const pageName = page.name.replace(/ Page/i, '');
+    //         const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
+    //         const pageContent = page.component || '<div>No content available</div>';
 
-//         content += `<div id="${pageId}" class="page">
-//     <h2 style="color: var(--theme-color); margin-bottom: 20px;">${pageName}</h2>
-//     ${pageContent}
-//   </div>`;
-//       });
+    //         content += `<div id="${pageId}" class="page">
+    //     <h2 style="color: var(--theme-color); margin-bottom: 20px;">${pageName}</h2>
+    //     ${pageContent}
+    //   </div>`;
+    //       });
 
-//       content += `</body></html>`;
+    //       content += `</body></html>`;
 
-//       // Save the file
-//       const filePath = `${uni.env.USER_DATA_PATH}/${projectName.toLowerCase().replace(/\s+/g, '-')}.html`;
-//       const fs = uni.getFileSystemManager();
+    //       // Save the file
+    //       const filePath = `${uni.env.USER_DATA_PATH}/${projectName.toLowerCase().replace(/\s+/g, '-')}.html`;
+    //       const fs = uni.getFileSystemManager();
 
-//       fs.writeFile({
-//         filePath: filePath,
-//         data: content,
-//         encoding: 'utf8',
-//         success: () => {
-//           uni.hideLoading();
-//           uni.showToast({
-//             title: 'HTML file saved',
-//             icon: 'success',
-//             duration: 2000
-//           });
+    //       fs.writeFile({
+    //         filePath: filePath,
+    //         data: content,
+    //         encoding: 'utf8',
+    //         success: () => {
+    //           uni.hideLoading();
+    //           uni.showToast({
+    //             title: 'HTML file saved',
+    //             icon: 'success',
+    //             duration: 2000
+    //           });
 
-//           // Open the file if possible
-//           uni.openDocument({
-//             filePath: filePath,
-//             showMenu: true,
-//             fail: () => {
-//               console.log('Unable to open HTML file');
-//             }
-//           });
-//         },
-//         fail: (error) => {
-//           uni.hideLoading();
-//           uni.showToast({
-//             title: 'Failed to save HTML file',
-//             icon: 'none',
-//             duration: 2000
-//           });
-//           console.error('Failed to save HTML file:', error);
-//         }
-//       });
-//     },
+    //           // Open the file if possible
+    //           uni.openDocument({
+    //             filePath: filePath,
+    //             showMenu: true,
+    //             fail: () => {
+    //               console.log('Unable to open HTML file');
+    //             }
+    //           });
+    //         },
+    //         fail: (error) => {
+    //           uni.hideLoading();
+    //           uni.showToast({
+    //             title: 'Failed to save HTML file',
+    //             icon: 'none',
+    //             duration: 2000
+    //           });
+    //           console.error('Failed to save HTML file:', error);
+    //         }
+    //       });
+    //     },
 
-//     exportHTMLSimple(projectData) {
-//       // Create a single HTML file for all pages
-//       const projectName = projectData.AIProjectName || 'ui_genius_project';
-//       let content = `<!DOCTYPE html>
-// <html lang="en">
-// <head>
-//   <meta charset="UTF-8">
-//   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-//   <title>${projectName}</title>
-//   <style>
-//     /* Reset styles */
-//     * { margin: 0; padding: 0; box-sizing: border-box; }
-//     body { font-family: Arial, sans-serif; line-height: 1.6; }
-//     /* Navigation */
-//     .nav { background: var(--theme-color); padding: 10px; position: sticky; top: 0; z-index: 100; }
-//     .nav ul { display: flex; list-style: none; overflow-x: auto; white-space: nowrap; }
-//     .nav a { color: white; text-decoration: none; padding: 10px 15px; display: inline-block; }
-//     .page { padding: 20px; min-height: 100vh; }
-//     h1 { margin-bottom: 20px; }
-//   </style>
-// </head>
-// <body>
-//   <nav class="nav">
-//     <ul>`;
+    //     exportHTMLSimple(projectData) {
+    //       // Create a single HTML file for all pages
+    //       const projectName = projectData.AIProjectName || 'ui_genius_project';
+    //       let content = `<!DOCTYPE html>
+    // <html lang="en">
+    // <head>
+    //   <meta charset="UTF-8">
+    //   <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    //   <title>${projectName}</title>
+    //   <style>
+    //     /* Reset styles */
+    //     * { margin: 0; padding: 0; box-sizing: border-box; }
+    //     body { font-family: Arial, sans-serif; line-height: 1.6; }
+    //     /* Navigation */
+    //     .nav { background: var(--theme-color); padding: 10px; position: sticky; top: 0; z-index: 100; }
+    //     .nav ul { display: flex; list-style: none; overflow-x: auto; white-space: nowrap; }
+    //     .nav a { color: white; text-decoration: none; padding: 10px 15px; display: inline-block; }
+    //     .page { padding: 20px; min-height: 100vh; }
+    //     h1 { margin-bottom: 20px; }
+    //   </style>
+    // </head>
+    // <body>
+    //   <nav class="nav">
+    //     <ul>`;
 
-//       // Add navigation links
-//       projectData.pages.forEach((page) => {
-//         const pageName = page.name.replace(/ Page/i, '');
-//         const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
-//         content += `<li><a href="#${pageId}">${pageName}</a></li>`;
-//       });
+    //       // Add navigation links
+    //       projectData.pages.forEach((page) => {
+    //         const pageName = page.name.replace(/ Page/i, '');
+    //         const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
+    //         content += `<li><a href="#${pageId}">${pageName}</a></li>`;
+    //       });
 
-//       content += `</ul>
-//   </nav>
-//   <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
-//     <h1 style="color: var(--theme-color);">${projectName}</h1>
-//     <p style="margin-bottom: 30px;">${projectData.AIProjectDescription || ''}</p>
-//   </div>`;
+    //       content += `</ul>
+    //   </nav>
+    //   <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
+    //     <h1 style="color: var(--theme-color);">${projectName}</h1>
+    //     <p style="margin-bottom: 30px;">${projectData.AIProjectDescription || ''}</p>
+    //   </div>`;
 
-//       // Add each page
-//       projectData.pages.forEach((page) => {
-//         const pageName = page.name.replace(/ Page/i, '');
-//         const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
-//         const pageContent = page.component || '<div>No content available</div>';
+    //       // Add each page
+    //       projectData.pages.forEach((page) => {
+    //         const pageName = page.name.replace(/ Page/i, '');
+    //         const pageId = pageName.toLowerCase().replace(/\s+/g, '-');
+    //         const pageContent = page.component || '<div>No content available</div>';
 
-//         content += `<div id="${pageId}" class="page">
-//     <h2 style="color: var(--theme-color); margin-bottom: 20px;">${pageName}</h2>
-//     ${pageContent}
-//   </div>`;
-//       });
+    //         content += `<div id="${pageId}" class="page">
+    //     <h2 style="color: var(--theme-color); margin-bottom: 20px;">${pageName}</h2>
+    //     ${pageContent}
+    //   </div>`;
+    //       });
 
-//       content += `</body></html>`;
+    //       content += `</body></html>`;
 
-//       // Download the file
-//       try {
-//         const blob = new Blob([content], { type: 'text/html' });
-//         const url = URL.createObjectURL(blob);
-//         const a = document.createElement('a');
-//         a.href = url;
-//         a.download = `${projectName.toLowerCase().replace(/\s+/g, '-')}.html`;
-//         document.body.appendChild(a);
-//         a.click();
-//         document.body.removeChild(a);
-//         URL.revokeObjectURL(url);
+    //       // Download the file
+    //       try {
+    //         const blob = new Blob([content], { type: 'text/html' });
+    //         const url = URL.createObjectURL(blob);
+    //         const a = document.createElement('a');
+    //         a.href = url;
+    //         a.download = `${projectName.toLowerCase().replace(/\s+/g, '-')}.html`;
+    //         document.body.appendChild(a);
+    //         a.click();
+    //         document.body.removeChild(a);
+    //         URL.revokeObjectURL(url);
 
-//         uni.hideLoading();
-//         uni.showToast({
-//           title: 'HTML exported successfully!',
-//           icon: 'success',
-//           duration: 2000
-//         });
-//       } catch (error) {
-//         uni.hideLoading();
-//         uni.showToast({
-//           title: 'Error downloading HTML',
-//           icon: 'none',
-//           duration: 2000
-//         });
-//         console.error('Error downloading HTML:', error);
-//       }
-//     },
+    //         uni.hideLoading();
+    //         uni.showToast({
+    //           title: 'HTML exported successfully!',
+    //           icon: 'success',
+    //           duration: 2000
+    //         });
+    //       } catch (error) {
+    //         uni.hideLoading();
+    //         uni.showToast({
+    //           title: 'Error downloading HTML',
+    //           icon: 'none',
+    //           duration: 2000
+    //         });
+    //         console.error('Error downloading HTML:', error);
+    //       }
+    //     },
     selectDevice(device) {
       this.selectedDevice = device;
       // Save selected device to storage
@@ -2102,7 +2123,7 @@ export default {
     // Methods to handle HTML2Canvas
     _showLoading(message) {
       uni.showLoading({
-        title: message || 'Loading...',
+        title: message || this.$t('design.toast.loading'),
         mask: true
       });
     },
@@ -2416,7 +2437,7 @@ export default {
           return;
         }
 
-        this._showLoading(`Generating ${templatesToGenerate.length} images...`);
+        this._showLoading(this.$t('design.toast.generatingImages', { count: templatesToGenerate.length }));
 
         // Capture elements sequentially
         const captureSequentially = (index) => {
@@ -2505,7 +2526,7 @@ export default {
 
       // Show a toast to indicate a long wait
       uni.showToast({
-        title: 'Generating page, this may take 10+ minutes',
+        title: this.$t('design.toast.generatingLongWait'),
         icon: 'none',
         duration: 3000
       });
@@ -2532,7 +2553,7 @@ export default {
             // Handle API error
             this.isGenerating = false;
             uni.showToast({
-              title: 'API error: ' + response.statusCode,
+              title: this.$t('design.toast.apiError', { code: response.statusCode }),
               icon: 'none',
               duration: 2000
             });
@@ -2833,7 +2854,7 @@ export default {
 
                     // Show success message
                     uni.showToast({
-                      title: 'Simple page created (parsing failed)',
+                      title: this.$t('design.toast.simplePageCreated'),
                       icon: 'success',
                       duration: 2000
                     });
@@ -2863,7 +2884,7 @@ export default {
             // Handle error
             this.isGenerating = false;
             uni.showToast({
-              title: 'Failed to process page data: ' + error.message,
+              title: this.$t('design.toast.failedToProcessPageData') + error.message,
               icon: 'none',
               duration: 3000
             });
@@ -2881,7 +2902,7 @@ export default {
           // Handle error
           this.isGenerating = false;
           uni.showToast({
-            title: 'Error generating page: ' + (error.errMsg || 'Request failed'),
+            title: this.$t('design.toast.errorGeneratingPage') + (error.errMsg || this.$t('design.toast.requestFailed')),
             icon: 'none',
             duration: 3000
           });
@@ -2989,13 +3010,13 @@ export default {
 
         if (this.isTemplateSelectionMode) {
           uni.showToast({
-            title: 'Click a template to select it as reference',
+            title: this.$t('design.toast.clickToSelectTemplate'),
             icon: 'none',
             duration: 2000
           });
         } else {
           uni.showToast({
-            title: 'Template selection mode disabled',
+            title: this.$t('design.toast.templateSelectionDisabled'),
             icon: 'none',
             duration: 1500
           });
@@ -3005,7 +3026,7 @@ export default {
     selectTemplate(template) {
       this.selectedTemplate = template;
       uni.showToast({
-        title: `Selected ${template} template`,
+        title: this.$t('design.toast.selectedTemplate', { template: template }),
         icon: 'none'
       });
     },
@@ -3531,12 +3552,12 @@ export default {
           }
           return res.result.project_id || currentProjectId;
         } else {
-          throw new Error('Failed to ' + action + ' project');
+          throw new Error(this.$t('design.toast.failedTo') + action + this.$t('design.toast.project'));
         }
       }).catch(err => {
         console.error('Cloud function error:', err);
         uni.showToast({
-          title: 'Cloud save failed',
+          title: this.$t('design.toast.cloudSaveFailed'),
           icon: 'error',
           duration: 2000
         });
@@ -3571,12 +3592,12 @@ export default {
           console.log('Project theme updated in cloud with ID:', currentProjectId);
           return res.result.project_id || currentProjectId;
         } else {
-          throw new Error('Failed to update project theme');
+          throw new Error(this.$t('design.toast.failedToUpdateProjectTheme'));
         }
       }).catch(err => {
         console.error('Cloud function error:', err);
         uni.showToast({
-          title: 'Theme save failed',
+          title: this.$t('design.toast.themeSaveFailed'),
           icon: 'error',
           duration: 2000
         });
@@ -3636,7 +3657,7 @@ export default {
     exportHTML() {
       // Show loading toast
       uni.showLoading({
-        title: 'Preparing HTML...',
+        title: this.$t('design.toast.preparingHtml'),
         mask: true
       });
 
@@ -3646,7 +3667,7 @@ export default {
         if (!jsonData) {
           uni.hideLoading();
           uni.showToast({
-            title: 'No project data found',
+            title: this.$t('design.toast.noProjectData'),
             icon: 'none',
             duration: 2000
           });
@@ -3660,7 +3681,7 @@ export default {
         if (!projectData.pages || !projectData.pages.length) {
           uni.hideLoading();
           uni.showToast({
-            title: 'No pages found in project',
+            title: this.$t('design.export.noData'),
             icon: 'none',
             duration: 2000
           });
@@ -3683,7 +3704,7 @@ export default {
 <div style="max-width: 800px; margin: 0 auto; padding: 20px;">
   <h1 style="color: var(--theme-color); margin-bottom: 20px;">${projectName}</h1>
   <p style="margin-bottom: 20px;">${projectData.AIProjectDescription || ''}</p>
-  <h2 style="margin-bottom: 15px;">Pages:</h2>
+  <h2 style="margin-bottom: 15px;">${this.$t('design.export.pages')}</h2>
   <ul style="list-style: none;">`;
 
         // Add each page to the zip and create link in index
@@ -3692,7 +3713,7 @@ export default {
           const fileName = pageName.toLowerCase().replace(/\s+/g, '-') + '.html';
 
           // Create HTML file for the page
-          const pageContent = page.component || '<div>No content available</div>';
+          const pageContent = page.component || `<div>${this.$t('design.export.noContent')}</div>`;
           const fullHtml = htmlTemplate(pageContent);
           zip.file(fileName, fullHtml);
 
@@ -3716,7 +3737,7 @@ export default {
           saveAs(content, `${projectName.toLowerCase().replace(/\s+/g, '-')}_html.zip`);
           uni.hideLoading();
           uni.showToast({
-            title: 'HTML exported successfully!',
+            title: this.$t('design.toast.htmlExportSuccess'),
             icon: 'success',
             duration: 2000
           });
@@ -3725,7 +3746,7 @@ export default {
       } catch (error) {
         uni.hideLoading();
         uni.showToast({
-          title: 'Error exporting HTML',
+          title: this.$t('design.toast.htmlExportError'),
           icon: 'none',
           duration: 2000
         });
@@ -3736,7 +3757,7 @@ export default {
     exportFrameworkCode(framework) {
       // Show loading toast
       uni.showLoading({
-        title: `Preparing ${framework.toUpperCase()} code...`,
+        title: this.$t('design.toast.preparingCode', { framework: framework.toUpperCase() }),
         mask: true
       });
 
@@ -3854,14 +3875,14 @@ export default {
               zip.generateAsync({ type: "blob" }).then((content) => {
                 saveAs(content, `${projectName.toLowerCase().replace(/\s+/g, '-')}_${framework}.zip`);
                 uni.showToast({
-                  title: `${framework.toUpperCase()} code exported!`,
+                  title: this.$t('design.toast.codeExportSuccess', { framework: framework.toUpperCase() }),
                   icon: 'success',
                   duration: 2000
                 });
               });
             } else {
               uni.showToast({
-                title: `Error exporting ${framework.toUpperCase()} code`,
+                title: this.$t('design.toast.codeExportError', { framework: framework.toUpperCase() }),
                 icon: 'none',
                 duration: 2000
               });
@@ -3870,7 +3891,7 @@ export default {
           fail: (err) => {
             uni.hideLoading();
             uni.showToast({
-              title: `Export failed: ${err.errMsg}`,
+              title: this.$t('design.toast.exportFailed', { error: err.errMsg }),
               icon: 'none',
               duration: 2000
             });
@@ -3910,7 +3931,7 @@ export default {
 
     getSelectedModelText() {
       const selectedOption = this.modelOptions.find(option => option.value === this.selectedPageModel);
-      return selectedOption ? selectedOption.text : 'please select your AI model';
+      return selectedOption ? selectedOption.text : this.$t('design.model.pleaseSelect');
     },
 
     handleClickOutside(event) {
@@ -3934,7 +3955,7 @@ export default {
         // Show confirmation toast
         const templateName = template.name ? template.name.replace(/ Page/i, '') : `Page ${index + 1}`;
         uni.showToast({
-          title: `"${templateName}" selected as reference`,
+          title: this.$t('design.toast.templateSelected', { name: templateName }),
           icon: 'none',
           duration: 1500
         });
@@ -3953,10 +3974,10 @@ export default {
 
     getSelectedTemplatePageText() {
       if (this.availableTemplatePages.length === 0) {
-        return 'No template selected';
+        return this.$t('design.createPage.noTemplateSelected');
       }
       const selectedPage = this.availableTemplatePages[this.selectedTemplatePageIndex];
-      return selectedPage ? (selectedPage.name || `Page ${this.selectedTemplatePageIndex + 1}`) : 'Select a template page';
+      return selectedPage ? (selectedPage.name || this.$t('design.createPage.defaultPageName', { index: this.selectedTemplatePageIndex + 1 })) : this.$t('design.createPage.selectTemplatePage');
     },
     async createPage() {
       // Close the dialog immediately to provide better UX
@@ -3964,7 +3985,7 @@ export default {
 
       // Validate the page description
       if (!this.pageDescription) {
-        this.errorMessage = 'Please enter a page description';
+        this.errorMessage = this.$t('design.toast.enterPageDescription');
         this.showCreatePageDialog = true; // Re-open dialog if validation fails
         return;
       }
@@ -4353,10 +4374,10 @@ export default {
                   // Create a simple page object based on the description
                   const pageName = this.pageDescription.split(' ').slice(0, 2).join(' ');
                   const simplifiedPage = {
-                    name: pageName || 'New Page',
+                    name: pageName || this.$t('design.createPage.defaultPageName', { index: projectData.pages.length + 1 }),
                     component: `<div class="container mx-auto p-4">
-                      <h1 class="text-2xl font-bold mb-4">Simple Page</h1>
-                      <p>This is a simple page created from your description: "${this.pageDescription}"</p>
+                      <h1 class="text-2xl font-bold mb-4">${this.$t('design.createPage.simplePageTitle')}</h1>
+                      <p>${this.$t('design.createPage.simplePageDescription', { description: this.pageDescription })}</p>
                     </div>`
                   };
 
@@ -4441,7 +4462,7 @@ export default {
           // Handle error
           this.isGenerating = false;
           uni.showToast({
-            title: 'Error generating page: ' + (error.errMsg || 'Request failed'),
+            title: this.$t('design.toast.generatePageError', { error: error.errMsg || 'Request failed' }),
             icon: 'none',
             duration: 3000
           });
@@ -4482,14 +4503,14 @@ export default {
     deleteSelectedPages() {
       // Check if we have pages to delete
       if (this.pagesToDelete.length === 0) {
-        this.errorMessage = 'Please select at least one page to delete';
+        this.errorMessage = this.$t('design.deletePages.error.selectRequired');
         return;
       }
 
       // Get existing project data
       const existingProjectData = uni.getStorageSync('latest_7_overall_page');
       if (!existingProjectData) {
-        this.errorMessage = 'No project data found';
+        this.errorMessage = this.$t('design.toast.noProjectData');
         return;
       }
 
@@ -4498,7 +4519,7 @@ export default {
 
       // Prevent deleting all pages
       if (this.pagesToDelete.length >= projectData.pages.length) {
-        this.errorMessage = 'You must keep at least one page in your project';
+        this.errorMessage = this.$t('design.deletePages.error.keepOne');
         return;
       }
 
@@ -4539,7 +4560,7 @@ export default {
 
       // Show success message
       uni.showToast({
-        title: 'Pages deleted successfully!',
+        title: this.$t('design.deletePages.success'),
         icon: 'success',
         duration: 2000
       });
@@ -4620,12 +4641,12 @@ export default {
     async importProject() {
       if (this.selectedImportType === 'html') {
         if (!this.htmlFiles || this.htmlFiles.length === 0) {
-          this.importError = 'Please select at least one HTML file to import';
+          this.importError = this.$t('design.import.htmlFileRequired');
           return;
         }
       } else {
         if (!this.importFileList.length) {
-          this.importError = 'Please select a file to import';
+          this.importError = this.$t('design.import.fileRequired');
           return;
         }
       }
@@ -4697,7 +4718,7 @@ export default {
 
       // Show a toast to indicate processing
       uni.showToast({
-        title: 'Processing imported files...',
+        title: this.$t('design.import.processing'),
         icon: 'none',
         duration: 3000
       });
@@ -5091,13 +5112,17 @@ export default {
                 // If all parsing attempts fail, try to extract and create a page manually
                 try {
                   // Create a simple page object based on the imported files
-                  const pageName = `Imported ${this.selectedImportType} ${new Date().toLocaleDateString()}`;
+                  const type = this.selectedImportType.toUpperCase();
+                  const date = new Date().toLocaleDateString();
+                  const pageName = this.$t('design.import.pageName', { type, date });
+                  const files = this.importFileList.map(f => f.name).join(', ');
+
                   const simplifiedPage = {
                     name: pageName,
                     component: `<div class="container mx-auto p-4">
-                      <h1 class="text-2xl font-bold mb-4">Imported Content</h1>
-                      <p>This page was created from imported ${this.selectedImportType} files.</p>
-                      <p>Files imported: ${this.importFileList.map(f => f.name).join(', ')}</p>
+                      <h1 class="text-2xl font-bold mb-4">${this.$t('design.import.contentTitle')}</h1>
+                      <p>${this.$t('design.import.contentDescription', { type: this.selectedImportType })}</p>
+                      <p>${this.$t('design.import.filesList', { files })}</p>
                     </div>`
                   };
 
@@ -5382,7 +5407,7 @@ export default {
         // Handle error
         this.isImporting = false;
         uni.showToast({
-          title: 'Failed to process HTML import: ' + error.message,
+          title: this.$t('design.import.processHtmlError', { error: error.message }),
           icon: 'none',
           duration: 3000
         });
@@ -5428,7 +5453,7 @@ export default {
         // Validate that it's actually HTML content
         if (this.htmlFileContent && this.htmlFileContent.trim()) {
           uni.showToast({
-            title: `HTML file "${file.name}" loaded successfully`,
+            title: this.$t('design.import.htmlFileLoaded', { name: file.name }),
             icon: 'success',
             duration: 2000
           });
@@ -5437,7 +5462,7 @@ export default {
           this.htmlFileName = '';
           this.htmlFiles = [];
           uni.showToast({
-            title: 'Invalid HTML file content',
+            title: this.$t('design.import.invalidHtml'),
             icon: 'none',
             duration: 2000
           });
@@ -5449,7 +5474,7 @@ export default {
         this.htmlFileContent = '';
         this.htmlFiles = [];
         uni.showToast({
-          title: 'Failed to read file',
+          title: this.$t('design.import.readError'),
           icon: 'none',
           duration: 2000
         });
@@ -5471,18 +5496,18 @@ export default {
           const valid = results.filter(r => r.content && String(r.content).trim());
           this.htmlFiles = valid;
           if (valid.length === 0) {
-            uni.showToast({ title: 'Selected files are empty', icon: 'none', duration: 2000 });
+            uni.showToast({ title: this.$t('design.import.emptyFiles'), icon: 'none', duration: 2000 });
             return;
           }
           // Keep backward-compatible single fields for any other logic
           this.htmlFileName = valid[0].name;
           this.htmlFileContent = valid[0].content;
-          uni.showToast({ title: `${valid.length} HTML file(s) loaded`, icon: 'success', duration: 2000 });
+          uni.showToast({ title: this.$t('design.import.htmlFilesCountLoaded', { count: valid.length }), icon: 'success', duration: 2000 });
         })
         .catch(err => {
           console.error(err);
           this.htmlFiles = [];
-          uni.showToast({ title: 'Failed to read selected files', icon: 'none', duration: 2000 });
+          uni.showToast({ title: this.$t('design.import.readSelectedError'), icon: 'none', duration: 2000 });
         });
     },
     tryImportByProjectId(projectId) {
@@ -5543,7 +5568,7 @@ export default {
       // }
 
       // If not imported before, proceed with import
-      uni.showLoading({ title: 'Loading project...' });
+      uni.showLoading({ title: this.$t('design.toast.loadingProject') });
       uniCloud.callFunction({
         name: 'generated-overall-pages',
         data: {
@@ -5562,6 +5587,7 @@ export default {
           setTimeout(() => {
             this.generatePreviewImages();
             this.refreshTemplates();
+            uni.showToast({ title: this.$t('design.toast.projectRefreshed'), icon: 'success', duration: 2000 });
 
             // After preview images are generated, update the project preview image
             // Wait longer to ensure images are captured
@@ -5657,11 +5683,11 @@ export default {
             });
           */
         } else {
-          uni.showToast({ title: 'Failed to load project', icon: 'none', duration: 2000 });
+          uni.showToast({ title: this.$t('design.toast.failedToLoadProject'), icon: 'none', duration: 2000 });
         }
       }).catch(err => {
         uni.hideLoading();
-        uni.showToast({ title: 'Error loading project', icon: 'none', duration: 2000 });
+        uni.showToast({ title: this.$t('design.toast.errorLoadingProject'), icon: 'none', duration: 2000 });
         console.error('Cloud function error:', err);
       });
     },
@@ -5677,7 +5703,7 @@ export default {
       }
 
       // Show loading indicator
-      uni.showLoading({ title: 'Refreshing project...' });
+      uni.showLoading({ title: this.$t('design.toast.refreshingProject') });
 
       // Call the cloud function to get the latest project data
       uniCloud.callFunction({
@@ -5721,7 +5747,7 @@ export default {
             }, 1500 + (index * 300));
           });
 
-          uni.showToast({ title: 'Project refreshed', icon: 'success', duration: 2000 });
+          uni.showToast({ title: this.$t('design.toast.projectRefreshed'), icon: 'success', duration: 2000 });
         } else {
           // If cloud refresh fails, fall back to regular refresh
           console.warn('Failed to refresh from cloud, falling back to local refresh');
@@ -5752,7 +5778,7 @@ export default {
 
       this.isOptimizingPrompt = true;
       // Optional: show a quick toast
-      uni.showToast({ title: 'Optimizing...', icon: 'none', duration: 1500 });
+      uni.showToast({ title: this.$t('design.toast.optimizingPrompt'), icon: 'none', duration: 1500 });
       uni.request({
         url: `${API_BASE_URL}/optimize-prompt`,
         method: 'POST',
@@ -5770,16 +5796,16 @@ export default {
             const optimized = data.optimized_description || '';
             if (typeof optimized === 'string' && optimized.trim().length > 0) {
               this.pageDescription = optimized.trim();
-              uni.showToast({ title: 'Prompt improved', icon: 'success', duration: 1500 });
+              uni.showToast({ title: this.$t('design.toast.promptImproved'), icon: 'success', duration: 1500 });
             } else {
-              uni.showToast({ title: 'No optimized prompt returned', icon: 'none', duration: 2000 });
+              uni.showToast({ title: this.$t('design.toast.noOptimizedPrompt'), icon: 'none', duration: 2000 });
             }
           } catch (e) {
-            uni.showToast({ title: 'Optimize failed', icon: 'none', duration: 2000 });
+            uni.showToast({ title: this.$t('design.toast.optimizeFailed'), icon: 'none', duration: 2000 });
           }
         },
         fail: (err) => {
-          uni.showToast({ title: `Optimize error: ${err.errMsg || 'Request failed'}`, icon: 'none', duration: 2500 });
+          uni.showToast({ title: this.$t('design.toast.optimizeError', { error: err.errMsg || 'Request failed' }), icon: 'none', duration: 2500 });
         },
         complete: () => {
           this.isOptimizingPrompt = false;
@@ -5883,7 +5909,7 @@ export default {
       this.customColor = '';
       this.previewColor = this.coolColors[0].hex;
       uni.showToast({
-        title: 'Color card cleared',
+        title: this.$t('design.toast.colorCardCleared'),
         icon: 'success',
         duration: 1500
       });
@@ -6001,8 +6027,8 @@ export default {
 
         if (!freeUsageData.allowed) {
           // Show membership upgrade dialog or message
-          const usageTypeText = usageType === 0 ? 'UI generation' : 'screenshot conversion';
-          const message = `You have reached your free ${usageTypeText} limit. Please upgrade to continue.`;
+          const usageTypeText = usageType === 0 ? this.$t('common.usageType.uiGeneration') : this.$t('common.usageType.screenshotConversion');
+          const message = this.$t('common.limitReachedMessage', { type: usageTypeText });
 
           // Use custom modal instead of uni.showModal
           this.showCustomUpgradeModal(message);
@@ -6016,7 +6042,7 @@ export default {
       } catch (error) {
         console.error('Error performing membership check:', error);
         uni.showToast({
-          title: 'Error checking permissions: ' + error.message,
+          title: this.$t('design.toast.permissionCheckError', { error: error.message }),
           icon: 'none',
           duration: 3000
         });
@@ -6069,7 +6095,7 @@ export default {
           this.colorCard.push(color);
         } else {
           // Show error if trying to select more than 5 colors
-          this.colorPaletteError = 'You can select up to 5 colors. Please deselect one first.';
+          this.colorPaletteError = this.$t('design.colorPalette.error.limitReached');
           setTimeout(() => {
             this.colorPaletteError = '';
           }, 3000);
@@ -6103,7 +6129,7 @@ export default {
       if (this.customColor && this.isValidColor(this.customColor)) {
         this.selectColor(this.customColor);
       } else if (this.customColor) {
-        this.colorPaletteError = 'Invalid color format. Please use #RRGGBB format.';
+        this.colorPaletteError = this.$t('design.colorPalette.error.invalidFormat');
         setTimeout(() => {
           this.colorPaletteError = '';
         }, 3000);
@@ -6151,7 +6177,7 @@ export default {
       this.colorPaletteError = '';
 
       uni.showToast({
-        title: `${this.colorCard.length} theme colors applied`,
+        title: this.$t('design.colorPalette.toast.applied', { count: this.colorCard.length }),
         icon: 'success',
         duration: 2000
       });
@@ -6180,7 +6206,7 @@ export default {
         // Check if user has reached the limit (3 times total)
         if (currentUsage >= 3) {
           uni.showToast({
-            title: 'You have reached your limit of 3 operations, please login to get 10 more operations',
+            title: this.$t('design.toast.specialUserLimitReached'),
             icon: 'none',
             duration: 4000
           });

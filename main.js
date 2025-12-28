@@ -2,8 +2,8 @@ import App from './App'
 import messages from './locale/index'
 
 let i18nConfig = {
-  locale: 'en', // 设置默认语言为英语
-  fallbackLocale: 'en', // 设置回退语言为英语
+  locale: uni.getStorageSync('appLocale') || 'en', // Set locale from storage or default to English
+  fallbackLocale: 'en', // Set fallback language to English
   messages
 }
 
