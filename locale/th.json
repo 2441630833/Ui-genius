@@ -784,5 +784,11 @@
   "editor.clone": "คัดลอกองค์ประกอบ",
   "editor.remove": "ลบองค์ประกอบ",
   "editor.insertAfter": "หลัง",
-  "editor.insertBefore": "ก่อน"
+  "editor.insertBefore": "ก่อน",
+  "dashboard.projects.alpha.title": "โครงการ Alpha",
+  "dashboard.projects.alpha.description": "โครงการนวัตกรรมที่ใช้เครื่องมือออกแบบล่าสุดเพื่อสร้างอินเทอร์เฟซที่ใช้งานง่าย",
+  "dashboard.projects.beta.title": "โครงการ Beta",
+  "dashboard.projects.beta.description": "มุ่งเน้นการปรับปรุงประสบการณ์ผู้ใช้ผ่านวิธีการออกแบบที่ได้รับการปรับปรุง",
+  "dashboard.projects.gamma.title": "โครงการ Gamma",
+  "dashboard.projects.gamma.description": "สำรวจกระบวนทัศน์การออกแบบใหม่เพื่อสร้างอินเทอร์เฟซที่ทันสมัยและน่าสนใจ"
 }

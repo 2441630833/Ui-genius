@@ -762,5 +762,11 @@
 	"editor.clone": "Clona elemento",
 	"editor.remove": "Rimuovi elemento",
 	"editor.insertAfter": "Dopo",
-	"editor.insertBefore": "Prima"
+	"editor.insertBefore": "Prima",
+	"dashboard.projects.alpha.title": "Progetto Alfa",
+	"dashboard.projects.alpha.description": "Un progetto innovativo che utilizza gli ultimi strumenti di design per creare interfacce user-friendly.",
+	"dashboard.projects.beta.title": "Progetto Beta",
+	"dashboard.projects.beta.description": "Concentrato sul miglioramento dell'esperienza utente attraverso metodologie di design raffinate.",
+	"dashboard.projects.gamma.title": "Progetto Gamma",
+	"dashboard.projects.gamma.description": "Esplorazione di nuovi paradigmi di design per creare interfacce futuristiche e coinvolgenti."
 }

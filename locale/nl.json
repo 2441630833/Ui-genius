@@ -763,5 +763,11 @@
 	"editor.clone": "Element klonen",
 	"editor.remove": "Element verwijderen",
 	"editor.insertAfter": "Daarna",
-	"editor.insertBefore": "Daarvoor"
+	"editor.insertBefore": "Daarvoor",
+	"dashboard.projects.alpha.title": "Project Alpha",
+	"dashboard.projects.alpha.description": "Een innovatief project dat de nieuwste ontwerptools gebruikt om gebruiksvriendelijke interfaces te creëren.",
+	"dashboard.projects.beta.title": "Project Beta",
+	"dashboard.projects.beta.description": "Gericht op het verbeteren van de gebruikerservaring door verfijnde ontwerpmethodologieën.",
+	"dashboard.projects.gamma.title": "Project Gamma",
+	"dashboard.projects.gamma.description": "Het verkennen van nieuwe ontwerpparadigma's om futuristische en boeiende interfaces te creëren."
 }

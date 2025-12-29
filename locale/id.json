@@ -763,5 +763,11 @@
   "editor.clone": "Gandakan elemen",
   "editor.remove": "Hapus elemen",
   "editor.insertAfter": "Sesudah",
-  "editor.insertBefore": "Sebelum"
+  "editor.insertBefore": "Sebelum",
+  "dashboard.projects.alpha.title": "Proyek Alpha",
+  "dashboard.projects.alpha.description": "Proyek inovatif yang menggunakan alat desain terbaru untuk membuat antarmuka yang ramah pengguna.",
+  "dashboard.projects.beta.title": "Proyek Beta",
+  "dashboard.projects.beta.description": "Berfokus pada peningkatan pengalaman pengguna melalui metodologi desain yang disempurnakan.",
+  "dashboard.projects.gamma.title": "Proyek Gamma",
+  "dashboard.projects.gamma.description": "Menjelajahi paradigma desain baru untuk menciptakan antarmuka futuristik dan menarik."
 }

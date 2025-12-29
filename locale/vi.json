@@ -763,5 +763,11 @@
   "editor.clone": "Sao chép phần tử",
   "editor.remove": "Xóa phần tử",
   "editor.insertAfter": "Sau",
-  "editor.insertBefore": "Trước"
+  "editor.insertBefore": "Trước",
+  "dashboard.projects.alpha.title": "Dự án Alpha",
+  "dashboard.projects.alpha.description": "Một dự án sáng tạo sử dụng các công cụ thiết kế mới nhất để tạo giao diện thân thiện với người dùng.",
+  "dashboard.projects.beta.title": "Dự án Beta",
+  "dashboard.projects.beta.description": "Tập trung vào việc nâng cao trải nghiệm người dùng thông qua các phương pháp thiết kế tinh tế.",
+  "dashboard.projects.gamma.title": "Dự án Gamma",
+  "dashboard.projects.gamma.description": "Khám phá các mô hình thiết kế mới để tạo ra các giao diện tương lai và hấp dẫn."
 }

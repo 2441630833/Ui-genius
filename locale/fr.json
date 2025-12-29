@@ -785,6 +785,12 @@
   "editor.editCode": "Modifier le code HTML",
   "editor.clone": "Cloner l'élément",
   "editor.remove": "Supprimer l'élément",
-  "editor.insertAfter": "Après",
-  "editor.insertBefore": "Avant"
+	"editor.insertAfter": "Après",
+	"editor.insertBefore": "Avant",
+	"dashboard.projects.alpha.title": "Projet Alpha",
+	"dashboard.projects.alpha.description": "Un projet innovant utilisant les derniers outils de conception pour créer des interfaces conviviales.",
+	"dashboard.projects.beta.title": "Projet Bêta",
+	"dashboard.projects.beta.description": "Se concentrant sur l'amélioration de l'expérience utilisateur grâce à des méthodologies de conception raffinées.",
+	"dashboard.projects.gamma.title": "Projet Gamma",
+	"dashboard.projects.gamma.description": "Explorer de nouveaux paradigmes de conception pour créer des interfaces futuristes et engageantes."
 }

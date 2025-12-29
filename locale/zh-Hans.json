@@ -783,5 +783,11 @@
 	"editor.clone": "克隆元素",
 	"editor.remove": "删除元素",
 	"editor.insertAfter": "之后插入",
-	"editor.insertBefore": "之前插入"
+	"editor.insertBefore": "之前插入",
+	"dashboard.projects.alpha.title": "项目 Alpha",
+	"dashboard.projects.alpha.description": "一个创新项目，使用最新的设计工具创建用户友好的界面。",
+	"dashboard.projects.beta.title": "项目 Beta",
+	"dashboard.projects.beta.description": "专注于通过精细的设计方法增强用户体验。",
+	"dashboard.projects.gamma.title": "项目 Gamma",
+	"dashboard.projects.gamma.description": "探索新的设计范式，创建未来感和吸引力的界面。"
 }

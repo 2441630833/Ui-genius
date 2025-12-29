@@ -779,5 +779,11 @@
 	"editor.clone": "要素を複製",
 	"editor.remove": "要素を削除",
 	"editor.insertAfter": "後に挿入",
-	"editor.insertBefore": "前に挿入"
+	"editor.insertBefore": "前に挿入",
+	"dashboard.projects.alpha.title": "プロジェクトアルファ",
+	"dashboard.projects.alpha.description": "最新のデザインツールを使用してユーザーフレンドリーなインターフェースを作成する革新的なプロジェクト。",
+	"dashboard.projects.beta.title": "プロジェクトベータ",
+	"dashboard.projects.beta.description": "洗練されたデザイン手法を通じてユーザーエクスペリエンスを向上させることに焦点を当てています。",
+	"dashboard.projects.gamma.title": "プロジェクトガンマ",
+	"dashboard.projects.gamma.description": "未来的で魅力的なインターフェースを作成するための新しいデザインパラダイムの探求。"
 }

@@ -784,5 +784,11 @@
 	"editor.clone": "Klon element",
 	"editor.remove": "Fjern element",
 	"editor.insertAfter": "Efter",
-	"editor.insertBefore": "Før"
+	"editor.insertBefore": "Før",
+	"dashboard.projects.alpha.title": "Projekt Alpha",
+	"dashboard.projects.alpha.description": "Et innovativt projekt, der bruger de nyeste designværktøjer til at skabe brugervenlige grænseflader.",
+	"dashboard.projects.beta.title": "Projekt Beta",
+	"dashboard.projects.beta.description": "Fokuserer på at forbedre brugeroplevelsen gennem raffinerede designmetoder.",
+	"dashboard.projects.gamma.title": "Projekt Gamma",
+	"dashboard.projects.gamma.description": "Udforsker nye designparadigmer for at skabe futuristiske og engagerende grænseflader."
 }

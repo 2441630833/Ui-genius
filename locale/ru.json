@@ -783,5 +783,11 @@
 	"editor.clone": "Дублировать элемент",
 	"editor.remove": "Удалить элемент",
 	"editor.insertAfter": "После",
-	"editor.insertBefore": "До"
+	"editor.insertBefore": "До",
+	"dashboard.projects.alpha.title": "Проект Alpha",
+	"dashboard.projects.alpha.description": "Инновационный проект, использующий новейшие инструменты дизайна для создания удобных интерфейсов.",
+	"dashboard.projects.beta.title": "Проект Beta",
+	"dashboard.projects.beta.description": "Сосредоточен на улучшении пользовательского опыта с помощью усовершенствованных методологий дизайна.",
+	"dashboard.projects.gamma.title": "Проект Gamma",
+	"dashboard.projects.gamma.description": "Исследование новых парадигм дизайна для создания футуристических и привлекательных интерфейсов."
 }

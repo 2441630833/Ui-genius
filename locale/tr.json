@@ -763,5 +763,11 @@
   "editor.clone": "Öğeyi klonla",
   "editor.remove": "Öğeyi kaldır",
   "editor.insertAfter": "Sonra",
-  "editor.insertBefore": "Önce"
+  "editor.insertBefore": "Önce",
+  "dashboard.projects.alpha.title": "Proje Alpha",
+  "dashboard.projects.alpha.description": "Kullanıcı dostu arayüzler oluşturmak için en son tasarım araçlarını kullanan yenilikçi bir proje.",
+  "dashboard.projects.beta.title": "Proje Beta",
+  "dashboard.projects.beta.description": "Rafine tasarım metodolojileri aracılığıyla kullanıcı deneyimini geliştirmeye odaklanıyor.",
+  "dashboard.projects.gamma.title": "Proje Gamma",
+  "dashboard.projects.gamma.description": "Fütüristik ve ilgi çekici arayüzler oluşturmak için yeni tasarım paradigmalarını keşfediyor."
 }

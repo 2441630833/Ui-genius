@@ -763,5 +763,11 @@
   "editor.clone": "Sklonuj element",
   "editor.remove": "Usuń element",
   "editor.insertAfter": "Po",
-  "editor.insertBefore": "Przed"
+  "editor.insertBefore": "Przed",
+  "dashboard.projects.alpha.title": "Projekt Alpha",
+  "dashboard.projects.alpha.description": "Innowacyjny projekt wykorzystujący najnowsze narzędzia projektowe do tworzenia przyjaznych dla użytkownika interfejsów.",
+  "dashboard.projects.beta.title": "Projekt Beta",
+  "dashboard.projects.beta.description": "Skupia się na poprawie doświadczenia użytkownika poprzez udoskonalone metodologie projektowania.",
+  "dashboard.projects.gamma.title": "Projekt Gamma",
+  "dashboard.projects.gamma.description": "Eksploracja nowych paradygmatów projektowania w celu tworzenia futurystycznych i angażujących interfejsów."
 }

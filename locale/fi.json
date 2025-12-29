@@ -763,5 +763,11 @@
   "editor.clone": "Kloonaa elementti",
   "editor.remove": "Poista elementti",
   "editor.insertAfter": "Jälkeen",
-  "editor.insertBefore": "Ennen"
+  "editor.insertBefore": "Ennen",
+  "dashboard.projects.alpha.title": "Projekti Alpha",
+  "dashboard.projects.alpha.description": "Innovatiivinen projekti, joka käyttää uusimpia suunnittelutyökaluja käyttäjäystävällisten käyttöliittymien luomiseen.",
+  "dashboard.projects.beta.title": "Projekti Beta",
+  "dashboard.projects.beta.description": "Keskittyy käyttäjäkokemuksen parantamiseen hienostuneilla suunnittelumenetelmillä.",
+  "dashboard.projects.gamma.title": "Projekti Gamma",
+  "dashboard.projects.gamma.description": "Tutkii uusia suunnitteluparadigmoja futurististen ja mukaansatempaavien käyttöliittymien luomiseksi."
 }

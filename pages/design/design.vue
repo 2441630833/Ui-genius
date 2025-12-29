@@ -1020,7 +1020,7 @@ export default {
     this.cleanupInjectedStyles();
   },
   onLoad(options) {
-    this.loadSavedLanguage();
+    // this.loadSavedLanguage();
     // Initialize project_id from storage
     const storedProjectId = uni.getStorageSync('currentProjectId');
     if (storedProjectId) {
@@ -1096,20 +1096,20 @@ export default {
     }
   },
   methods: {
-    loadSavedLanguage() {
-      try {
-        const savedLocale = uni.getStorageSync('appLocale');
-        if (savedLocale) {
-          uni.setLocale(savedLocale);
-          // Also update i18n locale if available
-          if (this.$i18n) {
-            this.$i18n.locale = savedLocale;
-          }
-        }
-      } catch (error) {
-        console.error('Design page: Error loading saved language:', error);
-      }
-    },
+    // loadSavedLanguage() {
+    //   try {
+    //     const savedLocale = uni.getStorageSync('appLocale');
+    //     if (savedLocale) {
+    //       uni.setLocale(savedLocale);
+    //       // Also update i18n locale if available
+    //       if (this.$i18n) {
+    //         this.$i18n.locale = savedLocale;
+    //       }
+    //     }
+    //   } catch (error) {
+    //     console.error('Design page: Error loading saved language:', error);
+    //   }
+    // },
     // tryLoadSharedFromQuery() {
     //   // H5 only: parse params from hash URL
     //   // #ifdef H5

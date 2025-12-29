@@ -783,5 +783,11 @@
   "editor.clone": "تكرار العنصر",
   "editor.remove": "إزالة العنصر",
   "editor.insertAfter": "بعد",
-  "editor.insertBefore": "قبل"
+  "editor.insertBefore": "قبل",
+  "dashboard.projects.alpha.title": "مشروع Alpha",
+  "dashboard.projects.alpha.description": "مشروع مبتكر يستخدم أحدث أدوات التصميم لإنشاء واجهات سهلة الاستخدام.",
+  "dashboard.projects.beta.title": "مشروع Beta",
+  "dashboard.projects.beta.description": "التركيز على تحسين تجربة المستخدم من خلال منهجيات التصميم المحسنة.",
+  "dashboard.projects.gamma.title": "مشروع Gamma",
+  "dashboard.projects.gamma.description": "استكشاف نماذج تصميم جديدة لإنشاء واجهات مستقبلية وجذابة."
 }

@@ -783,6 +783,12 @@
   "editor.editCode": "編輯源碼",
   "editor.clone": "克隆元素",
   "editor.remove": "刪除元素",
-  "editor.insertAfter": "之後插入",
-  "editor.insertBefore": "之前插入"
+	"editor.insertAfter": "之後插入",
+	"editor.insertBefore": "之前插入",
+	"dashboard.projects.alpha.title": "阿爾法專案",
+	"dashboard.projects.alpha.description": "一個創新專案，使用最新的設計工具創建用戶友好的界面。",
+	"dashboard.projects.beta.title": "貝塔專案",
+	"dashboard.projects.beta.description": "專注於通過精細的設計方法改進用戶體驗。",
+	"dashboard.projects.gamma.title": "伽馬專案",
+	"dashboard.projects.gamma.description": "探索新的設計範式來創建未來感和吸引人的界面。"
 }

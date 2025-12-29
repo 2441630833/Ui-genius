@@ -784,5 +784,11 @@
   "editor.clone": "तत्व क्लोन करें",
   "editor.remove": "तत्व हटाएँ",
   "editor.insertAfter": "बाद में",
-  "editor.insertBefore": "पहले"
+  "editor.insertBefore": "पहले",
+  "dashboard.projects.alpha.title": "प्रोजेक्ट Alpha",
+  "dashboard.projects.alpha.description": "उपयोगकर्ता-अनुकूल इंटरफेस बनाने के लिए नवीनतम डिज़ाइन टूल का उपयोग करने वाली एक अभिनव परियोजना।",
+  "dashboard.projects.beta.title": "प्रोजेक्ट Beta",
+  "dashboard.projects.beta.description": "परिष्कृत डिज़ाइन पद्धतियों के माध्यम से उपयोगकर्ता अनुभव को बढ़ाने पर ध्यान केंद्रित करना।",
+  "dashboard.projects.gamma.title": "प्रोजेक्ट Gamma",
+  "dashboard.projects.gamma.description": "भविष्यवादी और आकर्षक इंटरफेस बनाने के लिए नए डिज़ाइन प्रतिमानों की खोज करना।"
 }

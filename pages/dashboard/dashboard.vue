@@ -111,9 +111,8 @@
                   mode="aspectFill">
                 </image>
                 <view class="project-content">
-                  <text class="project-title">Project Alpha</text>
-                  <text class="project-description">An innovative project using the latest design tools to create
-                    user-friendly interfaces.</text>
+                  <text class="project-title">{{$t('dashboard.projects.alpha.title')}}</text>
+                  <text class="project-description">{{$t('dashboard.projects.alpha.description')}}</text>
                 </view>
               </view>
             </x-skeleton>
@@ -126,9 +125,8 @@
                   mode="aspectFill">
                 </image>
                 <view class="project-content">
-                  <text class="project-title">Project Beta</text>
-                  <text class="project-description">Focusing on enhancing user experience through refined design
-                    methodologies.</text>
+                  <text class="project-title">{{$t('dashboard.projects.beta.title')}}</text>
+                  <text class="project-description">{{$t('dashboard.projects.beta.description')}}</text>
                 </view>
               </view>
             </x-skeleton>
@@ -141,9 +139,8 @@
                   mode="aspectFill">
                 </image>
                 <view class="project-content">
-                  <text class="project-title">Project Gamma</text>
-                  <text class="project-description">Exploring new design paradigms to create futuristic and engaging
-                    interfaces.</text>
+                  <text class="project-title">{{$t('dashboard.projects.gamma.title')}}</text>
+                  <text class="project-description">{{$t('dashboard.projects.gamma.description')}}</text>
                 </view>
               </view>
             </x-skeleton>
@@ -670,7 +667,7 @@ export default {
   },
   mounted() {
     // Load saved language preference
-    this.loadSavedLanguage();
+    //this.loadSavedLanguage();
     
     // Staggered loading for projects
     setTimeout(() => {
@@ -701,25 +698,25 @@ export default {
   },
   methods: {
     // Load saved language preference from storage
-    loadSavedLanguage() {
-      try {
-        const savedLocale = uni.getStorageSync('appLocale');
-        if (savedLocale) {
-          uni.setLocale(savedLocale);
-          // Also update i18n locale if available
-          if (this.$i18n) {
-            this.$i18n.locale = savedLocale;
-          }
-          console.log('Dashboard: Loaded saved locale:', savedLocale);
-        } else {
-          // Get current locale from uni-app
-          const currentLocale = uni.getLocale();
-          console.log('Dashboard: Using current locale:', currentLocale);
-        }
-      } catch (error) {
-        console.error('Dashboard: Error loading saved language:', error);
-      }
-    },
+    // loadSavedLanguage() {
+    //   try {
+    //     const savedLocale = uni.getStorageSync('appLocale');
+    //     if (savedLocale) {
+    //       uni.setLocale(savedLocale);
+    //       // Also update i18n locale if available
+    //       if (this.$i18n) {
+    //         this.$i18n.locale = savedLocale;
+    //       }
+    //       console.log('Dashboard: Loaded saved locale:', savedLocale);
+    //     } else {
+    //       // Get current locale from uni-app
+    //       const currentLocale = uni.getLocale();
+    //       console.log('Dashboard: Using current locale:', currentLocale);
+    //     }
+    //   } catch (error) {
+    //     console.error('Dashboard: Error loading saved language:', error);
+    //   }
+    // },
     
     checkAndStartGuide() {
       const hasGuideShown = uni.getStorageSync('hasUserGuideShown'); // 或 localStorage.getItem('hasUserGuideShown')

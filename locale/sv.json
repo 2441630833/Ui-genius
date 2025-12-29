@@ -763,5 +763,11 @@
 	"editor.clone": "Klona element",
 	"editor.remove": "Ta bort element",
 	"editor.insertAfter": "Efter",
-	"editor.insertBefore": "Före"
+	"editor.insertBefore": "Före",
+	"dashboard.projects.alpha.title": "Projekt Alpha",
+	"dashboard.projects.alpha.description": "Ett innovativt projekt som använder de senaste designverktygen för att skapa användarvänliga gränssnitt.",
+	"dashboard.projects.beta.title": "Projekt Beta",
+	"dashboard.projects.beta.description": "Fokuserar på att förbättra användarupplevelsen genom förfinade designmetoder.",
+	"dashboard.projects.gamma.title": "Projekt Gamma",
+	"dashboard.projects.gamma.description": "Utforska nya designparadigm för att skapa futuristiska och engagerande gränssnitt."
 }
