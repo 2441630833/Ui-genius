@@ -1991,7 +1991,7 @@ export default {
           needsUpdate = true;
           // Remove the old image from storage
           uni.removeStorageSync(`uigenius_image_${key}`);
-          console.log(`Template ${key} has changed, will regenerate image`);
+          // console.log(`Template ${key} has changed, will regenerate image`);
         }
       });
 
@@ -2000,7 +2000,7 @@ export default {
       if (forceRegeneration) {
         needsUpdate = true;
         uni.removeStorageSync('force_regeneration');
-        console.log('Forcing template regeneration after UI generation');
+        // console.log('Forcing template regeneration after UI generation');
       }
 
       // If any templates have changed, regenerate the images
@@ -2202,11 +2202,11 @@ export default {
               const alreadyUpdated = uni.getStorageSync(previewUpdatedKey);
 
               if (alreadyUpdated) {
-                console.log('Project preview already updated, skipping:', currentProjectId);
+                // console.log('Project preview already updated, skipping:', currentProjectId);
                 return;
               }
 
-              console.log('Updating project preview image for first page:', pageKey);
+              // console.log('Updating project preview image for first page:', pageKey);
 
               // Call cloud function to update preview image
               uniCloud.callFunction({
@@ -2221,7 +2221,7 @@ export default {
                 }
               }).then(res => {
                 if (res.result && res.result.success) {
-                  console.log('Project preview image updated successfully');
+                  // console.log('Project preview image updated successfully');
                   // Mark as updated to prevent duplicate updates
                   uni.setStorageSync(previewUpdatedKey, 'true');
                 }
@@ -2239,14 +2239,14 @@ export default {
     updateImportedProjectPreview(projectData, retryCount = 0) {
       // Get the first page preview image from storage
       if (!projectData || !projectData.pages || projectData.pages.length === 0) {
-        console.log('No pages in imported project to create preview');
+        // console.log('No pages in imported project to create preview');
         return;
       }
 
       const currentProjectId = uni.getStorageSync('currentProjectId');
 
       if (!currentProjectId) {
-        console.log('No current project ID found');
+        // console.log('No current project ID found');
         return;
       }
 
@@ -2255,7 +2255,7 @@ export default {
       const alreadyUpdated = uni.getStorageSync(previewUpdatedKey);
 
       if (alreadyUpdated) {
-        console.log('Imported project preview already updated, skipping:', currentProjectId);
+        // console.log('Imported project preview already updated, skipping:', currentProjectId);
         return;
       }
 
@@ -2268,18 +2268,18 @@ export default {
         if (!previewImage) {
           // Only retry up to 5 times to prevent infinite loops
           if (retryCount < 5) {
-            console.log(`Preview image not yet generated for first page: ${firstPageKey}, retry ${retryCount + 1}/5`);
+            // console.log(`Preview image not yet generated for first page: ${firstPageKey}, retry ${retryCount + 1}/5`);
             // Retry after another delay
             setTimeout(() => {
               this.updateImportedProjectPreview(projectData, retryCount + 1);
             }, 1000);
           } else {
-            console.log('Max retry attempts reached, preview image not available');
+            // console.log('Max retry attempts reached, preview image not available');
           }
           return;
         }
 
-        console.log('Updating imported project preview image with first page:', firstPageKey);
+        // console.log('Updating imported project preview image with first page:', firstPageKey);
 
         // Update the project preview image in the cloud
         uniCloud.callFunction({
@@ -2294,7 +2294,7 @@ export default {
           }
         }).then(res => {
           if (res.result && res.result.success) {
-            console.log('Imported project preview image updated successfully');
+            // console.log('Imported project preview image updated successfully');
             // Mark as updated to prevent duplicate updates
             uni.setStorageSync(previewUpdatedKey, 'true');
           }
@@ -2542,7 +2542,7 @@ export default {
         // Set a much longer timeout (20 minutes = 1,200,000ms)
         timeout: 1200000,
         success: (response) => {
-          console.log('API Response:', response);
+          // console.log('API Response:', response);
 
           // Stop the progress interval
           clearInterval(progressInterval);
@@ -3505,7 +3505,7 @@ export default {
         // Try to get the captured image from storage
         try {
           previewImage = uni.getStorageSync(`uigenius_image_${firstPageKey}`) || '';
-          console.log(`Using preview image for project from page: ${firstPageKey}`);
+          // console.log(`Using preview image for project from page: ${firstPageKey}`);
         } catch (e) {
           console.error('Failed to get preview image:', e);
         }
@@ -3539,16 +3539,16 @@ export default {
         data: callData
       }).then(res => {
         if (res.result && res.result.success) {
-          console.log('res.result', res.result);
+          // console.log('res.result', res.result);
           if (action === 'create' && res.result.project_id) {
             uni.setStorageSync('currentProjectId', res.result.project_id);
-            console.log('Project created in cloud with ID:', res.result.project_id);
+            // console.log('Project created in cloud with ID:', res.result.project_id);
 
             // Clear the preview update flag for the new project to allow preview update
             const previewUpdatedKey = `preview_updated_${res.result.project_id}`;
             uni.removeStorageSync(previewUpdatedKey);
           } else {
-            console.log('Project updated in cloud with ID:', currentProjectId);
+            // console.log('Project updated in cloud with ID:', currentProjectId);
           }
           return res.result.project_id || currentProjectId;
         } else {
@@ -3570,7 +3570,7 @@ export default {
 
       // If no project ID exists, cannot update theme
       if (!currentProjectId) {
-        console.warn('No project ID found, cannot update theme color');
+        // console.warn('No project ID found, cannot update theme color');
         return Promise.reject(new Error('No project ID found'));
       }
 
@@ -3589,7 +3589,7 @@ export default {
         }
       }).then(res => {
         if (res.result && res.result.success) {
-          console.log('Project theme updated in cloud with ID:', currentProjectId);
+          // console.log('Project theme updated in cloud with ID:', currentProjectId);
           return res.result.project_id || currentProjectId;
         } else {
           throw new Error(this.$t('design.toast.failedToUpdateProjectTheme'));
@@ -3606,7 +3606,7 @@ export default {
     },
     // Add a new method to fully refresh templates
     refreshTemplates() {
-      console.log('Refreshing templates completely');
+      // console.log('Refreshing templates completely');
 
       // Reset all loading states
       this.templatesLoading = true;
@@ -3794,9 +3794,9 @@ export default {
           success: (res) => {
 
             uni.hideLoading();
-            console.log('res', res);
+            // console.log('res', res);
             if (res.data) {
-              console.log('res.data', res.data);
+              // console.log('res.data', res.data);
               // Save the converted code as a zip file
               const JSZip = require('jszip');
               const saveAs = require('file-saver');
@@ -3915,7 +3915,7 @@ export default {
     // Handle model selection for new page
     onPageModelChange(e) {
       this.selectedPageModel = e;
-      console.log('Selected page model:', this.selectedPageModel);
+      // console.log('Selected page model:', this.selectedPageModel);
     },
 
     // Custom dropdown methods
@@ -3926,7 +3926,7 @@ export default {
     selectModel(value) {
       this.selectedPageModel = value;
       this.showModelDropdown = false;
-      console.log('Selected page model:', this.selectedPageModel);
+      // console.log('Selected page model:', this.selectedPageModel);
     },
 
     getSelectedModelText() {
@@ -3960,7 +3960,7 @@ export default {
           duration: 1500
         });
 
-        console.log('Selected template page index:', this.selectedTemplatePageIndex);
+        // console.log('Selected template page index:', this.selectedTemplatePageIndex);
       } else {
         // Normal mode, navigate to editor
         this.navigateToEditor(template);
@@ -3969,7 +3969,7 @@ export default {
 
     selectTemplatePage(index) {
       this.selectedTemplatePageIndex = index;
-      console.log('Selected template page index:', this.selectedTemplatePageIndex);
+      // console.log('Selected template page index:', this.selectedTemplatePageIndex);
     },
 
     getSelectedTemplatePageText() {
@@ -4121,7 +4121,7 @@ export default {
           try {
             // Process the response data - handle both string and object formats
             let responseData = data;
-            console.log('responseData', responseData);
+            // console.log('responseData', responseData);
 
             // If it's an object with a response property, extract it
             if (typeof data === 'object' && data.response) {
@@ -4430,7 +4430,7 @@ export default {
                     }, 500);
                   }, 1000);
 
-                  console.error('Used fallback page creation due to parsing error:', parseError);
+                  // console.error('Used fallback page creation due to parsing error:', parseError);
                 } catch (fallbackError) {
                   throw new Error(`JSON parsing failed: ${parseError.message}`);
                 }
@@ -4576,7 +4576,7 @@ export default {
 
       // Create a fallback image for the missing template
       if (data.error.includes('not found')) {
-        console.log(`Creating fallback image for missing template: ${templateName}`);
+        // console.log(`Creating fallback image for missing template: ${templateName}`);
 
         // Set a placeholder image in capturedImages
         this.$set(this.capturedImages, templateName, '');
@@ -4591,7 +4591,7 @@ export default {
           );
 
           if (missingTemplate) {
-            console.log(`Found missing template in jsonTemplates: ${missingTemplate.name}`);
+            // console.log(`Found missing template in jsonTemplates: ${missingTemplate.name}`);
             // Force a re-render
             this.$forceUpdate();
           }
@@ -4619,7 +4619,7 @@ export default {
     },
 
     onImportFileDelete(e) {
-      console.log('File deleted:', e);
+      // console.log('File deleted:', e);
       // Remove only the specific item that was deleted
       if (e && e.index !== undefined) {
         // If the event provides an index, remove that specific item
@@ -5290,7 +5290,7 @@ export default {
       }
     },
     successUploadFiles() {
-      console.log('successUploadFiles', this.importFileList);
+      // console.log('successUploadFiles', this.importFileList);
     },
     handleHtmlImport(progressInterval) {
       try {
@@ -5304,7 +5304,7 @@ export default {
         if (!filesToImport.length) {
           throw new Error('No HTML files to import');
         }
-        console.log('Importing HTML files count:', filesToImport.length);
+        // console.log('Importing HTML files count:', filesToImport.length);
 
         // Get existing project data
         const existingProjectData = uni.getStorageSync('latest_7_overall_page');
@@ -5438,7 +5438,7 @@ export default {
 
     // Read HTML file content using FileReader
     readFileContent(file) {
-      console.log('Reading file:', file.name, 'Size:', file.size);
+      // console.log('Reading file:', file.name, 'Size:', file.size);
 
       const reader = new FileReader();
       reader.onload = (event) => {
@@ -5446,9 +5446,9 @@ export default {
         this.htmlFileContent = content;
         this.htmlFileName = file.name; // Store the filename
         this.htmlFiles = [{ name: file.name, content }];
-        console.log('HTML file content loaded:', file.name);
-        console.log('Content length:', this.htmlFileContent.length);
-        console.log('First 100 characters:', this.htmlFileContent.substring(0, 100));
+        // console.log('HTML file content loaded:', file.name);
+        // console.log('Content length:', this.htmlFileContent.length);
+        // console.log('First 100 characters:', this.htmlFileContent.substring(0, 100));
 
         // Validate that it's actually HTML content
         if (this.htmlFileContent && this.htmlFileContent.trim()) {
@@ -5631,7 +5631,7 @@ export default {
                     }
                   }
                 }).then(shareRes => {
-                  console.log('Project shared successfully:', shareRes);
+                  // console.log('Project shared successfully:', shareRes);
                 }).catch(shareErr => {
                   console.error('Failed to update share project:', shareErr);
                 });
@@ -5750,7 +5750,7 @@ export default {
           uni.showToast({ title: this.$t('design.toast.projectRefreshed'), icon: 'success', duration: 2000 });
         } else {
           // If cloud refresh fails, fall back to regular refresh
-          console.warn('Failed to refresh from cloud, falling back to local refresh');
+          // console.warn('Failed to refresh from cloud, falling back to local refresh');
           this.refreshDataLocal();
         }
       }).catch(err => {
@@ -6271,7 +6271,7 @@ export default {
             return;
           }
           
-          console.log(`Capturing element: ${elementId}`);
+          // console.log(`Capturing element: ${elementId}`);
           
           // OPTIMIZATION: Force reflow to ensure all styles are computed
           // This helps ensure that dynamically injected styles are applied
@@ -6279,7 +6279,7 @@ export default {
           
           // Get computed styles to verify they're applied
           const computedStyle = window.getComputedStyle(dom);
-          console.log(`Element background: ${computedStyle.backgroundColor}`);
+          // console.log(`Element background: ${computedStyle.backgroundColor}`);
           
           html2canvas(dom, {
             width: dom.clientWidth,
@@ -6354,7 +6354,7 @@ export default {
             const imageData = canvas.toDataURL('image/png', 0.85); // Added compression for faster processing
             // Send the image data back to the Vue component
             uni.$emit('image-captured', { element: elementId, imageData });
-            console.log(`Successfully captured ${elementId}`);
+            // console.log(`Successfully captured ${elementId}`);
           }).catch(err => {
             console.error(`Failed to generate image for ${elementId}:`, err);
             uni.$emit('capture-error', { element: elementId, error: err.toString() });
