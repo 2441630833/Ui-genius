@@ -12,13 +12,13 @@ import { saveCurrentTab, restoreLastTab, isTabPage } from './common/tabStorage.j
         const savedLocale = uni.getStorageSync('appLocale')
         if (savedLocale) {
           uni.setLocale(savedLocale)
-          console.log('Loaded saved locale:', savedLocale)
+          // console.log('Loaded saved locale:', savedLocale)
         } else {
           // If no saved locale, use system default or 'en'
           const systemLocale = uni.getSystemInfoSync().language
           const defaultLocale = systemLocale || 'en'
           uni.setLocale(defaultLocale)
-          console.log('Using default locale:', defaultLocale)
+          // console.log('Using default locale:', defaultLocale)
         }
       } catch (error) {
         console.error('Failed to load saved locale:', error)
@@ -59,7 +59,7 @@ import { saveCurrentTab, restoreLastTab, isTabPage } from './common/tabStorage.j
             saveCurrentTab(currentRoute)
           }
         } catch (error) {
-          console.error('保存标签页状态失败:', error)
+          // console.error('保存标签页状态失败:', error)
         }
       }
     },
@@ -69,7 +69,7 @@ import { saveCurrentTab, restoreLastTab, isTabPage } from './common/tabStorage.j
       // 当用户点击标签页时，保存新的标签页状态
       if (item && item.pagePath && isTabPage(item.pagePath)) {
         saveCurrentTab(item.pagePath)
-        console.log('标签页切换，已保存状态:', item.pagePath)
+        // console.log('标签页切换，已保存状态:', item.pagePath)
       }
     }
   }
