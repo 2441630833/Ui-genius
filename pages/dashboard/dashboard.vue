@@ -1063,7 +1063,7 @@ export default {
         return;
       }
 
-      console.log('Loading projects for user ID:', userId);
+      // console.log('Loading projects for user ID:', userId);
 
       // Set loading state
       this.userProjectsLoading = true;
@@ -1111,7 +1111,7 @@ export default {
         if (ownProjectsRes.result && ownProjectsRes.result.success) {
           const ownProjects = Array.isArray(ownProjectsRes.result.data) ? ownProjectsRes.result.data : [];
           allProjects = allProjects.concat(ownProjects);
-          console.log(`Loaded ${ownProjects.length} own projects for user ID ${userId}`);
+          // console.log(`Loaded ${ownProjects.length} own projects for user ID ${userId}`);
         } else {
           console.error('Failed to load own projects:', ownProjectsRes.result);
         }
@@ -1120,14 +1120,14 @@ export default {
         if (sharedProjectsRes.result && sharedProjectsRes.result.success) {
           const sharedProjects = Array.isArray(sharedProjectsRes.result.data) ? sharedProjectsRes.result.data : [];
           allProjects = allProjects.concat(sharedProjects);
-          console.log(`Loaded ${sharedProjects.length} shared projects for user ID ${userId}`);
+          // console.log(`Loaded ${sharedProjects.length} shared projects for user ID ${userId}`);
         } else {
           console.error('Failed to load shared projects:', sharedProjectsRes.result);
         }
 
         // Ensure userProjects is always an array
         this.userProjects = allProjects;
-        console.log(`Total ${this.userProjects.length} projects loaded (own + shared)`);
+        // console.log(`Total ${this.userProjects.length} projects loaded (own + shared)`);
 
         // Update the project grid with user projects
         this.updateProjectGrid();
@@ -1198,7 +1198,7 @@ export default {
             icon: 'success',
             duration: 2000
           });
-          console.log('Payment verification successful:', result.result.data);
+          // console.log('Payment verification successful:', result.result.data);
           
           // Reload projects to reflect membership changes
           // this.setActiveNavItem('dashboard');
@@ -1209,7 +1209,7 @@ export default {
             icon: 'none',
             duration: 2000
           });
-          console.error('Payment verification failed:', result.result);
+          // console.error('Payment verification failed:', result.result);
         }
       } catch (error) {
         uni.hideLoading();
@@ -1218,7 +1218,7 @@ export default {
           icon: 'none',
           duration: 2000
         });
-        console.error('Payment verification error:', error);
+        // console.error('Payment verification error:', error);
       }
     },
 
@@ -1725,10 +1725,10 @@ export default {
             filePath: tempFilePath,
             cloudPath: `profile-photos/${userId}-${Date.now()}.jpg`,
             onUploadProgress: (progressEvent) => {
-              console.log('Upload progress:', progressEvent);
+              // console.log('Upload progress:', progressEvent);
             },
             success: (uploadRes) => {
-              console.log('Upload success:', uploadRes);
+              // console.log('Upload success:', uploadRes);
               
               // Get the file URL from the upload response
               const fileURL = uploadRes.fileID;
@@ -1796,7 +1796,7 @@ export default {
     // Handle model selection change
     onModelChange(e) {
       this.selectedModel = e;
-      console.log('Selected model:', this.selectedModel);
+      // console.log('Selected model:', this.selectedModel);
     },
     
     // Custom dropdown methods
@@ -1807,7 +1807,7 @@ export default {
     selectModel(value) {
       this.selectedModel = value;
       this.showModelDropdown = false;
-      console.log('Selected model:', this.selectedModel);
+      // console.log('Selected model:', this.selectedModel);
     },
     
     getSelectedModelText() {
@@ -1912,7 +1912,7 @@ export default {
         if (!filesToImport.length) {
           throw new Error('No HTML files to import');
         }
-        console.log('Importing HTML files count:', filesToImport.length);
+        // console.log('Importing HTML files count:', filesToImport.length);
         
         const timestamp = new Date().toLocaleString();
         
