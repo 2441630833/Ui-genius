@@ -67,7 +67,20 @@ export default {
                 clone: this.$t('editor.clone'),
                 remove: this.$t('editor.remove'),
                 insertAfter: this.$t('editor.insertAfter'),
-                insertBefore: this.$t('editor.insertBefore')
+                insertBefore: this.$t('editor.insertBefore'),
+                // AI Assistant translations
+                aiAssistant: {
+                    title: this.$t('aiAssistant.title'),
+                    placeholder: this.$t('aiAssistant.placeholder'),
+                    askButton: this.$t('aiAssistant.askButton'),
+                    loading: this.$t('aiAssistant.loading'),
+                    close: this.$t('aiAssistant.close'),
+                    error: this.$t('aiAssistant.error'),
+                    success: this.$t('aiAssistant.success'),
+                    errorEmpty: this.$t('aiAssistant.errorEmpty'),
+                    errorEmptyResponse: this.$t('aiAssistant.errorEmptyResponse'),
+                    successUpdate: this.$t('aiAssistant.successUpdate')
+                }
             };
         }
     },

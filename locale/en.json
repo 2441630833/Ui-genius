@@ -789,5 +789,15 @@
   "editor.clone": "Clone element",
   "editor.remove": "Remove element",
   "editor.insertAfter": "After",
-  "editor.insertBefore": "Before"
+  "editor.insertBefore": "Before",
+  "aiAssistant.title": "AI Assistant",
+  "aiAssistant.placeholder": "Describe what you want to change or add to the page...",
+  "aiAssistant.askButton": "Ask Uigenius AI To Modify Page",
+  "aiAssistant.loading": "Loading...",
+  "aiAssistant.close": "Close",
+  "aiAssistant.error": "Error",
+  "aiAssistant.success": "Success",
+  "aiAssistant.errorEmpty": "Input cannot be empty",
+  "aiAssistant.errorEmptyResponse": "Empty response from AI",
+  "aiAssistant.successUpdate": "Page updated successfully"
 }
