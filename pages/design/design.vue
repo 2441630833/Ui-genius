@@ -360,7 +360,7 @@
 
           <!-- Model Selection -->
           <view class="model-selection-container">
-            <text class="model-selection-label">{{ $t('design.model.selectModel') }}</text>
+            <text class="model-selection-label">{{ $t('design.createPage.selectModel') }}</text>
             <view class="model-selector">
               <view class="custom-dropdown" @click="toggleModelDropdown">
                 <view class="dropdown-display">
