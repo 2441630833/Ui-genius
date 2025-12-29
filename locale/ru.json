@@ -712,6 +712,7 @@
 	"design.toast.failedTo": "Не удалось: ",
 	"design.toast.project": " проект",
 	"design.toast.failedToUpdateProjectTheme": "Не удалось обновить тему проекта",
+	"design.toast.enterPageDescription": "Пожалуйста, введите описание страницы",
 	"design.toast.loadingProject": "Загрузка проекта...",
 	"design.toast.failedToLoadProject": "Не удалось загрузить проект",
 	"design.toast.errorLoadingProject": "Ошибка при загрузке проекта",

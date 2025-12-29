@@ -538,6 +538,7 @@
   "design.toast.noProjectData": "ไม่พบข้อมูลโปรเจกต์",
   "design.toast.creatingProject": "กำลังสร้างโปรเจกต์...",
   "design.toast.createProjectFailed": "สร้างโปรเจกต์ล้มเหลว",
+  "design.toast.enterPageDescription": "โปรดป้อนคำอธิบายเพจ",
   "design.toast.shareProjectFailed": "แชร์ล้มเหลว",
   "design.toast.shareLinkCopied": "คัดลอกลิงก์แชร์แล้ว",
   "design.toast.copyFailed": "คัดลอกล้มเหลว",
