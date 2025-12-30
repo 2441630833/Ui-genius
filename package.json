@@ -2,7 +2,7 @@
     "id": "ui-genius",
     "name": "ui-genius",
     "displayName": "Uigenius",
-    "version": "1.1.9",
+    "version": "1.2.0",
     "description": "AI-powered UX/UI design tool for rapid prototyping and design generation",
     "keywords": [
         "ui-design",
@@ -17,9 +17,9 @@
     ],
     "dcloudext": {
         "category": [
-            "AI设计工具",
-            "UI/UX设计平台",
-            "代码生成工具"
+            "AI Design Tool",
+            "UI/UX Design Platform",
+            "Code Generation Tool"
         ],
         "sale": {
             "regular": {
@@ -33,9 +33,9 @@
             "qq": ""
         },
         "declaration": {
-            "ads": "无",
-            "data": "无",
-            "permissions": "无"
+            "ads": "None",
+            "data": "None",
+            "permissions": "None"
         },
         "npmurl": ""
     },
@@ -65,16 +65,16 @@
                     "Safari": "u"
                 },
                 "小程序": {
-                    "微信": "u",
-                    "阿里": "u",
-                    "百度": "u",
-                    "字节跳动": "u",
+                    "WeChat": "u",
+                    "Alipay": "u",
+                    "Baidu": "u",
+                    "ByteDance": "u",
                     "QQ": "u",
-                    "京东": "u"
+                    "JD": "u"
                 },
                 "快应用": {
-                    "华为": "u",
-                    "联盟": "u"
+                    "Huawei": "u",
+                    "Union": "u"
                 },
                 "Vue": {
                     "vue2": "u",
@@ -149,7 +149,7 @@
         "appx": {
             "identityName": "AD11B95F.Uigenius",
             "publisher": "CN=69601FC2-D90D-4AFF-889C-6B7EE5281E09",
-            "publisherDisplayName": "朱龙泽",
+            "publisherDisplayName": "Longze Zhu",
             "applicationId": "com.uigenius.app",
             "languages": [
               "en-US"

@@ -799,7 +799,7 @@ export default {
       }
       
       uni.showLoading({
-        title: 'Loading project data...'
+        title: this.$t('dashboard.loading.projectData')
       });
       
       // Call the generated-overall-pages cloud function to get the project data
@@ -1069,7 +1069,7 @@ export default {
       this.userProjectsLoading = true;
 
       uni.showLoading({
-        title: 'Loading your projects...'
+        title: this.$t('dashboard.loading.projects')
       });
       // test mode no login,just return 
       if (userId == '123bcbfeqqaeabfaf5a') {
@@ -1170,7 +1170,7 @@ export default {
 
       try {
         uni.showLoading({
-          title: 'Verifying payment...'
+          title: this.$t('dashboard.loading.verifyingPayment')
         });
 
         // Call the checkMembership cloud function with verifyCreemSignature action
@@ -1318,7 +1318,7 @@ export default {
 
       // Show loading indicator
       uni.showLoading({
-        title: 'Saving changes...'
+        title: this.$t('dashboard.loading.savingChanges')
       });
 
       // Get user ID from storage
@@ -1404,7 +1404,7 @@ export default {
 
       // Show loading indicator
       uni.showLoading({
-        title: 'Updating email...'
+        title: this.$t('dashboard.loading.updatingEmail')
       });
 
       // Get user ID from storage
@@ -1501,7 +1501,7 @@ export default {
 
       // Show loading indicator
       uni.showLoading({
-        title: 'Updating password...'
+        title: this.$t('dashboard.loading.updatingPassword')
       });
 
       // Get user ID from storage
@@ -1614,7 +1614,7 @@ export default {
     logout() {
       // Show loading indicator
       uni.showLoading({
-        title: 'Logging out...'
+        title: this.$t('dashboard.loading.loggingOut')
       });
 
       // Simulate API call with timeout
@@ -1683,7 +1683,7 @@ export default {
           
           // Show loading indicator
           uni.showLoading({
-            title: 'Uploading photo...'
+            title: this.$t('dashboard.loading.uploadingPhoto')
           });
           
           // Get user ID from storage

@@ -10,7 +10,7 @@
         {
             "path": "pages/login/login",
             "style": {
-                "navigationBarTitleText": "Login",
+                "navigationBarTitleText": "%index.login%",
                 "enablePullDownRefresh": false
             }
         },
@@ -65,21 +65,21 @@
         {
             "path": "pages/terms/terms",
             "style": {
-                "navigationBarTitleText": "Terms of Service",
+                "navigationBarTitleText": "%index.terms%",
                 "enablePullDownRefresh": false
             }
         },
         {
             "path": "pages/privacy/privacy",
             "style": {
-                "navigationBarTitleText": "Privacy Policy",
+                "navigationBarTitleText": "%index.privacy%",
                 "enablePullDownRefresh": false
             }
         },
         {
             "path": "pages/quickstart/quickstart",
             "style": {
-                "navigationBarTitleText": "Quick Start",
+                "navigationBarTitleText": "%index.quickstart%",
                 "enablePullDownRefresh": false
             }
         }

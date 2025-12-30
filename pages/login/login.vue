@@ -25,15 +25,6 @@
 </template>
 
 <script>
-const uniIdCo = uniCloud.importObject("uni-id-co", {
-  loadingOptions: { // loading
-    title: 'logging in...',
-    mask: true //
-  },
-  errorOptions: {
-    type: 'toast'
-  }
-})
 // Import token management functions
 import { setTokenWithExpiration, setGoogleTokenWithExpiration, isTokenExpired, isGoogleTokenExpired } from '@/common/permission.js'
 // Add a simple URLSearchParams polyfill
@@ -97,6 +88,19 @@ export default {
         newToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9M',
         uid: '123bcbfeqqaeabfaf5a'
       }
+    }
+  },
+  computed: {
+    uniIdCo() {
+      return uniCloud.importObject("uni-id-co", {
+        loadingOptions: { // loading
+          title: this.$t('login.loading.loggingIn'),
+          mask: true //
+        },
+        errorOptions: {
+          type: 'toast'
+        }
+      })
     }
   },
   mounted() {
@@ -219,7 +223,7 @@ export default {
       this.pwdLogin()
     },
     loginSuccess(e) {
-      console.log('Login successful', e)
+      //console.log('Login successful', e)
 
       // Store token with expiration
       setTokenWithExpiration(e)
@@ -287,7 +291,7 @@ export default {
         data.username = this.user.email
       }
 
-      uniIdCo.login(data).then(e => {
+      this.uniIdCo.login(data).then(e => {
         this.loginSuccess(e)
         uni.setStorageSync('email', this.user.email)
       }).catch(e => {
@@ -448,7 +452,7 @@ export default {
 
                   // Store Google user info to uni-id-co
                   // console.log('About to call loginByGoogle with direct params')
-                  uniIdCo.loginByGoogle(googleInfo).then(result => {
+                  this.uniIdCo.loginByGoogle(googleInfo).then(result => {
                     console.log('Google login success:', result)
                     // Login success, store token
                     this.googleLoginSuccess(result)
