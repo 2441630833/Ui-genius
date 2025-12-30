@@ -15,6 +15,47 @@ const loginPage = "/pages/login/login"
 // Token expiration time in milliseconds (e.g., 7 days)
 const TOKEN_EXPIRATION_TIME = 7 * 24 * 60 * 60 * 1000;
 
+// Simple translation map for the specific message we need
+const translations = {
+	'en': 'Login expired, please login first',
+	'zh-Hans': '登录已过期，请先登录',
+	'zh-Hant': '登錄已過期，請先登錄',
+	'fr': 'Connexion expirée, veuillez vous connecter d\'abord',
+	'es': 'Sesión expirada, por favor inicia sesión primero',
+	'de': 'Anmeldung abgelaufen, bitte melden Sie sich zuerst an',
+	'ja': 'ログインの有効期限が切れました。まずログインしてください',
+	'ru': 'Срок действия входа истек, пожалуйста, сначала войдите в систему',
+	'it': 'Login scaduto, effettua prima il login',
+	'pt': 'Login expirado, por favor faça login primeiro',
+	'ko': '로그인이 만료되었습니다. 먼저 로그인하세요',
+	'ar': 'انتهت صلاحية تسجيل الدخول، يرجى تسجيل الدخول أولاً',
+	'nl': 'Login verlopen, log eerst in',
+	'pl': 'Login wygasł, zaloguj się najpierw',
+	'tr': 'Giriş süresi doldu, lütfen önce giriş yapın',
+	'sv': 'Inloggning har gått ut, logga in först',
+	'da': 'Login udløbet, log venligst ind først',
+	'fi': 'Kirjautuminen vanhentunut, kirjaudu ensin sisään',
+	'no': 'Pålogging utløpt, vennligst logg inn først',
+	'vi': 'Đăng nhập đã hết hạn, vui lòng đăng nhập trước',
+	'th': 'การเข้าสู่ระบบหมดอายุ กรุณาเข้าสู่ระบบก่อน',
+	'id': 'Login kedaluwarsa, silakan login terlebih dahulu',
+	'hi': 'लॉगिन समाप्त हो गया, कृपया पहले लॉगिन करें'
+}
+
+// Function to get translated text
+function getLoginExpiredMessage() {
+	try {
+		// Try to get the current locale from storage (same key as used in main.js)
+		const currentLocale = uni.getStorageSync('appLocale') || 'en';
+		const message = translations[currentLocale] || translations['en'];
+		console.log(`Login expired message: ${message} (locale: ${currentLocale})`);
+		return message;
+	} catch (error) {
+		console.warn('Failed to get locale, using English:', error);
+		return translations['en'];
+	}
+}
+
 // Function to store token with expiration
 export function setTokenWithExpiration(tokenData) {
 	// Store the actual token
@@ -129,7 +170,7 @@ export default function initPermission() {
 						clearAuthData();
 						
 						uni.showToast({
-							title: 'login expired, please login first',
+							title: getLoginExpiredMessage(),
 							icon: 'none'
 						})
 						
