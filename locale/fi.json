@@ -777,6 +777,8 @@
   "aiAssistant.errorEmpty": "Syöte ei voi olla tyhjä",
   "aiAssistant.errorEmptyResponse": "Tyhjä vastaus AI:lta",
   "aiAssistant.successUpdate": "Sivu päivitetty onnistuneesti",
+  "uni.showLoading.unpaired": "Ladataan...",
+  "uni.showActionSheet.cancel": "Peruuta",
   "dashboard.projects.alpha.title": "Projekti Alpha",
   "dashboard.projects.alpha.description": "Innovatiivinen projekti, joka käyttää uusimpia suunnittelutyökaluja käyttäjäystävällisten käyttöliittymien luomiseen.",
   "dashboard.projects.beta.title": "Projekti Beta",

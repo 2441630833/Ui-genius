@@ -800,6 +800,8 @@
 	"aiAssistant.errorEmpty": "Eingabe darf nicht leer sein",
 	"aiAssistant.errorEmptyResponse": "Leere Antwort von der KI",
 	"aiAssistant.successUpdate": "Seite erfolgreich aktualisiert",
+	"uni.showLoading.unpaired": "Laden...",
+	"uni.showActionSheet.cancel": "Abbrechen",
 	"dashboard.projects.alpha.title": "Projekt Alpha",
 	"dashboard.projects.alpha.description": "Ein innovatives Projekt, das die neuesten Design-Tools verwendet, um benutzerfreundliche Schnittstellen zu erstellen.",
 	"dashboard.projects.beta.title": "Projekt Beta",

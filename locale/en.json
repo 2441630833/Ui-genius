@@ -811,5 +811,7 @@
   "aiAssistant.success": "Success",
   "aiAssistant.errorEmpty": "Input cannot be empty",
   "aiAssistant.errorEmptyResponse": "Empty response from AI",
-  "aiAssistant.successUpdate": "Page updated successfully"
+  "aiAssistant.successUpdate": "Page updated successfully",
+  "uni.showLoading.unpaired": "Loading...",
+  "uni.showActionSheet.cancel": "Cancel"
 }

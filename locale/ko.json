@@ -802,6 +802,8 @@
 	"aiAssistant.errorEmpty": "입력이 비어 있을 수 없습니다",
 	"aiAssistant.errorEmptyResponse": "AI 응답이 비어 있습니다",
 	"aiAssistant.successUpdate": "페이지가 성공적으로 업데이트되었습니다",
+	"uni.showLoading.unpaired": "로딩 중...",
+	"uni.showActionSheet.cancel": "취소",
 	"dashboard.projects.alpha.title": "프로젝트 알파",
 	"dashboard.projects.alpha.description": "최신 디자인 도구를 사용하여 사용자 친화적인 인터페이스를 만드는 혁신적인 프로젝트입니다.",
 	"dashboard.projects.beta.title": "프로젝트 베타",

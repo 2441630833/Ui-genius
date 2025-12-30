@@ -777,6 +777,8 @@
   "aiAssistant.errorEmpty": "Inndata kan ikke være tom",
   "aiAssistant.errorEmptyResponse": "Tomt svar fra AI",
   "aiAssistant.successUpdate": "Siden er oppdatert",
+  "uni.showLoading.unpaired": "Laster...",
+  "uni.showActionSheet.cancel": "Avbryt",
   "dashboard.projects.alpha.title": "Prosjekt Alpha",
   "dashboard.projects.alpha.description": "Et innovativt prosjekt som bruker de nyeste designverktøyene for å lage brukervennlige grensesnitt.",
   "dashboard.projects.beta.title": "Prosjekt Beta",

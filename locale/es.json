@@ -801,6 +801,8 @@
 	"aiAssistant.errorEmpty": "La entrada no puede estar vacía",
 	"aiAssistant.errorEmptyResponse": "Respuesta vacía de la IA",
 	"aiAssistant.successUpdate": "Página actualizada con éxito",
+	"uni.showLoading.unpaired": "Cargando...",
+	"uni.showActionSheet.cancel": "Cancelar",
 	"dashboard.projects.alpha.title": "Proyecto Alfa",
 	"dashboard.projects.alpha.description": "Un proyecto innovador que utiliza las últimas herramientas de diseño para crear interfaces amigables.",
 	"dashboard.projects.beta.title": "Proyecto Beta",

@@ -798,6 +798,8 @@
 	"aiAssistant.errorEmpty": "Input må ikke være tom",
 	"aiAssistant.errorEmptyResponse": "Tomt svar fra AI",
 	"aiAssistant.successUpdate": "Siden er opdateret",
+	"uni.showLoading.unpaired": "Indlæser...",
+	"uni.showActionSheet.cancel": "Annuller",
 	"dashboard.projects.alpha.title": "Projekt Alpha",
 	"dashboard.projects.alpha.description": "Et innovativt projekt, der bruger de nyeste designværktøjer til at skabe brugervenlige grænseflader.",
 	"dashboard.projects.beta.title": "Projekt Beta",

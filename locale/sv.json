@@ -777,6 +777,8 @@
 	"aiAssistant.errorEmpty": "Inmatningen kan inte vara tom",
 	"aiAssistant.errorEmptyResponse": "Tomt svar från AI",
 	"aiAssistant.successUpdate": "Sidan har uppdaterats",
+	"uni.showLoading.unpaired": "Laddar...",
+	"uni.showActionSheet.cancel": "Avbryt",
 	"dashboard.projects.alpha.title": "Projekt Alpha",
 	"dashboard.projects.alpha.description": "Ett innovativt projekt som använder de senaste designverktygen för att skapa användarvänliga gränssnitt.",
 	"dashboard.projects.beta.title": "Projekt Beta",

@@ -797,6 +797,8 @@
 	"aiAssistant.errorEmpty": "入力は空にできません",
 	"aiAssistant.errorEmptyResponse": "AIからの応答が空です",
 	"aiAssistant.successUpdate": "ページが正常に更新されました",
+	"uni.showLoading.unpaired": "読み込み中...",
+	"uni.showActionSheet.cancel": "キャンセル",
 	"dashboard.projects.alpha.title": "プロジェクトアルファ",
 	"dashboard.projects.alpha.description": "最新のデザインツールを使用してユーザーフレンドリーなインターフェースを作成する革新的なプロジェクト。",
 	"dashboard.projects.beta.title": "プロジェクトベータ",

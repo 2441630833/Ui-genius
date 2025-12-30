@@ -798,6 +798,8 @@
   "aiAssistant.errorEmpty": "इनपुट खाली नहीं हो सकता",
   "aiAssistant.errorEmptyResponse": "AI से खाली प्रतिक्रिया",
   "aiAssistant.successUpdate": "पृष्ठ सफलतापूर्वक अपडेट किया गया",
+  "uni.showLoading.unpaired": "लोड हो रहा है...",
+  "uni.showActionSheet.cancel": "रद्द करें",
   "dashboard.projects.alpha.title": "प्रोजेक्ट Alpha",
   "dashboard.projects.alpha.description": "उपयोगकर्ता-अनुकूल इंटरफेस बनाने के लिए नवीनतम डिज़ाइन टूल का उपयोग करने वाली एक अभिनव परियोजना।",
   "dashboard.projects.beta.title": "प्रोजेक्ट Beta",

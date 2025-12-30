@@ -798,6 +798,8 @@
   "aiAssistant.errorEmpty": "ข้อมูลไม่สามารถว่างเปล่าได้",
   "aiAssistant.errorEmptyResponse": "การตอบกลับจาก AI ว่างเปล่า",
   "aiAssistant.successUpdate": "อัปเดตหน้าสำเร็จแล้ว",
+  "uni.showLoading.unpaired": "กำลังโหลด...",
+  "uni.showActionSheet.cancel": "ยกเลิก",
   "dashboard.projects.alpha.title": "โครงการ Alpha",
   "dashboard.projects.alpha.description": "โครงการนวัตกรรมที่ใช้เครื่องมือออกแบบล่าสุดเพื่อสร้างอินเทอร์เฟซที่ใช้งานง่าย",
   "dashboard.projects.beta.title": "โครงการ Beta",

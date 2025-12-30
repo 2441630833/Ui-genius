@@ -777,6 +777,8 @@
   "aiAssistant.errorEmpty": "Đầu vào không được để trống",
   "aiAssistant.errorEmptyResponse": "Phản hồi trống từ AI",
   "aiAssistant.successUpdate": "Cập nhật trang thành công",
+  "uni.showLoading.unpaired": "Đang tải...",
+  "uni.showActionSheet.cancel": "Hủy",
   "dashboard.projects.alpha.title": "Dự án Alpha",
   "dashboard.projects.alpha.description": "Một dự án sáng tạo sử dụng các công cụ thiết kế mới nhất để tạo giao diện thân thiện với người dùng.",
   "dashboard.projects.beta.title": "Dự án Beta",

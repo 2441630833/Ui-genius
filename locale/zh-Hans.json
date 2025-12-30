@@ -801,6 +801,8 @@
 	"aiAssistant.errorEmpty": "输入不能为空",
 	"aiAssistant.errorEmptyResponse": "AI响应为空",
 	"aiAssistant.successUpdate": "页面更新成功",
+	"uni.showLoading.unpaired": "加载中...",
+	"uni.showActionSheet.cancel": "取消",
 	"dashboard.projects.alpha.title": "项目 Alpha",
 	"dashboard.projects.alpha.description": "一个创新项目，使用最新的设计工具创建用户友好的界面。",
 	"dashboard.projects.beta.title": "项目 Beta",

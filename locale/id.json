@@ -777,6 +777,8 @@
   "aiAssistant.errorEmpty": "Input tidak boleh kosong",
   "aiAssistant.errorEmptyResponse": "Respons kosong dari AI",
   "aiAssistant.successUpdate": "Halaman berhasil diperbarui",
+  "uni.showLoading.unpaired": "Memuat...",
+  "uni.showActionSheet.cancel": "Batal",
   "dashboard.projects.alpha.title": "Proyek Alpha",
   "dashboard.projects.alpha.description": "Proyek inovatif yang menggunakan alat desain terbaru untuk membuat antarmuka yang ramah pengguna.",
   "dashboard.projects.beta.title": "Proyek Beta",

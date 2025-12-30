@@ -804,6 +804,8 @@
 	"aiAssistant.errorEmpty": "L'entrée ne peut pas être vide",
 	"aiAssistant.errorEmptyResponse": "Réponse vide de l'IA",
 	"aiAssistant.successUpdate": "Page mise à jour avec succès",
+	"uni.showLoading.unpaired": "Chargement...",
+	"uni.showActionSheet.cancel": "Annuler",
 	"dashboard.projects.alpha.title": "Projet Alpha",
 	"dashboard.projects.alpha.description": "Un projet innovant utilisant les derniers outils de conception pour créer des interfaces conviviales.",
 	"dashboard.projects.beta.title": "Projet Bêta",

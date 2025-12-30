@@ -801,6 +801,8 @@
   "aiAssistant.errorEmpty": "لا يمكن أن يكون الإدخال فارغًا",
   "aiAssistant.errorEmptyResponse": "استجابة فارغة من الذكاء الاصطناعي",
   "aiAssistant.successUpdate": "تم تحديث الصفحة بنجاح",
+  "uni.showLoading.unpaired": "جار التحميل...",
+  "uni.showActionSheet.cancel": "إلغاء",
   "dashboard.projects.alpha.title": "مشروع Alpha",
   "dashboard.projects.alpha.description": "مشروع مبتكر يستخدم أحدث أدوات التصميم لإنشاء واجهات سهلة الاستخدام.",
   "dashboard.projects.beta.title": "مشروع Beta",

@@ -777,6 +777,8 @@
   "aiAssistant.errorEmpty": "Dane wejściowe nie mogą być puste",
   "aiAssistant.errorEmptyResponse": "Pusta odpowiedź od AI",
   "aiAssistant.successUpdate": "Strona została pomyślnie zaktualizowana",
+  "uni.showLoading.unpaired": "Ładowanie...",
+  "uni.showActionSheet.cancel": "Anuluj",
   "dashboard.projects.alpha.title": "Projekt Alpha",
   "dashboard.projects.alpha.description": "Innowacyjny projekt wykorzystujący najnowsze narzędzia projektowe do tworzenia przyjaznych dla użytkownika interfejsów.",
   "dashboard.projects.beta.title": "Projekt Beta",

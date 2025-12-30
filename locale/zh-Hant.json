@@ -802,6 +802,8 @@
 	"aiAssistant.errorEmpty": "輸入不能為空",
 	"aiAssistant.errorEmptyResponse": "AI響應為空",
 	"aiAssistant.successUpdate": "頁面更新成功",
+	"uni.showLoading.unpaired": "載入中...",
+	"uni.showActionSheet.cancel": "取消",
 	"dashboard.projects.alpha.title": "阿爾法專案",
 	"dashboard.projects.alpha.description": "一個創新專案，使用最新的設計工具創建用戶友好的界面。",
 	"dashboard.projects.beta.title": "貝塔專案",

@@ -777,6 +777,8 @@
   "aiAssistant.errorEmpty": "Giriş boş olamaz",
   "aiAssistant.errorEmptyResponse": "AI'dan boş yanıt",
   "aiAssistant.successUpdate": "Sayfa başarıyla güncellendi",
+  "uni.showLoading.unpaired": "Yükleniyor...",
+  "uni.showActionSheet.cancel": "İptal",
   "dashboard.projects.alpha.title": "Proje Alpha",
   "dashboard.projects.alpha.description": "Kullanıcı dostu arayüzler oluşturmak için en son tasarım araçlarını kullanan yenilikçi bir proje.",
   "dashboard.projects.beta.title": "Proje Beta",
