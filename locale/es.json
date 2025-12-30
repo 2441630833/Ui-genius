@@ -453,6 +453,7 @@
 	"dashboard.account.logout.title": "Cerrar sesión",
 	"dashboard.account.logout.description": "Puedes cerrar sesión de tu cuenta abajo",
 	"dashboard.account.logout.button": "Cerrar sesión",
+	"dashboard.account.logout.success": "Sesión cerrada exitosamente",
 	"dashboard.settings.title": "Configuración",
 	"dashboard.settings.placeholder": "El contenido de configuración se implementará aquí.",
 	"dashboard.delete.title": "Eliminar Proyectos",

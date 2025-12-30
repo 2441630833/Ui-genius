@@ -617,6 +617,7 @@
   "dashboard.account.logout.title": "Çıkış Yap",
   "dashboard.account.logout.description": "Aşağıda hesabınızdan çıkabilirsiniz",
   "dashboard.account.logout.button": "Çıkış Yap",
+  "dashboard.account.logout.success": "Başarıyla çıkış yapıldı",
   "dashboard.settings.title": "Ayarlar",
   "dashboard.settings.placeholder": "Ayarlar içeriği burada uygulanacak.",
   "dashboard.delete.title": "Projeleri Sil",

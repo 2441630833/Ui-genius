@@ -620,6 +620,7 @@
 	"dashboard.account.logout.title": "Esci",
 	"dashboard.account.logout.description": "Puoi disconnetterti dal tuo account qui sotto",
 	"dashboard.account.logout.button": "Esci",
+	"dashboard.account.logout.success": "Disconnessione riuscita",
 	"dashboard.settings.title": "Impostazioni",
 	"dashboard.settings.placeholder": "Il contenuto delle impostazioni sarà implementato qui.",
 	"dashboard.delete.title": "Elimina Progetti",

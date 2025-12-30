@@ -617,6 +617,7 @@
   "dashboard.account.logout.title": "Wyloguj się",
   "dashboard.account.logout.description": "Możesz wylogować się ze swojego konta poniżej",
   "dashboard.account.logout.button": "Wyloguj się",
+  "dashboard.account.logout.success": "Wylogowano pomyślnie",
   "dashboard.settings.title": "Ustawienia",
   "dashboard.settings.placeholder": "Zawartość ustawień zostanie zaimplementowana tutaj.",
   "dashboard.delete.title": "Usuń projekty",

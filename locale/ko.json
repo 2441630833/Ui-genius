@@ -454,6 +454,7 @@
   "dashboard.account.logout.title": "로그아웃",
   "dashboard.account.logout.description": "아래에서 로그아웃할 수 있습니다",
   "dashboard.account.logout.button": "로그아웃",
+  "dashboard.account.logout.success": "로그아웃 성공",
   "dashboard.settings.title": "설정",
   "dashboard.settings.placeholder": "설정 페이지 내용이 여기에 표시됩니다.",
   "dashboard.delete.title": "프로젝트 삭제",

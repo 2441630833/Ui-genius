@@ -456,6 +456,7 @@
   "dashboard.account.logout.title": "Déconnexion",
   "dashboard.account.logout.description": "Vous pouvez vous déconnecter de votre compte ci-dessous",
   "dashboard.account.logout.button": "Déconnexion",
+  "dashboard.account.logout.success": "Déconnexion réussie",
   "dashboard.settings.title": "Paramètres",
   "dashboard.settings.placeholder": "Le contenu des paramètres sera implémenté ici.",
   "dashboard.delete.title": "Supprimer des Projets",

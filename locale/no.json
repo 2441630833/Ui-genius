@@ -617,6 +617,7 @@
   "dashboard.account.logout.title": "Logg ut",
   "dashboard.account.logout.description": "Du kan logge ut av kontoen din nedenfor",
   "dashboard.account.logout.button": "Logg ut",
+  "dashboard.account.logout.success": "Logget ut vellykket",
   "dashboard.settings.title": "Innstillinger",
   "dashboard.settings.placeholder": "Innstillingsinnhold implementeres her.",
   "dashboard.delete.title": "Slett Prosjekter",

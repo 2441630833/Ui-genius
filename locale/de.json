@@ -453,6 +453,7 @@
 	"dashboard.account.logout.title": "Abmelden",
 	"dashboard.account.logout.description": "Sie können sich unten von Ihrem Konto abmelden",
 	"dashboard.account.logout.button": "Abmelden",
+	"dashboard.account.logout.success": "Erfolgreich abgemeldet",
 	"dashboard.settings.title": "Einstellungen",
 	"dashboard.settings.placeholder": "Einstellungsinhalt wird hier implementiert.",
 	"dashboard.delete.title": "Projekte löschen",

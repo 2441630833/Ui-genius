@@ -620,6 +620,7 @@
 	"dashboard.account.logout.title": "Sair",
 	"dashboard.account.logout.description": "Você pode sair da sua conta abaixo",
 	"dashboard.account.logout.button": "Sair",
+	"dashboard.account.logout.success": "Saída realizada com sucesso",
 	"dashboard.settings.title": "Configurações",
 	"dashboard.settings.placeholder": "O conteúdo de configurações será implementado aqui.",
 	"dashboard.delete.title": "Excluir Projetos",

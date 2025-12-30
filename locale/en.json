@@ -458,6 +458,7 @@
   "dashboard.account.logout.title": "Logout",
   "dashboard.account.logout.description": "You can logout from your account below",
   "dashboard.account.logout.button": "Logout",
+  "dashboard.account.logout.success": "Logged out successfully",
   "dashboard.settings.title": "Settings",
   "dashboard.settings.placeholder": "Settings page content will be implemented here.",
   "dashboard.delete.title": "Delete Projects",

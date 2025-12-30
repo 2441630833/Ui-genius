@@ -617,6 +617,7 @@
   "dashboard.account.logout.title": "Kirjaudu ulos",
   "dashboard.account.logout.description": "Voit kirjautua ulos tililtäsi alla",
   "dashboard.account.logout.button": "Kirjaudu ulos",
+  "dashboard.account.logout.success": "Uloskirjautuminen onnistui",
   "dashboard.settings.title": "Asetukset",
   "dashboard.settings.placeholder": "Asetussisältö toteutetaan tähän.",
   "dashboard.delete.title": "Poista Projekteja",

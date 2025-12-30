@@ -1637,7 +1637,7 @@ export default {
         // Hide loading and show success message
         uni.hideLoading();
         uni.showToast({
-          title: 'Logged out successfully',
+          title: this.$t('dashboard.account.logout.success'),
           icon: 'success',
           duration: 2000
         });

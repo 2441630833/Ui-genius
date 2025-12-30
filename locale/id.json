@@ -617,6 +617,7 @@
   "dashboard.account.logout.title": "Keluar",
   "dashboard.account.logout.description": "Anda dapat keluar dari akun di bawah",
   "dashboard.account.logout.button": "Keluar",
+  "dashboard.account.logout.success": "Berhasil keluar",
   "dashboard.settings.title": "Pengaturan",
   "dashboard.settings.placeholder": "Konten pengaturan akan diterapkan di sini.",
   "dashboard.delete.title": "Hapus Proyek",

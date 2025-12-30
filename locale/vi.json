@@ -617,6 +617,7 @@
   "dashboard.account.logout.title": "Đăng xuất",
   "dashboard.account.logout.description": "Bạn có thể đăng xuất tài khoản bên dưới",
   "dashboard.account.logout.button": "Đăng xuất",
+  "dashboard.account.logout.success": "Đăng xuất thành công",
   "dashboard.settings.title": "Cài đặt",
   "dashboard.settings.placeholder": "Nội dung cài đặt sẽ được triển khai ở đây.",
   "dashboard.delete.title": "Xóa Dự án",

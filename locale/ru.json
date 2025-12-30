@@ -453,6 +453,7 @@
 	"dashboard.account.logout.title": "Выйти",
 	"dashboard.account.logout.description": "Вы можете выйти из аккаунта ниже",
 	"dashboard.account.logout.button": "Выйти",
+	"dashboard.account.logout.success": "Выход выполнен успешно",
 	"dashboard.settings.title": "Настройки",
 	"dashboard.settings.placeholder": "Контент настроек будет реализован здесь.",
 	"dashboard.delete.title": "Удалить Проекты",

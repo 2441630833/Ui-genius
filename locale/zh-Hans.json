@@ -453,6 +453,7 @@
 	"dashboard.account.logout.title": "退出登录",
 	"dashboard.account.logout.description": "您可以在下方退出登录",
 	"dashboard.account.logout.button": "退出登录",
+	"dashboard.account.logout.success": "退出登录成功",
 	"dashboard.settings.title": "设置",
 	"dashboard.settings.placeholder": "设置页面内容将在此处实现。",
 	"dashboard.delete.title": "删除项目",

@@ -621,6 +621,7 @@
 	"dashboard.account.logout.title": "Uitloggen",
 	"dashboard.account.logout.description": "Je kunt hieronder uitloggen",
 	"dashboard.account.logout.button": "Uitloggen",
+	"dashboard.account.logout.success": "Succesvol uitgelogd",
 	"dashboard.settings.title": "Instellingen",
 	"dashboard.settings.placeholder": "Instellingen inhoud wordt hier geïmplementeerd.",
 	"dashboard.delete.title": "Projecten Verwijderen",

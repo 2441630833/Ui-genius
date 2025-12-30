@@ -638,6 +638,7 @@
   "dashboard.account.logout.title": "लॉगआउट",
   "dashboard.account.logout.description": "आप नीचे खाते से लॉगआउट कर सकते हैं",
   "dashboard.account.logout.button": "लॉगआउट",
+  "dashboard.account.logout.success": "सफलतापूर्वक लॉगआउट किया गया",
   "dashboard.settings.title": "सेटिंग्स",
   "dashboard.settings.placeholder": "सेटिंग सामग्री यहां लागू की जाएगी।",
   "dashboard.delete.title": "प्रोजेक्ट हटाएं",

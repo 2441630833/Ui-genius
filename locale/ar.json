@@ -641,6 +641,7 @@
   "dashboard.account.logout.title": "تسجيل الخروج",
   "dashboard.account.logout.description": "يمكنك تسجيل الخروج من حسابك أدناه",
   "dashboard.account.logout.button": "تسجيل الخروج",
+  "dashboard.account.logout.success": "تم تسجيل الخروج بنجاح",
   "dashboard.settings.title": "الإعدادات",
   "dashboard.settings.placeholder": "سيتم تنفيذ محتوى الإعدادات هنا.",
   "dashboard.delete.title": "حذف المشاريع",

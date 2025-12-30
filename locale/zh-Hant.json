@@ -454,6 +454,7 @@
   "dashboard.account.logout.title": "登出",
   "dashboard.account.logout.description": "您可以在下方登出",
   "dashboard.account.logout.button": "登出",
+  "dashboard.account.logout.success": "登出成功",
   "dashboard.settings.title": "設定",
   "dashboard.settings.placeholder": "設定頁面內容將在此處實現。",
   "dashboard.delete.title": "刪除專案",

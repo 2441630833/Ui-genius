@@ -638,6 +638,7 @@
   "dashboard.account.logout.title": "ออกจากระบบ",
   "dashboard.account.logout.description": "คุณสามารถออกจากระบบบัญชีด้านล่าง",
   "dashboard.account.logout.button": "ออกจากระบบ",
+  "dashboard.account.logout.success": "ออกจากระบบสำเร็จ",
   "dashboard.settings.title": "การตั้งค่า",
   "dashboard.settings.placeholder": "เนื้อหาการตั้งค่าจะถูกนำมาใช้ที่นี่",
   "dashboard.delete.title": "ลบโปรเจกต์",

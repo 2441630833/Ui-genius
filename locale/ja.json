@@ -453,6 +453,7 @@
 	"dashboard.account.logout.title": "ログアウト",
 	"dashboard.account.logout.description": "以下でログアウトできます",
 	"dashboard.account.logout.button": "ログアウト",
+	"dashboard.account.logout.success": "ログアウトに成功しました",
 	"dashboard.settings.title": "設定",
 	"dashboard.settings.placeholder": "設定ページのコンテンツはここに実装されます。",
 	"dashboard.delete.title": "プロジェクト削除",

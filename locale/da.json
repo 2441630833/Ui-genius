@@ -638,6 +638,7 @@
 	"dashboard.account.logout.title": "Log ud",
 	"dashboard.account.logout.description": "Du kan logge ud af din konto nedenfor",
 	"dashboard.account.logout.button": "Log ud",
+	"dashboard.account.logout.success": "Logget ud med succes",
 	"dashboard.settings.title": "Indstillinger",
 	"dashboard.settings.placeholder": "Indstillingsindhold implementeres her.",
 	"dashboard.delete.title": "Slet Projekter",
