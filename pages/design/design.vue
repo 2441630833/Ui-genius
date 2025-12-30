@@ -3517,6 +3517,13 @@ export default {
     },
 
     saveProjectToCloud(content, projectTitle, projectDescription) {
+      // Check if this is the special skip login user
+      const skipLoginUid = uni.getStorageSync('uid');
+      if (skipLoginUid === '123bcbfeqqaeabfaf5a') {
+        // Return early for skip login user
+        return Promise.resolve();
+      }
+
       // Check for existing project ID
       const currentProjectId = uni.getStorageSync('currentProjectId');
       const uid = uni.getStorageSync('uid');
