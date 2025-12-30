@@ -31,13 +31,15 @@ import { saveCurrentTab, restoreLastTab, isTabPage } from './common/tabStorage.j
       }
       
       // 恢复上次访问的标签页
-      restoreLastTab()
+      // if uid exist , then restore, otherwise not restore
+      const token = uni.getStorageSync('token')
+      if(token){
+        restoreLastTab()
+      }
     },
     onShow: function() {
       console.log('App Show')
       
-      // 每次应用显示时也尝试恢复标签页状态
-      restoreLastTab()
     },
     onHide: function() {
       console.log('App Hide')
