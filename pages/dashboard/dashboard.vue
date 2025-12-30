@@ -451,8 +451,10 @@
           <div class="description-container-overall">
           <view class="try-example-container">
             <text class="description-label">{{$t('dashboard.createProject.describeLabel')}}</text>
-            <button class="try-example-btn" @click="tryExample">{{$t('dashboard.createProject.tryExample')}}</button>
-            <button class="try-example-btn" :disabled="!projectDescription || isOptimizingPrompt" @click="optimizeProjectDescription">{{ isOptimizingPrompt ? $t('dashboard.createProject.optimizing') : $t('dashboard.createProject.improveWithAI') }}</button>
+            <view class="button-group">
+              <button class="try-example-btn" @click="tryExample">{{$t('dashboard.createProject.tryExample')}}</button>
+              <button class="try-example-btn" :disabled="!projectDescription || isOptimizingPrompt" @click="optimizeProjectDescription">{{ isOptimizingPrompt ? $t('dashboard.createProject.optimizing') : $t('dashboard.createProject.improveWithAI') }}</button>
+            </view>
           </view>
           <view class="description-container">
             <textarea class="project-description-input" :placeholder="$t('dashboard.createProject.placeholder')"
@@ -2550,6 +2552,14 @@ export default {
 .try-example-container {
   display: flex;
   justify-content: space-between;
+  align-items: center;
+  margin-bottom: 15px;
+}
+
+.button-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
 }
 
 .try-example-btn {
@@ -2557,7 +2567,7 @@ export default {
   align-items: center;
   justify-content: center;
   height: 36px;
-  padding: 0 12px;
+  padding: 0 16px;
   background-color: #e53935;
   color: #fff;
   border: none;
@@ -2567,9 +2577,7 @@ export default {
   font-weight: 500;
   white-space: nowrap;
   width: auto;
-  max-width: 100%;
   transition: background-color 0.2s, transform 0.1s;
-  margin-left: 8px;
 
   &:hover {
     background-color: #d32f2f;

@@ -393,17 +393,19 @@
 
           <!-- Selected Template Info (show which template is selected) -->
           <view v-if="useColor && availableTemplatePages.length > 0" class="selected-template-info">
-            <text class="model-selection-label">{{ $t('design.createPage.referenceTemplate') }}: {{
+            <text class="model-selection-label">{{ $t('design.createPage.referenceTemplate') }}{{
               getSelectedTemplatePageText() }}</text>
             <text class="template-hint">{{ $t('design.createPage.templateHint') }}</text>
           </view>
 
           <view class="try-example-container">
             <text class="description-label">{{ $t('design.createPage.describeLabel') }}</text>
-            <button class="try-example-btn" @click="tryPageExample">{{ $t('design.createPage.tryExample') }}</button>
-            <button class="try-example-btn" :disabled="!pageDescription || isOptimizingPrompt"
-              @click="optimizePageDescription">{{ isOptimizingPrompt ? $t('design.createPage.optimizing') :
-                $t('design.createPage.improveWithAI') }}</button>
+            <view class="button-group">
+              <button class="try-example-btn" @click="tryPageExample">{{ $t('design.createPage.tryExample') }}</button>
+              <button class="try-example-btn" :disabled="!pageDescription || isOptimizingPrompt"
+                @click="optimizePageDescription">{{ isOptimizingPrompt ? $t('design.createPage.optimizing') :
+                  $t('design.createPage.improveWithAI') }}</button>
+            </view>
           </view>
           <view class="description-container">
             <textarea class="project-description-input" :placeholder="$t('design.createPage.placeholder')"
@@ -7451,12 +7453,18 @@ export default {
   margin-bottom: 20px;
 }
 
+.button-group {
+  display: flex;
+  gap: 8px;
+  align-items: center;
+}
+
 .try-example-btn {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   height: 36px;
-  padding: 0 12px;
+  padding: 0 16px;
   background-color: #e53935;
   color: #fff;
   border: none;
@@ -7466,9 +7474,7 @@ export default {
   font-weight: 500;
   white-space: nowrap;
   width: auto;
-  max-width: 100%;
   transition: background-color 0.2s, transform 0.1s;
-  margin-left: 8px;
 
   &:hover {
     background-color: #d32f2f;
