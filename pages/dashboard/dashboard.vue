@@ -571,7 +571,7 @@ export default {
         { value: 'x-ai/grok-code-fast-1', text: 'x-ai/grok-code-fast-1', isPro: true },
         { value: 'minimax/minimax-m2', text: 'minimax/minimax-m2', isPro: true },
         { value: 'uigenius5:latest', text: 'uigenius/uigenius5:latest', isPro: false },
-        { value: 'alibaba/tongyi-deepresearch-30b-a3b:free', text: 'alibaba/tongyi-deepresearch-30b-a3b:free', isPro: false },
+        { value: 'xiaomi/mimo-v2-flash:free', text: 'xiaomi/mimo-v2-flash:free', isPro: false },
         { value: 'mistralai/devstral-2512:free', text: 'mistralai/devstral-2512:free', isPro: false },
         { value: 'kwaipilot/kat-coder-pro:free', text: 'kwaipilot/kat-coder-pro:free', isPro: false },
         { value: 'google/gemma-3-27b-it:free', text: 'google/gemma-3-27b-it:free', isPro: false },

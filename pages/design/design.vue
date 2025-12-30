@@ -770,7 +770,7 @@ export default {
         { value: 'x-ai/grok-code-fast-1', text: 'x-ai/grok-code-fast-1', isPro: true },
         { value: 'minimax/minimax-m2', text: 'minimax/minimax-m2', isPro: true },
         { value: 'uigenius5:latest', text: 'uigenius/uigenius5:latest', isPro: false },
-        { value: 'alibaba/tongyi-deepresearch-30b-a3b:free', text: 'alibaba/tongyi-deepresearch-30b-a3b:free', isPro: false },
+        { value: 'xiaomi/mimo-v2-flash:free', text: 'xiaomi/mimo-v2-flash:free', isPro: false },
         { value: 'mistralai/devstral-2512:free', text: 'mistralai/devstral-2512:free', isPro: false },
         { value: 'kwaipilot/kat-coder-pro:free', text: 'kwaipilot/kat-coder-pro:free', isPro: false },
         { value: 'google/gemma-3-27b-it:free', text: 'google/gemma-3-27b-it:free', isPro: false },
@@ -806,7 +806,9 @@ export default {
       isTemplateSelectionMode: false, // Toggle template selection mode from sidebar
       isOptimizingPrompt: false,
       showUpgradeModal: false,
-      upgradeModalMessage: ''
+      upgradeModalMessage: '',
+      // Flag to track if preview images have been generated in this session
+      previewImagesGenerated: false
     }
   },
 
@@ -1072,15 +1074,12 @@ export default {
         uni.getStorageSync('projectDescription')) {
         this.generateUI();
         uni.setStorageSync('shouldGenerateUI', 'false');
-      } else {
-        // Generate preview images only if we need them
-        if (this.needsImageGeneration()) {
-          // Use a timeout to ensure DOM is ready
-          setTimeout(() => {
-            this.generatePreviewImages();
-          }, 300);
-        }
       }
+      // Note: Preview images are now generated on-demand when needed, not on every page load
+      // They will be generated when:
+      // 1. A new page is created (handled in createPage method)
+      // 2. Project is refreshed (handled in pullRefreshProject method)
+      // 3. Templates are imported (handled in import methods)
     }, 500);
   },
 
@@ -1930,6 +1929,16 @@ export default {
             this.$forceUpdate();
             this.$nextTick(() => {
               this.injectScopedStyles();
+              
+              // Generate preview images only if:
+              // 1. We haven't generated them in this session yet, OR
+              // 2. We're missing images for some templates
+              if (!this.previewImagesGenerated || this.needsImageGeneration()) {
+                setTimeout(() => {
+                  this.generatePreviewImages();
+                  this.previewImagesGenerated = true;
+                }, 300);
+              }
             });
           }
         } catch (e) {
@@ -1954,18 +1963,29 @@ export default {
           // Force a re-render to show fallback templates
           this.$forceUpdate();
 
-          // Generate preview images for static templates
+          // Generate preview images for static templates only if needed
           this.$nextTick(() => {
-            setTimeout(() => {
-              this.generatePreviewImages();
-              // Reveal static templates
+            if (!this.previewImagesGenerated || this.needsImageGeneration()) {
+              setTimeout(() => {
+                this.generatePreviewImages();
+                this.previewImagesGenerated = true;
+                // Reveal static templates
+                const staticKeys = ['signup', 'home', 'notification', 'profile', 'settings'];
+                staticKeys.forEach((key, index) => {
+                  setTimeout(() => {
+                    this.$set(this.templateLoadingStates, key, false);
+                  }, 500 + (index * 100));
+                });
+              }, 300);
+            } else {
+              // Just reveal the templates if images already exist
               const staticKeys = ['signup', 'home', 'notification', 'profile', 'settings'];
               staticKeys.forEach((key, index) => {
                 setTimeout(() => {
                   this.$set(this.templateLoadingStates, key, false);
-                }, 500 + (index * 100));
+                }, 100 + (index * 50));
               });
-            }, 300);
+            }
           });
         }
       }
@@ -2072,14 +2092,20 @@ export default {
     },
 
     refreshData() {
+      // Reset the flag to force regeneration of preview images
+      this.previewImagesGenerated = false;
+      
       // Use the new pullRefreshProject method to refresh from cloud
       this.pullRefreshProject();
       this.loadJsonTemplates();
       this.updateLoadingStates();
-      // Note: generatePreviewImages() is handled by pullRefreshProject()
+      // Note: generatePreviewImages() is handled by loadJsonTemplates() when flag is reset
     },
 
     refreshDataLocal(showToast = true) {
+      // Reset the flag to force regeneration of preview images
+      this.previewImagesGenerated = false;
+      
       // Clear stored images first
       this.clearStoredImages(showToast);
 
