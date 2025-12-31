@@ -1473,13 +1473,9 @@ export default {
 <head>
   <meta charset="utf-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1" />
-  <style>
-    * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
-  </style>
 </head>
-<body>
-  <div id="template-${pageKey}" class="page-root" style="width: 100%;">
+<body style="margin: 0; padding: 0;">
+  <div id="template-${pageKey}">
     ${componentContent}
   </div>
 </body>
