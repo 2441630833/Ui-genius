@@ -1410,23 +1410,36 @@ export default {
         iframe.style.top = '-9999px';
         iframe.style.width = '1440px';
         iframe.style.height = '2000px';
-        iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
         document.body.appendChild(iframe);
 
-        // Initialize iframe document with minimal HTML and base styles
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        iframeDoc.open();
-        iframeDoc.write(`<!DOCTYPE html>
-<html><head><meta charset="utf-8" />
-<meta name="viewport" content="width=device-width, initial-scale=1" />
-<style>
-  * { box-sizing: border-box; }
-  html, body { margin: 0; padding: 0; background: #ffffff; font-family: Arial, sans-serif; color: #333333; }
-  .page-root { padding: 20px; max-width: 1200px; margin: 0 auto; }
-  h1 { font-size: 24px; font-weight: bold; margin: 0 0 20px; }
-</style>
-</head><body></body></html>`);
-        iframeDoc.close();
+        // Helper function to wait for iframe content to fully render
+        const waitForRender = (iframeDoc, maxWait = 3000) => {
+          return new Promise((resolve) => {
+            let waited = 0;
+            const checkInterval = 100;
+            
+            const checkReady = () => {
+              waited += checkInterval;
+              
+              // Check if document is ready
+              if (iframeDoc.readyState === 'complete') {
+                // Additional wait for JS libraries like ECharts to initialize
+                setTimeout(resolve, 800);
+                return;
+              }
+              
+              if (waited >= maxWait) {
+                resolve();
+                return;
+              }
+              
+              setTimeout(checkReady, checkInterval);
+            };
+            
+            // Start checking after initial delay
+            setTimeout(checkReady, 200);
+          });
+        };
 
         const images = [];
         const renderPage = async (index) => {
@@ -1444,48 +1457,63 @@ export default {
           const pageName = page.name.replace(/ Page/i, '');
           const pageKey = pageName.toLowerCase().replace(/\s+/g, '-');
 
-          // Reset iframe body content for this page
-          iframeDoc.body.innerHTML = '';
-
-          // Build the page markup inside the iframe document
-          const root = iframeDoc.createElement('div');
-          root.className = 'page-root';
-          root.id = 'template-' + pageKey;
-
-          const contentEl = iframeDoc.createElement('div');
-          contentEl.className = 'preview-content';
-          const parsed = this.parseTemplate(page);
-          contentEl.innerHTML = (parsed && parsed.html) || page.component || `<div>${this.$t('design.export.noContent')}</div>`;
-          root.appendChild(contentEl);
-
-          // Inject scoped styles for this page into the iframe head
-          if (parsed && parsed.styles) {
-            const styleEl = iframeDoc.createElement('style');
-            styleEl.textContent = parsed.styles;
-            iframeDoc.head.appendChild(styleEl);
+          // Get the whole component content directly
+          let componentContent = page.component || '';
+          
+          // Clean up code block markers if present
+          if (typeof componentContent === 'string' && componentContent.startsWith('```')) {
+            componentContent = componentContent.replace(/^```(?:html|vue)?\s*/, '').replace(/```\s*$/, '');
           }
 
-          iframeDoc.body.appendChild(root);
+          // Write the whole template directly into iframe
+          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+          iframeDoc.open();
+          iframeDoc.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #fff; font-family: Arial, sans-serif; }
+  </style>
+</head>
+<body>
+  <div id="template-${pageKey}" class="page-root" style="width: 100%; background: #fff;">
+    ${componentContent}
+  </div>
+</body>
+</html>`);
+          iframeDoc.close();
 
-          // Wait a moment for images/fonts inside iframe to layout
-          await new Promise(resolve => setTimeout(resolve, 120));
+          // Wait for content to fully render (including JS libraries like ECharts)
+          await waitForRender(iframeDoc);
 
           try {
-            const contentHeight = root.scrollHeight;
-            const contentWidth = root.scrollWidth;
+            const root = iframeDoc.getElementById('template-' + pageKey);
+            if (root) {
+              // Force reflow
+              void root.offsetHeight;
+              
+              // Additional wait for canvas/chart rendering
+              await new Promise(r => setTimeout(r, 500));
+              
+              const contentHeight = root.scrollHeight;
+              const contentWidth = root.scrollWidth;
 
-            const canvas = await html2canvas(root, {
-              width: contentWidth,
-              height: contentHeight,
-              scale: 2,
-              useCORS: true,
-              logging: false,
-              backgroundColor: '#ffffff',
-              allowTaint: true
-            });
+              const canvas = await html2canvas(root, {
+                width: contentWidth,
+                height: contentHeight,
+                scale: 2,
+                useCORS: true,
+                logging: false,
+                backgroundColor: '#ffffff',
+                allowTaint: true
+              });
 
-            const imageData = canvas.toDataURL('image/png');
-            images.push({ key: pageKey, data: imageData });
+              const imageData = canvas.toDataURL('image/png');
+              images.push({ key: pageKey, data: imageData });
+            }
 
             // Next page
             renderPage(index + 1);
@@ -2359,13 +2387,36 @@ export default {
         iframe.style.top = '-9999px';
         iframe.style.width = '1440px';
         iframe.style.height = '1200px';
-        iframe.setAttribute('sandbox', 'allow-same-origin allow-scripts');
         document.body.appendChild(iframe);
 
-        const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-        iframeDoc.open();
-        iframeDoc.write('<!DOCTYPE html><html><head><meta charset="utf-8" /><style>* { box-sizing: border-box; } body { margin: 0; background: #fff; font-family: sans-serif; }</style></head><body></body></html>');
-        iframeDoc.close();
+        // Helper function to wait for iframe content to fully render
+        const waitForRender = (iframeDoc, maxWait = 3000) => {
+          return new Promise((resolve) => {
+            let waited = 0;
+            const checkInterval = 100;
+            
+            const checkReady = () => {
+              waited += checkInterval;
+              
+              // Check if document is ready
+              if (iframeDoc.readyState === 'complete') {
+                // Additional wait for JS libraries like ECharts to initialize
+                setTimeout(resolve, 800);
+                return;
+              }
+              
+              if (waited >= maxWait) {
+                resolve();
+                return;
+              }
+              
+              setTimeout(checkReady, checkInterval);
+            };
+            
+            // Start checking after initial delay
+            setTimeout(checkReady, 200);
+          });
+        };
 
         // Sequential generation
         const processNext = async (index) => {
@@ -2379,57 +2430,62 @@ export default {
           const key = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
           const templateId = 'template-' + key;
 
-          // Reset iframe content
-          // We need to keep the head styles that we might have added? No, we should clear specific styles but keep base.
-          // Re-writing body is safer.
-          iframeDoc.body.innerHTML = '';
-
-          // Remove any previous custom styles from head
-          const oldStyles = iframeDoc.head.querySelectorAll('style[data-custom="true"]');
-          oldStyles.forEach(s => s.remove());
-
-          const wrapper = iframeDoc.createElement('div');
-          wrapper.id = templateId;
-          wrapper.style.width = '100%';
-          wrapper.style.backgroundColor = '#fff';
-          wrapper.style.overflow = 'hidden';
-
-          // Inject content
-          const parsed = this.parseTemplate(template);
-          const contentDiv = iframeDoc.createElement('div');
-          contentDiv.className = 'preview-content';
-          contentDiv.innerHTML = (parsed && parsed.html) || '';
-          wrapper.appendChild(contentDiv);
-
-          // Inject styles
-          if (parsed && parsed.styles) {
-            const styleEl = iframeDoc.createElement('style');
-            styleEl.setAttribute('data-custom', 'true');
-            // We might not need scoping inside iframe as it's isolated, but keeping it doesn't hurt
-            styleEl.textContent = parsed.styles;
-            iframeDoc.head.appendChild(styleEl);
+          // Get the whole component content
+          let componentContent = template.component || '';
+          
+          // Clean up code block markers if present
+          if (typeof componentContent === 'string' && componentContent.startsWith('```')) {
+            componentContent = componentContent.replace(/^```(?:html|vue)?\s*/, '').replace(/```\s*$/, '');
           }
 
-          iframeDoc.body.appendChild(wrapper);
+          // Write the whole template directly into iframe
+          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+          iframeDoc.open();
+          iframeDoc.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <style>
+    * { box-sizing: border-box; }
+    html, body { margin: 0; padding: 0; background: #fff; font-family: Arial, sans-serif; }
+  </style>
+</head>
+<body>
+  <div id="${templateId}" style="width: 100%; background: #fff;">
+    ${componentContent}
+  </div>
+</body>
+</html>`);
+          iframeDoc.close();
 
-          // Wait for render
-          await new Promise(r => setTimeout(r, 150));
+          // Wait for content to fully render (including JS libraries like ECharts)
+          await waitForRender(iframeDoc);
 
           try {
-            // Check if content exists/has size
-            const rect = wrapper.getBoundingClientRect();
-            if (rect.height > 0 && rect.width > 0) {
-              const canvas = await html2canvas(wrapper, {
-                width: rect.width,
-                height: rect.height,
-                scale: 1,
-                useCORS: true,
-                logging: false,
-                backgroundColor: '#ffffff'
-              });
+            const wrapper = iframeDoc.getElementById(templateId);
+            if (wrapper) {
+              // Force reflow
+              void wrapper.offsetHeight;
+              
+              // Additional wait for canvas/chart rendering
+              await new Promise(r => setTimeout(r, 500));
+              
+              const rect = wrapper.getBoundingClientRect();
+              if (rect.height > 0 && rect.width > 0) {
+                const canvas = await html2canvas(wrapper, {
+                  width: rect.width,
+                  height: Math.min(rect.height, 1200),
+                  scale: 1,
+                  useCORS: true,
+                  logging: false,
+                  backgroundColor: '#ffffff',
+                  allowTaint: true
+                });
 
-              const imageData = canvas.toDataURL('image/png', 0.8);
-              this.receiveImageData({ element: templateId, imageData: imageData });
+                const imageData = canvas.toDataURL('image/png', 0.8);
+                this.receiveImageData({ element: templateId, imageData: imageData });
+              }
             }
           } catch (e) {
             console.error('Preview generation failed for ' + key, e);
