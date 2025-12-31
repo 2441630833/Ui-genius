@@ -2549,7 +2549,8 @@ export default {
         prompt: uni.getStorageSync('projectDescription') || this.projectDescription,
         device_type: uni.getStorageSync('selectedDevice') || 'desktop',
         model: uni.getStorageSync('selectedModel') || 'gemini2.5',
-        num_pages: 1
+        num_pages: 1,
+        need_project_description: true  // Only generate description for new projects
       };
 
       // Show a toast to indicate a long wait
@@ -4096,7 +4097,8 @@ export default {
         prompt: prompt,
         device_type: this.selectedDevice,
         model: this.selectedPageModel,
-        num_pages: 1
+        num_pages: 1,
+        need_project_description: false  // Don't generate description when adding pages to existing project
       };
 
       // If useColor is enabled, also pass the latest_7_overall_page data for context
