@@ -1504,7 +1504,7 @@ export default {
                 scale: 2,
                 useCORS: true,
                 logging: false,
-                backgroundColor: null,
+                backgroundColor: '#ffffff',  // Set backgroundColor to pure white
                 allowTaint: true
               });
 
@@ -2476,7 +2476,7 @@ export default {
                   scale: 1,
                   useCORS: true,
                   logging: false,
-                  backgroundColor: '#ffffff',
+                  backgroundColor: '#ffffff',  // Set backgroundColor to pure white
                   allowTaint: true
                 });
 
@@ -6379,7 +6379,7 @@ export default {
             useCORS: true,
             scale: 1.5, // Reduced from 2 for faster rendering
             logging: false, // Disable logging for performance
-            backgroundColor: '#ffffff', // OPTIMIZATION: Changed from null to white for better visibility
+            backgroundColor: '#ffffff', // Set backgroundColor to pure white
             imageTimeout: 0, // No timeout for images
             allowTaint: true, // Allow tainted canvas for better performance
             removeContainer: true, // Clean up after rendering
