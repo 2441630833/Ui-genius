@@ -2420,7 +2420,7 @@ export default {
         };
         
         const PARALLEL_COUNT = getOptimalParallelCount();
-        console.log(`[Preview] Using ${PARALLEL_COUNT} parallel workers (CPU: ${navigator.hardwareConcurrency || 'unknown'}, Memory: ${navigator.deviceMemory || 'unknown'}GB)`);
+        // console.log(`[Preview] Using ${PARALLEL_COUNT} parallel workers (CPU: ${navigator.hardwareConcurrency || 'unknown'}, Memory: ${navigator.deviceMemory || 'unknown'}GB)`);
         
         const iframes = [];
         
