@@ -2375,8 +2375,32 @@ export default {
           return;
         }
 
-        // OPTIMIZATION: Create multiple iframes for parallel processing
-        const PARALLEL_COUNT = Math.min(3, templatesToGenerate.length);
+        // OPTIMIZATION: Dynamic parallel count based on device capabilities
+        const getOptimalParallelCount = () => {
+          // Use navigator.hardwareConcurrency to detect CPU cores (defaults to 4 if unavailable)
+          const cpuCores = navigator.hardwareConcurrency || 4;
+          // Use deviceMemory if available (in GB), default to 4GB assumption
+          const memory = navigator.deviceMemory || 4;
+          
+          // Calculate optimal count: 
+          // - Base on CPU cores (leave 1-2 cores free for UI)
+          // - Cap based on memory (each iframe ~50-100MB)
+          // - Never exceed templates count
+          let optimal = Math.max(2, Math.floor(cpuCores * 0.75)); // Use 75% of cores
+          
+          // Adjust for memory: ~1 parallel task per 1GB RAM, minimum 2
+          const memoryLimit = Math.max(2, Math.floor(memory));
+          optimal = Math.min(optimal, memoryLimit);
+          
+          // Cap at reasonable maximum (8) to avoid diminishing returns
+          optimal = Math.min(optimal, 8);
+          
+          return Math.min(optimal, templatesToGenerate.length);
+        };
+        
+        const PARALLEL_COUNT = getOptimalParallelCount();
+        console.log(`[Preview] Using ${PARALLEL_COUNT} parallel workers (CPU: ${navigator.hardwareConcurrency || 'unknown'}, Memory: ${navigator.deviceMemory || 'unknown'}GB)`);
+        
         const iframes = [];
         
         for (let i = 0; i < PARALLEL_COUNT; i++) {
@@ -2390,18 +2414,17 @@ export default {
         const waitForRender = (iframeDoc, maxWait = 1500) => {
           return new Promise((resolve) => {
             let waited = 0;
-            const checkInterval = 50; // Reduced from 100ms
+            const checkInterval = 50;
             
             const checkReady = () => {
               waited += checkInterval;
               if (iframeDoc.readyState === 'complete' || waited >= maxWait) {
-                // Reduced from 800ms to 200ms - most content doesn't need long waits
                 setTimeout(resolve, 200);
                 return;
               }
               setTimeout(checkReady, checkInterval);
             };
-            setTimeout(checkReady, 100); // Reduced from 200ms
+            setTimeout(checkReady, 100);
           });
         };
 
