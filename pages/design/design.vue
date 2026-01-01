@@ -2375,67 +2375,46 @@ export default {
           return;
         }
 
-        // this._showLoading(`Generating ${templatesToGenerate.length} previews...`);
+        // OPTIMIZATION: Create multiple iframes for parallel processing
+        const PARALLEL_COUNT = Math.min(3, templatesToGenerate.length);
+        const iframes = [];
+        
+        for (let i = 0; i < PARALLEL_COUNT; i++) {
+          const iframe = document.createElement('iframe');
+          iframe.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1440px;height:1200px;visibility:hidden;';
+          document.body.appendChild(iframe);
+          iframes.push(iframe);
+        }
 
-        // Create a hidden iframe
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'absolute';
-        iframe.style.left = '-9999px';
-        iframe.style.top = '-9999px';
-        iframe.style.width = '1440px';
-        iframe.style.height = '1200px';
-        document.body.appendChild(iframe);
-
-        // Helper function to wait for iframe content to fully render
-        const waitForRender = (iframeDoc, maxWait = 3000) => {
+        // OPTIMIZATION: Faster render check with reduced timeouts
+        const waitForRender = (iframeDoc, maxWait = 1500) => {
           return new Promise((resolve) => {
             let waited = 0;
-            const checkInterval = 100;
+            const checkInterval = 50; // Reduced from 100ms
             
             const checkReady = () => {
               waited += checkInterval;
-              
-              // Check if document is ready
-              if (iframeDoc.readyState === 'complete') {
-                // Additional wait for JS libraries like ECharts to initialize
-                setTimeout(resolve, 800);
+              if (iframeDoc.readyState === 'complete' || waited >= maxWait) {
+                // Reduced from 800ms to 200ms - most content doesn't need long waits
+                setTimeout(resolve, 200);
                 return;
               }
-              
-              if (waited >= maxWait) {
-                resolve();
-                return;
-              }
-              
               setTimeout(checkReady, checkInterval);
             };
-            
-            // Start checking after initial delay
-            setTimeout(checkReady, 200);
+            setTimeout(checkReady, 100); // Reduced from 200ms
           });
         };
 
-        // Sequential generation
-        const processNext = async (index) => {
-          if (index >= templatesToGenerate.length) {
-            document.body.removeChild(iframe);
-            uni.hideLoading();
-            return;
-          }
-
-          const template = templatesToGenerate[index];
+        // OPTIMIZATION: Process single template with minimal delays
+        const processTemplate = async (template, iframe) => {
           const key = template.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
           const templateId = 'template-' + key;
 
-          // Get the whole component content
           let componentContent = template.component || '';
-          
-          // Clean up code block markers if present
           if (typeof componentContent === 'string' && componentContent.startsWith('```')) {
             componentContent = componentContent.replace(/^```(?:html|vue)?\s*/, '').replace(/```\s*$/, '');
           }
 
-          // Write the whole template directly into iframe
           const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
           iframeDoc.open();
           iframeDoc.write(`<!DOCTYPE html>
@@ -2446,6 +2425,7 @@ export default {
   <style>
     * { box-sizing: border-box; }
     html, body { margin: 0; padding: 0; background: #fff; font-family: Arial, sans-serif; }
+    img { max-width: 100%; }
   </style>
 </head>
 <body>
@@ -2456,42 +2436,56 @@ export default {
 </html>`);
           iframeDoc.close();
 
-          // Wait for content to fully render (including JS libraries like ECharts)
           await waitForRender(iframeDoc);
 
           try {
             const wrapper = iframeDoc.getElementById(templateId);
             if (wrapper) {
-              // Force reflow
               void wrapper.offsetHeight;
-              
-              // Additional wait for canvas/chart rendering
-              await new Promise(r => setTimeout(r, 500));
+              // OPTIMIZATION: Reduced from 500ms to 100ms
+              await new Promise(r => setTimeout(r, 100));
               
               const rect = wrapper.getBoundingClientRect();
               if (rect.height > 0 && rect.width > 0) {
                 const canvas = await html2canvas(wrapper, {
                   width: rect.width,
                   height: Math.min(rect.height, 1200),
-                  scale: 1,
+                  scale: 0.75, // OPTIMIZATION: Reduced scale for faster rendering
                   useCORS: true,
                   logging: false,
-                  backgroundColor: '#ffffff',  // Set backgroundColor to pure white
-                  allowTaint: true
+                  backgroundColor: '#ffffff',
+                  allowTaint: true,
+                  imageTimeout: 5000, // OPTIMIZATION: Limit image loading time
+                  removeContainer: true,
+                  foreignObjectRendering: false
                 });
 
-                const imageData = canvas.toDataURL('image/png', 0.8);
+                const imageData = canvas.toDataURL('image/jpeg', 0.7); // OPTIMIZATION: JPEG is faster than PNG
                 this.receiveImageData({ element: templateId, imageData: imageData });
               }
             }
           } catch (e) {
             console.error('Preview generation failed for ' + key, e);
           }
-
-          processNext(index + 1);
         };
 
-        processNext(0);
+        // OPTIMIZATION: Process templates in parallel batches
+        const processBatch = async (startIndex) => {
+          const batch = templatesToGenerate.slice(startIndex, startIndex + PARALLEL_COUNT);
+          if (batch.length === 0) {
+            // Cleanup iframes
+            iframes.forEach(iframe => document.body.removeChild(iframe));
+            uni.hideLoading();
+            return;
+          }
+
+          await Promise.all(batch.map((template, i) => processTemplate(template, iframes[i])));
+          
+          // Process next batch
+          await processBatch(startIndex + PARALLEL_COUNT);
+        };
+
+        await processBatch(0);
 
       } else {
         // Fallback to static template IDs (DOM based)
@@ -6349,27 +6343,14 @@ export default {
         try {
           const dom = document.getElementById(elementId);
           if (!dom) {
-            // console.error(`Element not found: ${elementId}`);   
-            // uni.$emit('capture-error', { element: elementId, error: 'Element not found' });
             return;
           }
           
-          // Check if element has size
           if (dom.clientWidth <= 0 || dom.clientHeight <= 0) {
-            // console.error(`Element has no size: ${elementId}`);
-            // uni.$emit('capture-error', { element: elementId, error: 'Element has no size' });
             return;
           }
           
-          // console.log(`Capturing element: ${elementId}`);
-          
-          // OPTIMIZATION: Force reflow to ensure all styles are computed
-          // This helps ensure that dynamically injected styles are applied
           void dom.offsetHeight;
-          
-          // Get computed styles to verify they're applied
-          const computedStyle = window.getComputedStyle(dom);
-          // console.log(`Element background: ${computedStyle.backgroundColor}`);
           
           html2canvas(dom, {
             width: dom.clientWidth,
@@ -6377,74 +6358,37 @@ export default {
             scrollY: 0,
             scrollX: 0,
             useCORS: true,
-            scale: 1.5, // Reduced from 2 for faster rendering
-            logging: false, // Disable logging for performance
-            backgroundColor: '#ffffff', // Set backgroundColor to pure white
-            imageTimeout: 0, // No timeout for images
-            allowTaint: true, // Allow tainted canvas for better performance
-            removeContainer: true, // Clean up after rendering
-            // OPTIMIZATION: Additional options for better style capture
-            foreignObjectRendering: false, // Use native rendering for better compatibility
-            ignoreElements: (element) => {
-              // Don't ignore any elements that might have styles
-              return false;
-            },
+            scale: 1, // OPTIMIZATION: Reduced from 1.5 for faster rendering
+            logging: false,
+            backgroundColor: '#ffffff',
+            imageTimeout: 5000, // OPTIMIZATION: Add timeout instead of 0 (infinite)
+            allowTaint: true,
+            removeContainer: true,
+            foreignObjectRendering: false,
+            // OPTIMIZATION: Remove expensive onclone callback - html2canvas handles styles well enough
+            // Only copy styles for elements with explicit background colors if needed
             onclone: (clonedDoc) => {
-              // OPTIMIZATION: Ensure all styles are present in the cloned document
-              // This helps with dynamically added style tags
               const clonedElement = clonedDoc.getElementById(elementId);
               if (clonedElement) {
-                // Force a reflow in the cloned document
                 void clonedElement.offsetHeight;
-                
-                // Copy all computed styles explicitly
+                // OPTIMIZATION: Only copy background colors for direct children (not all descendants)
                 const originalElement = document.getElementById(elementId);
                 if (originalElement) {
-                  const allElements = originalElement.querySelectorAll('*');
-                  const clonedElements = clonedElement.querySelectorAll('*');
-                  
-                  // Ensure we have the same number of elements
-                  if (allElements.length === clonedElements.length) {
-                    for (let i = 0; i < allElements.length; i++) {
-                      const original = allElements[i];
-                      const cloned = clonedElements[i];
-                      const computedStyle = window.getComputedStyle(original);
-                      
-                      // Copy critical style properties that might be missing
-                      if (computedStyle.backgroundColor && computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)') {
-                        cloned.style.backgroundColor = computedStyle.backgroundColor;
-                      }
-                      if (computedStyle.color) {
-                        cloned.style.color = computedStyle.color;
-                      }
-                      if (computedStyle.fontSize) {
-                        cloned.style.fontSize = computedStyle.fontSize;
-                      }
-                      if (computedStyle.fontFamily) {
-                        cloned.style.fontFamily = computedStyle.fontFamily;
-                      }
-                      if (computedStyle.fontWeight) {
-                        cloned.style.fontWeight = computedStyle.fontWeight;
-                      }
-                      if (computedStyle.padding) {
-                        cloned.style.padding = computedStyle.padding;
-                      }
-                      if (computedStyle.margin) {
-                        cloned.style.margin = computedStyle.margin;
-                      }
-                      if (computedStyle.borderRadius) {
-                        cloned.style.borderRadius = computedStyle.borderRadius;
-                      }
+                  const directChildren = originalElement.children;
+                  const clonedChildren = clonedElement.children;
+                  const len = Math.min(directChildren.length, clonedChildren.length, 50); // Limit to 50 elements
+                  for (let i = 0; i < len; i++) {
+                    const computedStyle = window.getComputedStyle(directChildren[i]);
+                    if (computedStyle.backgroundColor && computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+                      clonedChildren[i].style.backgroundColor = computedStyle.backgroundColor;
                     }
                   }
                 }
               }
             }
           }).then((canvas) => {
-            const imageData = canvas.toDataURL('image/png', 0.85); // Added compression for faster processing
-            // Send the image data back to the Vue component
+            const imageData = canvas.toDataURL('image/jpeg', 0.75); // OPTIMIZATION: JPEG is faster than PNG
             uni.$emit('image-captured', { element: elementId, imageData });
-            // console.log(`Successfully captured ${elementId}`);
           }).catch(err => {
             console.error(`Failed to generate image for ${elementId}:`, err);
             uni.$emit('capture-error', { element: elementId, error: err.toString() });
@@ -6453,7 +6397,7 @@ export default {
           console.error(`Exception while capturing ${elementId}:`, err);
           uni.$emit('capture-error', { element: elementId, error: `Exception: ${err.toString()}` });
         }
-      }, 100); // OPTIMIZATION: Increased from 50ms to 100ms to ensure styles are fully applied
+      }, 50); // OPTIMIZATION: Reduced from 100ms
     }
   }
 }
