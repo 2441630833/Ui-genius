@@ -1434,7 +1434,7 @@ export default {
             const checkReady = () => {
               waited += checkInterval;
               if (iframeDoc.readyState === 'complete' || waited >= maxWait) {
-                setTimeout(resolve, 200);
+                setTimeout(resolve, 400); // Increased for ECharts
                 return;
               }
               setTimeout(checkReady, checkInterval);
@@ -1476,7 +1476,8 @@ export default {
             const root = iframeDoc.getElementById(templateId);
             if (root) {
               void root.offsetHeight;
-              await new Promise(r => setTimeout(r, 100));
+              // Wait for charts/scripts to render (increased for ECharts compatibility)
+              await new Promise(r => setTimeout(r, 600));
               
               const contentHeight = root.scrollHeight;
               const contentWidth = root.scrollWidth;
@@ -2439,7 +2440,7 @@ export default {
             const checkReady = () => {
               waited += checkInterval;
               if (iframeDoc.readyState === 'complete' || waited >= maxWait) {
-                setTimeout(resolve, 200);
+                setTimeout(resolve, 400); // Increased for ECharts
                 return;
               }
               setTimeout(checkReady, checkInterval);
@@ -2485,8 +2486,8 @@ export default {
             const wrapper = iframeDoc.getElementById(templateId);
             if (wrapper) {
               void wrapper.offsetHeight;
-              // OPTIMIZATION: Reduced from 500ms to 100ms
-              await new Promise(r => setTimeout(r, 100));
+              // Wait for charts/scripts to render (increased for ECharts compatibility)
+              await new Promise(r => setTimeout(r, 600));
               
               const rect = wrapper.getBoundingClientRect();
               if (rect.height > 0 && rect.width > 0) {
