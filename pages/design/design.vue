@@ -1404,69 +1404,56 @@ export default {
           return;
         }
 
-        // Create a hidden iframe to isolate rendering from the main page
-        const iframe = document.createElement('iframe');
-        iframe.style.position = 'absolute';
-        iframe.style.left = '-9999px';
-        iframe.style.top = '-9999px';
-        iframe.style.width = '1440px';
-        iframe.style.height = '2000px';
-        document.body.appendChild(iframe);
+        // OPTIMIZATION: Dynamic parallel count based on device capabilities
+        const getOptimalParallelCount = (totalPages) => {
+          const cpuCores = navigator.hardwareConcurrency || 4;
+          const memory = navigator.deviceMemory || 4;
+          let optimal = Math.max(2, Math.floor(cpuCores * 0.75));
+          const memoryLimit = Math.max(2, Math.floor(memory));
+          optimal = Math.min(optimal, memoryLimit, 8);
+          return Math.min(optimal, totalPages);
+        };
 
-        // Helper function to wait for iframe content to fully render
-        const waitForRender = (iframeDoc, maxWait = 3000) => {
+        const PARALLEL_COUNT = getOptimalParallelCount(projectData.pages.length);
+        console.log(`[Export] Using ${PARALLEL_COUNT} parallel workers`);
+
+        // Create multiple iframes for parallel processing
+        const iframes = [];
+        for (let i = 0; i < PARALLEL_COUNT; i++) {
+          const iframe = document.createElement('iframe');
+          iframe.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1440px;height:2000px;visibility:hidden;';
+          document.body.appendChild(iframe);
+          iframes.push(iframe);
+        }
+
+        // OPTIMIZATION: Faster render check with reduced timeouts
+        const waitForRender = (iframeDoc, maxWait = 1500) => {
           return new Promise((resolve) => {
             let waited = 0;
-            const checkInterval = 100;
-            
+            const checkInterval = 50;
             const checkReady = () => {
               waited += checkInterval;
-              
-              // Check if document is ready
-              if (iframeDoc.readyState === 'complete') {
-                // Additional wait for JS libraries like ECharts to initialize
-                setTimeout(resolve, 800);
+              if (iframeDoc.readyState === 'complete' || waited >= maxWait) {
+                setTimeout(resolve, 200);
                 return;
               }
-              
-              if (waited >= maxWait) {
-                resolve();
-                return;
-              }
-              
               setTimeout(checkReady, checkInterval);
             };
-            
-            // Start checking after initial delay
-            setTimeout(checkReady, 200);
+            setTimeout(checkReady, 100);
           });
         };
 
-        const images = [];
-        const renderPage = async (index) => {
-          if (index >= projectData.pages.length) {
-            // Clean up the iframe
-            document.body.removeChild(iframe);
-            // Export the images (web only for now)
-            // #ifdef H5 
-            this.exportImagesWeb(images);
-            // #endif
-            return;
-          }
-
-          const page = projectData.pages[index];
+        // OPTIMIZATION: Process single page with minimal delays
+        const renderSinglePage = async (page, iframe) => {
           const pageName = page.name.replace(/ Page/i, '');
           const pageKey = pageName.toLowerCase().replace(/\s+/g, '-');
+          const templateId = 'template-' + pageKey;
 
-          // Get the whole component content directly
           let componentContent = page.component || '';
-          
-          // Clean up code block markers if present
           if (typeof componentContent === 'string' && componentContent.startsWith('```')) {
             componentContent = componentContent.replace(/^```(?:html|vue)?\s*/, '').replace(/```\s*$/, '');
           }
 
-          // Write the whole template directly into iframe
           const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
           iframeDoc.open();
           iframeDoc.write(`<!DOCTYPE html>
@@ -1476,24 +1463,20 @@ export default {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
 </head>
 <body style="margin: 0; padding: 0;">
-  <div id="template-${pageKey}">
+  <div id="${templateId}">
     ${componentContent}
   </div>
 </body>
 </html>`);
           iframeDoc.close();
 
-          // Wait for content to fully render (including JS libraries like ECharts)
           await waitForRender(iframeDoc);
 
           try {
-            const root = iframeDoc.getElementById('template-' + pageKey);
+            const root = iframeDoc.getElementById(templateId);
             if (root) {
-              // Force reflow
               void root.offsetHeight;
-              
-              // Additional wait for canvas/chart rendering
-              await new Promise(r => setTimeout(r, 500));
+              await new Promise(r => setTimeout(r, 100));
               
               const contentHeight = root.scrollHeight;
               const contentWidth = root.scrollWidth;
@@ -1504,25 +1487,62 @@ export default {
                 scale: 2,
                 useCORS: true,
                 logging: false,
-                backgroundColor: '#ffffff',  // Set backgroundColor to pure white
-                allowTaint: true
+                backgroundColor: '#ffffff',
+                allowTaint: true,
+                imageTimeout: 5000,
+                removeContainer: true,
+                foreignObjectRendering: false,
+                // OPTIMIZATION: Only copy background colors for direct children
+                onclone: (clonedDoc) => {
+                  const clonedElement = clonedDoc.getElementById(templateId);
+                  if (clonedElement) {
+                    void clonedElement.offsetHeight;
+                    const originalElement = iframeDoc.getElementById(templateId);
+                    if (originalElement) {
+                      const directChildren = originalElement.children;
+                      const clonedChildren = clonedElement.children;
+                      const len = Math.min(directChildren.length, clonedChildren.length, 50);
+                      for (let i = 0; i < len; i++) {
+                        const computedStyle = window.getComputedStyle(directChildren[i]);
+                        if (computedStyle.backgroundColor && computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+                          clonedChildren[i].style.backgroundColor = computedStyle.backgroundColor;
+                        }
+                      }
+                    }
+                  }
+                }
               });
 
               const imageData = canvas.toDataURL('image/png');
-              images.push({ key: pageKey, data: imageData });
+              return { key: pageKey, data: imageData };
             }
-
-            // Next page
-            renderPage(index + 1);
           } catch (error) {
             console.error(`Error capturing screenshot for ${pageName}:`, error);
-            // Continue with next page even on error
-            renderPage(index + 1);
           }
+          return null;
         };
 
-        // Start rendering pages
-        renderPage(0);
+        // OPTIMIZATION: Process pages in parallel batches
+        const images = [];
+        const pages = projectData.pages;
+        
+        for (let i = 0; i < pages.length; i += PARALLEL_COUNT) {
+          const batch = pages.slice(i, i + PARALLEL_COUNT);
+          const results = await Promise.all(
+            batch.map((page, idx) => renderSinglePage(page, iframes[idx]))
+          );
+          results.forEach(result => {
+            if (result) images.push(result);
+          });
+        }
+
+        // Clean up iframes
+        iframes.forEach(iframe => document.body.removeChild(iframe));
+
+        // Export the images (web only for now)
+        // #ifdef H5 
+        this.exportImagesWeb(images);
+        // #endif
       } catch (error) {
         uni.hideLoading();
         uni.showToast({
