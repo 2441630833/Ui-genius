@@ -2482,12 +2482,12 @@ export default {
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <style>
     * { box-sizing: border-box; }
-    html, body { margin: 0; padding: 0; background: #fff; font-family: Arial, sans-serif; }
+    html, body { margin: 0; padding: 0; font-family: Arial, sans-serif; }
     img { max-width: 100%; }
   </style>
 </head>
 <body>
-  <div id="${templateId}" style="width: 100%; background: #fff;">
+  <div id="${templateId}" style="width: 100%;">
     ${componentContent}
   </div>
 </body>
@@ -3609,8 +3609,14 @@ export default {
         'settings'
       ];
 
-      // Use main template keys
-      const allKeys = [...mainTemplateKeys];
+      // Add dynamic template keys from jsonTemplates
+      const dynamicKeys = this.jsonTemplates.map(t => {
+        const pageName = t.name.replace(/ Page/i, '');
+        return pageName.toLowerCase().replace(/\s+/g, '-');
+      });
+
+      // Combine all keys
+      const allKeys = [...mainTemplateKeys, ...dynamicKeys];
 
       // Clear each image from storage
       for (const key of allKeys) {
