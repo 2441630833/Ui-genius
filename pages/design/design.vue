@@ -1488,18 +1488,32 @@ export default {
                 scale: 2,
                 useCORS: true,
                 logging: false,
-                backgroundColor: '#ffffff',
                 allowTaint: true,
                 imageTimeout: 5000,
                 removeContainer: true,
                 foreignObjectRendering: false,
-                // OPTIMIZATION: Only copy background colors for direct children
+                // Copy background color from inner content to wrapper
                 onclone: (clonedDoc) => {
                   const clonedElement = clonedDoc.getElementById(templateId);
                   if (clonedElement) {
                     void clonedElement.offsetHeight;
                     const originalElement = iframeDoc.getElementById(templateId);
                     if (originalElement) {
+                      // Copy background from first child or body to wrapper
+                      const firstChild = originalElement.firstElementChild;
+                      if (firstChild) {
+                        const childBg = window.getComputedStyle(firstChild).backgroundColor;
+                        if (childBg && childBg !== 'rgba(0, 0, 0, 0)') {
+                          clonedElement.style.backgroundColor = childBg;
+                        }
+                      }
+                      // Also check body background
+                      const bodyBg = window.getComputedStyle(iframeDoc.body).backgroundColor;
+                      if (bodyBg && bodyBg !== 'rgba(0, 0, 0, 0)' && !clonedElement.style.backgroundColor) {
+                        clonedElement.style.backgroundColor = bodyBg;
+                      }
+                      
+                      // Copy background colors for direct children
                       const directChildren = originalElement.children;
                       const clonedChildren = clonedElement.children;
                       const len = Math.min(directChildren.length, clonedChildren.length, 50);
@@ -2497,11 +2511,33 @@ export default {
                   scale: 0.75, // OPTIMIZATION: Reduced scale for faster rendering
                   useCORS: true,
                   logging: false,
-                  backgroundColor: '#ffffff',
                   allowTaint: true,
                   imageTimeout: 5000, // OPTIMIZATION: Limit image loading time
                   removeContainer: true,
-                  foreignObjectRendering: false
+                  foreignObjectRendering: false,
+                  // Copy background color from inner content to wrapper
+                  onclone: (clonedDoc) => {
+                    const clonedElement = clonedDoc.getElementById(templateId);
+                    if (clonedElement) {
+                      void clonedElement.offsetHeight;
+                      const originalElement = iframeDoc.getElementById(templateId);
+                      if (originalElement) {
+                        // Copy background from first child or body to wrapper
+                        const firstChild = originalElement.firstElementChild;
+                        if (firstChild) {
+                          const childBg = window.getComputedStyle(firstChild).backgroundColor;
+                          if (childBg && childBg !== 'rgba(0, 0, 0, 0)') {
+                            clonedElement.style.backgroundColor = childBg;
+                          }
+                        }
+                        // Also check body background
+                        const bodyBg = window.getComputedStyle(iframeDoc.body).backgroundColor;
+                        if (bodyBg && bodyBg !== 'rgba(0, 0, 0, 0)' && !clonedElement.style.backgroundColor) {
+                          clonedElement.style.backgroundColor = bodyBg;
+                        }
+                      }
+                    }
+                  }
                 });
 
                 const imageData = canvas.toDataURL('image/jpeg', 0.7); // OPTIMIZATION: JPEG is faster than PNG
@@ -6404,20 +6440,30 @@ export default {
             useCORS: true,
             scale: 1, // OPTIMIZATION: Reduced from 1.5 for faster rendering
             logging: false,
-            backgroundColor: '#ffffff',
             imageTimeout: 5000, // OPTIMIZATION: Add timeout instead of 0 (infinite)
             allowTaint: true,
             removeContainer: true,
             foreignObjectRendering: false,
-            // OPTIMIZATION: Remove expensive onclone callback - html2canvas handles styles well enough
-            // Only copy styles for elements with explicit background colors if needed
+            // Copy background color from inner content to wrapper
             onclone: (clonedDoc) => {
               const clonedElement = clonedDoc.getElementById(elementId);
               if (clonedElement) {
                 void clonedElement.offsetHeight;
-                // OPTIMIZATION: Only copy background colors for direct children (not all descendants)
                 const originalElement = document.getElementById(elementId);
                 if (originalElement) {
+                  // Copy background from first child to wrapper if wrapper has no background
+                  const wrapperBg = window.getComputedStyle(originalElement).backgroundColor;
+                  if (!wrapperBg || wrapperBg === 'rgba(0, 0, 0, 0)') {
+                    const firstChild = originalElement.firstElementChild;
+                    if (firstChild) {
+                      const childBg = window.getComputedStyle(firstChild).backgroundColor;
+                      if (childBg && childBg !== 'rgba(0, 0, 0, 0)') {
+                        clonedElement.style.backgroundColor = childBg;
+                      }
+                    }
+                  }
+                  
+                  // Copy background colors for direct children
                   const directChildren = originalElement.children;
                   const clonedChildren = clonedElement.children;
                   const len = Math.min(directChildren.length, clonedChildren.length, 50); // Limit to 50 elements
