@@ -6915,7 +6915,6 @@ export default {
   border-radius: 8px;
   overflow: hidden;
   padding: 16px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
 }
 
 .preview-header {
@@ -7211,7 +7210,6 @@ export default {
   font-weight: 500;
   text-align: center;
   display: inline-block;
-  box-shadow: 0 3px 8px rgba(0, 0, 0, 0.2);
 }
 
 .preview-label {
