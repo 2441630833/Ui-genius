@@ -1334,18 +1334,14 @@ export default {
     handleActionSheetSelection(index) {
       this.closeCustomActionSheet();
 
-      const exportTypes = ['images', 'html', 'vue2', 'vue3', 'react'];
+      const exportTypes = ['html', 'vue2', 'vue3', 'react'];
       this.exportType = exportTypes[index];
 
       switch (this.exportType) {
         // case 'images':
-        //   console.log(this.exportType);
-        // case 'images':
-        //   this.exportImages();
+        //   // Disabled export to images by request
+        //   // this.exportImages();
         //   break;
-        case 'images':
-          this.exportImages();
-          break;
         case 'html':
           this.exportHTML();
           break;
@@ -1356,318 +1352,318 @@ export default {
           break;
       }
     },
-    async exportImages() {
-      // Debounce protection
-      if (this.isExporting) {
-        uni.showToast({
-          title: this.$t('design.export.alreadyInProgress'),
-          icon: 'none',
-          duration: 2000
-        });
-        return;
-      }
+//     async exportImages() {
+//       // Debounce protection
+//       if (this.isExporting) {
+//         uni.showToast({
+//           title: this.$t('design.export.alreadyInProgress'),
+//           icon: 'none',
+//           duration: 2000
+//         });
+//         return;
+//       }
 
-      this.isExporting = true;
+//       this.isExporting = true;
 
-      // Show loading toast
-      uni.showLoading({
-        title: this.$t('design.export.preparingImages'),
-        mask: true
-      });
+//       // Show loading toast
+//       uni.showLoading({
+//         title: this.$t('design.export.preparingImages'),
+//         mask: true
+//       });
 
-      try {
-        // Get the project data from storage
-        const jsonData = uni.getStorageSync('latest_7_overall_page');
-        if (!jsonData) {
-          uni.hideLoading();
-          uni.showToast({
-            title: this.$t('design.toast.noProjectData'),
-            icon: 'none',
-            duration: 2000
-          });
-          this.isExporting = false;
-          return;
-        }
+//       try {
+//         // Get the project data from storage
+//         const jsonData = uni.getStorageSync('latest_7_overall_page');
+//         if (!jsonData) {
+//           uni.hideLoading();
+//           uni.showToast({
+//             title: this.$t('design.toast.noProjectData'),
+//             icon: 'none',
+//             duration: 2000
+//           });
+//           this.isExporting = false;
+//           return;
+//         }
 
-        // Parse the JSON data
-        const projectData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+//         // Parse the JSON data
+//         const projectData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
 
-        // Check if we have pages
-        if (!projectData.pages || !projectData.pages.length) {
-          uni.hideLoading();
-          uni.showToast({
-            title: this.$t('design.export.noData'),
-            icon: 'none',
-            duration: 2000
-          });
-          this.isExporting = false;
-          return;
-        }
+//         // Check if we have pages
+//         if (!projectData.pages || !projectData.pages.length) {
+//           uni.hideLoading();
+//           uni.showToast({
+//             title: this.$t('design.export.noData'),
+//             icon: 'none',
+//             duration: 2000
+//           });
+//           this.isExporting = false;
+//           return;
+//         }
 
-        // OPTIMIZATION: Dynamic parallel count based on device capabilities
-        const getOptimalParallelCount = (totalPages) => {
-          const cpuCores = navigator.hardwareConcurrency || 4;
-          const memory = navigator.deviceMemory || 4;
-          let optimal = Math.max(2, Math.floor(cpuCores * 0.75));
-          const memoryLimit = Math.max(2, Math.floor(memory));
-          optimal = Math.min(optimal, memoryLimit, 8);
-          return Math.min(optimal, totalPages);
-        };
+//         // OPTIMIZATION: Dynamic parallel count based on device capabilities
+//         const getOptimalParallelCount = (totalPages) => {
+//           const cpuCores = navigator.hardwareConcurrency || 4;
+//           const memory = navigator.deviceMemory || 4;
+//           let optimal = Math.max(2, Math.floor(cpuCores * 0.75));
+//           const memoryLimit = Math.max(2, Math.floor(memory));
+//           optimal = Math.min(optimal, memoryLimit, 8);
+//           return Math.min(optimal, totalPages);
+//         };
 
-        const PARALLEL_COUNT = getOptimalParallelCount(projectData.pages.length);
-        console.log(`[Export] Using ${PARALLEL_COUNT} parallel workers`);
+//         const PARALLEL_COUNT = getOptimalParallelCount(projectData.pages.length);
+//         console.log(`[Export] Using ${PARALLEL_COUNT} parallel workers`);
 
-        // Create multiple iframes for parallel processing
-        const iframes = [];
-        for (let i = 0; i < PARALLEL_COUNT; i++) {
-          const iframe = document.createElement('iframe');
-          iframe.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1440px;height:2000px;visibility:hidden;';
-          document.body.appendChild(iframe);
-          iframes.push(iframe);
-        }
+//         // Create multiple iframes for parallel processing
+//         const iframes = [];
+//         for (let i = 0; i < PARALLEL_COUNT; i++) {
+//           const iframe = document.createElement('iframe');
+//           iframe.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1440px;height:2000px;visibility:hidden;';
+//           document.body.appendChild(iframe);
+//           iframes.push(iframe);
+//         }
 
-        // OPTIMIZATION: Faster render check with reduced timeouts
-        const waitForRender = (iframeDoc, maxWait = 1500) => {
-          return new Promise((resolve) => {
-            let waited = 0;
-            const checkInterval = 50;
-            const checkReady = () => {
-              waited += checkInterval;
-              if (iframeDoc.readyState === 'complete' || waited >= maxWait) {
-                setTimeout(resolve, 400); // Increased for ECharts
-                return;
-              }
-              setTimeout(checkReady, checkInterval);
-            };
-            setTimeout(checkReady, 100);
-          });
-        };
+//         // OPTIMIZATION: Faster render check with reduced timeouts
+//         const waitForRender = (iframeDoc, maxWait = 1500) => {
+//           return new Promise((resolve) => {
+//             let waited = 0;
+//             const checkInterval = 50;
+//             const checkReady = () => {
+//               waited += checkInterval;
+//               if (iframeDoc.readyState === 'complete' || waited >= maxWait) {
+//                 setTimeout(resolve, 400); // Increased for ECharts
+//                 return;
+//               }
+//               setTimeout(checkReady, checkInterval);
+//             };
+//             setTimeout(checkReady, 100);
+//           });
+//         };
 
-        // OPTIMIZATION: Process single page with minimal delays
-        const renderSinglePage = async (page, iframe) => {
-          const pageName = page.name.replace(/ Page/i, '');
-          const pageKey = pageName.toLowerCase().replace(/\s+/g, '-');
-          const templateId = 'template-' + pageKey;
+//         // OPTIMIZATION: Process single page with minimal delays
+//         const renderSinglePage = async (page, iframe) => {
+//           const pageName = page.name.replace(/ Page/i, '');
+//           const pageKey = pageName.toLowerCase().replace(/\s+/g, '-');
+//           const templateId = 'template-' + pageKey;
 
-          let componentContent = page.component || '';
-          if (typeof componentContent === 'string' && componentContent.startsWith('```')) {
-            componentContent = componentContent.replace(/^```(?:html|vue)?\s*/, '').replace(/```\s*$/, '');
-          }
+//           let componentContent = page.component || '';
+//           if (typeof componentContent === 'string' && componentContent.startsWith('```')) {
+//             componentContent = componentContent.replace(/^```(?:html|vue)?\s*/, '').replace(/```\s*$/, '');
+//           }
 
-          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-          iframeDoc.open();
-          iframeDoc.write(`<!DOCTYPE html>
-<html>
-<head>
-  <meta charset="utf-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
-</head>
-<body style="margin: 0; padding: 0;">
-  <div id="${templateId}">
-    ${componentContent}
-  </div>
-</body>
-</html>`);
-          iframeDoc.close();
+//           const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+//           iframeDoc.open();
+//           iframeDoc.write(`<!DOCTYPE html>
+// <html>
+// <head>
+//   <meta charset="utf-8" />
+//   <meta name="viewport" content="width=device-width, initial-scale=1" />
+// </head>
+// <body style="margin: 0; padding: 0;">
+//   <div id="${templateId}">
+//     ${componentContent}
+//   </div>
+// </body>
+// </html>`);
+//           iframeDoc.close();
 
-          await waitForRender(iframeDoc);
+//           await waitForRender(iframeDoc);
 
-          try {
-            const root = iframeDoc.getElementById(templateId);
-            if (root) {
-              void root.offsetHeight;
-              // Wait for charts/scripts to render (increased for ECharts compatibility)
-              await new Promise(r => setTimeout(r, 600));
+//           try {
+//             const root = iframeDoc.getElementById(templateId);
+//             if (root) {
+//               void root.offsetHeight;
+//               // Wait for charts/scripts to render (increased for ECharts compatibility)
+//               await new Promise(r => setTimeout(r, 600));
               
-              const contentHeight = root.scrollHeight;
-              const contentWidth = root.scrollWidth;
+//               const contentHeight = root.scrollHeight;
+//               const contentWidth = root.scrollWidth;
 
-              const canvas = await html2canvas(root, {
-                width: contentWidth,
-                height: contentHeight,
-                scale: 2,
-                useCORS: true,
-                logging: false,
-                allowTaint: true,
-                imageTimeout: 5000,
-                removeContainer: true,
-                foreignObjectRendering: false,
-                // Copy background color from inner content to wrapper
-                onclone: (clonedDoc) => {
-                  const clonedElement = clonedDoc.getElementById(templateId);
-                  if (clonedElement) {
-                    void clonedElement.offsetHeight;
-                    const originalElement = iframeDoc.getElementById(templateId);
-                    if (originalElement) {
-                      // Copy background from first child or body to wrapper
-                      const firstChild = originalElement.firstElementChild;
-                      if (firstChild) {
-                        const childBg = window.getComputedStyle(firstChild).backgroundColor;
-                        if (childBg && childBg !== 'rgba(0, 0, 0, 0)') {
-                          clonedElement.style.backgroundColor = childBg;
-                        }
-                      }
-                      // Also check body background
-                      const bodyBg = window.getComputedStyle(iframeDoc.body).backgroundColor;
-                      if (bodyBg && bodyBg !== 'rgba(0, 0, 0, 0)' && !clonedElement.style.backgroundColor) {
-                        clonedElement.style.backgroundColor = bodyBg;
-                      }
+//               const canvas = await html2canvas(root, {
+//                 width: contentWidth,
+//                 height: contentHeight,
+//                 scale: 2,
+//                 useCORS: true,
+//                 logging: false,
+//                 allowTaint: true,
+//                 imageTimeout: 5000,
+//                 removeContainer: true,
+//                 foreignObjectRendering: false,
+//                 // Copy background color from inner content to wrapper
+//                 onclone: (clonedDoc) => {
+//                   const clonedElement = clonedDoc.getElementById(templateId);
+//                   if (clonedElement) {
+//                     void clonedElement.offsetHeight;
+//                     const originalElement = iframeDoc.getElementById(templateId);
+//                     if (originalElement) {
+//                       // Copy background from first child or body to wrapper
+//                       const firstChild = originalElement.firstElementChild;
+//                       if (firstChild) {
+//                         const childBg = window.getComputedStyle(firstChild).backgroundColor;
+//                         if (childBg && childBg !== 'rgba(0, 0, 0, 0)') {
+//                           clonedElement.style.backgroundColor = childBg;
+//                         }
+//                       }
+//                       // Also check body background
+//                       const bodyBg = window.getComputedStyle(iframeDoc.body).backgroundColor;
+//                       if (bodyBg && bodyBg !== 'rgba(0, 0, 0, 0)' && !clonedElement.style.backgroundColor) {
+//                         clonedElement.style.backgroundColor = bodyBg;
+//                       }
                       
-                      // Copy background colors for direct children
-                      const directChildren = originalElement.children;
-                      const clonedChildren = clonedElement.children;
-                      const len = Math.min(directChildren.length, clonedChildren.length, 50);
-                      for (let i = 0; i < len; i++) {
-                        const computedStyle = window.getComputedStyle(directChildren[i]);
-                        if (computedStyle.backgroundColor && computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)') {
-                          clonedChildren[i].style.backgroundColor = computedStyle.backgroundColor;
-                        }
-                      }
-                    }
-                  }
-                }
-              });
+//                       // Copy background colors for direct children
+//                       const directChildren = originalElement.children;
+//                       const clonedChildren = clonedElement.children;
+//                       const len = Math.min(directChildren.length, clonedChildren.length, 50);
+//                       for (let i = 0; i < len; i++) {
+//                         const computedStyle = window.getComputedStyle(directChildren[i]);
+//                         if (computedStyle.backgroundColor && computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+//                           clonedChildren[i].style.backgroundColor = computedStyle.backgroundColor;
+//                         }
+//                       }
+//                     }
+//                   }
+//                 }
+//               });
 
-              const imageData = canvas.toDataURL('image/png');
-              return { key: pageKey, data: imageData };
-            }
-          } catch (error) {
-            console.error(`Error capturing screenshot for ${pageName}:`, error);
-          }
-          return null;
-        };
+//               const imageData = canvas.toDataURL('image/png');
+//               return { key: pageKey, data: imageData };
+//             }
+//           } catch (error) {
+//             console.error(`Error capturing screenshot for ${pageName}:`, error);
+//           }
+//           return null;
+//         };
 
-        // OPTIMIZATION: Process pages in parallel batches
-        const images = [];
-        const pages = projectData.pages;
+//         // OPTIMIZATION: Process pages in parallel batches
+//         const images = [];
+//         const pages = projectData.pages;
         
-        for (let i = 0; i < pages.length; i += PARALLEL_COUNT) {
-          const batch = pages.slice(i, i + PARALLEL_COUNT);
-          const results = await Promise.all(
-            batch.map((page, idx) => renderSinglePage(page, iframes[idx]))
-          );
-          results.forEach(result => {
-            if (result) images.push(result);
-          });
-        }
+//         for (let i = 0; i < pages.length; i += PARALLEL_COUNT) {
+//           const batch = pages.slice(i, i + PARALLEL_COUNT);
+//           const results = await Promise.all(
+//             batch.map((page, idx) => renderSinglePage(page, iframes[idx]))
+//           );
+//           results.forEach(result => {
+//             if (result) images.push(result);
+//           });
+//         }
 
-        // Clean up iframes
-        iframes.forEach(iframe => document.body.removeChild(iframe));
+//         // Clean up iframes
+//         iframes.forEach(iframe => document.body.removeChild(iframe));
 
-        // Export the images (web only for now)
-        // #ifdef H5 
-        this.exportImagesWeb(images);
-        // #endif
-      } catch (error) {
-        uni.hideLoading();
-        uni.showToast({
-          title: this.$t('design.toast.errorExportingImages'),
-          icon: 'none',
-          duration: 2000
-        });
-        console.error('Error exporting images:', error);
-        this.isExporting = false;
+//         // Export the images (web only for now)
+//         // #ifdef H5 
+//         this.exportImagesWeb(images);
+//         // #endif
+//       } catch (error) {
+//         uni.hideLoading();
+//         uni.showToast({
+//           title: this.$t('design.toast.errorExportingImages'),
+//           icon: 'none',
+//           duration: 2000
+//         });
+//         console.error('Error exporting images:', error);
+//         this.isExporting = false;
 
-        // Clean up any temporary elements
-        const orphanIframes = Array.from(document.querySelectorAll('iframe'))
-          .filter(f => f.style && f.style.left === '-9999px' && f.style.top === '-9999px');
-        orphanIframes.forEach(f => {
-          try { document.body.removeChild(f); } catch (_) { }
-        });
-      }
-    },
+//         // Clean up any temporary elements
+//         const orphanIframes = Array.from(document.querySelectorAll('iframe'))
+//           .filter(f => f.style && f.style.left === '-9999px' && f.style.top === '-9999px');
+//         orphanIframes.forEach(f => {
+//           try { document.body.removeChild(f); } catch (_) { }
+//         });
+//       }
+//     },
 
-    async exportImagesWeb(images) {
-      try {
-        // Use the imported JSZip and saveAs
-        // If they're not available, show an error
-        if (typeof JSZip !== 'function' || typeof saveAs !== 'function') {
-          uni.hideLoading();
-          // console.error('JSZip or saveAs is not available');
-          uni.showToast({
-            title: this.$t('design.export.librariesNotAvailable'),
-            icon: 'none',
-            duration: 2000
-          });
-          this.isExporting = false;
-          return;
-        }
+//     async exportImagesWeb(images) {
+//       try {
+//         // Use the imported JSZip and saveAs
+//         // If they're not available, show an error
+//         if (typeof JSZip !== 'function' || typeof saveAs !== 'function') {
+//           uni.hideLoading();
+//           // console.error('JSZip or saveAs is not available');
+//           uni.showToast({
+//             title: this.$t('design.export.librariesNotAvailable'),
+//             icon: 'none',
+//             duration: 2000
+//           });
+//           this.isExporting = false;
+//           return;
+//         }
 
-        // console.log(`Exporting ${images.length} images to a single zip file`);
+//         // console.log(`Exporting ${images.length} images to a single zip file`);
 
-        // Create a single zip file with all images
-        const zip = new JSZip();
-        let imagesFolder = zip.folder("ui_genius_images");
+//         // Create a single zip file with all images
+//         const zip = new JSZip();
+//         let imagesFolder = zip.folder("ui_genius_images");
 
-        // Convert all images to blobs and add them to the zip
-        for (let i = 0; i < images.length; i++) {
-          const image = images[i];
-          try {
-            // Convert base64 data URL to blob
-            const parts = image.data.split(';base64,');
-            const contentType = parts[0].split(':')[1];
-            const raw = window.atob(parts[1]);
-            const rawLength = raw.length;
-            const uInt8Array = new Uint8Array(rawLength);
+//         // Convert all images to blobs and add them to the zip
+//         for (let i = 0; i < images.length; i++) {
+//           const image = images[i];
+//           try {
+//             // Convert base64 data URL to blob
+//             const parts = image.data.split(';base64,');
+//             const contentType = parts[0].split(':')[1];
+//             const raw = window.atob(parts[1]);
+//             const rawLength = raw.length;
+//             const uInt8Array = new Uint8Array(rawLength);
 
-            for (let j = 0; j < rawLength; ++j) {
-              uInt8Array[j] = raw.charCodeAt(j);
-            }
+//             for (let j = 0; j < rawLength; ++j) {
+//               uInt8Array[j] = raw.charCodeAt(j);
+//             }
 
-            const blob = new Blob([uInt8Array], { type: contentType });
-            imagesFolder.file(`${image.key}.png`, blob);
-            // console.log(`Added ${image.key}.png to zip (${i + 1}/${images.length})`);
-          } catch (error) {
-            // console.error(`Error processing image ${image.key}:`, error);
-          }
-        }
+//             const blob = new Blob([uInt8Array], { type: contentType });
+//             imagesFolder.file(`${image.key}.png`, blob);
+//             // console.log(`Added ${image.key}.png to zip (${i + 1}/${images.length})`);
+//           } catch (error) {
+//             // console.error(`Error processing image ${image.key}:`, error);
+//           }
+//         }
 
-        // Generate and save the zip
-        const content = await zip.generateAsync({ type: "blob" });
-        saveAs(content, "ui_genius_images.zip");
+//         // Generate and save the zip
+//         const content = await zip.generateAsync({ type: "blob" });
+//         saveAs(content, "ui_genius_images.zip");
 
-        uni.hideLoading();
-        uni.showToast({
-          title: this.$t('design.export.success'),
-          icon: 'success',
-          duration: 2000
-        });
-      } catch (error) {
-        // Handle any errors
-        uni.hideLoading();
-        // console.error('Error exporting images:', error);
-        uni.showToast({
-          title: this.$t('design.toast.errorExportingImages'),
-          icon: 'none',
-          duration: 2000
-        });
-      } finally {
-        // Always reset the exporting flag when done
-        this.isExporting = false;
-      }
-    },
+//         uni.hideLoading();
+//         uni.showToast({
+//           title: this.$t('design.export.success'),
+//           icon: 'success',
+//           duration: 2000
+//         });
+//       } catch (error) {
+//         // Handle any errors
+//         uni.hideLoading();
+//         // console.error('Error exporting images:', error);
+//         uni.showToast({
+//           title: this.$t('design.toast.errorExportingImages'),
+//           icon: 'none',
+//           duration: 2000
+//         });
+//       } finally {
+//         // Always reset the exporting flag when done
+//         this.isExporting = false;
+//       }
+//     },
 
-    exportImagesIndividually(images) {
-      // Fallback method to download images one by one
-      uni.showToast({
-        title: this.$t('design.export.downloadingIndividually'),
-        icon: 'none',
-        duration: 2000
-      });
+//     exportImagesIndividually(images) {
+//       // Fallback method to download images one by one
+//       uni.showToast({
+//         title: this.$t('design.export.downloadingIndividually'),
+//         icon: 'none',
+//         duration: 2000
+//       });
 
-      images.forEach(image => {
-        try {
-          const a = document.createElement('a');
-          a.href = image.data;
-          a.download = `${image.key}.png`;
-          document.body.appendChild(a);
-          a.click();
-          document.body.removeChild(a);
-        } catch (e) {
-          // console.error(`Failed to download ${image.key}.png`, e);
-        }
-      });
-    },
+//       images.forEach(image => {
+//         try {
+//           const a = document.createElement('a');
+//           a.href = image.data;
+//           a.download = `${image.key}.png`;
+//           document.body.appendChild(a);
+//           a.click();
+//           document.body.removeChild(a);
+//         } catch (e) {
+//           // console.error(`Failed to download ${image.key}.png`, e);
+//         }
+//       });
+//     },
 
     //     exportHTML() {
     //       // Show loading toast
