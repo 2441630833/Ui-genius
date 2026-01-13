@@ -897,7 +897,7 @@ export default {
     },
     actionSheetOptions() {
       return [
-        this.$t('design.export.asImages'),
+        // this.$t('design.export.asImages'),
         this.$t('design.export.asHtml'),
         this.$t('design.export.asVue2'),
         this.$t('design.export.asVue3'),
@@ -1032,7 +1032,7 @@ export default {
       this.project_id = storedProjectId;
     }
 
-    this.checkAndStartGuide();
+    // this.checkAndStartGuide();
     // Also handle shared content if navigating normally (non-H5)
     if (options && options.pid) {
       this.tryImportByProjectId(options.pid);
@@ -1164,15 +1164,15 @@ export default {
     //     uni.showToast({ title: 'Invalid share link', icon: 'none', duration: 2000 });
     //   }
     // },
-    checkAndStartGuide() {
-      const designHasGuideShown = uni.getStorageSync('designHasUserGuideShown'); // 或 localStorage.getItem('hasUserGuideShown')
-      if (!designHasGuideShown) {
-        setTimeout(() => {
-          this.startGuide();
-          uni.setStorageSync('designHasUserGuideShown', true);
-        }, 1000);
-      }
-    },
+    // checkAndStartGuide() {
+    //   const designHasGuideShown = uni.getStorageSync('designHasUserGuideShown'); // 或 localStorage.getItem('hasUserGuideShown')
+    //   if (!designHasGuideShown) {
+    //     setTimeout(() => {
+    //       this.startGuide();
+    //       uni.setStorageSync('designHasUserGuideShown', true);
+    //     }, 1000);
+    //   }
+    // },
     // Longze Guide methods
     startGuide() {
       const guide = this.$refs.guide;
