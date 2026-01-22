@@ -115,6 +115,11 @@
           </image>
         </view>
 
+        <view class="nav-item automation_guide" :class="{ active: activeNavItem === 'automation' }" @click="navigateTo('automation')">
+          <image class="nav-icon" :src="activeNavItem === 'automation' ? '/static/agent_white.png' : '/static/agent.png'">
+          </image>
+        </view>
+
         <view class="nav-item template_guide"
           :class="{ active: activeNavItem === 'template' || isTemplateSelectionMode }" @click="navigateTo('template')">
           <image class="nav-icon"
@@ -656,6 +661,33 @@
         </view>
       </view>
     </view>
+
+    <!-- Browser Automation Dialog -->
+    <view class="dialog-overlay" v-if="showAutomationDialog" @click="closeAutomationDialog">
+      <view class="dialog-container automation-dialog" @click.stop>
+        <view class="dialog-content">
+          <text class="dialog-title">Browser Automation</text>
+
+          <!-- Error notification -->
+          <view class="error-notification" v-if="errorMessage">
+            <text>{{ errorMessage }}</text>
+          </view>
+
+          <view class="try-example-container">
+            <text class="description-label">Describe the project you want to generate:</text>
+          </view>
+          <view class="description-container">
+            <textarea class="project-description-input" placeholder="e.g., a modern sports website with team rosters and game schedules"
+              v-model="automationProjectDescription" maxlength="500"></textarea>
+            <text class="char-count">{{ automationProjectDescription.length }}/500</text>
+          </view>
+
+          <button class="continue-btn" :disabled="isAutomating || !automationProjectDescription" @click="startBrowserAutomation">
+            {{ isAutomating ? 'Automating...' : 'Start Automation' }}
+          </button>
+        </view>
+      </view>
+    </view>
   </view>
 </template>
 
@@ -811,7 +843,11 @@ export default {
       showUpgradeModal: false,
       upgradeModalMessage: '',
       // Flag to track if preview images have been generated in this session
-      previewImagesGenerated: false
+      previewImagesGenerated: false,
+      // Browser automation properties
+      showAutomationDialog: false,
+      automationProjectDescription: '',
+      isAutomating: false
     }
   },
 
@@ -3136,6 +3172,14 @@ export default {
         this.importError = '';
         this.selectedImportType = 'image';
       }
+      
+      // Show automation dialog if automation nav item is clicked
+      if (item === 'automation') {
+        this.showAutomationDialog = true;
+        this.automationProjectDescription = '';
+        this.errorMessage = '';
+      }
+      
       if (item === 'guide') {
         this.startGuide();
       }
@@ -6236,6 +6280,84 @@ export default {
         url: '/pages/dashboard/dashboard'
       });
     },
+    
+    // Browser Automation methods
+    closeAutomationDialog() {
+      this.showAutomationDialog = false;
+      this.automationProjectDescription = '';
+      this.errorMessage = '';
+    },
+    
+    async startBrowserAutomation() {
+      if (!this.automationProjectDescription) {
+        this.errorMessage = 'Please enter a project description';
+        return;
+      }
+      
+      // Get authentication data from storage
+      const uid = uni.getStorageSync('uid');
+      const token = uni.getStorageSync('token');
+      const tokenExpiration = uni.getStorageSync('tokenExpiration');
+      const currentProjectId = uni.getStorageSync('currentProjectId');
+      
+      if (!uid || !token || !tokenExpiration) {
+        this.errorMessage = 'Authentication required. Please log in again.';
+        return;
+      }
+      
+      if (!currentProjectId) {
+        this.errorMessage = 'No project selected. Please select a project first.';
+        return;
+      }
+      
+      this.isAutomating = true;
+      this.errorMessage = '';
+      
+      try {
+        uni.showLoading({
+          title: 'Starting automation...',
+          mask: true
+        });
+        
+        const response = await fetch(`${API_BASE_URL}/browser-automation`, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json'
+          },
+          body: JSON.stringify({
+            task: 'login_and_generate',
+            uid: uid,
+            token: token,
+            tokenExpiration: tokenExpiration,
+            currentProjectId: currentProjectId,
+            project_description: this.automationProjectDescription,
+            timeout: 300
+          })
+        });
+        
+        const result = await response.json();
+        
+        uni.hideLoading();
+        
+        if (response.ok && result.success) {
+          uni.showToast({
+            title: 'Automation completed!',
+            icon: 'success',
+            duration: 2000
+          });
+          this.closeAutomationDialog();
+        } else {
+          this.errorMessage = result.detail || 'Automation failed';
+        }
+      } catch (error) {
+        uni.hideLoading();
+        this.errorMessage = `Error: ${error.message}`;
+        console.error('Browser automation error:', error);
+      } finally {
+        this.isAutomating = false;
+      }
+    },
+    
     toggleuseColor() {
       this.useColor = !this.useColor;
       try {
@@ -7715,8 +7837,8 @@ export default {
 /* Custom Checkbox Styles */
 .custom-checkbox {
 
-  /* Override default checkbox styles */
-  /deep/ .uni-checkbox-input {
+  /* Override default checkbox styles - Updated for dart-sass compatibility */
+  :deep(.uni-checkbox-input) {
     border-color: #e0e0e0;
 
     &.uni-checkbox-input-checked {
