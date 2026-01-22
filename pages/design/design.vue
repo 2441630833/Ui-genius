@@ -666,24 +666,35 @@
     <view class="dialog-overlay" v-if="showAutomationDialog" @click="closeAutomationDialog">
       <view class="dialog-container automation-dialog" @click.stop>
         <view class="dialog-content">
-          <text class="dialog-title">Browser Automation</text>
+          <text class="dialog-title">AI Agent Generation</text>
 
           <!-- Error notification -->
           <view class="error-notification" v-if="errorMessage">
             <text>{{ errorMessage }}</text>
           </view>
 
-          <view class="try-example-container">
-            <text class="description-label">Describe the project you want to generate:</text>
-          </view>
           <view class="description-container">
-            <textarea class="project-description-input" placeholder="e.g., a modern sports website with team rosters and game schedules"
-              v-model="automationProjectDescription" maxlength="500"></textarea>
-            <text class="char-count">{{ automationProjectDescription.length }}/500</text>
+            <view class="automation-info-box">
+              <text class="automation-title">How It Works</text>
+              <text class="automation-description">The AI Agent will analyze your project and automatically generate 2-5 additional pages to complete your application.</text>
+              
+              <text class="automation-subtitle">Process Steps:</text>
+              <view class="automation-steps">
+                <text class="automation-step">• Understanding your project type</text>
+                <text class="automation-step">• Identifying missing pages</text>
+                <text class="automation-step">• Generating pages sequentially</text>
+                <text class="automation-step">• Waiting for each to complete</text>
+              </view>
+              
+              <view class="automation-footer">
+                <text class="automation-time">⏱ Estimated time: 15-30 minutes</text>
+                <text class="automation-note">You can close this dialog - automation continues in background.</text>
+              </view>
+            </view>
           </view>
 
-          <button class="continue-btn" :disabled="isAutomating || !automationProjectDescription" @click="startBrowserAutomation">
-            {{ isAutomating ? 'Automating...' : 'Start Automation' }}
+          <button class="continue-btn" :disabled="isAutomating" @click="startBrowserAutomation">
+            {{ isAutomating ? 'Automating...' : 'Start Intelligent Generation' }}
           </button>
         </view>
       </view>
@@ -846,7 +857,6 @@ export default {
       previewImagesGenerated: false,
       // Browser automation properties
       showAutomationDialog: false,
-      automationProjectDescription: '',
       isAutomating: false
     }
   },
@@ -3176,7 +3186,6 @@ export default {
       // Show automation dialog if automation nav item is clicked
       if (item === 'automation') {
         this.showAutomationDialog = true;
-        this.automationProjectDescription = '';
         this.errorMessage = '';
       }
       
@@ -6284,16 +6293,10 @@ export default {
     // Browser Automation methods
     closeAutomationDialog() {
       this.showAutomationDialog = false;
-      this.automationProjectDescription = '';
       this.errorMessage = '';
     },
     
     async startBrowserAutomation() {
-      if (!this.automationProjectDescription) {
-        this.errorMessage = 'Please enter a project description';
-        return;
-      }
-      
       // Get authentication data from storage
       const uid = uni.getStorageSync('uid');
       const token = uni.getStorageSync('token');
@@ -6310,14 +6313,38 @@ export default {
         return;
       }
       
+      // Get the latest_7_overall_page from localStorage
+      const latest_7_overall_page_raw = uni.getStorageSync('latest_7_overall_page');
+      
+      if (!latest_7_overall_page_raw) {
+        this.errorMessage = 'No project data found. Please ensure the project is loaded.';
+        return;
+      }
+      
+      // Parse the latest_7_overall_page if it's a string
+      let latest_7_overall_page;
+      try {
+        latest_7_overall_page = typeof latest_7_overall_page_raw === 'string' 
+          ? JSON.parse(latest_7_overall_page_raw) 
+          : latest_7_overall_page_raw;
+      } catch (e) {
+        this.errorMessage = 'Failed to parse project data.';
+        return;
+      }
+      
+      if (!latest_7_overall_page || latest_7_overall_page.length === 0) {
+        this.errorMessage = 'No pages found in the current project.';
+        return;
+      }
+      
       this.isAutomating = true;
       this.errorMessage = '';
       
       try {
-        uni.showLoading({
-          title: 'Starting automation...',
-          mask: true
-        });
+        // uni.showLoading({
+        //   title: 'Starting automation...',
+        //   mask: true
+        // });
         
         const response = await fetch(`${API_BASE_URL}/browser-automation`, {
           method: 'POST',
@@ -6330,14 +6357,14 @@ export default {
             token: token,
             tokenExpiration: tokenExpiration,
             currentProjectId: currentProjectId,
-            project_description: this.automationProjectDescription,
-            timeout: 300
+            latest_7_overall_page: JSON.stringify(latest_7_overall_page),
+            timeout: 600  // Increase timeout to 10 minutes for multiple page generation
           })
         });
         
         const result = await response.json();
         
-        uni.hideLoading();
+        // uni.hideLoading();
         
         if (response.ok && result.success) {
           uni.showToast({
@@ -6346,6 +6373,8 @@ export default {
             duration: 2000
           });
           this.closeAutomationDialog();
+          // Reload the project to see the new pages
+          this.loadProject();
         } else {
           this.errorMessage = result.detail || 'Automation failed';
         }
@@ -7522,7 +7551,8 @@ export default {
   font-size: 20px;
   font-weight: 600;
   color: #333;
-  margin-bottom: 20px;
+  margin-bottom: 24px;
+  display: block;
 }
 
 /* Device options styles */
@@ -7720,6 +7750,95 @@ export default {
   border-radius: 4px;
   padding: 8px;
   margin-bottom: 10px;
+}
+
+.automation-info-box {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+  width: 100%;
+  padding: 20px;
+  background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+  border-radius: 12px;
+  border: 1px solid #dee2e6;
+  box-sizing: border-box;
+}
+
+.automation-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #212529;
+  margin-bottom: 4px;
+}
+
+.automation-description {
+  font-size: 14px;
+  line-height: 1.6;
+  color: #495057;
+  margin-bottom: 8px;
+}
+
+.automation-subtitle {
+  font-size: 15px;
+  font-weight: 600;
+  color: #343a40;
+  margin-top: 4px;
+  margin-bottom: 8px;
+}
+
+.automation-steps {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  padding-left: 8px;
+}
+
+.automation-step {
+  font-size: 14px;
+  line-height: 1.5;
+  color: #495057;
+  display: block;
+}
+
+.automation-footer {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 8px;
+  padding-top: 16px;
+  border-top: 1px solid #dee2e6;
+}
+
+.automation-time {
+  font-size: 14px;
+  font-weight: 500;
+  color: #e53935;
+  display: block;
+}
+
+.automation-note {
+  font-size: 13px;
+  line-height: 1.5;
+  color: #6c757d;
+  font-style: italic;
+  display: block;
+}
+
+.automation-info {
+  display: block;
+  width: 100%;
+  max-width: 100%;
+  padding: 12px 16px;
+  background-color: #f5f5f5;
+  border-radius: 8px;
+  font-size: 13px;
+  line-height: 1.5;
+  color: #333;
+  white-space: pre-line;
+  word-wrap: break-word;
+  word-break: break-word;
+  overflow-wrap: break-word;
+  box-sizing: border-box;
 }
 
 .char-count {
