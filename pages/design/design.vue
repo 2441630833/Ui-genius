@@ -115,8 +115,10 @@
           </image>
         </view>
 
-        <view class="nav-item automation_guide" :class="{ active: activeNavItem === 'automation' }" @click="navigateTo('automation')">
-          <image class="nav-icon" :src="activeNavItem === 'automation' ? '/static/agent_white.png' : '/static/agent.png'">
+        <view class="nav-item automation_guide" :class="{ active: activeNavItem === 'automation' }"
+          @click="navigateTo('automation')">
+          <image class="nav-icon"
+            :src="activeNavItem === 'automation' ? '/static/agent_white.png' : '/static/agent.png'">
           </image>
         </view>
 
@@ -221,7 +223,7 @@
       <view class="section">
         <text class="section-title">{{ $t('design.sectionTitle') }} <span class="template-count">({{
           jsonTemplates.length
-        }}
+            }}
             {{ $t('design.pagesLabel') }})</span></text>
         <view class="templates-grid-container">
           <view class="templates-grid">
@@ -347,13 +349,12 @@
           </view>
           <view class="terminal-container" :class="{ 'expanded': terminalExpanded }">
             <scroll-view class="terminal-output" scroll-y="true" :scroll-top="terminalScrollTop">
-              <view v-for="(line, index) in terminalOutput" :key="index" class="terminal-line"
-                    :class="{ 
-                      'error': line.type === 'error',
-                      'success': line.type === 'success',
-                      'info': line.type === 'info',
-                      'warning': line.type === 'warning'
-                    }">
+              <view v-for="(line, index) in terminalOutput" :key="index" class="terminal-line" :class="{
+                'error': line.type === 'error',
+                'success': line.type === 'success',
+                'info': line.type === 'info',
+                'warning': line.type === 'warning'
+              }">
                 <text class="terminal-timestamp">[{{ line.timestamp }}]</text>
                 <text class="terminal-text">{{ line.message }}</text>
               </view>
@@ -724,8 +725,9 @@
           <view class="description-container">
             <view class="automation-info-box">
               <text class="automation-title">How It Works</text>
-              <text class="automation-description">The AI Agent will analyze your project and automatically generate 2-5 additional pages to complete your application.</text>
-              
+              <text class="automation-description">The AI Agent will analyze your project and automatically generate 2-5
+                additional pages to complete your application.</text>
+
               <text class="automation-subtitle">Process Steps:</text>
               <view class="automation-steps">
                 <text class="automation-step">• Understanding your project type</text>
@@ -733,7 +735,7 @@
                 <text class="automation-step">• Generating pages sequentially</text>
                 <text class="automation-step">• Waiting for each to complete</text>
               </view>
-              
+
               <view class="automation-footer">
                 <text class="automation-time">⏱ Estimated time: 15-30 minutes</text>
                 <text class="automation-note">Click the terminal icon in the toolbar to view live execution logs.</text>
@@ -1459,318 +1461,318 @@ export default {
           break;
       }
     },
-//     async exportImages() {
-//       // Debounce protection
-//       if (this.isExporting) {
-//         uni.showToast({
-//           title: this.$t('design.export.alreadyInProgress'),
-//           icon: 'none',
-//           duration: 2000
-//         });
-//         return;
-//       }
+    //     async exportImages() {
+    //       // Debounce protection
+    //       if (this.isExporting) {
+    //         uni.showToast({
+    //           title: this.$t('design.export.alreadyInProgress'),
+    //           icon: 'none',
+    //           duration: 2000
+    //         });
+    //         return;
+    //       }
 
-//       this.isExporting = true;
+    //       this.isExporting = true;
 
-//       // Show loading toast
-//       uni.showLoading({
-//         title: this.$t('design.export.preparingImages'),
-//         mask: true
-//       });
+    //       // Show loading toast
+    //       uni.showLoading({
+    //         title: this.$t('design.export.preparingImages'),
+    //         mask: true
+    //       });
 
-//       try {
-//         // Get the project data from storage
-//         const jsonData = uni.getStorageSync('latest_7_overall_page');
-//         if (!jsonData) {
-//           uni.hideLoading();
-//           uni.showToast({
-//             title: this.$t('design.toast.noProjectData'),
-//             icon: 'none',
-//             duration: 2000
-//           });
-//           this.isExporting = false;
-//           return;
-//         }
+    //       try {
+    //         // Get the project data from storage
+    //         const jsonData = uni.getStorageSync('latest_7_overall_page');
+    //         if (!jsonData) {
+    //           uni.hideLoading();
+    //           uni.showToast({
+    //             title: this.$t('design.toast.noProjectData'),
+    //             icon: 'none',
+    //             duration: 2000
+    //           });
+    //           this.isExporting = false;
+    //           return;
+    //         }
 
-//         // Parse the JSON data
-//         const projectData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+    //         // Parse the JSON data
+    //         const projectData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
 
-//         // Check if we have pages
-//         if (!projectData.pages || !projectData.pages.length) {
-//           uni.hideLoading();
-//           uni.showToast({
-//             title: this.$t('design.export.noData'),
-//             icon: 'none',
-//             duration: 2000
-//           });
-//           this.isExporting = false;
-//           return;
-//         }
+    //         // Check if we have pages
+    //         if (!projectData.pages || !projectData.pages.length) {
+    //           uni.hideLoading();
+    //           uni.showToast({
+    //             title: this.$t('design.export.noData'),
+    //             icon: 'none',
+    //             duration: 2000
+    //           });
+    //           this.isExporting = false;
+    //           return;
+    //         }
 
-//         // OPTIMIZATION: Dynamic parallel count based on device capabilities
-//         const getOptimalParallelCount = (totalPages) => {
-//           const cpuCores = navigator.hardwareConcurrency || 4;
-//           const memory = navigator.deviceMemory || 4;
-//           let optimal = Math.max(2, Math.floor(cpuCores * 0.75));
-//           const memoryLimit = Math.max(2, Math.floor(memory));
-//           optimal = Math.min(optimal, memoryLimit, 8);
-//           return Math.min(optimal, totalPages);
-//         };
+    //         // OPTIMIZATION: Dynamic parallel count based on device capabilities
+    //         const getOptimalParallelCount = (totalPages) => {
+    //           const cpuCores = navigator.hardwareConcurrency || 4;
+    //           const memory = navigator.deviceMemory || 4;
+    //           let optimal = Math.max(2, Math.floor(cpuCores * 0.75));
+    //           const memoryLimit = Math.max(2, Math.floor(memory));
+    //           optimal = Math.min(optimal, memoryLimit, 8);
+    //           return Math.min(optimal, totalPages);
+    //         };
 
-//         const PARALLEL_COUNT = getOptimalParallelCount(projectData.pages.length);
-//         console.log(`[Export] Using ${PARALLEL_COUNT} parallel workers`);
+    //         const PARALLEL_COUNT = getOptimalParallelCount(projectData.pages.length);
+    //         console.log(`[Export] Using ${PARALLEL_COUNT} parallel workers`);
 
-//         // Create multiple iframes for parallel processing
-//         const iframes = [];
-//         for (let i = 0; i < PARALLEL_COUNT; i++) {
-//           const iframe = document.createElement('iframe');
-//           iframe.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1440px;height:2000px;visibility:hidden;';
-//           document.body.appendChild(iframe);
-//           iframes.push(iframe);
-//         }
+    //         // Create multiple iframes for parallel processing
+    //         const iframes = [];
+    //         for (let i = 0; i < PARALLEL_COUNT; i++) {
+    //           const iframe = document.createElement('iframe');
+    //           iframe.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1440px;height:2000px;visibility:hidden;';
+    //           document.body.appendChild(iframe);
+    //           iframes.push(iframe);
+    //         }
 
-//         // OPTIMIZATION: Faster render check with reduced timeouts
-//         const waitForRender = (iframeDoc, maxWait = 1500) => {
-//           return new Promise((resolve) => {
-//             let waited = 0;
-//             const checkInterval = 50;
-//             const checkReady = () => {
-//               waited += checkInterval;
-//               if (iframeDoc.readyState === 'complete' || waited >= maxWait) {
-//                 setTimeout(resolve, 400); // Increased for ECharts
-//                 return;
-//               }
-//               setTimeout(checkReady, checkInterval);
-//             };
-//             setTimeout(checkReady, 100);
-//           });
-//         };
+    //         // OPTIMIZATION: Faster render check with reduced timeouts
+    //         const waitForRender = (iframeDoc, maxWait = 1500) => {
+    //           return new Promise((resolve) => {
+    //             let waited = 0;
+    //             const checkInterval = 50;
+    //             const checkReady = () => {
+    //               waited += checkInterval;
+    //               if (iframeDoc.readyState === 'complete' || waited >= maxWait) {
+    //                 setTimeout(resolve, 400); // Increased for ECharts
+    //                 return;
+    //               }
+    //               setTimeout(checkReady, checkInterval);
+    //             };
+    //             setTimeout(checkReady, 100);
+    //           });
+    //         };
 
-//         // OPTIMIZATION: Process single page with minimal delays
-//         const renderSinglePage = async (page, iframe) => {
-//           const pageName = page.name.replace(/ Page/i, '');
-//           const pageKey = pageName.toLowerCase().replace(/\s+/g, '-');
-//           const templateId = 'template-' + pageKey;
+    //         // OPTIMIZATION: Process single page with minimal delays
+    //         const renderSinglePage = async (page, iframe) => {
+    //           const pageName = page.name.replace(/ Page/i, '');
+    //           const pageKey = pageName.toLowerCase().replace(/\s+/g, '-');
+    //           const templateId = 'template-' + pageKey;
 
-//           let componentContent = page.component || '';
-//           if (typeof componentContent === 'string' && componentContent.startsWith('```')) {
-//             componentContent = componentContent.replace(/^```(?:html|vue)?\s*/, '').replace(/```\s*$/, '');
-//           }
+    //           let componentContent = page.component || '';
+    //           if (typeof componentContent === 'string' && componentContent.startsWith('```')) {
+    //             componentContent = componentContent.replace(/^```(?:html|vue)?\s*/, '').replace(/```\s*$/, '');
+    //           }
 
-//           const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-//           iframeDoc.open();
-//           iframeDoc.write(`<!DOCTYPE html>
-// <html>
-// <head>
-//   <meta charset="utf-8" />
-//   <meta name="viewport" content="width=device-width, initial-scale=1" />
-// </head>
-// <body style="margin: 0; padding: 0;">
-//   <div id="${templateId}">
-//     ${componentContent}
-//   </div>
-// </body>
-// </html>`);
-//           iframeDoc.close();
+    //           const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+    //           iframeDoc.open();
+    //           iframeDoc.write(`<!DOCTYPE html>
+    // <html>
+    // <head>
+    //   <meta charset="utf-8" />
+    //   <meta name="viewport" content="width=device-width, initial-scale=1" />
+    // </head>
+    // <body style="margin: 0; padding: 0;">
+    //   <div id="${templateId}">
+    //     ${componentContent}
+    //   </div>
+    // </body>
+    // </html>`);
+    //           iframeDoc.close();
 
-//           await waitForRender(iframeDoc);
+    //           await waitForRender(iframeDoc);
 
-//           try {
-//             const root = iframeDoc.getElementById(templateId);
-//             if (root) {
-//               void root.offsetHeight;
-//               // Wait for charts/scripts to render (increased for ECharts compatibility)
-//               await new Promise(r => setTimeout(r, 600));
-              
-//               const contentHeight = root.scrollHeight;
-//               const contentWidth = root.scrollWidth;
+    //           try {
+    //             const root = iframeDoc.getElementById(templateId);
+    //             if (root) {
+    //               void root.offsetHeight;
+    //               // Wait for charts/scripts to render (increased for ECharts compatibility)
+    //               await new Promise(r => setTimeout(r, 600));
 
-//               const canvas = await html2canvas(root, {
-//                 width: contentWidth,
-//                 height: contentHeight,
-//                 scale: 2,
-//                 useCORS: true,
-//                 logging: false,
-//                 allowTaint: true,
-//                 imageTimeout: 5000,
-//                 removeContainer: true,
-//                 foreignObjectRendering: false,
-//                 // Copy background color from inner content to wrapper
-//                 onclone: (clonedDoc) => {
-//                   const clonedElement = clonedDoc.getElementById(templateId);
-//                   if (clonedElement) {
-//                     void clonedElement.offsetHeight;
-//                     const originalElement = iframeDoc.getElementById(templateId);
-//                     if (originalElement) {
-//                       // Copy background from first child or body to wrapper
-//                       const firstChild = originalElement.firstElementChild;
-//                       if (firstChild) {
-//                         const childBg = window.getComputedStyle(firstChild).backgroundColor;
-//                         if (childBg && childBg !== 'rgba(0, 0, 0, 0)') {
-//                           clonedElement.style.backgroundColor = childBg;
-//                         }
-//                       }
-//                       // Also check body background
-//                       const bodyBg = window.getComputedStyle(iframeDoc.body).backgroundColor;
-//                       if (bodyBg && bodyBg !== 'rgba(0, 0, 0, 0)' && !clonedElement.style.backgroundColor) {
-//                         clonedElement.style.backgroundColor = bodyBg;
-//                       }
-                      
-//                       // Copy background colors for direct children
-//                       const directChildren = originalElement.children;
-//                       const clonedChildren = clonedElement.children;
-//                       const len = Math.min(directChildren.length, clonedChildren.length, 50);
-//                       for (let i = 0; i < len; i++) {
-//                         const computedStyle = window.getComputedStyle(directChildren[i]);
-//                         if (computedStyle.backgroundColor && computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)') {
-//                           clonedChildren[i].style.backgroundColor = computedStyle.backgroundColor;
-//                         }
-//                       }
-//                     }
-//                   }
-//                 }
-//               });
+    //               const contentHeight = root.scrollHeight;
+    //               const contentWidth = root.scrollWidth;
 
-//               const imageData = canvas.toDataURL('image/png');
-//               return { key: pageKey, data: imageData };
-//             }
-//           } catch (error) {
-//             console.error(`Error capturing screenshot for ${pageName}:`, error);
-//           }
-//           return null;
-//         };
+    //               const canvas = await html2canvas(root, {
+    //                 width: contentWidth,
+    //                 height: contentHeight,
+    //                 scale: 2,
+    //                 useCORS: true,
+    //                 logging: false,
+    //                 allowTaint: true,
+    //                 imageTimeout: 5000,
+    //                 removeContainer: true,
+    //                 foreignObjectRendering: false,
+    //                 // Copy background color from inner content to wrapper
+    //                 onclone: (clonedDoc) => {
+    //                   const clonedElement = clonedDoc.getElementById(templateId);
+    //                   if (clonedElement) {
+    //                     void clonedElement.offsetHeight;
+    //                     const originalElement = iframeDoc.getElementById(templateId);
+    //                     if (originalElement) {
+    //                       // Copy background from first child or body to wrapper
+    //                       const firstChild = originalElement.firstElementChild;
+    //                       if (firstChild) {
+    //                         const childBg = window.getComputedStyle(firstChild).backgroundColor;
+    //                         if (childBg && childBg !== 'rgba(0, 0, 0, 0)') {
+    //                           clonedElement.style.backgroundColor = childBg;
+    //                         }
+    //                       }
+    //                       // Also check body background
+    //                       const bodyBg = window.getComputedStyle(iframeDoc.body).backgroundColor;
+    //                       if (bodyBg && bodyBg !== 'rgba(0, 0, 0, 0)' && !clonedElement.style.backgroundColor) {
+    //                         clonedElement.style.backgroundColor = bodyBg;
+    //                       }
 
-//         // OPTIMIZATION: Process pages in parallel batches
-//         const images = [];
-//         const pages = projectData.pages;
-        
-//         for (let i = 0; i < pages.length; i += PARALLEL_COUNT) {
-//           const batch = pages.slice(i, i + PARALLEL_COUNT);
-//           const results = await Promise.all(
-//             batch.map((page, idx) => renderSinglePage(page, iframes[idx]))
-//           );
-//           results.forEach(result => {
-//             if (result) images.push(result);
-//           });
-//         }
+    //                       // Copy background colors for direct children
+    //                       const directChildren = originalElement.children;
+    //                       const clonedChildren = clonedElement.children;
+    //                       const len = Math.min(directChildren.length, clonedChildren.length, 50);
+    //                       for (let i = 0; i < len; i++) {
+    //                         const computedStyle = window.getComputedStyle(directChildren[i]);
+    //                         if (computedStyle.backgroundColor && computedStyle.backgroundColor !== 'rgba(0, 0, 0, 0)') {
+    //                           clonedChildren[i].style.backgroundColor = computedStyle.backgroundColor;
+    //                         }
+    //                       }
+    //                     }
+    //                   }
+    //                 }
+    //               });
 
-//         // Clean up iframes
-//         iframes.forEach(iframe => document.body.removeChild(iframe));
+    //               const imageData = canvas.toDataURL('image/png');
+    //               return { key: pageKey, data: imageData };
+    //             }
+    //           } catch (error) {
+    //             console.error(`Error capturing screenshot for ${pageName}:`, error);
+    //           }
+    //           return null;
+    //         };
 
-//         // Export the images (web only for now)
-//         // #ifdef H5 
-//         this.exportImagesWeb(images);
-//         // #endif
-//       } catch (error) {
-//         uni.hideLoading();
-//         uni.showToast({
-//           title: this.$t('design.toast.errorExportingImages'),
-//           icon: 'none',
-//           duration: 2000
-//         });
-//         console.error('Error exporting images:', error);
-//         this.isExporting = false;
+    //         // OPTIMIZATION: Process pages in parallel batches
+    //         const images = [];
+    //         const pages = projectData.pages;
 
-//         // Clean up any temporary elements
-//         const orphanIframes = Array.from(document.querySelectorAll('iframe'))
-//           .filter(f => f.style && f.style.left === '-9999px' && f.style.top === '-9999px');
-//         orphanIframes.forEach(f => {
-//           try { document.body.removeChild(f); } catch (_) { }
-//         });
-//       }
-//     },
+    //         for (let i = 0; i < pages.length; i += PARALLEL_COUNT) {
+    //           const batch = pages.slice(i, i + PARALLEL_COUNT);
+    //           const results = await Promise.all(
+    //             batch.map((page, idx) => renderSinglePage(page, iframes[idx]))
+    //           );
+    //           results.forEach(result => {
+    //             if (result) images.push(result);
+    //           });
+    //         }
 
-//     async exportImagesWeb(images) {
-//       try {
-//         // Use the imported JSZip and saveAs
-//         // If they're not available, show an error
-//         if (typeof JSZip !== 'function' || typeof saveAs !== 'function') {
-//           uni.hideLoading();
-//           // console.error('JSZip or saveAs is not available');
-//           uni.showToast({
-//             title: this.$t('design.export.librariesNotAvailable'),
-//             icon: 'none',
-//             duration: 2000
-//           });
-//           this.isExporting = false;
-//           return;
-//         }
+    //         // Clean up iframes
+    //         iframes.forEach(iframe => document.body.removeChild(iframe));
 
-//         // console.log(`Exporting ${images.length} images to a single zip file`);
+    //         // Export the images (web only for now)
+    //         // #ifdef H5 
+    //         this.exportImagesWeb(images);
+    //         // #endif
+    //       } catch (error) {
+    //         uni.hideLoading();
+    //         uni.showToast({
+    //           title: this.$t('design.toast.errorExportingImages'),
+    //           icon: 'none',
+    //           duration: 2000
+    //         });
+    //         console.error('Error exporting images:', error);
+    //         this.isExporting = false;
 
-//         // Create a single zip file with all images
-//         const zip = new JSZip();
-//         let imagesFolder = zip.folder("ui_genius_images");
+    //         // Clean up any temporary elements
+    //         const orphanIframes = Array.from(document.querySelectorAll('iframe'))
+    //           .filter(f => f.style && f.style.left === '-9999px' && f.style.top === '-9999px');
+    //         orphanIframes.forEach(f => {
+    //           try { document.body.removeChild(f); } catch (_) { }
+    //         });
+    //       }
+    //     },
 
-//         // Convert all images to blobs and add them to the zip
-//         for (let i = 0; i < images.length; i++) {
-//           const image = images[i];
-//           try {
-//             // Convert base64 data URL to blob
-//             const parts = image.data.split(';base64,');
-//             const contentType = parts[0].split(':')[1];
-//             const raw = window.atob(parts[1]);
-//             const rawLength = raw.length;
-//             const uInt8Array = new Uint8Array(rawLength);
+    //     async exportImagesWeb(images) {
+    //       try {
+    //         // Use the imported JSZip and saveAs
+    //         // If they're not available, show an error
+    //         if (typeof JSZip !== 'function' || typeof saveAs !== 'function') {
+    //           uni.hideLoading();
+    //           // console.error('JSZip or saveAs is not available');
+    //           uni.showToast({
+    //             title: this.$t('design.export.librariesNotAvailable'),
+    //             icon: 'none',
+    //             duration: 2000
+    //           });
+    //           this.isExporting = false;
+    //           return;
+    //         }
 
-//             for (let j = 0; j < rawLength; ++j) {
-//               uInt8Array[j] = raw.charCodeAt(j);
-//             }
+    //         // console.log(`Exporting ${images.length} images to a single zip file`);
 
-//             const blob = new Blob([uInt8Array], { type: contentType });
-//             imagesFolder.file(`${image.key}.png`, blob);
-//             // console.log(`Added ${image.key}.png to zip (${i + 1}/${images.length})`);
-//           } catch (error) {
-//             // console.error(`Error processing image ${image.key}:`, error);
-//           }
-//         }
+    //         // Create a single zip file with all images
+    //         const zip = new JSZip();
+    //         let imagesFolder = zip.folder("ui_genius_images");
 
-//         // Generate and save the zip
-//         const content = await zip.generateAsync({ type: "blob" });
-//         saveAs(content, "ui_genius_images.zip");
+    //         // Convert all images to blobs and add them to the zip
+    //         for (let i = 0; i < images.length; i++) {
+    //           const image = images[i];
+    //           try {
+    //             // Convert base64 data URL to blob
+    //             const parts = image.data.split(';base64,');
+    //             const contentType = parts[0].split(':')[1];
+    //             const raw = window.atob(parts[1]);
+    //             const rawLength = raw.length;
+    //             const uInt8Array = new Uint8Array(rawLength);
 
-//         uni.hideLoading();
-//         uni.showToast({
-//           title: this.$t('design.export.success'),
-//           icon: 'success',
-//           duration: 2000
-//         });
-//       } catch (error) {
-//         // Handle any errors
-//         uni.hideLoading();
-//         // console.error('Error exporting images:', error);
-//         uni.showToast({
-//           title: this.$t('design.toast.errorExportingImages'),
-//           icon: 'none',
-//           duration: 2000
-//         });
-//       } finally {
-//         // Always reset the exporting flag when done
-//         this.isExporting = false;
-//       }
-//     },
+    //             for (let j = 0; j < rawLength; ++j) {
+    //               uInt8Array[j] = raw.charCodeAt(j);
+    //             }
 
-//     exportImagesIndividually(images) {
-//       // Fallback method to download images one by one
-//       uni.showToast({
-//         title: this.$t('design.export.downloadingIndividually'),
-//         icon: 'none',
-//         duration: 2000
-//       });
+    //             const blob = new Blob([uInt8Array], { type: contentType });
+    //             imagesFolder.file(`${image.key}.png`, blob);
+    //             // console.log(`Added ${image.key}.png to zip (${i + 1}/${images.length})`);
+    //           } catch (error) {
+    //             // console.error(`Error processing image ${image.key}:`, error);
+    //           }
+    //         }
 
-//       images.forEach(image => {
-//         try {
-//           const a = document.createElement('a');
-//           a.href = image.data;
-//           a.download = `${image.key}.png`;
-//           document.body.appendChild(a);
-//           a.click();
-//           document.body.removeChild(a);
-//         } catch (e) {
-//           // console.error(`Failed to download ${image.key}.png`, e);
-//         }
-//       });
-//     },
+    //         // Generate and save the zip
+    //         const content = await zip.generateAsync({ type: "blob" });
+    //         saveAs(content, "ui_genius_images.zip");
+
+    //         uni.hideLoading();
+    //         uni.showToast({
+    //           title: this.$t('design.export.success'),
+    //           icon: 'success',
+    //           duration: 2000
+    //         });
+    //       } catch (error) {
+    //         // Handle any errors
+    //         uni.hideLoading();
+    //         // console.error('Error exporting images:', error);
+    //         uni.showToast({
+    //           title: this.$t('design.toast.errorExportingImages'),
+    //           icon: 'none',
+    //           duration: 2000
+    //         });
+    //       } finally {
+    //         // Always reset the exporting flag when done
+    //         this.isExporting = false;
+    //       }
+    //     },
+
+    //     exportImagesIndividually(images) {
+    //       // Fallback method to download images one by one
+    //       uni.showToast({
+    //         title: this.$t('design.export.downloadingIndividually'),
+    //         icon: 'none',
+    //         duration: 2000
+    //       });
+
+    //       images.forEach(image => {
+    //         try {
+    //           const a = document.createElement('a');
+    //           a.href = image.data;
+    //           a.download = `${image.key}.png`;
+    //           document.body.appendChild(a);
+    //           a.click();
+    //           document.body.removeChild(a);
+    //         } catch (e) {
+    //           // console.error(`Failed to download ${image.key}.png`, e);
+    //         }
+    //       });
+    //     },
 
     //     exportHTML() {
     //       // Show loading toast
@@ -2094,7 +2096,7 @@ export default {
             this.$forceUpdate();
             this.$nextTick(() => {
               this.injectScopedStyles();
-              
+
               // Generate preview images only if:
               // 1. We haven't generated them in this session yet, OR
               // 2. We're missing images for some templates
@@ -2259,7 +2261,7 @@ export default {
     refreshData() {
       // Reset the flag to force regeneration of preview images
       this.previewImagesGenerated = false;
-      
+
       // Use the new pullRefreshProject method to refresh from cloud
       this.pullRefreshProject();
       this.loadJsonTemplates();
@@ -2270,7 +2272,7 @@ export default {
     refreshDataLocal(showToast = true) {
       // Reset the flag to force regeneration of preview images
       this.previewImagesGenerated = false;
-      
+
       // Clear stored images first
       this.clearStoredImages(showToast);
 
@@ -2519,28 +2521,28 @@ export default {
           const cpuCores = navigator.hardwareConcurrency || 4;
           // Use deviceMemory if available (in GB), default to 4GB assumption
           const memory = navigator.deviceMemory || 4;
-          
+
           // Calculate optimal count: 
           // - Base on CPU cores (leave 1-2 cores free for UI)
           // - Cap based on memory (each iframe ~50-100MB)
           // - Never exceed templates count
           let optimal = Math.max(2, Math.floor(cpuCores * 0.75)); // Use 75% of cores
-          
+
           // Adjust for memory: ~1 parallel task per 1GB RAM, minimum 2
           const memoryLimit = Math.max(2, Math.floor(memory));
           optimal = Math.min(optimal, memoryLimit);
-          
+
           // Cap at reasonable maximum (8) to avoid diminishing returns
           optimal = Math.min(optimal, 8);
-          
+
           return Math.min(optimal, templatesToGenerate.length);
         };
-        
+
         const PARALLEL_COUNT = getOptimalParallelCount();
         // console.log(`[Preview] Using ${PARALLEL_COUNT} parallel workers (CPU: ${navigator.hardwareConcurrency || 'unknown'}, Memory: ${navigator.deviceMemory || 'unknown'}GB)`);
-        
+
         const iframes = [];
-        
+
         for (let i = 0; i < PARALLEL_COUNT; i++) {
           const iframe = document.createElement('iframe');
           iframe.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1440px;height:1200px;visibility:hidden;';
@@ -2553,7 +2555,7 @@ export default {
           return new Promise((resolve) => {
             let waited = 0;
             const checkInterval = 50;
-            
+
             const checkReady = () => {
               waited += checkInterval;
               if (iframeDoc.readyState === 'complete' || waited >= maxWait) {
@@ -2605,7 +2607,7 @@ export default {
               void wrapper.offsetHeight;
               // Wait for charts/scripts to render (increased for ECharts compatibility)
               await new Promise(r => setTimeout(r, 600));
-              
+
               const rect = wrapper.getBoundingClientRect();
               if (rect.height > 0 && rect.width > 0) {
                 const canvas = await html2canvas(wrapper, {
@@ -2663,7 +2665,7 @@ export default {
           }
 
           await Promise.all(batch.map((template, i) => processTemplate(template, iframes[i])));
-          
+
           // Process next batch
           await processBatch(startIndex + PARALLEL_COUNT);
         };
@@ -3243,13 +3245,13 @@ export default {
         this.importError = '';
         this.selectedImportType = 'image';
       }
-      
+
       // Show automation dialog if automation nav item is clicked
       if (item === 'automation') {
         this.showAutomationDialog = true;
         this.errorMessage = '';
       }
-      
+
       if (item === 'guide') {
         this.startGuide();
       }
@@ -6350,13 +6352,13 @@ export default {
         url: '/pages/dashboard/dashboard'
       });
     },
-    
+
     // Browser Automation methods
     closeAutomationDialog() {
       this.showAutomationDialog = false;
       this.errorMessage = '';
-      // Clean up WebSocket connection if exists
-      if (this.automationWebSocket) {
+      // Only close WebSocket if NOT automating
+      if (!this.isAutomating && this.automationWebSocket) {
         this.automationWebSocket.close();
         this.automationWebSocket = null;
       }
@@ -6379,12 +6381,12 @@ export default {
         type,
         timestamp
       });
-      
-      // Auto-scroll to bottom
+
+      // Auto-scroll to bottom using a large value to ensure we reach the end
       this.$nextTick(() => {
-        this.terminalScrollTop = this.terminalOutput.length * 30; // Approximate line height
+        this.terminalScrollTop = 9999999;
       });
-      
+
       // Limit terminal output to prevent memory issues
       if (this.terminalOutput.length > 1000) {
         this.terminalOutput = this.terminalOutput.slice(-500);
@@ -6412,10 +6414,10 @@ export default {
       // Remove /api suffix from API_BASE_URL for WebSocket connection
       let wsUrl = API_BASE_URL.replace(/\/api$/, '').replace(/^http:/, 'ws:').replace(/^https:/, 'wss:');
       wsUrl = `${wsUrl}/ws/${taskId}`;
-      
+
       try {
         this.automationWebSocket = new WebSocket(wsUrl);
-        
+
         // Set a connection timeout
         const connectionTimeout = setTimeout(() => {
           if (this.automationWebSocket && this.automationWebSocket.readyState !== WebSocket.OPEN) {
@@ -6425,16 +6427,16 @@ export default {
             // Don't use simulation - the HTTP request will handle the actual work
           }
         }, 5000);
-        
+
         this.automationWebSocket.onopen = () => {
           clearTimeout(connectionTimeout);
           this.addTerminalLog('🔌 Connected to automation agent stream', 'success');
         };
-        
+
         this.automationWebSocket.onmessage = (event) => {
           try {
             const data = JSON.parse(event.data);
-            
+
             switch (data.type) {
               case 'log':
                 this.addTerminalLog(data.message, data.level || 'info');
@@ -6455,14 +6457,14 @@ export default {
             this.addTerminalLog(`⚠️ Failed to parse message: ${e.message}`, 'warning');
           }
         };
-        
+
         this.automationWebSocket.onerror = (error) => {
           clearTimeout(connectionTimeout);
           console.error('WebSocket error:', error);
           this.addTerminalLog('⚠️ WebSocket connection error - continuing with HTTP polling', 'warning');
           // Don't close the dialog or stop the process - the HTTP request is still running
         };
-        
+
         this.automationWebSocket.onclose = (event) => {
           clearTimeout(connectionTimeout);
           if (event.wasClean) {
@@ -6472,7 +6474,7 @@ export default {
           }
           this.automationWebSocket = null;
         };
-        
+
       } catch (error) {
         console.error('Failed to create WebSocket connection:', error);
         this.addTerminalLog('⚠️ WebSocket not available - using HTTP polling', 'warning');
@@ -6486,7 +6488,7 @@ export default {
       this.isAutomating = false;
       this.automationStatus = 'idle';
       this.addTerminalLog('🛑 Automation stopped by user', 'warning');
-      
+
       if (this.automationWebSocket) {
         this.automationWebSocket.close();
         this.automationWebSocket = null;
@@ -6495,73 +6497,76 @@ export default {
 
     toggleTerminalSection() {
       this.showTerminalSection = !this.showTerminalSection;
-      
+
       // If showing terminal section and no logs exist, add a welcome message
       if (this.showTerminalSection && this.terminalOutput.length === 0) {
         this.addTerminalLog('🖥️ Terminal section opened. Ready for automation logs.', 'info');
       }
     },
-    
+
     async startBrowserAutomation() {
       // Get authentication data from storage
       const uid = uni.getStorageSync('uid');
       const token = uni.getStorageSync('token');
       const tokenExpiration = uni.getStorageSync('tokenExpiration');
       const currentProjectId = uni.getStorageSync('currentProjectId');
-      
+
       if (!uid || !token || !tokenExpiration) {
         this.errorMessage = 'Authentication required. Please log in again.';
         return;
       }
-      
+
       if (!currentProjectId) {
         this.errorMessage = 'No project selected. Please select a project first.';
         return;
       }
-      
+
       // Get the latest_7_overall_page from localStorage
       const latest_7_overall_page_raw = uni.getStorageSync('latest_7_overall_page');
-      
+
       if (!latest_7_overall_page_raw) {
         this.errorMessage = 'No project data found. Please ensure the project is loaded.';
         return;
       }
-      
+
       // Parse the latest_7_overall_page if it's a string
       let latest_7_overall_page;
       try {
-        latest_7_overall_page = typeof latest_7_overall_page_raw === 'string' 
-          ? JSON.parse(latest_7_overall_page_raw) 
+        latest_7_overall_page = typeof latest_7_overall_page_raw === 'string'
+          ? JSON.parse(latest_7_overall_page_raw)
           : latest_7_overall_page_raw;
       } catch (e) {
         this.errorMessage = 'Failed to parse project data.';
         return;
       }
-      
+
       if (!latest_7_overall_page || latest_7_overall_page.length === 0) {
         this.errorMessage = 'No pages found in the current project.';
         return;
       }
-      
+
       // Initialize automation
       this.isAutomating = true;
       this.automationStatus = 'running';
       this.errorMessage = '';
       this.terminalOutput = [];
-      
+
       // Auto-show terminal section when automation starts
       this.showTerminalSection = true;
-      
+
       // Initialize WebSocket connection for streaming
       const taskId = Date.now().toString();
       this.automationTaskId = taskId;
       this.initializeWebSocket(taskId);
-      
+
+      // Close the dialog immediately so user sees the terminal
+      this.showAutomationDialog = false;
+
       try {
         this.addTerminalLog('🚀 Starting browser automation...', 'info');
         this.addTerminalLog(`📊 Project ID: ${currentProjectId}`, 'info');
         this.addTerminalLog(`👤 User ID: ${uid}`, 'info');
-        
+
         const response = await fetch(`${API_BASE_URL}/browser-automation`, {
           method: 'POST',
           headers: {
@@ -6578,19 +6583,19 @@ export default {
             client_id: taskId  // Send the same ID used for WebSocket connection
           })
         });
-        
+
         const result = await response.json();
-        
+
         if (response.ok && result.success) {
           this.addTerminalLog('🎉 Automation completed successfully!', 'success');
           this.automationStatus = 'success';
-          
+
           uni.showToast({
             title: 'Automation completed!',
             icon: 'success',
             duration: 2000
           });
-          
+
           // Don't close dialog immediately, let user see the results
           setTimeout(() => {
             this.closeAutomationDialog();
@@ -6611,7 +6616,7 @@ export default {
         this.isAutomating = false;
       }
     },
-    
+
     toggleuseColor() {
       this.useColor = !this.useColor;
       try {
@@ -8949,6 +8954,7 @@ export default {
     opacity: 0;
     transform: translateY(-5px);
   }
+
   to {
     opacity: 1;
     transform: translateY(0);
@@ -9090,10 +9096,13 @@ export default {
 }
 
 @keyframes pulse {
-  0%, 100% {
+
+  0%,
+  100% {
     opacity: 1;
     transform: scale(1);
   }
+
   50% {
     opacity: 0.6;
     transform: scale(1.1);
@@ -9158,6 +9167,7 @@ export default {
   from {
     opacity: 0;
   }
+
   to {
     opacity: 1;
   }
@@ -9179,6 +9189,7 @@ export default {
     opacity: 0;
     transform: translateY(20px) scale(0.95);
   }
+
   to {
     opacity: 1;
     transform: translateY(0) scale(1);
@@ -9250,28 +9261,28 @@ export default {
     max-height: 90vh;
     border-radius: 12px;
   }
-  
+
   .terminal-container {
     height: 250px !important;
   }
-  
+
   .terminal-container.expanded {
     height: 400px !important;
   }
-  
+
   .terminal-header {
     padding: 12px 16px;
   }
-  
+
   .terminal-title {
     font-size: 14px;
   }
-  
+
   .terminal-output {
     padding: 12px 16px;
     font-size: 12px;
   }
-  
+
   .terminal-status {
     padding: 10px 16px;
   }
@@ -9281,16 +9292,16 @@ export default {
   .terminal-controls {
     gap: 6px;
   }
-  
+
   .terminal-control-btn {
     padding: 4px 8px;
     font-size: 11px;
   }
-  
+
   .terminal-output {
     font-size: 11px;
   }
-  
+
   .terminal-line {
     margin-bottom: 4px;
   }
