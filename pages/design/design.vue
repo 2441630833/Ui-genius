@@ -121,10 +121,8 @@
         </view>
 
         <view class="nav-item terminal_guide" :class="{ active: showTerminalSection }" @click="toggleTerminalSection">
-          <!-- Fallback text icon if terminal images don't exist -->
-          <image v-if="terminalIconExists" class="nav-icon" :src="showTerminalSection ? '/static/terminal_white.png' : '/static/terminal.png'">
+          <image class="nav-icon" :src="showTerminalSection ? '/static/terminal_white.png' : '/static/terminal.png'">
           </image>
-          <text v-else class="nav-icon-text" :class="{ active: showTerminalSection }">⬛</text>
         </view>
 
         <view class="nav-item template_guide"
@@ -738,7 +736,7 @@
               
               <view class="automation-footer">
                 <text class="automation-time">⏱ Estimated time: 15-30 minutes</text>
-                <text class="automation-note">Click the terminal icon (⬛) in the toolbar to view live execution logs.</text>
+                <text class="automation-note">Click the terminal icon in the toolbar to view live execution logs.</text>
               </view>
             </view>
           </view>
@@ -921,7 +919,6 @@ export default {
       automationWebSocket: null,
       automationTaskId: null,
       showTerminalSection: false,
-      terminalIconExists: false // Set to true when you add terminal icons
     }
   },
 
@@ -6411,12 +6408,26 @@ export default {
 
     initializeWebSocket(taskId) {
       // Create WebSocket connection for real-time updates
-      const wsUrl = `${API_BASE_URL.replace('http', 'ws')}/ws/automation_${taskId}`;
+      // Convert http/https to ws/wss properly
+      // Remove /api suffix from API_BASE_URL for WebSocket connection
+      let wsUrl = API_BASE_URL.replace(/\/api$/, '').replace(/^http:/, 'ws:').replace(/^https:/, 'wss:');
+      wsUrl = `${wsUrl}/ws/${taskId}`;
       
       try {
         this.automationWebSocket = new WebSocket(wsUrl);
         
+        // Set a connection timeout
+        const connectionTimeout = setTimeout(() => {
+          if (this.automationWebSocket && this.automationWebSocket.readyState !== WebSocket.OPEN) {
+            this.addTerminalLog('⚠️ WebSocket connection timeout, using polling fallback', 'warning');
+            this.automationWebSocket.close();
+            this.automationWebSocket = null;
+            // Don't use simulation - the HTTP request will handle the actual work
+          }
+        }, 5000);
+        
         this.automationWebSocket.onopen = () => {
+          clearTimeout(connectionTimeout);
           this.addTerminalLog('🔌 Connected to automation agent stream', 'success');
         };
         
@@ -6426,7 +6437,7 @@ export default {
             
             switch (data.type) {
               case 'log':
-                this.addTerminalLog(data.message, data.level);
+                this.addTerminalLog(data.message, data.level || 'info');
                 break;
               case 'completion':
                 this.addTerminalLog('🎉 Automation completed successfully!', 'success');
@@ -6441,68 +6452,35 @@ export default {
             }
           } catch (e) {
             console.error('Error parsing WebSocket message:', e);
+            this.addTerminalLog(`⚠️ Failed to parse message: ${e.message}`, 'warning');
           }
         };
         
         this.automationWebSocket.onerror = (error) => {
+          clearTimeout(connectionTimeout);
           console.error('WebSocket error:', error);
-          this.addTerminalLog('⚠️ WebSocket connection error', 'warning');
+          this.addTerminalLog('⚠️ WebSocket connection error - continuing with HTTP polling', 'warning');
+          // Don't close the dialog or stop the process - the HTTP request is still running
         };
         
-        this.automationWebSocket.onclose = () => {
-          this.addTerminalLog('🔌 Disconnected from automation stream', 'info');
+        this.automationWebSocket.onclose = (event) => {
+          clearTimeout(connectionTimeout);
+          if (event.wasClean) {
+            this.addTerminalLog('🔌 Disconnected from automation stream', 'info');
+          } else {
+            this.addTerminalLog('🔌 Connection lost - automation continues via HTTP', 'warning');
+          }
           this.automationWebSocket = null;
         };
         
       } catch (error) {
         console.error('Failed to create WebSocket connection:', error);
-        this.addTerminalLog('⚠️ Failed to connect to real-time stream, using simulation', 'warning');
-        
-        // Fallback to simulation
-        this.simulateAutomationProgress();
+        this.addTerminalLog('⚠️ WebSocket not available - using HTTP polling', 'warning');
+        // Don't use simulation - the actual HTTP request will handle the work
       }
     },
 
-    simulateAutomationProgress() {
-      // Simulate WebSocket connection for demo purposes when real WebSocket fails
-      this.addTerminalLog('🔌 Using simulated progress updates', 'info');
-      
-      // Simulate periodic updates
-      const messages = [
-        '🔍 Analyzing project structure...',
-        '🧠 Understanding application type...',
-        '📋 Identifying missing pages...',
-        '🌐 Navigating to UI Genius platform...',
-        '🔐 Authenticating with stored credentials...',
-        '📄 Loading project data...',
-        '🎨 Generating new page: Product Details...',
-        '⏳ Waiting for page generation to complete...',
-        '✅ Page generated successfully',
-        '🎨 Generating new page: User Profile...',
-        '⏳ Waiting for page generation to complete...',
-        '✅ Page generated successfully',
-        '🎨 Generating new page: Settings...',
-        '⏳ Waiting for page generation to complete...',
-        '✅ Page generated successfully',
-        '🔄 Refreshing project data...',
-        '✨ Automation completed successfully!'
-      ];
-      
-      let messageIndex = 0;
-      const interval = setInterval(() => {
-        if (messageIndex < messages.length && this.isAutomating) {
-          this.addTerminalLog(messages[messageIndex], 'info');
-          messageIndex++;
-          
-          if (messageIndex === messages.length) {
-            clearInterval(interval);
-            this.automationStatus = 'success';
-          }
-        } else {
-          clearInterval(interval);
-        }
-      }, 2000);
-    },
+
 
     stopBrowserAutomation() {
       this.isAutomating = false;
@@ -6596,7 +6574,8 @@ export default {
             tokenExpiration: tokenExpiration,
             currentProjectId: currentProjectId,
             latest_7_overall_page: JSON.stringify(latest_7_overall_page),
-            timeout: 1800  // 30 minutes timeout for multiple page generation
+            timeout: 1800,  // 30 minutes timeout for multiple page generation
+            client_id: taskId  // Send the same ID used for WebSocket connection
           })
         });
         
