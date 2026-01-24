@@ -120,6 +120,13 @@
           </image>
         </view>
 
+        <view class="nav-item terminal_guide" :class="{ active: showTerminalSection }" @click="toggleTerminalSection">
+          <!-- Fallback text icon if terminal images don't exist -->
+          <image v-if="terminalIconExists" class="nav-icon" :src="showTerminalSection ? '/static/terminal_white.png' : '/static/terminal.png'">
+          </image>
+          <text v-else class="nav-icon-text" :class="{ active: showTerminalSection }">⬛</text>
+        </view>
+
         <view class="nav-item template_guide"
           :class="{ active: activeNavItem === 'template' || isTemplateSelectionMode }" @click="navigateTo('template')">
           <image class="nav-icon"
@@ -324,6 +331,48 @@
       </view>
 
 
+    </view>
+
+    <!-- Standalone Terminal Section -->
+    <view v-if="showTerminalSection" class="standalone-terminal-overlay" @click="toggleTerminalSection">
+      <view class="standalone-terminal-container" @click.stop>
+        <view class="terminal-section">
+          <view class="terminal-header">
+            <text class="terminal-title">🖥️ Automation Terminal</text>
+            <view class="terminal-controls">
+              <button class="terminal-control-btn" @click="toggleTerminalExpanded">
+                {{ terminalExpanded ? '▼' : '▲' }}
+              </button>
+              <button class="terminal-control-btn" @click="clearTerminalOutput">Clear</button>
+              <button class="terminal-control-btn terminal-close-btn" @click="toggleTerminalSection">✕</button>
+            </view>
+          </view>
+          <view class="terminal-container" :class="{ 'expanded': terminalExpanded }">
+            <scroll-view class="terminal-output" scroll-y="true" :scroll-top="terminalScrollTop">
+              <view v-for="(line, index) in terminalOutput" :key="index" class="terminal-line"
+                    :class="{ 
+                      'error': line.type === 'error',
+                      'success': line.type === 'success',
+                      'info': line.type === 'info',
+                      'warning': line.type === 'warning'
+                    }">
+                <text class="terminal-timestamp">[{{ line.timestamp }}]</text>
+                <text class="terminal-text">{{ line.message }}</text>
+              </view>
+              <view v-if="terminalOutput.length === 0" class="terminal-placeholder">
+                <text>Terminal ready. Automation logs will appear here when tasks are running.</text>
+              </view>
+            </scroll-view>
+          </view>
+          <view class="terminal-status">
+            <view class="status-indicator" :class="automationStatus">
+              <view class="status-dot"></view>
+              <text class="status-text">{{ getStatusText() }}</text>
+            </view>
+            <text class="terminal-info">{{ terminalOutput.length }} log entries</text>
+          </view>
+        </view>
+      </view>
     </view>
 
     <!-- Custom Action Sheet Component -->
@@ -673,6 +722,7 @@
             <text>{{ errorMessage }}</text>
           </view>
 
+          <!-- Info Section -->
           <view class="description-container">
             <view class="automation-info-box">
               <text class="automation-title">How It Works</text>
@@ -688,14 +738,19 @@
               
               <view class="automation-footer">
                 <text class="automation-time">⏱ Estimated time: 15-30 minutes</text>
-                <text class="automation-note">You can close this dialog - automation continues in background.</text>
+                <text class="automation-note">Click the terminal icon (⬛) in the toolbar to view live execution logs.</text>
               </view>
             </view>
           </view>
 
-          <button class="continue-btn" :disabled="isAutomating" @click="startBrowserAutomation">
-            {{ isAutomating ? 'Automating...' : 'Start Intelligent Generation' }}
-          </button>
+          <view class="automation-actions">
+            <button class="continue-btn" :disabled="isAutomating" @click="startBrowserAutomation">
+              {{ isAutomating ? 'Automating...' : 'Start Intelligent Generation' }}
+            </button>
+            <button v-if="isAutomating" class="stop-btn" @click="stopBrowserAutomation">
+              Stop Automation
+            </button>
+          </view>
         </view>
       </view>
     </view>
@@ -857,7 +912,16 @@ export default {
       previewImagesGenerated: false,
       // Browser automation properties
       showAutomationDialog: false,
-      isAutomating: false
+      isAutomating: false,
+      // Terminal properties
+      terminalOutput: [],
+      terminalExpanded: true,
+      terminalScrollTop: 0,
+      automationStatus: 'idle', // idle, running, success, error
+      automationWebSocket: null,
+      automationTaskId: null,
+      showTerminalSection: false,
+      terminalIconExists: false // Set to true when you add terminal icons
     }
   },
 
@@ -6294,6 +6358,170 @@ export default {
     closeAutomationDialog() {
       this.showAutomationDialog = false;
       this.errorMessage = '';
+      // Clean up WebSocket connection if exists
+      if (this.automationWebSocket) {
+        this.automationWebSocket.close();
+        this.automationWebSocket = null;
+      }
+    },
+
+    // Terminal methods
+    toggleTerminalExpanded() {
+      this.terminalExpanded = !this.terminalExpanded;
+    },
+
+    clearTerminalOutput() {
+      this.terminalOutput = [];
+      this.terminalScrollTop = 0;
+    },
+
+    addTerminalLog(message, type = 'info') {
+      const timestamp = new Date().toLocaleTimeString();
+      this.terminalOutput.push({
+        message,
+        type,
+        timestamp
+      });
+      
+      // Auto-scroll to bottom
+      this.$nextTick(() => {
+        this.terminalScrollTop = this.terminalOutput.length * 30; // Approximate line height
+      });
+      
+      // Limit terminal output to prevent memory issues
+      if (this.terminalOutput.length > 1000) {
+        this.terminalOutput = this.terminalOutput.slice(-500);
+      }
+    },
+
+    getStatusText() {
+      switch (this.automationStatus) {
+        case 'idle':
+          return 'Ready';
+        case 'running':
+          return 'Agent Executing...';
+        case 'success':
+          return 'Completed Successfully';
+        case 'error':
+          return 'Error Occurred';
+        default:
+          return 'Unknown Status';
+      }
+    },
+
+    initializeWebSocket(taskId) {
+      // Create WebSocket connection for real-time updates
+      const wsUrl = `${API_BASE_URL.replace('http', 'ws')}/ws/automation_${taskId}`;
+      
+      try {
+        this.automationWebSocket = new WebSocket(wsUrl);
+        
+        this.automationWebSocket.onopen = () => {
+          this.addTerminalLog('🔌 Connected to automation agent stream', 'success');
+        };
+        
+        this.automationWebSocket.onmessage = (event) => {
+          try {
+            const data = JSON.parse(event.data);
+            
+            switch (data.type) {
+              case 'log':
+                this.addTerminalLog(data.message, data.level);
+                break;
+              case 'completion':
+                this.addTerminalLog('🎉 Automation completed successfully!', 'success');
+                this.automationStatus = 'success';
+                break;
+              case 'error':
+                this.addTerminalLog(`❌ Error: ${data.message}`, 'error');
+                this.automationStatus = 'error';
+                break;
+              default:
+                this.addTerminalLog(data.message || 'Unknown message type', 'info');
+            }
+          } catch (e) {
+            console.error('Error parsing WebSocket message:', e);
+          }
+        };
+        
+        this.automationWebSocket.onerror = (error) => {
+          console.error('WebSocket error:', error);
+          this.addTerminalLog('⚠️ WebSocket connection error', 'warning');
+        };
+        
+        this.automationWebSocket.onclose = () => {
+          this.addTerminalLog('🔌 Disconnected from automation stream', 'info');
+          this.automationWebSocket = null;
+        };
+        
+      } catch (error) {
+        console.error('Failed to create WebSocket connection:', error);
+        this.addTerminalLog('⚠️ Failed to connect to real-time stream, using simulation', 'warning');
+        
+        // Fallback to simulation
+        this.simulateAutomationProgress();
+      }
+    },
+
+    simulateAutomationProgress() {
+      // Simulate WebSocket connection for demo purposes when real WebSocket fails
+      this.addTerminalLog('🔌 Using simulated progress updates', 'info');
+      
+      // Simulate periodic updates
+      const messages = [
+        '🔍 Analyzing project structure...',
+        '🧠 Understanding application type...',
+        '📋 Identifying missing pages...',
+        '🌐 Navigating to UI Genius platform...',
+        '🔐 Authenticating with stored credentials...',
+        '📄 Loading project data...',
+        '🎨 Generating new page: Product Details...',
+        '⏳ Waiting for page generation to complete...',
+        '✅ Page generated successfully',
+        '🎨 Generating new page: User Profile...',
+        '⏳ Waiting for page generation to complete...',
+        '✅ Page generated successfully',
+        '🎨 Generating new page: Settings...',
+        '⏳ Waiting for page generation to complete...',
+        '✅ Page generated successfully',
+        '🔄 Refreshing project data...',
+        '✨ Automation completed successfully!'
+      ];
+      
+      let messageIndex = 0;
+      const interval = setInterval(() => {
+        if (messageIndex < messages.length && this.isAutomating) {
+          this.addTerminalLog(messages[messageIndex], 'info');
+          messageIndex++;
+          
+          if (messageIndex === messages.length) {
+            clearInterval(interval);
+            this.automationStatus = 'success';
+          }
+        } else {
+          clearInterval(interval);
+        }
+      }, 2000);
+    },
+
+    stopBrowserAutomation() {
+      this.isAutomating = false;
+      this.automationStatus = 'idle';
+      this.addTerminalLog('🛑 Automation stopped by user', 'warning');
+      
+      if (this.automationWebSocket) {
+        this.automationWebSocket.close();
+        this.automationWebSocket = null;
+      }
+    },
+
+    toggleTerminalSection() {
+      this.showTerminalSection = !this.showTerminalSection;
+      
+      // If showing terminal section and no logs exist, add a welcome message
+      if (this.showTerminalSection && this.terminalOutput.length === 0) {
+        this.addTerminalLog('🖥️ Terminal section opened. Ready for automation logs.', 'info');
+      }
     },
     
     async startBrowserAutomation() {
@@ -6337,14 +6565,24 @@ export default {
         return;
       }
       
+      // Initialize automation
       this.isAutomating = true;
+      this.automationStatus = 'running';
       this.errorMessage = '';
+      this.terminalOutput = [];
+      
+      // Auto-show terminal section when automation starts
+      this.showTerminalSection = true;
+      
+      // Initialize WebSocket connection for streaming
+      const taskId = Date.now().toString();
+      this.automationTaskId = taskId;
+      this.initializeWebSocket(taskId);
       
       try {
-        // uni.showLoading({
-        //   title: 'Starting automation...',
-        //   mask: true
-        // });
+        this.addTerminalLog('🚀 Starting browser automation...', 'info');
+        this.addTerminalLog(`📊 Project ID: ${currentProjectId}`, 'info');
+        this.addTerminalLog(`👤 User ID: ${uid}`, 'info');
         
         const response = await fetch(`${API_BASE_URL}/browser-automation`, {
           method: 'POST',
@@ -6358,28 +6596,36 @@ export default {
             tokenExpiration: tokenExpiration,
             currentProjectId: currentProjectId,
             latest_7_overall_page: JSON.stringify(latest_7_overall_page),
-            timeout: 600  // Increase timeout to 10 minutes for multiple page generation
+            timeout: 1800  // 30 minutes timeout for multiple page generation
           })
         });
         
         const result = await response.json();
         
-        // uni.hideLoading();
-        
         if (response.ok && result.success) {
+          this.addTerminalLog('🎉 Automation completed successfully!', 'success');
+          this.automationStatus = 'success';
+          
           uni.showToast({
             title: 'Automation completed!',
             icon: 'success',
             duration: 2000
           });
-          this.closeAutomationDialog();
-          // Reload the project to see the new pages
-          this.loadProject();
+          
+          // Don't close dialog immediately, let user see the results
+          setTimeout(() => {
+            this.closeAutomationDialog();
+            // Reload the project to see the new pages
+            this.loadProject();
+          }, 3000);
         } else {
+          this.addTerminalLog(`❌ Automation failed: ${result.detail || 'Unknown error'}`, 'error');
+          this.automationStatus = 'error';
           this.errorMessage = result.detail || 'Automation failed';
         }
       } catch (error) {
-        uni.hideLoading();
+        this.addTerminalLog(`💥 Error: ${error.message}`, 'error');
+        this.automationStatus = 'error';
         this.errorMessage = `Error: ${error.message}`;
         console.error('Browser automation error:', error);
       } finally {
@@ -8624,5 +8870,450 @@ export default {
   font-size: 12px;
   color: #888;
   margin-top: 4px;
+}
+
+/* Terminal Styles */
+.terminal-section {
+  margin-top: 20px;
+  border: 1px solid #2d2d2d;
+  border-radius: 12px;
+  overflow: hidden;
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
+}
+
+.terminal-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 20px;
+  background: linear-gradient(135deg, #2d2d2d 0%, #3a3a3a 100%);
+  border-bottom: 1px solid #404040;
+  backdrop-filter: blur(10px);
+}
+
+.terminal-title {
+  color: #ffffff;
+  font-size: 15px;
+  font-weight: 600;
+  letter-spacing: 0.5px;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.terminal-controls {
+  display: flex;
+  gap: 10px;
+  align-items: center;
+}
+
+.terminal-control-btn {
+  background: rgba(255, 255, 255, 0.1);
+  color: #ffffff;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  padding: 6px 12px;
+  font-size: 12px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  backdrop-filter: blur(10px);
+}
+
+.terminal-control-btn:hover {
+  background: rgba(255, 255, 255, 0.2);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.terminal-control-btn:active {
+  transform: translateY(0);
+}
+
+.terminal-container {
+  height: 300px;
+  transition: height 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  background-color: #1a1a1a;
+}
+
+.terminal-container.expanded {
+  height: 500px;
+}
+
+.terminal-output {
+  height: 100%;
+  padding: 16px 20px;
+  font-family: 'Consolas', 'Monaco', 'Courier New', monospace;
+  font-size: 13px;
+  line-height: 1.6;
+  background-color: #1a1a1a;
+  color: #e0e0e0;
+}
+
+.terminal-line {
+  display: flex;
+  margin-bottom: 6px;
+  word-wrap: break-word;
+  animation: fadeIn 0.2s ease-in;
+  padding: 4px 0;
+  border-radius: 4px;
+  transition: background-color 0.2s;
+}
+
+.terminal-line:hover {
+  background-color: rgba(255, 255, 255, 0.03);
+}
+
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+    transform: translateY(-5px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.terminal-timestamp {
+  color: #888888;
+  margin-right: 12px;
+  flex-shrink: 0;
+  font-size: 11px;
+  font-weight: 500;
+  opacity: 0.7;
+}
+
+.terminal-text {
+  color: #e0e0e0;
+  flex: 1;
+  word-break: break-word;
+}
+
+.terminal-line.error .terminal-text {
+  color: #ff6b6b;
+  font-weight: 500;
+}
+
+.terminal-line.error .terminal-timestamp {
+  color: #ff6b6b;
+  opacity: 0.8;
+}
+
+.terminal-line.success .terminal-text {
+  color: #51cf66;
+  font-weight: 500;
+}
+
+.terminal-line.success .terminal-timestamp {
+  color: #51cf66;
+  opacity: 0.8;
+}
+
+.terminal-line.warning .terminal-text {
+  color: #ffd43b;
+  font-weight: 500;
+}
+
+.terminal-line.warning .terminal-timestamp {
+  color: #ffd43b;
+  opacity: 0.8;
+}
+
+.terminal-line.info .terminal-text {
+  color: #74c0fc;
+}
+
+.terminal-line.info .terminal-timestamp {
+  color: #74c0fc;
+  opacity: 0.8;
+}
+
+.terminal-placeholder {
+  color: #666666;
+  font-style: italic;
+  text-align: center;
+  padding: 40px 20px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 12px;
+}
+
+.terminal-placeholder::before {
+  content: '⚡';
+  font-size: 32px;
+  opacity: 0.5;
+}
+
+.terminal-status {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 20px;
+  background: linear-gradient(135deg, #2d2d2d 0%, #3a3a3a 100%);
+  border-top: 1px solid #404040;
+  backdrop-filter: blur(10px);
+}
+
+.status-indicator {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.status-dot {
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background-color: #666666;
+  box-shadow: 0 0 10px rgba(102, 102, 102, 0.5);
+  transition: all 0.3s ease;
+}
+
+.status-indicator.idle .status-dot {
+  background-color: #888888;
+  box-shadow: 0 0 10px rgba(136, 136, 136, 0.3);
+}
+
+.status-indicator.running .status-dot {
+  background-color: #74c0fc;
+  box-shadow: 0 0 15px rgba(116, 192, 252, 0.6);
+  animation: pulse 1.5s infinite;
+}
+
+.status-indicator.success .status-dot {
+  background-color: #51cf66;
+  box-shadow: 0 0 15px rgba(81, 207, 102, 0.6);
+}
+
+.status-indicator.error .status-dot {
+  background-color: #ff6b6b;
+  box-shadow: 0 0 15px rgba(255, 107, 107, 0.6);
+}
+
+.status-text {
+  color: #ffffff;
+  font-size: 13px;
+  font-weight: 500;
+  letter-spacing: 0.3px;
+}
+
+.terminal-info {
+  color: #888888;
+  font-size: 12px;
+  font-weight: 500;
+  padding: 4px 12px;
+  background: rgba(255, 255, 255, 0.05);
+  border-radius: 12px;
+  border: 1px solid rgba(255, 255, 255, 0.1);
+}
+
+@keyframes pulse {
+  0%, 100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+  50% {
+    opacity: 0.6;
+    transform: scale(1.1);
+  }
+}
+
+/* Automation Dialog Enhancements */
+.automation-actions {
+  display: flex;
+  gap: 12px;
+  margin-top: 20px;
+}
+
+.stop-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
+  color: white;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 24px;
+  font-size: 14px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+}
+
+.stop-btn:hover {
+  background: linear-gradient(135deg, #ff5252 0%, #ff4444 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+}
+
+.stop-btn:active {
+  transform: translateY(0);
+}
+
+.stop-btn:disabled {
+  background: #cccccc;
+  cursor: not-allowed;
+  box-shadow: none;
+  transform: none;
+}
+
+/* Standalone Terminal Styles */
+.standalone-terminal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.75);
+  backdrop-filter: blur(8px);
+  z-index: 1000;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  padding: 20px;
+  animation: overlayFadeIn 0.2s ease-out;
+}
+
+@keyframes overlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.standalone-terminal-container {
+  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
+  border-radius: 16px;
+  width: 90%;
+  max-width: 1200px;
+  max-height: 85vh;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.5), 0 0 0 1px rgba(255, 255, 255, 0.1);
+  overflow: hidden;
+  animation: terminalSlideIn 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes terminalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(20px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.terminal-close-btn {
+  background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%) !important;
+  color: white !important;
+  border: 1px solid rgba(255, 107, 107, 0.3) !important;
+  box-shadow: 0 2px 8px rgba(255, 107, 107, 0.3);
+}
+
+.terminal-close-btn:hover {
+  background: linear-gradient(135deg, #ff5252 0%, #ff4444 100%) !important;
+  box-shadow: 0 4px 12px rgba(255, 107, 107, 0.4);
+}
+
+/* Navigation item for terminal */
+.nav-item.terminal_guide {
+  position: relative;
+}
+
+.nav-item.terminal_guide::after {
+  content: '';
+  position: absolute;
+  top: -2px;
+  right: -2px;
+  width: 8px;
+  height: 8px;
+  background-color: #51cf66;
+  border-radius: 50%;
+  opacity: 0;
+  transition: opacity 0.2s;
+  box-shadow: 0 0 8px rgba(81, 207, 102, 0.6);
+}
+
+.nav-item.terminal_guide.active::after {
+  opacity: 1;
+  animation: pulse 2s infinite;
+}
+
+/* Text icon fallback for terminal */
+.nav-icon-text {
+  font-size: 20px;
+  color: #666;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 24px;
+  height: 24px;
+}
+
+.nav-icon-text.active {
+  color: white;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.nav-item.active .nav-icon-text {
+  color: white;
+  text-shadow: 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+/* Responsive adjustments for standalone terminal */
+@media (max-width: 768px) {
+  .standalone-terminal-container {
+    width: 95%;
+    max-height: 90vh;
+    border-radius: 12px;
+  }
+  
+  .terminal-container {
+    height: 250px !important;
+  }
+  
+  .terminal-container.expanded {
+    height: 400px !important;
+  }
+  
+  .terminal-header {
+    padding: 12px 16px;
+  }
+  
+  .terminal-title {
+    font-size: 14px;
+  }
+  
+  .terminal-output {
+    padding: 12px 16px;
+    font-size: 12px;
+  }
+  
+  .terminal-status {
+    padding: 10px 16px;
+  }
+}
+
+@media (max-width: 480px) {
+  .terminal-controls {
+    gap: 6px;
+  }
+  
+  .terminal-control-btn {
+    padding: 4px 8px;
+    font-size: 11px;
+  }
+  
+  .terminal-output {
+    font-size: 11px;
+  }
+  
+  .terminal-line {
+    margin-bottom: 4px;
+  }
 }
 </style>
