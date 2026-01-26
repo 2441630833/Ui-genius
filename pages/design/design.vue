@@ -223,7 +223,7 @@
       <view class="section">
         <text class="section-title">{{ $t('design.sectionTitle') }} <span class="template-count">({{
           jsonTemplates.length
-            }}
+        }}
             {{ $t('design.pagesLabel') }})</span></text>
         <view class="templates-grid-container">
           <view class="templates-grid">
@@ -6484,7 +6484,23 @@ export default {
 
 
 
-    stopBrowserAutomation() {
+    async stopBrowserAutomation() {
+      if (this.automationTaskId) {
+        try {
+          this.addTerminalLog('🛑 Sending stop signal to agent...', 'warning');
+          await fetch(`${API_BASE_URL}/browser-automation/stop`, {
+            method: 'POST',
+            headers: {
+              'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+              client_id: this.automationTaskId
+            })
+          });
+        } catch (error) {
+          console.error('Error stopping automation:', error);
+        }
+      }
       this.isAutomating = false;
       this.automationStatus = 'idle';
       this.addTerminalLog('🛑 Automation stopped by user', 'warning');
