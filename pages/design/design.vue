@@ -6845,9 +6845,8 @@ export default {
         // If there's an error, allow the action to proceed
         return { allowed: true, reason: 'error_fallback' };
       }
-    },
+    }
   }
-}
 </script>
 
 <script module="renderjs" lang="renderjs">
