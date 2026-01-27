@@ -862,7 +862,7 @@ export default {
       // Model selection for Create New Page dialog
       modelOptions: [
         { value: 'google/gemini-3-flash-preview', text: 'google/gemini3', isPro: true },
-        { value: 'xiaomi/mimo-v2-flash:free', text: 'xiaomi/mimo-v2-flash', isPro: true },
+        { value: 'xiaomi/mimo-v2-flash', text: 'xiaomi/mimo-v2-flash', isPro: true },
         { value: 'deepseek/deepseek-v3.2', text: 'deepseek/deepseek-v3.2', isPro: true },
         { value: 'anthropic/claude-opus-4.5', text: 'anthropic/claude-opus-4.5', isPro: true },
         { value: 'qwen/qwen3-coder', text: 'qwen/qwen3-coder', isPro: true },
@@ -872,7 +872,6 @@ export default {
         { value: 'minimax/minimax-m2', text: 'minimax/minimax-m2', isPro: true },
         { value: 'z-ai/glm-4.7', text: 'z-ai/glm-4.7', isPro: true },
         { value: 'mistralai/devstral-2512:free', text: 'mistralai/devstral-2512:free', isPro: false },
-        { value: 'kwaipilot/kat-coder-pro:free', text: 'kwaipilot/kat-coder-pro:free', isPro: false },
         { value: 'google/gemma-3-27b-it:free', text: 'google/gemma-3-27b-it:free', isPro: false },
         { value: 'uigenius5:latest', text: 'uigenius/uigenius5:latest', isPro: false }
       ],
@@ -919,6 +918,7 @@ export default {
       terminalScrollTop: 0,
       automationStatus: 'idle', // idle, running, success, error
       automationWebSocket: null,
+      wsHeartbeatInterval: null,
       automationTaskId: null,
       showTerminalSection: false,
     }
@@ -6409,6 +6409,18 @@ export default {
     },
 
     initializeWebSocket(taskId) {
+      // Close existing WebSocket if any
+      if (this.automationWebSocket) {
+        this.automationWebSocket.close();
+        this.automationWebSocket = null;
+      }
+
+      // Clear existing heartbeat interval
+      if (this.wsHeartbeatInterval) {
+        clearInterval(this.wsHeartbeatInterval);
+        this.wsHeartbeatInterval = null;
+      }
+
       // Create WebSocket connection for real-time updates
       // Convert http/https to ws/wss properly
       // Remove /api suffix from API_BASE_URL for WebSocket connection
@@ -6431,6 +6443,17 @@ export default {
         this.automationWebSocket.onopen = () => {
           clearTimeout(connectionTimeout);
           this.addTerminalLog('🔌 Connected to automation agent stream', 'success');
+          
+          // Start heartbeat to keep connection alive
+          this.wsHeartbeatInterval = setInterval(() => {
+            if (this.automationWebSocket && this.automationWebSocket.readyState === WebSocket.OPEN) {
+              try {
+                this.automationWebSocket.send(JSON.stringify({ type: 'ping' }));
+              } catch (e) {
+                console.error('Failed to send heartbeat:', e);
+              }
+            }
+          }, 30000); // Send heartbeat every 30 seconds
         };
 
         this.automationWebSocket.onmessage = (event) => {
@@ -6448,6 +6471,9 @@ export default {
               case 'error':
                 this.addTerminalLog(`❌ Error: ${data.message}`, 'error');
                 this.automationStatus = 'error';
+                break;
+              case 'pong':
+                // Heartbeat response - connection is alive
                 break;
               default:
                 this.addTerminalLog(data.message || 'Unknown message type', 'info');
@@ -6467,10 +6493,26 @@ export default {
 
         this.automationWebSocket.onclose = (event) => {
           clearTimeout(connectionTimeout);
+          
+          // Clear heartbeat interval
+          if (this.wsHeartbeatInterval) {
+            clearInterval(this.wsHeartbeatInterval);
+            this.wsHeartbeatInterval = null;
+          }
+          
           if (event.wasClean) {
             this.addTerminalLog('🔌 Disconnected from automation stream', 'info');
           } else {
-            this.addTerminalLog('🔌 Connection lost - automation continues via HTTP', 'warning');
+            this.addTerminalLog('🔌 Connection lost - attempting to reconnect...', 'warning');
+            // Auto-reconnect if there's still an active task
+            if (this.automationTaskId && this.isAutomating) {
+              setTimeout(() => {
+                if (this.automationTaskId && !this.automationWebSocket) {
+                  this.addTerminalLog('🔄 Reconnecting to automation stream...', 'info');
+                  this.initializeWebSocket(this.automationTaskId);
+                }
+              }, 3000); // Retry after 3 seconds
+            }
           }
           this.automationWebSocket = null;
         };
@@ -6503,6 +6545,7 @@ export default {
       }
       this.isAutomating = false;
       this.automationStatus = 'idle';
+      this.automationTaskId = null; // Clear task ID when stopping
       this.addTerminalLog('🛑 Automation stopped by user', 'warning');
 
       if (this.automationWebSocket) {
@@ -6518,6 +6561,13 @@ export default {
       if (this.showTerminalSection && this.terminalOutput.length === 0) {
         this.addTerminalLog('🖥️ Terminal section opened. Ready for automation logs.', 'info');
       }
+
+      // If reopening terminal and there's an active task but no WebSocket, reconnect
+      if (this.showTerminalSection && this.automationTaskId && !this.automationWebSocket) {
+        this.addTerminalLog('🔄 Reconnecting to automation stream...', 'info');
+        this.initializeWebSocket(this.automationTaskId);
+      }
+    },
     },
 
     async startBrowserAutomation() {
@@ -6813,6 +6863,18 @@ export default {
   beforeDestroy() {
     // Clean up event listeners
     uni.$off('capture-element', this.captureElement);
+    
+    // Clean up WebSocket connection
+    if (this.automationWebSocket) {
+      this.automationWebSocket.close();
+      this.automationWebSocket = null;
+    }
+    
+    // Clear heartbeat interval if exists
+    if (this.wsHeartbeatInterval) {
+      clearInterval(this.wsHeartbeatInterval);
+      this.wsHeartbeatInterval = null;
+    }
   },
   
   methods: {

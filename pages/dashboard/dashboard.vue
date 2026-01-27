@@ -565,7 +565,7 @@ export default {
       // Model selection
       modelOptions: [
         { value: 'google/gemini-3-flash-preview', text: 'google/gemini3', isPro: true },
-        { value: 'xiaomi/mimo-v2-flash:free', text: 'xiaomi/mimo-v2-flash', isPro: true },
+        { value: 'xiaomi/mimo-v2-flash', text: 'xiaomi/mimo-v2-flash', isPro: true },
         { value: 'deepseek/deepseek-v3.2', text: 'deepseek/deepseek-v3.2', isPro: true },
         { value: 'anthropic/claude-opus-4.5', text: 'anthropic/claude-opus-4.5', isPro: true },
         { value: 'qwen/qwen3-coder', text: 'qwen/qwen3-coder', isPro: true },
@@ -575,7 +575,6 @@ export default {
         { value: 'minimax/minimax-m2', text: 'minimax/minimax-m2', isPro: true },
         { value: 'z-ai/glm-4.7', text: 'z-ai/glm-4.7', isPro: true },
         { value: 'mistralai/devstral-2512:free', text: 'mistralai/devstral-2512:free', isPro: false },
-        { value: 'kwaipilot/kat-coder-pro:free', text: 'kwaipilot/kat-coder-pro:free', isPro: false },
         { value: 'google/gemma-3-27b-it:free', text: 'google/gemma-3-27b-it:free', isPro: false },
         { value: 'uigenius5:latest', text: 'uigenius/uigenius5:latest', isPro: false }
       ],
