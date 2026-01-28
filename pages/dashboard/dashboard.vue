@@ -664,6 +664,10 @@ export default {
         this.loadProjectsByUid();
         uni.removeStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard');
       }
+      
+      // Refresh account settings and email when returning to dashboard
+      // This ensures the email is updated after login/account change
+      this.initializeAccountSettings();
     } catch (e) {}
 
   },
@@ -736,6 +740,12 @@ export default {
       this.accountSettings.lastName = userInfo.family_name || '';
       this.accountSettings.email = userInfo.email || '';
       this.accountSettings.photoUrl = userInfo.picture || userInfo.avatar || '';
+      
+      // Update currentEmail from storage to reflect the current logged-in user
+      this.currentEmail = uni.getStorageSync('email') || userInfo.email || '';
+      
+      // Update userInfo to reflect current user
+      this.userInfo = userInfo;
     },
     refreshProjects() {
       // Reset all project loading states
@@ -771,6 +781,12 @@ export default {
           this.currentUserId = newUserId;
           this.refreshProjects();
         }
+      }
+      
+      // Refresh account settings when switching to account tab
+      // This ensures email and other info are up-to-date
+      if (item === 'account') {
+        this.initializeAccountSettings();
       }
     },
     jumpToDesign(project) {
