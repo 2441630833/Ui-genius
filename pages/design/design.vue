@@ -6357,6 +6357,8 @@ export default {
     closeAutomationDialog() {
       this.showAutomationDialog = false;
       this.errorMessage = '';
+      // Reset activeNavItem so automation icon becomes inactive
+      this.activeNavItem = '';
       // Only close WebSocket if NOT automating
       if (!this.isAutomating && this.automationWebSocket) {
         this.automationWebSocket.close();
@@ -6626,6 +6628,8 @@ export default {
 
       // Close the dialog immediately so user sees the terminal
       this.showAutomationDialog = false;
+      // Reset activeNavItem so automation icon becomes inactive
+      this.activeNavItem = '';
 
       try {
         this.addTerminalLog('🚀 Starting browser automation...', 'info');
