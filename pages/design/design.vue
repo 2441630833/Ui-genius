@@ -6568,7 +6568,6 @@ export default {
         this.initializeWebSocket(this.automationTaskId);
       }
     },
-    },
 
     async startBrowserAutomation() {
       // Get authentication data from storage
@@ -6847,6 +6846,7 @@ export default {
       }
     }
   }
+}
 </script>
 
 <script module="renderjs" lang="renderjs">
