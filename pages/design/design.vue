@@ -223,7 +223,7 @@
       <view class="section">
         <text class="section-title">{{ $t('design.sectionTitle') }} <span class="template-count">({{
           jsonTemplates.length
-            }}
+        }}
             {{ $t('design.pagesLabel') }})</span></text>
         <view class="templates-grid-container">
           <view class="templates-grid">
@@ -343,9 +343,12 @@
               <button class="terminal-control-btn" @click="toggleTerminalExpanded">
                 {{ terminalExpanded ? '▼' : '▲' }}
               </button>
+              <button class="terminal-control-btn" @click="copyAllTerminalLogs">
+                {{ $t('design.automation.terminal.copyAll') || 'Copy All' }}
+              </button>
               <button class="terminal-control-btn" @click="clearTerminalOutput">{{
                 $t('design.automation.terminal.clear')
-                }}</button>
+              }}</button>
               <button class="terminal-control-btn terminal-close-btn" @click="toggleTerminalSection">✕</button>
             </view>
           </view>
@@ -6885,6 +6888,94 @@ export default {
         // If there's an error, allow the action to proceed
         return { allowed: true, reason: 'error_fallback' };
       }
+    },
+
+    // Copy all terminal logs to clipboard
+    copyAllTerminalLogs() {
+      if (!this.terminalOutput || this.terminalOutput.length === 0) {
+        uni.showToast({
+          title: this.$t('design.automation.terminal.noLogs') || 'No logs to copy',
+          icon: 'none',
+          duration: 2000
+        });
+        return;
+      }
+
+      // Format all logs as text
+      const logsText = this.terminalOutput
+        .map(line => `[${line.timestamp}] ${line.message}`)
+        .join('\n');
+
+      // Copy to clipboard
+      // #ifdef H5
+      if (navigator.clipboard && navigator.clipboard.writeText) {
+        navigator.clipboard.writeText(logsText)
+          .then(() => {
+            uni.showToast({
+              title: this.$t('design.automation.terminal.copied') || 'Logs copied to clipboard',
+              icon: 'success',
+              duration: 2000
+            });
+          })
+          .catch(err => {
+            console.error('Failed to copy logs:', err);
+            // Fallback method
+            this.fallbackCopyToClipboard(logsText);
+          });
+      } else {
+        // Fallback for older browsers
+        this.fallbackCopyToClipboard(logsText);
+      }
+      // #endif
+
+      // #ifndef H5
+      uni.setClipboardData({
+        data: logsText,
+        success: () => {
+          uni.showToast({
+            title: this.$t('design.automation.terminal.copied') || 'Logs copied to clipboard',
+            icon: 'success',
+            duration: 2000
+          });
+        },
+        fail: (err) => {
+          console.error('Failed to copy logs:', err);
+          uni.showToast({
+            title: this.$t('design.automation.terminal.copyFailed') || 'Failed to copy logs',
+            icon: 'none',
+            duration: 2000
+          });
+        }
+      });
+      // #endif
+    },
+
+    // Fallback method for copying to clipboard (H5 only)
+    fallbackCopyToClipboard(text) {
+      const textArea = document.createElement('textarea');
+      textArea.value = text;
+      textArea.style.position = 'fixed';
+      textArea.style.left = '-9999px';
+      document.body.appendChild(textArea);
+      textArea.select();
+
+      try {
+        document.execCommand('copy');
+        uni.showToast({
+          title: this.$t('design.automation.terminal.copied') || 'Logs copied to clipboard',
+          icon: 'success',
+          duration: 2000
+        });
+      } catch (err) {
+        console.error('Fallback copy failed:', err);
+        uni.showToast({
+          title: this.$t('design.automation.terminal.copyFailed') || 'Failed to copy logs',
+          icon: 'none',
+          duration: 2000
+        });
+      } finally {
+        document.body.removeChild(textArea);
+      }
     }
   }
 }
@@ -9051,6 +9142,10 @@ export default {
   line-height: 1.6;
   background-color: #1a1a1a;
   color: #e0e0e0;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
 }
 
 .terminal-line {
@@ -9061,6 +9156,10 @@ export default {
   padding: 4px 0;
   border-radius: 4px;
   transition: background-color 0.2s;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
 }
 
 .terminal-line:hover {
@@ -9086,12 +9185,20 @@ export default {
   font-size: 11px;
   font-weight: 500;
   opacity: 0.7;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
 }
 
 .terminal-text {
   color: #e0e0e0;
   flex: 1;
   word-break: break-word;
+  user-select: text;
+  -webkit-user-select: text;
+  -moz-user-select: text;
+  -ms-user-select: text;
 }
 
 .terminal-line.error .terminal-text {
