@@ -223,7 +223,7 @@
       <view class="section">
         <text class="section-title">{{ $t('design.sectionTitle') }} <span class="template-count">({{
           jsonTemplates.length
-        }}
+            }}
             {{ $t('design.pagesLabel') }})</span></text>
         <view class="templates-grid-container">
           <view class="templates-grid">
@@ -348,13 +348,15 @@
             </view>
           </view>
           <view class="terminal-container" :class="{ 'expanded': terminalExpanded }">
-            <scroll-view class="terminal-output" scroll-y="true" :scroll-top="terminalScrollTop">
-              <view v-for="(line, index) in terminalOutput" :key="index" class="terminal-line" :class="{
-                'error': line.type === 'error',
-                'success': line.type === 'success',
-                'info': line.type === 'info',
-                'warning': line.type === 'warning'
-              }">
+            <scroll-view class="terminal-output" scroll-y="true" :scroll-top="terminalScrollTop"
+              :scroll-into-view="lastLogId" scroll-with-animation>
+              <view v-for="(line, index) in terminalOutput" :key="index" :id="'log-' + index" class="terminal-line"
+                :class="{
+                  'error': line.type === 'error',
+                  'success': line.type === 'success',
+                  'info': line.type === 'info',
+                  'warning': line.type === 'warning'
+                }">
                 <text class="terminal-timestamp">[{{ line.timestamp }}]</text>
                 <text class="terminal-text">{{ line.message }}</text>
               </view>
@@ -916,6 +918,7 @@ export default {
       terminalOutput: [],
       terminalExpanded: true,
       terminalScrollTop: 0,
+      lastLogId: '',
       automationStatus: 'idle', // idle, running, success, error
       automationWebSocket: null,
       wsHeartbeatInterval: null,
@@ -6374,6 +6377,7 @@ export default {
     clearTerminalOutput() {
       this.terminalOutput = [];
       this.terminalScrollTop = 0;
+      this.lastLogId = '';
     },
 
     addTerminalLog(message, type = 'info') {
@@ -6384,9 +6388,11 @@ export default {
         timestamp
       });
 
-      // Auto-scroll to bottom using a large value to ensure we reach the end
+      // Auto-scroll to bottom using scroll-into-view
       this.$nextTick(() => {
-        this.terminalScrollTop = 9999999;
+        this.lastLogId = 'log-' + (this.terminalOutput.length - 1);
+        // Also keep terminalScrollTop update for fallback
+        this.terminalScrollTop = this.terminalScrollTop === 9999999 ? 9999998 : 9999999;
       });
 
       // Limit terminal output to prevent memory issues
@@ -6445,7 +6451,7 @@ export default {
         this.automationWebSocket.onopen = () => {
           clearTimeout(connectionTimeout);
           this.addTerminalLog('🔌 Connected to automation agent stream', 'success');
-          
+
           // Start heartbeat to keep connection alive
           this.wsHeartbeatInterval = setInterval(() => {
             if (this.automationWebSocket && this.automationWebSocket.readyState === WebSocket.OPEN) {
@@ -6495,13 +6501,13 @@ export default {
 
         this.automationWebSocket.onclose = (event) => {
           clearTimeout(connectionTimeout);
-          
+
           // Clear heartbeat interval
           if (this.wsHeartbeatInterval) {
             clearInterval(this.wsHeartbeatInterval);
             this.wsHeartbeatInterval = null;
           }
-          
+
           if (event.wasClean) {
             this.addTerminalLog('🔌 Disconnected from automation stream', 'info');
           } else {
@@ -6616,7 +6622,7 @@ export default {
       this.isAutomating = true;
       this.automationStatus = 'running';
       this.errorMessage = '';
-      this.terminalOutput = [];
+      this.clearTerminalOutput();
 
       // Auto-show terminal section when automation starts
       this.showTerminalSection = true;
@@ -6667,9 +6673,10 @@ export default {
 
           // Don't close dialog immediately, let user see the results
           setTimeout(() => {
+            this.showTerminalSection = false;
             this.closeAutomationDialog();
             // Reload the project to see the new pages
-            this.loadProject();
+            this.pullRefreshProject();
           }, 3000);
         } else {
           this.addTerminalLog(`❌ Automation failed: ${result.detail || 'Unknown error'}`, 'error');
