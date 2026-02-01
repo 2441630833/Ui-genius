@@ -716,7 +716,7 @@
     <view class="dialog-overlay" v-if="showAutomationDialog" @click="closeAutomationDialog">
       <view class="dialog-container automation-dialog" @click.stop>
         <view class="dialog-content">
-          <text class="dialog-title">AI Agent Generation</text>
+          <text class="dialog-title">{{ $t('design.automation.dialogTitle') }}</text>
 
           <!-- Error notification -->
           <view class="error-notification" v-if="errorMessage">
@@ -726,31 +726,30 @@
           <!-- Info Section -->
           <view class="description-container">
             <view class="automation-info-box">
-              <text class="automation-title">How It Works</text>
-              <text class="automation-description">The AI Agent will analyze your project and automatically generate 2-5
-                additional pages to complete your application.</text>
+              <text class="automation-title">{{ $t('design.automation.title') }}</text>
+              <text class="automation-description">{{ $t('design.automation.description') }}</text>
 
-              <text class="automation-subtitle">Process Steps:</text>
+              <text class="automation-subtitle">{{ $t('design.automation.subtitle') }}</text>
               <view class="automation-steps">
-                <text class="automation-step">• Understanding your project type</text>
-                <text class="automation-step">• Identifying missing pages</text>
-                <text class="automation-step">• Generating pages sequentially</text>
-                <text class="automation-step">• Waiting for each to complete</text>
+                <text class="automation-step">• {{ $t('design.automation.step1') }}</text>
+                <text class="automation-step">• {{ $t('design.automation.step2') }}</text>
+                <text class="automation-step">• {{ $t('design.automation.step3') }}</text>
+                <text class="automation-step">• {{ $t('design.automation.step4') }}</text>
               </view>
 
               <view class="automation-footer">
-                <text class="automation-time">⏱ Estimated time: 15-30 minutes</text>
-                <text class="automation-note">Click the terminal icon in the toolbar to view live execution logs.</text>
+                <text class="automation-time">{{ $t('design.automation.time') }}</text>
+                <text class="automation-note">{{ $t('design.automation.note') }}</text>
               </view>
             </view>
           </view>
 
           <view class="automation-actions">
             <button class="continue-btn" :disabled="isAutomating" @click="startBrowserAutomation">
-              {{ isAutomating ? 'Automating...' : 'Start Intelligent Generation' }}
+              {{ isAutomating ? $t('design.automation.automating') : $t('design.automation.start') }}
             </button>
             <button v-if="isAutomating" class="stop-btn" @click="stopBrowserAutomation">
-              Stop Automation
+              {{ $t('design.automation.stop') }}
             </button>
           </view>
         </view>
