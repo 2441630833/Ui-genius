@@ -760,6 +760,7 @@
   "design.automation.start": "開始智能生成",
   "design.automation.stop": "停止自動化",
   "design.automation.automating": "正在生成...",
+  "design.automation.error.notLoggedIn": "您尚未登入，請先登入",
   "design.templates.signup": "註冊",
   "design.templates.home": "首頁",
   "design.templates.notification": "通知",

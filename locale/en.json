@@ -766,6 +766,7 @@
   "design.automation.start": "Start Intelligent Generation",
   "design.automation.stop": "Stop Automation",
   "design.automation.automating": "Automating...",
+  "design.automation.error.notLoggedIn": "You are not login, please log in at first",
   "design.templates.signup": "Signup",
   "design.templates.home": "Home",
   "design.templates.notification": "notification",

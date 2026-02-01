@@ -6607,8 +6607,8 @@ export default {
       const tokenExpiration = uni.getStorageSync('tokenExpiration');
       const currentProjectId = uni.getStorageSync('currentProjectId');
 
-      if (!uid || !token || !tokenExpiration) {
-        this.errorMessage = 'Authentication required. Please log in again.';
+      if (!uid || !token || !tokenExpiration || uid === '123bcbfeqqaeabfaf5a') {
+        this.errorMessage = this.$t('design.automation.error.notLoggedIn');
         return;
       }
 
@@ -6661,7 +6661,7 @@ export default {
       this.activeNavItem = '';
 
       try {
-        this.addTerminalLog('🚀 Starting browser automation...', 'info');
+        this.addTerminalLog('🚀 Starting AI Agent task...', 'info');
         this.addTerminalLog(`📊 Project ID: ${currentProjectId}`, 'info');
         this.addTerminalLog(`👤 User ID: ${uid}`, 'info');
 

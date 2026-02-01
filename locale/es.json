@@ -759,6 +759,7 @@
 	"design.automation.start": "Iniciar Generación Inteligente",
 	"design.automation.stop": "Detener Automatización",
 	"design.automation.automating": "Automatizando...",
+	"design.automation.error.notLoggedIn": "No has iniciado sesión. Por favor, inicia sesión primero",
 	"design.templates.signup": "Registro",
 	"design.templates.home": "Inicio",
 	"design.templates.notification": "Notificación",

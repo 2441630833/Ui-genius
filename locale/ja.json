@@ -755,6 +755,7 @@
 	"design.automation.start": "スマート生成を開始",
 	"design.automation.stop": "自動化を停止",
 	"design.automation.automating": "自動化を実行中...",
+	"design.automation.error.notLoggedIn": "ログインしていません。最初にログインしてください",
 	"design.templates.signup": "登録",
 	"design.templates.home": "ホーム",
 	"design.templates.notification": "通知",

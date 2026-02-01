@@ -605,6 +605,7 @@
   "design.automation.start": "بدء التوليد الذكي",
   "design.automation.stop": "إيقاف الأتمتة",
   "design.automation.automating": "جاري الأتمتة...",
+  "design.automation.error.notLoggedIn": "أنت لم تقم بتسجيل الدخول، يرجى تسجيل الدخول أولاً",
   "design.templates.signup": "التسجيل",
   "design.templates.home": "الرئيسية",
   "design.templates.notification": "الإشعارات",

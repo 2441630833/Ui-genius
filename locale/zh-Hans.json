@@ -759,6 +759,7 @@
 	"design.automation.start": "开始智能生成",
 	"design.automation.stop": "停止自动化",
 	"design.automation.automating": "正在生成...",
+	"design.automation.error.notLoggedIn": "您尚未登录，请先登录",
 	"design.templates.signup": "注册",
 	"design.templates.home": "首页",
 	"design.templates.notification": "通知",

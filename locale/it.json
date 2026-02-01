@@ -584,6 +584,7 @@
 	"design.automation.start": "Avvia Generazione Intelligente",
 	"design.automation.stop": "Interrompi Automazione",
 	"design.automation.automating": "Automazione in corso...",
+	"design.automation.error.notLoggedIn": "Non hai effettuato l'accesso. Per favore, accedi prima",
 	"design.templates.signup": "Iscrizione",
 	"design.templates.home": "Home",
 	"design.templates.notification": "Notifica",

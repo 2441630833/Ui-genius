@@ -760,6 +760,7 @@
   "design.automation.start": "스마트 생성 시작",
   "design.automation.stop": "자동화 중지",
   "design.automation.automating": "자동화 진행 중...",
+  "design.automation.error.notLoggedIn": "로그인하지 않았습니다. 먼저 로그인하십시오",
   "design.templates.signup": "가입",
   "design.templates.home": "홈",
   "design.templates.notification": "알림",

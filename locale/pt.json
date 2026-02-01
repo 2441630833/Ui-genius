@@ -584,6 +584,7 @@
 	"design.automation.start": "Iniciar Geração Inteligente",
 	"design.automation.stop": "Parar Automação",
 	"design.automation.automating": "Automatizando...",
+	"design.automation.error.notLoggedIn": "Você não está logado. Por favor, faça login primeiro",
 	"design.templates.signup": "Cadastrar",
 	"design.templates.home": "Início",
 	"design.templates.notification": "Notificação",

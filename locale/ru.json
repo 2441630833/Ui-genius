@@ -759,6 +759,7 @@
 	"design.automation.start": "Запустить умную генерацию",
 	"design.automation.stop": "Остановить автоматизацию",
 	"design.automation.automating": "Автоматизация...",
+	"design.automation.error.notLoggedIn": "Вы не вошли в систему. Пожалуйста, сначала войдите",
 	"design.templates.signup": "Регистрация",
 	"design.templates.home": "Главная",
 	"design.templates.notification": "Уведомление",

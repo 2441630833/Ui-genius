@@ -581,6 +581,7 @@
   "design.automation.start": "Akıllı Üretimi Başlat",
   "design.automation.stop": "Otomasyonu Durdur",
   "design.automation.automating": "Otomatiğe bağlanıyor...",
+  "design.automation.error.notLoggedIn": "Giriş yapmadınız. Lütfen önce giriş yapın",
   "design.templates.signup": "Kaydol",
   "design.templates.home": "Ana Sayfa",
   "design.templates.notification": "Bildirim",
