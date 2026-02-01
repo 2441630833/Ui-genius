@@ -763,6 +763,8 @@
   "design.automation.stop": "Arrêter l'Automatisation",
   "design.automation.automating": "Automatisation en cours...",
   "design.automation.error.notLoggedIn": "Vous n'êtes pas connecté, veuillez vous connecter d'abord",
+  "design.automation.terminal.title": "🖥️ Terminal d'automatisation",
+  "design.automation.terminal.clear": "Effacer",
   "design.templates.signup": "Inscription",
   "design.templates.home": "Accueil",
   "design.templates.notification": "Notification",

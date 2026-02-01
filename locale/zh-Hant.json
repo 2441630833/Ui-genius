@@ -761,6 +761,8 @@
   "design.automation.stop": "停止自動化",
   "design.automation.automating": "正在生成...",
   "design.automation.error.notLoggedIn": "您尚未登入，請先登入",
+  "design.automation.terminal.title": "🖥️ 自動化終端",
+  "design.automation.terminal.clear": "清除",
   "design.templates.signup": "註冊",
   "design.templates.home": "首頁",
   "design.templates.notification": "通知",

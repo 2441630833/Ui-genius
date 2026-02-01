@@ -760,6 +760,8 @@
 	"design.automation.stop": "停止自动化",
 	"design.automation.automating": "正在生成...",
 	"design.automation.error.notLoggedIn": "您尚未登录，请先登录",
+	"design.automation.terminal.title": "🖥️ 自动化终端",
+	"design.automation.terminal.clear": "清除",
 	"design.templates.signup": "注册",
 	"design.templates.home": "首页",
 	"design.templates.notification": "通知",

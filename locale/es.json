@@ -760,6 +760,8 @@
 	"design.automation.stop": "Detener Automatización",
 	"design.automation.automating": "Automatizando...",
 	"design.automation.error.notLoggedIn": "No has iniciado sesión. Por favor, inicia sesión primero",
+	"design.automation.terminal.title": "🖥️ Terminal de Automatización",
+	"design.automation.terminal.clear": "Limpiar",
 	"design.templates.signup": "Registro",
 	"design.templates.home": "Inicio",
 	"design.templates.notification": "Notificación",

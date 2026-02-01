@@ -603,6 +603,8 @@
   "design.automation.stop": "หยุดการทำงานอัตโนมัติ",
   "design.automation.automating": "กำลังดำเนินการอัตโนมัติ...",
   "design.automation.error.notLoggedIn": "คุณยังไม่ได้เข้าสู่ระบบ กรุณาเข้าสู่ระบบก่อน",
+  "design.automation.terminal.title": "🖥️ เทอร์มินัลระบบอัตโนมัติ",
+  "design.automation.terminal.clear": "ล้าง",
   "design.templates.signup": "สมัครสมาชิก",
   "design.templates.home": "หน้าแรก",
   "design.templates.notification": "การแจ้งเตือน",

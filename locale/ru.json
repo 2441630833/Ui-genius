@@ -760,6 +760,8 @@
 	"design.automation.stop": "Остановить автоматизацию",
 	"design.automation.automating": "Автоматизация...",
 	"design.automation.error.notLoggedIn": "Вы не вошли в систему. Пожалуйста, сначала войдите",
+	"design.automation.terminal.title": "🖥️ Терминал автоматизации",
+	"design.automation.terminal.clear": "Очистить",
 	"design.templates.signup": "Регистрация",
 	"design.templates.home": "Главная",
 	"design.templates.notification": "Уведомление",

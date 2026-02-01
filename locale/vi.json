@@ -582,6 +582,8 @@
   "design.automation.stop": "Dừng Tự động hóa",
   "design.automation.automating": "Đang tự động hóa...",
   "design.automation.error.notLoggedIn": "Bạn chưa đăng nhập. Vui lòng đăng nhập trước.",
+  "design.automation.terminal.title": "🖥️ Cửa sổ tự động hóa",
+  "design.automation.terminal.clear": "Xóa sạch",
   "design.templates.signup": "Đăng ký",
   "design.templates.home": "Trang chủ",
   "design.templates.notification": "Thông báo",

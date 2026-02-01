@@ -582,6 +582,8 @@
 	"design.automation.stop": "Stoppa automatisering",
 	"design.automation.automating": "Automatiserar...",
 	"design.automation.error.notLoggedIn": "Du är inte inloggad. Vänligen logga in först.",
+	"design.automation.terminal.title": "🖥️ Automatiseringsterminal",
+	"design.automation.terminal.clear": "Rensa",
 	"design.templates.signup": "Registrera dig",
 	"design.templates.home": "Hem",
 	"design.templates.notification": "Avisering",

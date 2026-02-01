@@ -585,6 +585,8 @@
 	"design.automation.stop": "Interrompi Automazione",
 	"design.automation.automating": "Automazione in corso...",
 	"design.automation.error.notLoggedIn": "Non hai effettuato l'accesso. Per favore, accedi prima",
+	"design.automation.terminal.title": "🖥️ Terminale di automazione",
+	"design.automation.terminal.clear": "Cancella",
 	"design.templates.signup": "Iscrizione",
 	"design.templates.home": "Home",
 	"design.templates.notification": "Notifica",

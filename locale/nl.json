@@ -586,6 +586,8 @@
 	"design.automation.stop": "Stop Automatisering",
 	"design.automation.automating": "Automatiseren...",
 	"design.automation.error.notLoggedIn": "U bent niet ingelogd. Log eerst in.",
+	"design.automation.terminal.title": "🖥️ Automatiseringsterminal",
+	"design.automation.terminal.clear": "Wissen",
 	"design.templates.signup": "Aanmelden",
 	"design.templates.home": "Home",
 	"design.templates.notification": "Melding",

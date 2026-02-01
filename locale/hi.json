@@ -603,6 +603,8 @@
   "design.automation.stop": "स्वचालन रोकें",
   "design.automation.automating": "स्वचालित हो रहा है...",
   "design.automation.error.notLoggedIn": "आपने लॉग इन नहीं किया है। कृपया पहले लॉग इन करें",
+  "design.automation.terminal.title": "🖥️ ऑटोमेशन टर्मिनल",
+  "design.automation.terminal.clear": "साफ़ करें",
   "design.templates.signup": "साइन अप",
   "design.templates.home": "होम",
   "design.templates.notification": "अधिसूचना",

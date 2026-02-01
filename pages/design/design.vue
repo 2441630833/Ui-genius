@@ -223,7 +223,7 @@
       <view class="section">
         <text class="section-title">{{ $t('design.sectionTitle') }} <span class="template-count">({{
           jsonTemplates.length
-        }}
+            }}
             {{ $t('design.pagesLabel') }})</span></text>
         <view class="templates-grid-container">
           <view class="templates-grid">
@@ -338,12 +338,14 @@
       <view class="standalone-terminal-container" @click.stop>
         <view class="terminal-section">
           <view class="terminal-header">
-            <text class="terminal-title">🖥️ Automation Terminal</text>
+            <text class="terminal-title">{{ $t('design.automation.terminal.title') }}</text>
             <view class="terminal-controls">
               <button class="terminal-control-btn" @click="toggleTerminalExpanded">
                 {{ terminalExpanded ? '▼' : '▲' }}
               </button>
-              <button class="terminal-control-btn" @click="clearTerminalOutput">Clear</button>
+              <button class="terminal-control-btn" @click="clearTerminalOutput">{{
+                $t('design.automation.terminal.clear')
+                }}</button>
               <button class="terminal-control-btn terminal-close-btn" @click="toggleTerminalSection">✕</button>
             </view>
           </view>

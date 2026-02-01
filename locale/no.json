@@ -582,6 +582,8 @@
   "design.automation.stop": "Stopp automatisering",
   "design.automation.automating": "Automatiserer...",
   "design.automation.error.notLoggedIn": "Du er ikke logget inn. Vennligst logg inn først.",
+  "design.automation.terminal.title": "🖥️ Automasjonsterminal",
+  "design.automation.terminal.clear": "Tøm",
   "design.templates.signup": "Registrer deg",
   "design.templates.home": "Hjem",
   "design.templates.notification": "Varsling",

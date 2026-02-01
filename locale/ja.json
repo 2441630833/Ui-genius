@@ -756,6 +756,8 @@
 	"design.automation.stop": "自動化を停止",
 	"design.automation.automating": "自動化を実行中...",
 	"design.automation.error.notLoggedIn": "ログインしていません。最初にログインしてください",
+	"design.automation.terminal.title": "🖥️ 自動化ターミナル",
+	"design.automation.terminal.clear": "クリア",
 	"design.templates.signup": "登録",
 	"design.templates.home": "ホーム",
 	"design.templates.notification": "通知",

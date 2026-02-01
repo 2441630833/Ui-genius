@@ -582,6 +582,8 @@
   "design.automation.stop": "Zatrzymaj automatyzację",
   "design.automation.automating": "Automatyzacja w toku...",
   "design.automation.error.notLoggedIn": "Nie jesteś zalogowany. Zaloguj się najpierw.",
+  "design.automation.terminal.title": "🖥️ Terminal automatyzacji",
+  "design.automation.terminal.clear": "Wyczyść",
   "design.templates.signup": "Zarejestruj się",
   "design.templates.home": "Główna",
   "design.templates.notification": "Powiadomienie",
