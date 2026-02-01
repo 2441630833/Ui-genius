@@ -6610,9 +6610,17 @@ export default {
       const uid = uni.getStorageSync('uid');
       const token = uni.getStorageSync('token');
       const tokenExpiration = uni.getStorageSync('tokenExpiration');
+
+      const googleToken = uni.getStorageSync('googleToken');
+      const googleTokenExpiration = uni.getStorageSync('googleTokenExpiration');
+
       const currentProjectId = uni.getStorageSync('currentProjectId');
 
-      if (!uid || !token || !tokenExpiration || uid === '123bcbfeqqaeabfaf5a') {
+      // Check for valid login (either standard or google)
+      const hasStandardAuth = uid && uid !== '123bcbfeqqaeabfaf5a' && token && tokenExpiration;
+      const hasGoogleAuth = uid && googleToken && googleTokenExpiration;
+
+      if (!hasStandardAuth && !hasGoogleAuth) {
         this.errorMessage = this.$t('design.automation.error.notLoggedIn');
         return;
       }
@@ -6668,7 +6676,7 @@ export default {
       try {
         this.addTerminalLog('🚀 Starting AI Agent task...', 'info');
         this.addTerminalLog(`📊 Project ID: ${currentProjectId}`, 'info');
-        this.addTerminalLog(`👤 User ID: ${uid}`, 'info');
+        if (uid) this.addTerminalLog(`👤 User ID: ${uid}`, 'info');
 
         const response = await fetch(`${API_BASE_URL}/browser-automation`, {
           method: 'POST',
@@ -6677,15 +6685,17 @@ export default {
           },
           body: JSON.stringify({
             task: 'login_and_generate',
-            uid: uid,
-            token: token,
-            tokenExpiration: tokenExpiration,
+            uid: uid || '',
+            token: token || '',
+            tokenExpiration: tokenExpiration || '',
+            googleToken: googleToken || '',
+            googleTokenExpiration: googleTokenExpiration || '',
             currentProjectId: currentProjectId,
             latest_7_overall_page: JSON.stringify(latest_7_overall_page),
-            timeout: 1800,  // 30 minutes timeout for multiple page generation
-            client_id: taskId  // Send the same ID used for WebSocket connection
+            client_id: taskId
           })
         });
+
 
         const result = await response.json();
 
