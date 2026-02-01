@@ -223,7 +223,7 @@
       <view class="section">
         <text class="section-title">{{ $t('design.sectionTitle') }} <span class="template-count">({{
           jsonTemplates.length
-            }}
+        }}
             {{ $t('design.pagesLabel') }})</span></text>
         <view class="templates-grid-container">
           <view class="templates-grid">
@@ -923,6 +923,7 @@ export default {
       wsHeartbeatInterval: null,
       automationTaskId: null,
       showTerminalSection: false,
+      automationReconnectTimeout: null,
     }
   },
 
@@ -6416,6 +6417,14 @@ export default {
     },
 
     initializeWebSocket(taskId) {
+      if (!taskId) return;
+
+      // Clear any pending reconnection timeout
+      if (this.automationReconnectTimeout) {
+        clearTimeout(this.automationReconnectTimeout);
+        this.automationReconnectTimeout = null;
+      }
+
       // Close existing WebSocket if any
       if (this.automationWebSocket) {
         this.automationWebSocket.close();
@@ -6510,15 +6519,17 @@ export default {
           if (event.wasClean) {
             this.addTerminalLog('🔌 Disconnected from automation stream', 'info');
           } else {
-            this.addTerminalLog('🔌 Connection lost - attempting to reconnect...', 'warning');
             // Auto-reconnect if there's still an active task
             if (this.automationTaskId && this.isAutomating) {
-              setTimeout(() => {
-                if (this.automationTaskId && !this.automationWebSocket) {
+              this.addTerminalLog('🔌 Connection lost - attempting to reconnect...', 'warning');
+              this.automationReconnectTimeout = setTimeout(() => {
+                if (this.automationTaskId && this.isAutomating && !this.automationWebSocket) {
                   this.addTerminalLog('🔄 Reconnecting to automation stream...', 'info');
                   this.initializeWebSocket(this.automationTaskId);
                 }
               }, 3000); // Retry after 3 seconds
+            } else {
+              this.addTerminalLog('🔌 Connection closed', 'info');
             }
           }
           this.automationWebSocket = null;
@@ -6534,7 +6545,29 @@ export default {
 
 
     async stopBrowserAutomation() {
-      if (this.automationTaskId) {
+      // Store ID and clear flags immediately to prevent reconnection loops
+      const taskId = this.automationTaskId;
+      this.isAutomating = false;
+      this.automationStatus = 'idle';
+      this.automationTaskId = null;
+      this.addTerminalLog('🛑 Automation stopped by user', 'warning');
+
+      // Clear any pending reconnection
+      if (this.automationReconnectTimeout) {
+        clearTimeout(this.automationReconnectTimeout);
+        this.automationReconnectTimeout = null;
+      }
+
+      // Close WebSocket immediately
+      if (this.automationWebSocket) {
+        // Set onclose to null to prevent it from triggering reconnection logic if we're manually closing
+        this.automationWebSocket.onclose = null;
+        this.automationWebSocket.close();
+        this.automationWebSocket = null;
+      }
+
+      // Send stop signal to backend
+      if (taskId) {
         try {
           this.addTerminalLog('🛑 Sending stop signal to agent...', 'warning');
           await fetch(`${API_BASE_URL}/browser-automation/stop`, {
@@ -6543,21 +6576,12 @@ export default {
               'Content-Type': 'application/json'
             },
             body: JSON.stringify({
-              client_id: this.automationTaskId
+              client_id: taskId
             })
           });
         } catch (error) {
           console.error('Error stopping automation:', error);
         }
-      }
-      this.isAutomating = false;
-      this.automationStatus = 'idle';
-      this.automationTaskId = null; // Clear task ID when stopping
-      this.addTerminalLog('🛑 Automation stopped by user', 'warning');
-
-      if (this.automationWebSocket) {
-        this.automationWebSocket.close();
-        this.automationWebSocket = null;
       }
     },
 
@@ -6689,6 +6713,11 @@ export default {
         console.error('Browser automation error:', error);
       } finally {
         this.isAutomating = false;
+        this.automationTaskId = null;
+        if (this.automationReconnectTimeout) {
+          clearTimeout(this.automationReconnectTimeout);
+          this.automationReconnectTimeout = null;
+        }
       }
     },
 
