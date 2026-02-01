@@ -581,6 +581,7 @@
   "design.automation.start": "Start smart generering",
   "design.automation.stop": "Stopp automatisering",
   "design.automation.automating": "Automatiserer...",
+  "design.automation.error.notLoggedIn": "Du er ikke logget inn. Vennligst logg inn først.",
   "design.templates.signup": "Registrer deg",
   "design.templates.home": "Hjem",
   "design.templates.notification": "Varsling",

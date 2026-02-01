@@ -581,6 +581,7 @@
   "design.automation.start": "Mulai Generasi Pintar",
   "design.automation.stop": "Hentikan Otomatisasi",
   "design.automation.automating": "Sedang mengotomatisasi...",
+  "design.automation.error.notLoggedIn": "Anda belum masuk. Silakan masuk terlebih dahulu.",
   "design.templates.signup": "Daftar",
   "design.templates.home": "Beranda",
   "design.templates.notification": "Notifikasi",

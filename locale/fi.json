@@ -581,6 +581,7 @@
   "design.automation.start": "Aloita Älykäs Sukupolvi",
   "design.automation.stop": "Lopeta Automatisointi",
   "design.automation.automating": "Automatisoidaan...",
+  "design.automation.error.notLoggedIn": "Et ole kirjautunut sisään. Kirjaudu ensin sisään.",
   "design.templates.signup": "Rekisteröidy",
   "design.templates.home": "Koti",
   "design.templates.notification": "Ilmoitus",

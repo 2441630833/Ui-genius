@@ -581,6 +581,7 @@
   "design.automation.start": "Uruchom inteligentne generowanie",
   "design.automation.stop": "Zatrzymaj automatyzację",
   "design.automation.automating": "Automatyzacja w toku...",
+  "design.automation.error.notLoggedIn": "Nie jesteś zalogowany. Zaloguj się najpierw.",
   "design.templates.signup": "Zarejestruj się",
   "design.templates.home": "Główna",
   "design.templates.notification": "Powiadomienie",
