@@ -9067,12 +9067,10 @@ export default {
 
 /* Terminal Styles */
 .terminal-section {
-  margin-top: 20px;
-  border: 1px solid #2d2d2d;
-  border-radius: 12px;
+  width: 100%;
+  display: flex;
+  flex-direction: column;
   overflow: hidden;
-  background: linear-gradient(135deg, #1a1a1a 0%, #2d2d2d 100%);
-  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.4);
 }
 
 .terminal-header {
