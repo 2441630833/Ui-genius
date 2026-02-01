@@ -1646,7 +1646,7 @@ export default {
         uni.removeStorageSync('googleToken');
         uni.removeStorageSync('googleTokenExpiration');
         uni.removeStorageSync('googleUid');
-
+        uni.removeStorageSync('email')
         uni.removeStorageSync('latest_7_overall_page');
         uni.removeStorageSync('currentProjectId');
 
@@ -1671,7 +1671,7 @@ export default {
       uni.removeStorageSync('uid');
       uni.removeStorageSync('token');
       uni.removeStorageSync('tokenExpiration');
-
+      uni.removeStorageSync('email')
       uni.removeStorageSync('googleToken');
       uni.removeStorageSync('googleTokenExpiration');
       uni.removeStorageSync('googleUid');
