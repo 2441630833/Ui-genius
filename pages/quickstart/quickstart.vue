@@ -4,7 +4,7 @@
       <div class="container">
         <div style="display: flex; justify-content: space-between; align-items: center; width: 100%;">
           <a @click.prevent="goToHome" class="logo" style="margin-right: 15px; cursor: pointer;">
-            <img src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Icon paint brush.png" alt="Uigenius Logo">
+            <img src="/static/logo.png" alt="Uigenius Logo">
             Uigenius
           </a>
           <nav class="nav-menu">
@@ -196,7 +196,7 @@
       <div class="container footer-grid">
         <div class="footer-about">
           <a @click.prevent="goToHome" class="logo" style="cursor: pointer;">
-            <img src="https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Icon paint brush.png" alt="Uigenius Logo">
+            <img src="/static/logo.png" alt="Uigenius Logo">
             Uigenius
           </a>
           <p>{{$t('common.footer.description')}}</p>
