@@ -57,6 +57,47 @@
             </div>
         </section>
 
+        <!-- Inline Generate UI Section -->
+        <section class="generate-ui-section">
+                      <div class="container text-center">
+                <h2 class="section-title">{{$t('intro.startForFree.title')}}</h2>
+                <p>{{$t('intro.startForFree.description')}}</p>
+            </div>
+            <div class="container">
+                <div class="inline-generate-section">
+                    <div class="generate-form-container">
+                        <!-- Prompt Input -->
+                        <div class="prompt-input-section">
+                            <label class="selection-label">{{$t('dashboard.createProject.describeLabel')}}</label>
+                            <div class="prompt-input-wrapper">
+                                <textarea 
+                                    class="prompt-input-inline" 
+                                    :placeholder="$t('dashboard.createProject.placeholder')"
+                                    v-model="generateProjectDescription" 
+                                    maxlength="7000"
+                                    @keydown.enter.ctrl="generateUIFromIntro"
+                                ></textarea>
+                                <div class="prompt-actions">
+                                    <button class="prompt-action-btn" @click="tryGenerateExample" title="Try example">
+                                        <i class="fas fa-lightbulb"></i>
+                                    </button>
+                                    <button class="prompt-action-btn" :disabled="!generateProjectDescription || isOptimizingGeneratePrompt" @click="optimizeGenerateProjectDescription" title="Improve with AI">
+                                        <i class="fas fa-wand-magic-sparkles"></i>
+                                    </button>
+                                </div>
+                                <div class="char-count-inline">{{ generateProjectDescription.length }}/7000</div>
+                            </div>
+                        </div>
+
+                        <!-- Generate Button -->
+                        <button class="generate-btn-inline" @click="generateUIFromIntro" :disabled="!generateProjectDescription">
+                            {{$t('dashboard.createProject.continue')}}
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </section>
+
         <section id="features" class="features">
             <div class="container">
                 <h2 class="section-title text-center mb-6">{{$t('intro.features.title')}}</h2>
@@ -208,13 +249,6 @@
             </div>
         </section>
 
-        <section class="start-for-free">
-            <div class="container">
-                <h2 class="section-title">{{$t('intro.startForFree.title')}}</h2>
-                <p>{{$t('intro.startForFree.description')}}</p>
-            </div>
-        </section>
-
         <section id="contact" class="contact">
             <div class="container">
                 <h2 class="section-title text-center mb-6">{{$t('intro.contact.title')}}</h2>
@@ -305,7 +339,32 @@ export default {
       },
       submitting: false,
       showLanguageDropdown: false,
-      currentLocale: 'en'
+      currentLocale: 'en',
+      // Generate UI properties with defaults
+      generateSelectedDevice: 'mobile',
+      generateSelectedModel: 'google/gemini-3-flash-preview',
+      generateProjectDescription: '',
+      isOptimizingGeneratePrompt: false,
+      numPages: 1,
+      modelOptions: [
+        { value: 'google/gemini-3-flash-preview', text: 'google/gemini3', isPro: true },
+        { value: 'xiaomi/mimo-v2-flash', text: 'xiaomi/mimo-v2-flash', isPro: true },
+        { value: 'deepseek/deepseek-v3.2', text: 'deepseek/deepseek-v3.2', isPro: true },
+        { value: 'anthropic/claude-opus-4.5', text: 'anthropic/claude-opus-4.5', isPro: true },
+        { value: 'qwen/qwen3-coder', text: 'qwen/qwen3-coder', isPro: true },
+        { value: 'deepseek/deepseek-chat-v3-0324', text: 'deepseek/deepseek-chat-v3-0324', isPro: true },
+        { value: 'openai/gpt-oss-120b', text: 'openai/gpt-oss-120b', isPro: true },
+        { value: 'x-ai/grok-code-fast-1', text: 'x-ai/grok-code-fast-1', isPro: true },
+        { value: 'minimax/minimax-m2', text: 'minimax/minimax-m2', isPro: true },
+        { value: 'z-ai/glm-4.7', text: 'z-ai/glm-4.7', isPro: true },
+        { value: 'mistralai/devstral-2512:free', text: 'mistralai/devstral-2512:free', isPro: false },
+        { value: 'google/gemma-3-27b-it:free', text: 'google/gemma-3-27b-it:free', isPro: false },
+        { value: 'uigenius5:latest', text: 'uigenius/uigenius5:latest', isPro: false }
+      ],
+      fakeToken: {
+        newToken: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9M',
+        uid: '123bcbfeqqaeabfaf5a'
+      }
     }
   },
   watch: {
@@ -457,6 +516,12 @@ export default {
       const languageSelector = this.$el?.querySelector('.language-selector');
       if (languageSelector && !languageSelector.contains(event.target)) {
         this.showLanguageDropdown = false;
+      }
+      
+      // Also close generate model dropdown if clicking outside
+      const generateDropdown = this.$el?.querySelector('.custom-dropdown');
+      if (generateDropdown && !generateDropdown.contains(event.target)) {
+        this.showGenerateModelDropdown = false;
       }
     },
     scrollToTop() {
@@ -615,6 +680,129 @@ export default {
       } finally {
         this.submitting = false;
       }
+    },
+    // Generate UI Methods
+    tryGenerateExample() {
+      this.generateProjectDescription = 'Generate one app as same as tiktok app';
+    },
+    optimizeGenerateProjectDescription() {
+      if (!this.generateProjectDescription || this.isOptimizingGeneratePrompt) return;
+      this.isOptimizingGeneratePrompt = true;
+      uni.showToast({ title: 'Optimizing...', icon: 'none', duration: 1500 });
+      
+      const API_BASE_URL = require('../../env.js').API_BASE_URL;
+      
+      uni.request({
+        url: `${API_BASE_URL}/optimize-prompt`,
+        method: 'POST',
+        header: { 'content-type': 'application/json' },
+        data: {
+          description: this.generateProjectDescription,
+          model: this.generateSelectedModel || 'gemini2.5'
+        },
+        timeout: 120000,
+        success: (res) => {
+          try {
+            const data = res && res.data ? res.data : {};
+            const optimized = data.optimized_description || '';
+            if (typeof optimized === 'string' && optimized.trim().length > 0) {
+              this.generateProjectDescription = optimized.trim();
+              uni.showToast({ title: 'Prompt improved', icon: 'success', duration: 1500 });
+            } else {
+              uni.showToast({ title: 'No optimized prompt returned', icon: 'none', duration: 2000 });
+            }
+          } catch (e) {
+            uni.showToast({ title: 'Optimize failed', icon: 'none', duration: 2000 });
+          }
+        },
+        fail: (err) => {
+          uni.showToast({ title: `Optimize error: ${err.errMsg || 'Request failed'}`, icon: 'none', duration: 2500 });
+        },
+        complete: () => {
+          this.isOptimizingGeneratePrompt = false;
+        }
+      });
+    },
+    generateUIFromIntro() {
+      if (!this.generateSelectedDevice) {
+        uni.showToast({
+          title: 'Please select a device type first',
+          icon: 'none',
+          duration: 2000
+        });
+        return;
+      }
+      if (!this.generateProjectDescription) {
+        uni.showToast({
+          title: 'Please enter a project description',
+          icon: 'none',
+          duration: 2000
+        });
+        return;
+      }
+
+      // Skip login first
+      this.skipLoginAndGenerate();
+    },
+    skipLoginAndGenerate() {
+      // Clean up old storage data first
+      const keysToRemove = [
+        'latest_7_overall_page',
+        'projectDescription',
+        'selectedDevice',
+        'selectedModel',
+        'shouldGenerateUI',
+        'uigenius_image_dashboard',
+        'uigenius_image_generated',
+        'uigenius_image_home',
+        'uigenius_image_signup',
+        'uigenius_image_settings',
+        'uigenius_image_profile',
+        'uigenius_image_notification',
+        'currentProjectId',
+        'colorCard'
+      ];
+      
+      keysToRemove.forEach(key => {
+        uni.removeStorageSync(key);
+      });
+
+      // Check if user is already logged in
+      const existingToken = uni.getStorageSync('token');
+      const existingUid = uni.getStorageSync('uid');
+      
+      if (existingToken && existingUid) {
+        // User is already logged in, use their existing credentials
+        uni.setStorageSync('isSkipLogin', false);
+      } else {
+        // User is not logged in, use fake token for demo
+        uni.setStorageSync('isSkipLogin', true);
+        uni.setStorageSync('token', this.fakeToken.newToken);
+        uni.setStorageSync('tokenExpiration', Date.now() + 24 * 60 * 60 * 1000);
+        uni.setStorageSync('uid', this.fakeToken.uid);
+      }
+
+      // Store project generation data
+      uni.setStorageSync('projectDescription', this.generateProjectDescription);
+      uni.setStorageSync('selectedDevice', this.generateSelectedDevice);
+      uni.setStorageSync('selectedModel', this.generateSelectedModel);
+      uni.setStorageSync('numPages', this.numPages || 1);
+      uni.setStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard', 'true');
+      uni.setStorageSync('shouldGenerateUI', 'true');
+
+      // Show success toast
+      uni.showToast({
+        title: 'Starting generation...',
+        icon: 'success',
+        duration: 1000
+      });
+
+      // Navigate to design page after a short delay
+      setTimeout(() => {
+        uni.switchTab({
+          url: '/pages/design/design'
+        });
+      }, 1000);
     }
   }
 };
@@ -1688,6 +1876,159 @@ ul {
 
 .footer-legal-links .separator {
     color: var(--border-color);
+}
+
+/* Generate UI Section */
+.generate-ui-section {
+    padding: 60px 0;
+    background-color: var(--background-white);
+    border-bottom: 1px solid var(--border-color);
+}
+
+/* Generate UI Inline Section Styles */
+.inline-generate-section {
+    padding: 40px;
+    background: transparent;
+    border-radius: 16px;
+}
+
+.generate-form-container {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    flex-direction: column;
+    gap: 25px;
+}
+
+/* Prompt Input Section */
+.prompt-input-section {
+    display: flex;
+    flex-direction: column;
+    gap: 12px;
+}
+
+.selection-label {
+    font-size: 16px;
+    font-weight: 600;
+    color: #333;
+    display: block;
+}
+
+.prompt-input-wrapper {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+}
+
+.prompt-input-inline {
+    width: 100%;
+    min-height: 100px;
+    padding: 14px 16px;
+    background-color: #ffffff;
+    border: 2px solid #eaeaea;
+    border-radius: 12px;
+    color: #333;
+    font-size: 15px;
+    font-family: 'Poppins', sans-serif;
+    resize: vertical;
+    transition: all 0.3s ease;
+}
+
+.prompt-input-inline:focus {
+    outline: none;
+    border-color: #e53935;
+    box-shadow: 0 0 0 3px rgba(229, 57, 53, 0.1);
+}
+
+.prompt-input-inline::placeholder {
+    color: #999;
+}
+
+.prompt-actions {
+    display: flex;
+    gap: 8px;
+    align-items: center;
+}
+
+.prompt-action-btn {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 40px;
+    height: 40px;
+    background-color: #f0f0f0;
+    color: #666;
+    border: 1px solid #eaeaea;
+    border-radius: 8px;
+    cursor: pointer;
+    font-size: 16px;
+    transition: all 0.3s ease;
+}
+
+.prompt-action-btn:hover:not(:disabled) {
+    background-color: #e53935;
+    color: #fff;
+    border-color: #e53935;
+    transform: scale(1.05);
+}
+
+.prompt-action-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+.char-count-inline {
+    font-size: 12px;
+    color: #999;
+    text-align: right;
+}
+
+/* Generate Button */
+.generate-btn-inline {
+    background: linear-gradient(135deg, #e53935 0%, #d32f2f 100%);
+    color: #fff;
+    border: none;
+    border-radius: 12px;
+    padding: 16px 32px;
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 12px rgba(229, 57, 53, 0.3);
+    min-height: 50px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.generate-btn-inline:hover:not(:disabled) {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(229, 57, 53, 0.4);
+}
+
+.generate-btn-inline:active:not(:disabled) {
+    transform: translateY(0);
+}
+
+.generate-btn-inline:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+@media (max-width: 768px) {
+    .inline-generate-section {
+        padding: 25px;
+    }
+
+    .prompt-input-inline {
+        min-height: 80px;
+    }
+
+    .generate-btn-inline {
+        padding: 14px 24px;
+        font-size: 15px;
+    }
 }
 
 /* Scroll to Top Button */
