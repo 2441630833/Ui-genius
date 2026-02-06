@@ -738,7 +738,8 @@ export default {
       const userInfo = uni.getStorageSync('googleUserInfo') || {};
       this.accountSettings.firstName = userInfo.given_name || '';
       this.accountSettings.lastName = userInfo.family_name || '';
-      this.accountSettings.email = userInfo.email || '';
+      // Keep email field empty for new email input
+      this.accountSettings.email = '';
       this.accountSettings.photoUrl = userInfo.picture || userInfo.avatar || '';
       
       // Update currentEmail from storage to reflect the current logged-in user

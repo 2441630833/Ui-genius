@@ -791,11 +791,11 @@ export default {
       uni.setStorageSync('shouldGenerateUI', 'true');
 
       // Show success toast
-      uni.showToast({
-        title: 'Starting generation...',
-        icon: 'success',
-        duration: 1000
-      });
+      // uni.showToast({
+      //   title: 'Starting generation...',
+      //   icon: 'success',
+      //   duration: 1000
+      // });
 
       // Navigate to design page after a short delay
       setTimeout(() => {
