@@ -395,6 +395,10 @@ export default {
         return;
       }
 
+      uni.showLoading({
+        title: this.$t('login.loading.loggingIn'),
+        mask: true
+      })
       // Mark that we're processing Google login
       this.isProcessingGoogleLogin = true;
       // Get access_token
