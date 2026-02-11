@@ -36,11 +36,11 @@
           <text class="nav-text">{{$t('dashboard.nav.membership')}}</text>
         </view>
         <!-- Invitecode nav item -->
-        <view class="nav-item" :class="{ active: activeNavItem === 'inviteCode' }" @click="setActiveNavItem('inviteCode')">
+        <!-- <view class="nav-item" :class="{ active: activeNavItem === 'inviteCode' }" @click="setActiveNavItem('inviteCode')">
           <image class="sidebar-icon"
             :src="activeNavItem === 'inviteCode' ? '../../static/inviteCode_white.png' : '../../static/inviteCode.png'"></image>
           <text class="nav-text">{{$t('dashboard.nav.inviteCode')}}</text>
-        </view>
+        </view> -->
         <!-- Settings nav item -->
         <!-- <view class="nav-item" :class="{ active: activeNavItem === 'settings' }" @click="setActiveNavItem('settings')">
           <image class="sidebar-icon"
