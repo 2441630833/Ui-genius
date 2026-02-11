@@ -867,6 +867,7 @@ export default {
       // Model selection for Create New Page dialog
       modelOptions: [
         { value: 'google/gemini-3-flash-preview', text: 'google/gemini3', isPro: true },
+        { value: 'anthropic/claude-opus-4.6', text: 'anthropic/claude-opus-4.6', isPro: true },
         { value: 'xiaomi/mimo-v2-flash', text: 'xiaomi/mimo-v2-flash', isPro: true },
         { value: 'deepseek/deepseek-v3.2', text: 'deepseek/deepseek-v3.2', isPro: true },
         { value: 'anthropic/claude-opus-4.5', text: 'anthropic/claude-opus-4.5', isPro: true },
