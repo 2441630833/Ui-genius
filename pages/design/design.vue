@@ -750,11 +750,10 @@
           </view>
 
           <view class="automation-actions">
-            <button class="continue-btn" :disabled="isAutomating" @click="startBrowserAutomation">
-              {{ isAutomating ? $t('design.automation.automating') : $t('design.automation.start') }}
-            </button>
-            <button v-if="isAutomating" class="stop-btn" @click="stopBrowserAutomation">
-              {{ $t('design.automation.stop') }}
+            <button 
+              :class="isAutomating ? 'stop-btn' : 'continue-btn'" 
+              @click="isAutomating ? stopBrowserAutomation() : startBrowserAutomation()">
+              {{ isAutomating ? $t('design.automation.stop') : $t('design.automation.start') }}
             </button>
           </view>
         </view>
@@ -6555,7 +6554,15 @@ export default {
       this.isAutomating = false;
       this.automationStatus = 'idle';
       this.automationTaskId = null;
+
+      // Close the automation dialog immediately
+      this.showAutomationDialog = false;
+      this.activeNavItem = '';
+
+      // Show the terminal section with stop message
+      this.showTerminalSection = true;
       this.addTerminalLog('🛑 Automation stopped by user', 'warning');
+      this.addTerminalLog('⏹️ Agent execution has been terminated', 'info');
 
       // Clear any pending reconnection
       if (this.automationReconnectTimeout) {
@@ -6574,7 +6581,7 @@ export default {
       // Send stop signal to backend
       if (taskId) {
         try {
-          this.addTerminalLog('🛑 Sending stop signal to agent...', 'warning');
+          this.addTerminalLog('📡 Sending stop signal to backend...', 'info');
           await fetch(`${API_BASE_URL}/browser-automation/stop`, {
             method: 'POST',
             headers: {
@@ -6584,10 +6591,19 @@ export default {
               client_id: taskId
             })
           });
+          this.addTerminalLog('✅ Stop signal sent successfully', 'success');
         } catch (error) {
           console.error('Error stopping automation:', error);
+          this.addTerminalLog('⚠️ Failed to send stop signal to backend', 'warning');
         }
       }
+
+      // Show toast notification
+      // uni.showToast({
+      //   title: this.$t('design.automation.stop') || 'Automation stopped',
+      //   icon: 'none',
+      //   duration: 2000
+      // });
     },
 
     toggleTerminalSection() {
@@ -6678,6 +6694,8 @@ export default {
         this.addTerminalLog(`📊 Project ID: ${currentProjectId}`, 'info');
         if (uid) this.addTerminalLog(`👤 User ID: ${uid}`, 'info');
 
+        // COMMENTED OUT FOR TESTING STOP BUTTON CSS
+
         const response = await fetch(`${API_BASE_URL}/browser-automation`, {
           method: 'POST',
           headers: {
@@ -6721,6 +6739,16 @@ export default {
           this.automationStatus = 'error';
           this.errorMessage = result.detail || 'Automation failed';
         }
+
+
+        // // TESTING MODE: Simulate automation running for testing stop button
+        // this.addTerminalLog('⚠️ Testing mode: API call commented out', 'warning');
+        // this.addTerminalLog('🧪 Simulating automation process...', 'info');
+        
+        // // Keep the automation running indefinitely for testing
+        // // You can manually click the stop button to test its functionality
+        // await new Promise(resolve => setTimeout(resolve, 100000)); // Wait 100 seconds or until stopped
+        
       } catch (error) {
         this.addTerminalLog(`💥 Error: ${error.message}`, 'error');
         this.automationStatus = 'error';
@@ -9349,34 +9377,106 @@ export default {
   margin-top: 20px;
 }
 
+.continue-btn {
+  background-color: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 10px;
+  padding: 14px 20px;
+  font-size: 18px;
+  font-weight: 500;
+  height: 50px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  box-shadow: 0 4px 12px rgba(229, 57, 53, 0.3);
+
+  &:hover {
+    background-color: #d32f2f;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(229, 57, 53, 0.4);
+  }
+
+  &:active {
+    transform: translateY(0);
+  }
+
+  &:disabled {
+    background-color: #ffcdd2;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+  }
+}
+
 .stop-btn {
   background: linear-gradient(135deg, #ff6b6b 0%, #ff5252 100%);
   color: white;
   border: none;
-  border-radius: 8px;
-  padding: 12px 24px;
-  font-size: 14px;
-  font-weight: 600;
+  border-radius: 10px;
+  padding: 14px 20px;
+  font-size: 18px;
+  font-weight: 500;
+  height: 50px;
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   cursor: pointer;
   transition: all 0.2s ease;
   box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  animation: stopButtonPulse 2s ease-in-out infinite;
+  position: relative;
+  overflow: hidden;
+
+  &::before {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    border-radius: 50%;
+    background: rgba(255, 255, 255, 0.3);
+    transform: translate(-50%, -50%);
+    transition: width 0.6s, height 0.6s;
+  }
+
+  &:hover {
+    background: linear-gradient(135deg, #ff5252 0%, #ff4444 100%);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
+    animation: none;
+  }
+
+  &:active {
+    transform: translateY(0);
+
+    &::before {
+      width: 300px;
+      height: 300px;
+    }
+  }
+
+  &:disabled {
+    background: #cccccc;
+    cursor: not-allowed;
+    box-shadow: none;
+    transform: none;
+    animation: none;
+  }
 }
 
-.stop-btn:hover {
-  background: linear-gradient(135deg, #ff5252 0%, #ff4444 100%);
-  transform: translateY(-2px);
-  box-shadow: 0 6px 16px rgba(255, 107, 107, 0.4);
-}
-
-.stop-btn:active {
-  transform: translateY(0);
-}
-
-.stop-btn:disabled {
-  background: #cccccc;
-  cursor: not-allowed;
-  box-shadow: none;
-  transform: none;
+@keyframes stopButtonPulse {
+  0%, 100% {
+    box-shadow: 0 4px 12px rgba(255, 107, 107, 0.3);
+  }
+  50% {
+    box-shadow: 0 4px 20px rgba(255, 107, 107, 0.6), 0 0 30px rgba(255, 107, 107, 0.3);
+  }
 }
 
 /* Standalone Terminal Styles */
