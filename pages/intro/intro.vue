@@ -768,7 +768,7 @@ export default {
       });
 
       // Check if user is already logged in
-      const existingToken = uni.getStorageSync('token');
+      const existingToken = uni.getStorageSync('token') || uni.getStorageSync('googleToken');
       const existingUid = uni.getStorageSync('uid');
       
       if (existingToken && existingUid) {
