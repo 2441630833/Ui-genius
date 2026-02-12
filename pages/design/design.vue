@@ -6007,7 +6007,7 @@ export default {
         if (res.result && res.result.success && res.result.data) {
           // Update the project data with the latest version
           uni.setStorageSync('latest_7_overall_page', JSON.stringify(res.result.data));
-          // uni.setStorageSync('force_regeneration', 'true');
+          uni.setStorageSync('force_regeneration', 'true');
 
           // Clear stored images to force regeneration
           this.clearStoredImages();
@@ -6016,8 +6016,8 @@ export default {
           this.templatesLoading = true;
 
           // Load the updated JSON templates
-          // this.loadJsonTemplates();
-          // this.updateLoadingStates();
+          this.loadJsonTemplates();
+          this.updateLoadingStates();
 
           // Generate new preview images
           setTimeout(() => {
@@ -6728,13 +6728,17 @@ export default {
             duration: 2000
           });
 
-          // Don't close dialog immediately, let user see the results
+          // Close dialog and terminal first
+          this.showTerminalSection = false;
+          this.closeAutomationDialog();
+          
+          // Set force regeneration flag to ensure previews update
+          uni.setStorageSync('force_regeneration', 'true');
+          
+          // Wait 2 seconds for cloud data to be ready, then refresh to update template previews
           setTimeout(() => {
-            this.showTerminalSection = false;
-            this.closeAutomationDialog();
-            // Reload the project to see the new pages
             this.pullRefreshProject();
-          }, 3000);
+          }, 2000);
         } else {
           this.addTerminalLog(`❌ Automation failed: ${result.detail || 'Unknown error'}`, 'error');
           this.automationStatus = 'error';
@@ -6754,6 +6758,19 @@ export default {
         this.addTerminalLog(`💥 Error: ${error.message}`, 'error');
         this.automationStatus = 'error';
         this.errorMessage = `Error: ${error.message}`;
+        
+        // Close dialog and terminal first
+        this.showTerminalSection = false;
+        this.closeAutomationDialog();
+        
+        // Set force regeneration flag
+        uni.setStorageSync('force_regeneration', 'true');
+        
+        // Wait 2 seconds, then refresh to see any partial results
+        setTimeout(() => {
+          this.pullRefreshProject();
+        }, 2000);
+        
         console.error('Browser automation error:', error);
       } finally {
         this.isAutomating = false;
