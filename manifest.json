@@ -73,8 +73,9 @@
         "devServer" : {
             "port" : 5173
         },
-        "router": {
-            "mode": "history" 
-        }
+        "router" : {
+            "mode" : "history"
+        },
+        "template" : "index.html"
     }
 }
