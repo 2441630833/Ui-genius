@@ -957,57 +957,69 @@ export default {
           position: 'right'
         },
         {
-          target: '.template_guide',
+          target: '.automation_guide',
           title: this.$t('design.guide.step3.title'),
           content: this.$t('design.guide.step3.content'),
           position: 'right'
         },
         {
-          target: '.import_guide',
+          target: '.terminal_guide',
           title: this.$t('design.guide.step4.title'),
           content: this.$t('design.guide.step4.content'),
           position: 'right'
         },
         {
-          target: '.import-dialog',
+          target: '.template_guide',
           title: this.$t('design.guide.step5.title'),
           content: this.$t('design.guide.step5.content'),
           position: 'right'
         },
         {
-          target: '.color_guide',
+          target: '.import_guide',
           title: this.$t('design.guide.step6.title'),
           content: this.$t('design.guide.step6.content'),
           position: 'right'
         },
         {
-          target: '.delete_guide',
+          target: '.import-dialog',
           title: this.$t('design.guide.step7.title'),
           content: this.$t('design.guide.step7.content'),
           position: 'right'
         },
         {
-          target: '.deleteDialogGuide',
+          target: '.color_guide',
           title: this.$t('design.guide.step8.title'),
           content: this.$t('design.guide.step8.content'),
           position: 'right'
         },
         {
-          target: '.export-button',
+          target: '.delete_guide',
           title: this.$t('design.guide.step9.title'),
           content: this.$t('design.guide.step9.content'),
+          position: 'right'
+        },
+        {
+          target: '.deleteDialogGuide',
+          title: this.$t('design.guide.step10.title'),
+          content: this.$t('design.guide.step10.content'),
+          position: 'right'
+        },
+        {
+          target: '.export-button',
+          title: this.$t('design.guide.step11.title'),
+          content: this.$t('design.guide.step11.content'),
           position: 'left'
         },
         {
           target: '.refresh-button',
-          title: this.$t('design.guide.step10.title'),
-          content: this.$t('design.guide.step10.content'),
+          title: this.$t('design.guide.step12.title'),
+          content: this.$t('design.guide.step12.content'),
           position: 'left'
         },
         {
           target: '.share-button',
-          title: this.$t('design.guide.step11.title'),
-          content: this.$t('design.guide.step11.content'),
+          title: this.$t('design.guide.step13.title'),
+          content: this.$t('design.guide.step13.content'),
           position: 'left'
         },
       ];
@@ -1316,12 +1328,20 @@ export default {
     onGuideStepChange(index) {
       // Make step-change behavior work for BOTH directions by driving UI from the current step.
       const shouldShowCreatePageDialog = index === 1;
-      const shouldShowImportDialog = index === 4;
-      const shouldShowDeleteDialog = index === 7;
+      const shouldShowAutomationDialog = index === 2;
+      const shouldShowTerminalSection = index === 3;
+      const shouldShowImportDialog = index === 6;
+      const shouldShowDeleteDialog = index === 9;
 
       // Close dialogs when the new step shouldn't show them (covers going backwards).
       if (!shouldShowCreatePageDialog && this.showCreatePageDialog) {
         this.showCreatePageDialog = false;
+      }
+      if (!shouldShowAutomationDialog && this.showAutomationDialog) {
+        this.closeAutomationDialog();
+      }
+      if (!shouldShowTerminalSection && this.showTerminalSection) {
+        this.showTerminalSection = false;
       }
       if (!shouldShowImportDialog && this.showImportDialog) {
         this.closeImportDialog();
@@ -1337,6 +1357,16 @@ export default {
         this.errorMessage = '';
         // Initialize model selection to google/gemini-3-flash-preview
         this.selectedPageModel = 'google/gemini-3-flash-preview';
+      }
+      if (shouldShowAutomationDialog && !this.showAutomationDialog) {
+        this.showAutomationDialog = true;
+        this.errorMessage = '';
+      }
+      if (shouldShowTerminalSection && !this.showTerminalSection) {
+        this.showTerminalSection = true;
+        if (this.terminalOutput.length === 0) {
+          this.addTerminalLog('🖥️ Terminal section opened for guide demonstration.', 'info');
+        }
       }
       if (shouldShowImportDialog && !this.showImportDialog) {
         this.showImportDialog = true;
