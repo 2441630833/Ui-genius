@@ -42,7 +42,7 @@ function createMenu() {
             await dialog.showMessageBox({
               type: 'info',
               title: 'About Uigenius',
-              message: 'Uigenius v1.1.3',
+              message: 'Uigenius v1.2.8',
               detail: 'AI-powered UX/UI design tool for rapid prototyping and design generation'
             });
           }

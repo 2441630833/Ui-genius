@@ -536,7 +536,7 @@ export default {
       selectedDevice: 'desktop',
       projectDescription: '',
       numPages: 1,
-      exampleDescription: 'Generate one website as same as Apple Store page',
+      exampleDescription: 'Generate a women clothing Shopify store.',
       errorMessage: '',
       projectLoadingStates: {
         alpha: true,
@@ -564,7 +564,7 @@ export default {
       passwordStrengthText: '',
       // Model selection
       modelOptions: [
-        { value: 'google/gemini-3-flash-preview', text: 'google/gemini3', isPro: true },
+        { value: 'google/gemini-3.1-pro-preview', text: 'google/gemini3.1', isPro: true },
         { value: 'anthropic/claude-opus-4.6', text: 'anthropic/claude-opus-4.6', isPro: true },
         { value: 'xiaomi/mimo-v2-flash', text: 'xiaomi/mimo-v2-flash', isPro: true },
         { value: 'deepseek/deepseek-v3.2', text: 'deepseek/deepseek-v3.2', isPro: true },

@@ -341,13 +341,13 @@ export default {
       showLanguageDropdown: false,
       currentLocale: 'en',
       // Generate UI properties with defaults
-      generateSelectedDevice: 'mobile',
-      generateSelectedModel: 'google/gemini-3-flash-preview',
+      generateSelectedDevice: 'desktop',
+      generateSelectedModel: 'google/gemini-3.1-pro-preview',
       generateProjectDescription: '',
       isOptimizingGeneratePrompt: false,
       numPages: 1,
       modelOptions: [
-        { value: 'google/gemini-3-flash-preview', text: 'google/gemini3', isPro: true },
+        { value: 'google/gemini-3.1-pro-preview', text: 'google/gemini3.1', isPro: true },
         { value: 'xiaomi/mimo-v2-flash', text: 'xiaomi/mimo-v2-flash', isPro: true },
         { value: 'deepseek/deepseek-v3.2', text: 'deepseek/deepseek-v3.2', isPro: true },
         { value: 'anthropic/claude-opus-4.5', text: 'anthropic/claude-opus-4.5', isPro: true },
@@ -683,7 +683,7 @@ export default {
     },
     // Generate UI Methods
     tryGenerateExample() {
-      this.generateProjectDescription = 'Generate one app as same as tiktok app';
+      this.generateProjectDescription = 'Generate a women clothing Shopify store.';
     },
     optimizeGenerateProjectDescription() {
       if (!this.generateProjectDescription || this.isOptimizingGeneratePrompt) return;
