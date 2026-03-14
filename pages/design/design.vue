@@ -1200,13 +1200,57 @@ export default {
       // Check if we should generate UI based on the flag from createProject
       this.shouldGenerateUI = uni.getStorageSync('shouldGenerateUI') === 'true';
 
-      // Only generate UI if the flag is set and we have a project description
-      if (this.shouldGenerateUI &&
+      // Check if we should import project based on the flag from dashboard
+      const shouldImportProject = uni.getStorageSync('shouldImportProject');
+      if (this.shouldGenerateUI && shouldImportProject) {
+        if (shouldImportProject === 'html') {
+          // Handle HTML import
+          const pendingHtmlImport = uni.getStorageSync('pendingHtmlImport');
+          if (pendingHtmlImport) {
+            try {
+              this.htmlFiles = JSON.parse(pendingHtmlImport);
+              this.selectedImportType = 'html';
+              uni.removeStorageSync('pendingHtmlImport');
+              uni.removeStorageSync('shouldImportProject');
+              uni.setStorageSync('shouldGenerateUI', 'false');
+              this.triggerHtmlImport();
+            } catch (error) {
+              console.error('Error parsing pending HTML import:', error);
+              uni.removeStorageSync('pendingHtmlImport');
+              uni.removeStorageSync('shouldImportProject');
+              uni.setStorageSync('shouldGenerateUI', 'false');
+            }
+          }
+        } else if (shouldImportProject === 'files') {
+          // Handle image/other files import
+          const pendingImportFiles = uni.getStorageSync('pendingImportFiles');
+          const pendingImportType = uni.getStorageSync('pendingImportType');
+          if (pendingImportFiles && pendingImportType) {
+            try {
+              const filesData = JSON.parse(pendingImportFiles);
+              this.selectedImportType = pendingImportType;
+              uni.removeStorageSync('pendingImportFiles');
+              uni.removeStorageSync('pendingImportType');
+              uni.removeStorageSync('shouldImportProject');
+              uni.setStorageSync('shouldGenerateUI', 'false');
+              this.triggerFilesImport(filesData);
+            } catch (error) {
+              console.error('Error parsing pending files import:', error);
+              uni.removeStorageSync('pendingImportFiles');
+              uni.removeStorageSync('pendingImportType');
+              uni.removeStorageSync('shouldImportProject');
+              uni.setStorageSync('shouldGenerateUI', 'false');
+            }
+          }
+        }
+      } else if (this.shouldGenerateUI &&
         !uni.getStorageSync('latest_7_overall_page') &&
         uni.getStorageSync('projectDescription')) {
+        // Only generate UI if the flag is set and we have a project description
         this.generateUI();
         uni.setStorageSync('shouldGenerateUI', 'false');
       }
+
       // Note: Preview images are now generated on-demand when needed, not on every page load
       // They will be generated when:
       // 1. A new page is created (handled in createPage method)
@@ -5830,6 +5874,139 @@ export default {
           uni.showToast({ title: this.$t('design.import.readSelectedError'), icon: 'none', duration: 2000 });
         });
     },
+
+    // Trigger HTML import from dashboard
+    triggerHtmlImport() {
+      this.isImporting = true;
+      this.importProgress = 0;
+
+      // Set up progress interval
+      const progressInterval = setInterval(() => {
+        if (this.importProgress < 98) {
+          this.importProgress += 0.54;
+        }
+      }, 1000);
+
+      // Handle HTML import
+      this.handleHtmlImport(progressInterval);
+    },
+
+    // Trigger files import from dashboard
+    triggerFilesImport(filesData) {
+      this.isImporting = true;
+      this.importProgress = 0;
+
+      // Set up progress interval
+      const progressInterval = setInterval(() => {
+        if (this.importProgress < 98) {
+          this.importProgress += 0.54;
+        }
+      }, 1000);
+
+      const requestData = {
+        files: filesData,
+        importType: this.selectedImportType
+      };
+
+      uni.showToast({
+        title: this.$t('design.import.processing'),
+        icon: 'none',
+        duration: 3000
+      });
+
+      // Make the API call
+      uni.request({
+        url: `${API_BASE_URL}/import-project`,
+        method: 'POST',
+        header: {
+          'Content-Type': 'application/json'
+        },
+        data: requestData,
+        timeout: 600000,
+        success: (response) => {
+          clearInterval(progressInterval);
+          this.importProgress = 100;
+
+          const data = response.data;
+
+          try {
+            let responseData = data;
+            if (typeof data === 'object' && data.response) {
+              responseData = data.response;
+            }
+
+            if (typeof responseData === 'object' && responseData.pages) {
+              const parsedResponse = responseData;
+
+              if (parsedResponse && parsedResponse.pages && parsedResponse.pages.length > 0) {
+                const newPage = parsedResponse.pages[0];
+
+                const existingProjectData = uni.getStorageSync('latest_7_overall_page');
+                let projectData;
+
+                if (existingProjectData) {
+                  projectData = typeof existingProjectData === 'string' ? JSON.parse(existingProjectData) : existingProjectData;
+                } else {
+                  projectData = {
+                    pages: [],
+                    AIProjectDescription: 'My Project',
+                    AIProjectName: 'UI Genius Project',
+                  };
+                }
+
+                projectData.pages.push(newPage);
+
+                const updatedProjectData = JSON.stringify(projectData);
+                uni.setStorageSync('latest_7_overall_page', updatedProjectData);
+                uni.setStorageSync('force_regeneration', 'true');
+
+                setTimeout(() => {
+                  this.isImporting = false;
+
+                  // Refresh templates to show the new page
+                  this.loadJsonTemplates();
+                  this.updateLoadingStates();
+
+                  // Force generation of new preview images
+                  setTimeout(() => {
+                    this.generatePreviewImages();
+                  }, 100);
+
+                  uni.showToast({
+                    title: this.$t('design.import.success'),
+                    icon: 'success',
+                    duration: 2000
+                  });
+                }, 1000);
+              } else {
+                throw new Error('No valid page data found in response');
+              }
+            } else {
+              throw new Error('Invalid response format');
+            }
+          } catch (error) {
+            console.error('Error processing import data:', error);
+            this.isImporting = false;
+            uni.showToast({
+              title: 'Failed to process import data: ' + error.message,
+              icon: 'none',
+              duration: 3000
+            });
+          }
+        },
+        fail: (error) => {
+          clearInterval(progressInterval);
+          console.error('Error importing files:', error);
+          this.isImporting = false;
+          uni.showToast({
+            title: 'Error importing files: ' + (error.errMsg || 'Request failed'),
+            icon: 'none',
+            duration: 3000
+          });
+        }
+      });
+    },
+
     tryImportByProjectId(projectId) {
       if (!projectId) return;
 

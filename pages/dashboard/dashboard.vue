@@ -16,6 +16,11 @@
             :src="activeNavItem === 'plus' ? '../../static/plus_white.png' : '../../static/plus.png'"></image>
           <text class="nav-text">{{$t('dashboard.nav.createProject')}}</text>
         </view>
+        <view class="nav-item import-project-btn" :class="{ active: activeNavItem === 'import' }" @click="openImportDialog">
+          <image class="sidebar-icon"
+            :src="activeNavItem === 'import' ? '../../static/import_white.png' : '../../static/import.png'"></image>
+          <text class="nav-text">{{$t('common.import')}}</text>
+        </view>
         <view class="nav-item" :class="{ active: activeNavItem === 'dashboard' }"
           @click="setActiveNavItem('dashboard')">
           <image class="sidebar-icon dashboard-icon"
@@ -475,6 +480,99 @@
       </view>
     </view>
 
+    <!-- Import File Dialog -->
+    <view class="dialog-overlay" v-if="showImportDialog" @click="closeImportDialog">
+      <view class="dialog-container import-dialog" @click.stop>
+        <view class="dialog-content">
+          <text class="dialog-title">{{ $t('design.import.title') }}</text>
+
+          <!-- Error notification -->
+          <view class="error-notification" v-if="importError">
+            <text>{{ importError }}</text>
+          </view>
+
+          <!-- Import type tabs -->
+          <view class="import-type-tabs">
+            <view v-for="type in importTypeOptions" :key="type.value" class="import-type-tab"
+              :class="{ active: selectedImportType === type.value }" @click="selectImportType(type.value)">
+              {{ $t('design.import.type.' + type.value) }}
+            </view>
+          </view>
+
+          <view class="import-description">
+            <text>{{ $t('design.import.description.' + selectedImportType) }}</text>
+          </view>
+
+          <view class="file-upload-container">
+            <!-- HTML file picker -->
+            <view v-if="selectedImportType === 'html'" class="html-file-picker">
+              <view class="upload-placeholder" @click="chooseHtmlFile">
+                <view class="upload-icon">
+                  <view class="folder-icon">
+                    <view class="folder-body"></view>
+                    <view class="folder-tab"></view>
+                  </view>
+                  <view class="upload-arrow">↑</view>
+                </view>
+                <text class="upload-text">{{ $t('design.upload.clickToSelectHtmlFile') }}</text>
+                <text class="upload-hint">{{ $t('design.upload.allowedHtml') }}</text>
+              </view>
+              <view v-if="htmlFiles && htmlFiles.length" class="html-file-info">
+                <text class="file-info-text">{{ $t('design.import.htmlFilesCountLoaded', { count: htmlFiles.length }) }}</text>
+                <view v-for="(f, i) in htmlFiles" :key="i" class="file-list-item">
+                  <view class="file-list-item-header">
+                    <text class="file-info-text">- {{ f.name }}</text>
+                    <button class="remove-file-btn" @click.stop="removeHtmlFile(i)">{{ $t('common.delete') }}</button>
+                  </view>
+                </view>
+              </view>
+            </view>
+
+            <!-- Regular file picker for other types -->
+            <uni-file-picker v-else v-model="importFileList" fileMediatype="all" mode="grid"
+              :limit="selectedImportType === 'image' ? 10 : 1" :file-extname="allowedExtensions"
+              @success="successUploadFiles" @delete="onImportFileDelete">
+              <view class="upload-placeholder">
+                <view class="upload-icon">
+                  <view class="folder-icon">
+                    <view class="folder-body"></view>
+                    <view class="folder-tab"></view>
+                  </view>
+                  <view class="upload-arrow">↑</view>
+                </view>
+                <text class="upload-text">{{ selectedImportType === 'image' ? $t('design.upload.clickToSelectImages') :
+                  $t('design.upload.clickToSelectFile') }}</text>
+                <text class="upload-hint">{{ $t('design.upload.allowedFormats', {
+                  formats: allowedExtensions.join(', ')
+                }) }}</text>
+              </view>
+            </uni-file-picker>
+          </view>
+
+          <view class="import-actions">
+            <button class="import-btn"
+              :disabled="selectedImportType === 'html' ? (htmlFiles.length === 0) : !importFileList.length"
+              @click="importProject">
+              {{ $t('common.import') }}
+            </button>
+            <button class="cancel-btn" @click="closeImportDialog">{{ $t('common.cancel') }}</button>
+          </view>
+        </view>
+      </view>
+    </view>
+
+    <!-- Import Progress Overlay -->
+    <view v-if="isImporting" class="progress-overlay">
+      <view class="progress-container">
+        <text class="progress-title">{{ $t('design.progress.importingFiles') }}</text>
+        <view class="progress-bar-container">
+          <view class="progress-bar" :style="{ width: importProgress + '%' }"></view>
+        </view>
+        <text class="progress-percentage">{{ Math.floor(importProgress) }}%</text>
+        <text class="progress-message">{{ $t('design.progress.processingFiles') }}</text>
+      </view>
+    </view>
+
     <!-- Network Error Toast Overlay -->
     <view class="toast-overlay" v-if="networkErrorVisible" @click="networkErrorVisible = false">
       <!-- Network Error Toast -->
@@ -591,6 +689,10 @@ export default {
       htmlFileContent: '',
       htmlFileName: '',
       isOptimizingPrompt: false,
+      showImportDialog: false,
+      importFileList: [],
+      importError: '',
+      selectedImportType: 'image',
       // Delete projects state
       deleteProjectsLoading: false,
       showDeleteDialog: false,
@@ -636,6 +738,22 @@ export default {
           position: 'right'
         }
       ];
+    },
+    importTypeOptions() {
+      return [
+        { value: 'image', label: this.$t('design.import.type.image') },
+        { value: 'html', label: this.$t('design.import.type.html') }
+      ];
+    },
+    allowedExtensions() {
+      switch (this.selectedImportType) {
+        case 'image':
+          return ['png', 'jpg', 'jpeg', 'gif', 'webp', 'svg'];
+        case 'html':
+          return ['html', 'htm'];
+        default:
+          return ['*'];
+      }
     }
   },
   watch: {
@@ -888,6 +1006,41 @@ export default {
     closeCreateProjectDialog() {
       this.showCreateProjectDialog = false;
       this.errorMessage = '';
+    },
+    openImportDialog() {
+      this.setActiveNavItem('dashboard');
+      this.showImportDialog = true;
+      this.importError = '';
+    },
+    closeImportDialog() {
+      this.showImportDialog = false;
+      this.importFileList = [];
+      this.htmlFileContent = '';
+      this.htmlFileName = '';
+      this.htmlFiles = [];
+      this.importError = '';
+      this.selectedImportType = 'image';
+    },
+    selectImportType(type) {
+      this.selectedImportType = type;
+      this.importFileList = [];
+      this.htmlFileContent = '';
+      this.htmlFileName = '';
+      this.htmlFiles = [];
+      this.importError = '';
+    },
+    onImportFileDelete(e) {
+      if (e && e.index !== undefined) {
+        this.importFileList.splice(e.index, 1);
+      } else if (e && e.tempFilePaths) {
+        const deletedPaths = Array.isArray(e.tempFilePaths) ? e.tempFilePaths : [e.tempFilePaths];
+        this.importFileList = this.importFileList.filter(item => {
+          const itemPath = item.path || item.url || item.name;
+          return !deletedPaths.includes(itemPath);
+        });
+      } else {
+        this.importFileList = [];
+      }
     },
     selectDevice(device) {
       this.selectedDevice = device;
@@ -2039,6 +2192,67 @@ export default {
       if (!Array.isArray(this.htmlFiles)) return;
       if (index < 0 || index >= this.htmlFiles.length) return;
       this.htmlFiles.splice(index, 1);
+    },
+    successUploadFiles() {
+      // Callback for successful file upload
+    },
+    async importProject() {
+      if (this.selectedImportType === 'html') {
+        if (!this.htmlFiles || this.htmlFiles.length === 0) {
+          this.importError = this.$t('design.import.htmlFileRequired');
+          return;
+        }
+      } else {
+        if (!this.importFileList.length) {
+          this.importError = this.$t('design.import.fileRequired');
+          return;
+        }
+      }
+
+      // Close dialog and prepare for navigation
+      this.showImportDialog = false;
+
+      // Clear existing project data
+      await uni.removeStorageSync('latest_7_overall_page');
+      await uni.removeStorageSync('projectDescription');
+      await uni.removeStorageSync('selectedDevice');
+      await uni.removeStorageSync('selectedModel');
+      await uni.removeStorageSync('shouldGenerateUI');
+      await uni.removeStorageSync('uigenius_image_dashboard');
+      await uni.removeStorageSync('uigenius_image_generated');
+      await uni.removeStorageSync('uigenius_image_home');
+      await uni.removeStorageSync('uigenius_image_signup');
+      await uni.removeStorageSync('uigenius_image_settings');
+      await uni.removeStorageSync('uigenius_image_profile');
+      await uni.removeStorageSync('uigenius_image_notification');
+      await uni.removeStorageSync('currentProjectId');
+      await uni.removeStorageSync('colorCard');
+
+      // Store import data for the design page to process
+      if (this.selectedImportType === 'html') {
+        // Store HTML files data
+        await uni.setStorageSync('pendingHtmlImport', JSON.stringify(this.htmlFiles));
+        await uni.setStorageSync('shouldImportProject', 'html');
+      } else {
+        // Store image/other files data
+        const filesData = this.importFileList.map(file => ({
+          url: file.url,
+        }));
+        await uni.setStorageSync('pendingImportFiles', JSON.stringify(filesData));
+        await uni.setStorageSync('pendingImportType', this.selectedImportType);
+        await uni.setStorageSync('shouldImportProject', 'files');
+      }
+
+      // Set flag to load projects when user returns to dashboard
+      await uni.setStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard', 'true');
+
+      // Set flag to indicate we should generate UI when design page loads
+      await uni.setStorageSync('shouldGenerateUI', 'true');
+
+      // Navigate to design page immediately
+      uni.switchTab({
+        url: '/pages/design/design'
+      });
     },
     
     // Delete project methods
@@ -3640,5 +3854,212 @@ export default {
     background-color: #ffcdd2;
     cursor: not-allowed;
   }
+}
+
+/* Import Dialog Styles */
+.import-dialog {
+  max-width: 600px;
+}
+
+.import-type-tabs {
+  display: flex;
+  gap: 10px;
+  margin-bottom: 20px;
+  border-bottom: 2px solid #f0f0f0;
+}
+
+.import-type-tab {
+  padding: 12px 20px;
+  background-color: transparent;
+  border: none;
+  color: #666;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  border-bottom: 3px solid transparent;
+  transition: all 0.2s;
+  margin-bottom: -2px;
+
+  &:hover {
+    color: #333;
+  }
+
+  &.active {
+    color: #e53935;
+    border-bottom-color: #e53935;
+  }
+}
+
+.import-description {
+  background-color: #f8f8f8;
+  padding: 12px 15px;
+  border-radius: 8px;
+  margin-bottom: 20px;
+
+  text {
+    color: #666;
+    font-size: 14px;
+    line-height: 1.5;
+    display: block;
+  }
+}
+
+.import-actions {
+  display: flex;
+  gap: 10px;
+  margin-top: 30px;
+}
+
+.import-btn {
+  flex: 1;
+  background-color: #e53935;
+  color: #fff;
+  border: none;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: background-color 0.2s;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover:not(:disabled) {
+    background-color: #d32f2f;
+  }
+
+  &:disabled {
+    background-color: #f1a9a7;
+    cursor: not-allowed;
+  }
+}
+
+.cancel-btn {
+  flex: 1;
+  background-color: #f5f5f5;
+  color: #333;
+  border: 1px solid #eaeaea;
+  border-radius: 8px;
+  padding: 12px 20px;
+  font-size: 16px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  height: 50px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:hover {
+    background-color: #e8e8e8;
+  }
+}
+
+.html-file-picker {
+  width: 100%;
+}
+
+.html-file-info {
+  margin-top: 15px;
+  padding: 15px;
+  background-color: #f0f8ff;
+  border: 1px solid #b3d9ff;
+  border-radius: 8px;
+}
+
+.file-info-text {
+  display: block;
+  font-size: 14px;
+  color: #0066cc;
+  font-weight: 500;
+  margin-bottom: 8px;
+}
+
+.file-list-item {
+  margin-top: 8px;
+}
+
+.file-list-item-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.remove-file-btn {
+  background-color: #f5f5f5;
+  color: #e53935;
+  border: none;
+  border-radius: 6px;
+  padding: 6px 10px;
+  cursor: pointer;
+  font-size: 12px;
+  transition: background-color 0.2s;
+
+  &:hover {
+    background-color: #ffecec;
+  }
+}
+
+/* Progress Overlay Styles */
+.progress-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.7);
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  z-index: 2000;
+}
+
+.progress-container {
+  background-color: #fff;
+  border-radius: 12px;
+  padding: 40px;
+  text-align: center;
+  max-width: 400px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+}
+
+.progress-title {
+  display: block;
+  font-size: 18px;
+  font-weight: 600;
+  color: #333;
+  margin-bottom: 20px;
+}
+
+.progress-bar-container {
+  width: 100%;
+  height: 8px;
+  background-color: #f0f0f0;
+  border-radius: 4px;
+  overflow: hidden;
+  margin-bottom: 15px;
+}
+
+.progress-bar {
+  height: 100%;
+  background-color: #e53935;
+  transition: width 0.3s ease;
+  width: 0;
+}
+
+.progress-percentage {
+  display: block;
+  font-size: 24px;
+  font-weight: 700;
+  color: #e53935;
+  margin-bottom: 10px;
+}
+
+.progress-message {
+  display: block;
+  font-size: 14px;
+  color: #666;
 }
 </style>
