@@ -5956,9 +5956,38 @@ export default {
 
                 projectData.pages.push(newPage);
 
+                // Generate title and description for imported project
+                const currentProjectId = uni.getStorageSync('currentProjectId');
+                let projectTitle, projectDescription;
+
+                if (!currentProjectId) {
+                  // Creating a new project - generate title and description
+                  const importDate = new Date().toLocaleString('en-US', {
+                    year: 'numeric',
+                    month: 'short',
+                    day: 'numeric'
+                  });
+                  projectTitle = `Imported ${this.selectedImportType.charAt(0).toUpperCase() + this.selectedImportType.slice(1)} Project`;
+                  projectDescription = `Project created from imported ${this.selectedImportType} file${filesData.length > 1 ? 's' : ''} on ${importDate}`;
+                } else {
+                  // Updating existing project - use existing title/description or generate new ones
+                  projectTitle = projectData.AIProjectName || 'Imported Project';
+                  projectDescription = projectData.AIProjectDescription || `Project updated with imported ${this.selectedImportType}`;
+                }
+
                 const updatedProjectData = JSON.stringify(projectData);
                 uni.setStorageSync('latest_7_overall_page', updatedProjectData);
                 uni.setStorageSync('force_regeneration', 'true');
+
+                // Save project to the cloud if logged in
+                this.saveProjectToCloud(projectData, projectTitle, projectDescription)
+                  .then(() => {
+                    // Set flag to refresh dashboard when user returns
+                    uni.setStorageSync('ifLoadProjectsByUidWhenUserBackToDashboard', 'true');
+                  })
+                  .catch((err) => {
+                    console.error('Failed to save project to cloud:', err);
+                  });
 
                 setTimeout(() => {
                   this.isImporting = false;
