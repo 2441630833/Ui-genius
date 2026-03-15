@@ -480,6 +480,7 @@
   "design.import.description.html": "Unggah file HTML dan tambahkan ke proyek Anda sebagai halaman baru. Mendukung impor massal.",
   "design.import.description.vue": "Unggah file Vue dan tambahkan ke proyek Anda sebagai halaman baru.",
   "design.import.description.react": "Unggah file React dan tambahkan ke proyek Anda sebagai halaman baru.",
+  "design.import.success": "Impor berhasil!",
   "design.colorPalette.title": "Pilih Warna Tema Untuk Proyek Anda",
   "design.colorPalette.selectedColors": "Warna Terpilih:",
   "design.colorPalette.selectedCount": "Terpilih: {count}/5 warna",

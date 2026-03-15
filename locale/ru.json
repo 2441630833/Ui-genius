@@ -643,6 +643,7 @@
 	"design.import.contentTitle": "Импортированный контент",
 	"design.import.contentDescription": "Эта страница была создана из импортированных файлов {type}.",
 	"design.import.filesList": "Импортированные файлы: {files}",
+	"design.import.success": "Импорт успешен!",
 	"design.colorPalette.title": "Выберите тему цвета для вашего проекта",
 	"design.colorPalette.selectedColors": "Выбранные цвета:",
 	"design.colorPalette.selectedCount": "Выбрано: {count}/5 цветов",

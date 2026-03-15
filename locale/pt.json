@@ -483,6 +483,7 @@
 	"design.import.description.html": "Faça upload de arquivos HTML e adicione-os como novas páginas ao seu projeto. Suporta importação em lote.",
 	"design.import.description.vue": "Faça upload de arquivos Vue e adicione-os como novas páginas ao seu projeto.",
 	"design.import.description.react": "Faça upload de arquivos React e adicione-os como novas páginas ao seu projeto.",
+	"design.import.success": "Importação bem-sucedida!",
 	"design.colorPalette.title": "Selecione a Cor do Tema Para o Seu Projeto",
 	"design.colorPalette.selectedColors": "Cores Selecionadas:",
 	"design.colorPalette.selectedCount": "Selecionadas: {count}/5 cores",

@@ -484,6 +484,7 @@
 	"design.import.description.html": "Upload HTML-bestanden en voeg ze toe als nieuwe pagina's aan uw project. Ondersteunt batch-import.",
 	"design.import.description.vue": "Upload Vue-bestanden en voeg ze toe als nieuwe pagina's aan uw project.",
 	"design.import.description.react": "Upload React-bestanden en voeg ze toe als nieuwe pagina's aan uw project.",
+	"design.import.success": "Importeren geslaagd!",
 	"design.colorPalette.title": "Selecteer de themakleur voor uw project",
 	"design.colorPalette.selectedColors": "Geselecteerde kleuren:",
 	"design.colorPalette.selectedCount": "Geselecteerd: {count}/5 kleuren",

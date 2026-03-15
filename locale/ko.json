@@ -644,6 +644,7 @@
   "design.import.contentTitle": "가져온 콘텐츠",
   "design.import.contentDescription": "이 페이지는 가져온 {type} 파일에서 생성되었습니다.",
   "design.import.filesList": "가져온 파일: {files}",
+  "design.import.success": "가져오기 성공!",
   "design.colorPalette.title": "프로젝트의 테마 색상 선택",
   "design.colorPalette.selectedColors": "선택된 색상:",
   "design.colorPalette.selectedCount": "선택됨: {count}/5 색상",

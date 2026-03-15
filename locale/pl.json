@@ -480,6 +480,7 @@
   "design.import.description.html": "Prześlij pliki HTML i dodaj je jako nowe strony do swojego projektu. Obsługuje import masowy.",
   "design.import.description.vue": "Prześlij pliki Vue i dodaj je jako nowe strony do swojego projektu.",
   "design.import.description.react": "Prześlij pliki React i dodaj je jako nowe strony do swojego projektu.",
+  "design.import.success": "Import powiódł się!",
   "design.colorPalette.title": "Wybierz kolor motywu dla swojego projektu",
   "design.colorPalette.selectedColors": "Wybrane kolory:",
   "design.colorPalette.selectedCount": "Wybrano: {count}/5 kolorów",

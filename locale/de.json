@@ -643,6 +643,7 @@
 	"design.import.contentTitle": "Importierter Inhalt",
 	"design.import.contentDescription": "Diese Seite wurde aus importierten {type}-Dateien erstellt.",
 	"design.import.filesList": "Importierte Dateien: {files}",
+	"design.import.success": "Import erfolgreich!",
 	"design.colorPalette.title": "Wählen Sie die Themenfarbe für Ihr Projekt",
 	"design.colorPalette.selectedColors": "Ausgewählte Farben:",
 	"design.colorPalette.selectedCount": "Ausgewählt: {count}/5 Farben",

@@ -486,6 +486,7 @@
 	"design.import.contentTitle": "Importeret indhold",
 	"design.import.contentDescription": "Denne side blev oprettet fra importerede {type}-filer.",
 	"design.import.filesList": "Filer importeret: {files}",
+	"design.import.success": "Import lykkedes!",
 	"design.colorPalette.title": "Vælg temafarve til dit projekt",
 	"design.colorPalette.selectedColors": "Valgte farver:",
 	"design.colorPalette.selectedCount": "Valgt: {count}/5 farver",

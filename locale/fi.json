@@ -480,6 +480,7 @@
   "design.import.description.html": "Lataa HTML-tiedostoja ja lisää ne uusina sivuina projektiisi. Tukee erätuontia.",
   "design.import.description.vue": "Lataa Vue-tiedostoja ja lisää ne uusina sivuina projektiisi.",
   "design.import.description.react": "Lataa React-tiedostoja ja lisää ne uusina sivuina projektiisi.",
+  "design.import.success": "Tuonti onnistui!",
   "design.colorPalette.title": "Valitse projektin teemaväri",
   "design.colorPalette.selectedColors": "Valitut värit:",
   "design.colorPalette.selectedCount": "Valittu: {count}/5 väriä",

@@ -486,6 +486,7 @@
   "design.import.contentTitle": "เนื้อหาที่นำเข้า",
   "design.import.contentDescription": "หน้านี้สร้างขึ้นจากไฟล์ {type} ที่นำเข้า",
   "design.import.filesList": "ไฟล์ที่นำเข้า: {files}",
+  "design.import.success": "นำเข้าสำเร็จ!",
   "design.colorPalette.title": "เลือกสีธีมสำหรับโปรเจกต์ของคุณ",
   "design.colorPalette.selectedColors": "สีที่เลือก:",
   "design.colorPalette.selectedCount": "เลือกแล้ว: {count}/5 สี",

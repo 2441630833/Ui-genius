@@ -646,6 +646,7 @@
   "design.import.contentTitle": "Contenu importé",
   "design.import.contentDescription": "Cette page a été créée à partir de fichiers {type} importés.",
   "design.import.filesList": "Fichiers importés : {files}",
+  "design.import.success": "Importation réussie !",
   "design.colorPalette.title": "Sélectionnez la couleur du thème pour votre projet",
   "design.colorPalette.selectedColors": "Couleurs Sélectionnées :",
   "design.colorPalette.selectedCount": "Sélectionnés : {count}/5 couleurs",

@@ -486,6 +486,7 @@
   "design.import.contentTitle": "आयातित सामग्री",
   "design.import.contentDescription": "यह पेज आयातित {type} फाइलों से बनाया गया था।",
   "design.import.filesList": "आयातित फाइलें: {files}",
+  "design.import.success": "आयात सफल!",
   "design.colorPalette.title": "अपने प्रोजेक्ट के लिए थीम रंग चुनें",
   "design.colorPalette.selectedColors": "चयनित रंग:",
   "design.colorPalette.selectedCount": "चयनित: {count}/5 रंग",

@@ -480,6 +480,7 @@
 	"design.import.description.html": "Ladda upp HTML-filer och lägg till dem som nya sidor i ditt projekt. Stödjer batchimport.",
 	"design.import.description.vue": "Ladda upp Vue-filer och lägg till dem som nya sidor i ditt projekt.",
 	"design.import.description.react": "Ladda upp React-filer och lägg till dem som nya sidor i ditt projekt.",
+	"design.import.success": "Importen lyckades!",
 	"design.colorPalette.title": "Välj temafärg för ditt projekt",
 	"design.colorPalette.selectedColors": "Valda färger:",
 	"design.colorPalette.selectedCount": "Valda: {count}/5 färger",

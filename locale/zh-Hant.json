@@ -644,6 +644,7 @@
   "design.import.contentTitle": "導入的內容",
   "design.import.contentDescription": "此頁面是根據導入的 {type} 文件創建的。",
   "design.import.filesList": "導入的文件：{files}",
+  "design.import.success": "導入成功！",
   "design.colorPalette.title": "為您的項目選擇主題顔色",
   "design.colorPalette.selectedColors": "已選顏色：",
   "design.colorPalette.selectedCount": "已選擇：{count}/5 种顏色",

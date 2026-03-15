@@ -643,6 +643,7 @@
 	"design.import.contentTitle": "インポートされたコンテンツ",
 	"design.import.contentDescription": "このページはインポートされた {type} ファイルから作成されました。",
 	"design.import.filesList": "インポートされたファイル：{files}",
+	"design.import.success": "インポートに成功しました！",
 	"design.colorPalette.title": "プロジェクトのテーマカラーを選択",
 	"design.colorPalette.selectedColors": "選択された色：",
 	"design.colorPalette.selectedCount": "選択済み：{count}/5 色",

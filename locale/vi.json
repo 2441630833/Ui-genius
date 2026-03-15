@@ -480,6 +480,7 @@
   "design.import.description.html": "Tải lên các tệp HTML và thêm chúng vào dự án của bạn dưới dạng các trang mới. Hỗ trợ nhập hàng loạt.",
   "design.import.description.vue": "Tải lên các tệp Vue và thêm chúng vào dự án của bạn dưới dạng các trang mới.",
   "design.import.description.react": "Tải lên các tệp React và thêm chúng vào dự án của bạn dưới dạng các trang mới.",
+  "design.import.success": "Nhập thành công!",
   "design.colorPalette.title": "Chọn màu chủ đề cho dự án của bạn",
   "design.colorPalette.selectedColors": "Màu đã chọn:",
   "design.colorPalette.selectedCount": "Đã chọn: {count}/5 màu",

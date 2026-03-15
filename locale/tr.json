@@ -480,6 +480,7 @@
   "design.import.description.html": "HTML dosyalarını yükleyin ve projenize yeni sayfalar olarak ekleyin. Toplu içe aktarmayı destekler.",
   "design.import.description.vue": "Vue dosyalarını yükleyin ve projenize yeni sayfalar olarak ekleyin.",
   "design.import.description.react": "React dosyalarını yükleyin ve projenize yeni sayfalar olarak ekleyin.",
+  "design.import.success": "İçe aktarma başarılı!",
   "design.colorPalette.title": "Projeniz İçin Tema Rengini Seçin",
   "design.colorPalette.selectedColors": "Seçilen Renkler:",
   "design.colorPalette.selectedCount": "Seçilen: {count}/5 renk",

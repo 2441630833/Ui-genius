@@ -483,6 +483,7 @@
 	"design.import.description.html": "Carica file HTML e aggiungili come nuove pagine al tuo progetto. Supporta l'importazione batch.",
 	"design.import.description.vue": "Carica file Vue e aggiungili come nuove pagine al tuo progetto.",
 	"design.import.description.react": "Carica file React e aggiungili come nuove pagine al tuo progetto.",
+	"design.import.success": "Importazione riuscita!",
 	"design.colorPalette.title": "Seleziona il colore del tema per il tuo progetto",
 	"design.colorPalette.selectedColors": "Colori selezionati:",
 	"design.colorPalette.selectedCount": "Selezionati: {count}/5 colori",

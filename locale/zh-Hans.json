@@ -643,6 +643,7 @@
 	"design.import.contentTitle": "导入的内容",
 	"design.import.contentDescription": "此页面是根据导入的 {type} 文件创建的。",
 	"design.import.filesList": "导入的文件：{files}",
+	"design.import.success": "导入成功！",
 	"design.colorPalette.title": "为您的项目选择主题颜色",
 	"design.colorPalette.selectedColors": "已选颜色：",
 	"design.colorPalette.selectedCount": "已选择：{count}/5 种颜色",

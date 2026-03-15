@@ -490,6 +490,7 @@
   "design.import.contentTitle": "المحتوى المستورد",
   "design.import.contentDescription": "تم إنشاء هذه الصفحة من ملفات {type} المستوردة.",
   "design.import.filesList": "الملفات المستوردة: {files}",
+  "design.import.success": "تم الاستيراد بنجاح!",
   "design.colorPalette.title": "اختر لون السمة لمشروعك",
   "design.colorPalette.selectedColors": "الألوان المختارة:",
   "design.colorPalette.selectedCount": "المختار: {count}/5 ألوان",
