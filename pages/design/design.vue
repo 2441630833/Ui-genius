@@ -1399,8 +1399,7 @@ export default {
         this.showCreatePageDialog = true;
         this.pageDescription = '';
         this.errorMessage = '';
-        // Initialize model selection to google/gemini-3-flash-preview
-        this.selectedPageModel = 'google/gemini-3-flash-preview';
+        // Keep the default model selection from data()
       }
       if (shouldShowAutomationDialog && !this.showAutomationDialog) {
         this.showAutomationDialog = true;
@@ -3284,8 +3283,7 @@ export default {
         this.showCreatePageDialog = true;
         this.pageDescription = '';
         this.errorMessage = '';
-        // Initialize model selection to google/gemini-3-flash-preview
-        this.selectedPageModel = 'google/gemini-3-flash-preview';
+        // Keep the default model selection from data()
 
         // Populate available template pages from latest_7_overall_page (but DON'T reset selectedTemplatePageIndex)
         const existingProjectData = uni.getStorageSync('latest_7_overall_page');
