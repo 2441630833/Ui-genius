@@ -677,7 +677,7 @@ export default {
         { value: 'google/gemma-3-27b-it:free', text: 'google/gemma-3-27b-it:free', isPro: false },
         { value: 'uigenius5:latest', text: 'uigenius/uigenius5:latest', isPro: false }
       ],
-      selectedModel: 'google/gemini-3-flash-preview',
+      selectedModel: 'google/gemini-3.1-pro-preview',
       showModelDropdown: false,
       // Longze Guide
       guideTheme: 'dark',

@@ -881,7 +881,7 @@ export default {
         { value: 'google/gemma-3-27b-it:free', text: 'google/gemma-3-27b-it:free', isPro: false },
         { value: 'uigenius5:latest', text: 'uigenius/uigenius5:latest', isPro: false }
       ],
-      selectedPageModel: 'google/gemini-3-flash-preview',
+      selectedPageModel: 'google/gemini-3.1-pro-preview',
       showModelDropdown: false,
 
       // Import dialog properties
