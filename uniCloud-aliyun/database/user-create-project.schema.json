@@ -39,6 +39,11 @@
 		"themeColour": {
 			"bsonType": "array",
 			"description": "项目主题色"
+		},
+		"ifSharedProject": {
+			"bsonType": "bool",
+			"description": "项目是否分享",
+			"defaultValue": false // 默认项目不分享
 		}
 	}
 }

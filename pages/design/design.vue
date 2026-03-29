@@ -155,6 +155,11 @@
           <image class="nav-icon" :src="activeNavItem === 'guide' ? '/static/guide_white.png' : '/static/guide.png'">
           </image>
         </view>
+
+        <view class="nav-item share_project_guide" :class="{ active: activeNavItem === 'share_project' }" @click="navigateTo('share_project')">
+          <image class="nav-icon" :src="activeNavItem === 'share_project' ? '/static/share_white.png' : '/static/share.png'">
+          </image>
+        </view>
       </view>
     </view>
 
@@ -717,6 +722,26 @@
       </view>
     </view>
 
+    <!-- Custom Confirmation Modal -->
+    <view v-if="showCustomModal" class="custom-modal-overlay" @click="closeCustomModal">
+      <view class="custom-modal-container" @click.stop>
+        <view class="custom-modal-icon">
+          <image v-if="customModalIconImage" class="modal-icon-image" :src="customModalIconImage" mode="aspectFit"></image>
+          <text v-else class="modal-icon-text">{{ customModalIcon }}</text>
+        </view>
+        <view class="custom-modal-header">
+          <text class="custom-modal-title">{{ customModalTitle }}</text>
+        </view>
+        <view class="custom-modal-content">
+          <text class="custom-modal-message">{{ customModalMessage }}</text>
+        </view>
+        <view class="custom-modal-actions">
+          <button class="custom-modal-cancel" @click="closeCustomModal">{{ customModalCancelText }}</button>
+          <button class="custom-modal-confirm" @click="handleCustomModalConfirm">{{ customModalConfirmText }}</button>
+        </view>
+      </view>
+    </view>
+
     <!-- Browser Automation Dialog -->
     <view class="dialog-overlay" v-if="showAutomationDialog" @click="closeAutomationDialog">
       <view class="dialog-container automation-dialog" @click.stop>
@@ -929,6 +954,15 @@ export default {
       automationTaskId: null,
       showTerminalSection: false,
       automationReconnectTimeout: null,
+      // Custom modal properties
+      showCustomModal: false,
+      customModalTitle: '',
+      customModalMessage: '',
+      customModalConfirmText: '',
+      customModalCancelText: '',
+      customModalIcon: '🔗',
+      customModalIconImage: '',
+      customModalCallback: null,
     }
   },
 
@@ -1021,6 +1055,12 @@ export default {
           title: this.$t('design.guide.step13.title'),
           content: this.$t('design.guide.step13.content'),
           position: 'left'
+        },
+        {
+          target: '.share_project_guide',
+          title: this.$t('design.guide.step14.title') || 'Share Project',
+          content: this.$t('design.guide.step14.content') || 'Click here to make your project publicly shareable',
+          position: 'right'
         },
       ];
     },
@@ -3334,6 +3374,11 @@ export default {
 
       if (item === 'guide') {
         this.startGuide();
+      }
+
+      // Show share project confirmation
+      if (item === 'share_project') {
+        this.showShareProjectConfirmation();
       }
 
       // Toggle template selection mode
@@ -6004,6 +6049,16 @@ export default {
                     icon: 'success',
                     duration: 2000
                   });
+
+                  // Navigate to editor with the new template ID
+                  const newTemplateId = newPage.name.toLowerCase().replace(/ page/i, '').replace(/\s+/g, '-');
+                  uni.setStorageSync('selectedTemplateId', newTemplateId);
+
+                  setTimeout(() => {
+                    uni.switchTab({
+                      url: '/pages/editor/editor'
+                    });
+                  }, 500);
                 }, 1000);
               } else {
                 throw new Error('No valid page data found in response');
@@ -7238,6 +7293,106 @@ export default {
         }
       });
       // #endif
+    },
+
+    // Show share project confirmation dialog
+    showShareProjectConfirmation() {
+      this.showCustomConfirmModal({
+        title: this.$t('design.shareProject.title') || 'Share Project',
+        message: this.$t('design.shareProject.message') || 'Do you want to make this project publicly shareable? Others will be able to view and import your project.',
+        confirmText: this.$t('common.confirm') || 'Confirm',
+        cancelText: this.$t('common.cancel') || 'Cancel',
+        iconImage: '/static/share.png',
+        onConfirm: () => {
+          this.updateProjectShareStatus(true);
+        }
+      });
+    },
+
+    // Show custom confirmation modal
+    showCustomConfirmModal({ title, message, confirmText, cancelText, icon = '✨', iconImage = '', onConfirm }) {
+      this.customModalTitle = title;
+      this.customModalMessage = message;
+      this.customModalConfirmText = confirmText;
+      this.customModalCancelText = cancelText;
+      this.customModalIcon = icon;
+      this.customModalIconImage = iconImage;
+      this.customModalCallback = onConfirm;
+      this.showCustomModal = true;
+    },
+
+    // Close custom modal
+    closeCustomModal() {
+      this.showCustomModal = false;
+      this.customModalCallback = null;
+      this.customModalIconImage = '';
+    },
+
+    // Handle custom modal confirm
+    handleCustomModalConfirm() {
+      if (this.customModalCallback) {
+        this.customModalCallback();
+      }
+      this.closeCustomModal();
+    },
+
+    // Update project share status
+    async updateProjectShareStatus(isShared) {
+      try {
+        const currentProjectId = uni.getStorageSync('currentProjectId');
+        
+        if (!currentProjectId) {
+          uni.showToast({
+            title: this.$t('design.toast.noProjectSelected') || 'No project selected',
+            icon: 'none',
+            duration: 2000
+          });
+          return;
+        }
+
+        // Show loading
+        uni.showLoading({
+          title: this.$t('design.toast.updating') || 'Updating...',
+          mask: true
+        });
+
+        // Call cloud function to update share status
+        const result = await uniCloud.callFunction({
+          name: 'user-project',
+          data: {
+            action: 'update',
+            id: currentProjectId,
+            data: {
+              ifSharedProject: isShared
+            }
+          }
+        });
+
+        uni.hideLoading();
+
+        if (result.result && result.result.success) {
+          uni.showToast({
+            title: isShared 
+              ? (this.$t('design.toast.projectShared') || 'Project is now shared!') 
+              : (this.$t('design.toast.projectUnshared') || 'Project is now private'),
+            icon: 'success',
+            duration: 2000
+          });
+
+          // Reset activeNavItem after successful update
+          this.activeNavItem = '';
+        } else {
+          throw new Error(result.result?.message || 'Failed to update project');
+        }
+      } catch (error) {
+        uni.hideLoading();
+        console.error('Error updating project share status:', error);
+        uni.showToast({
+          title: this.$t('design.toast.updateFailed') || 'Failed to update project',
+          icon: 'none',
+          duration: 2000
+        });
+      }
     },
 
     // Fallback method for copying to clipboard (H5 only)
@@ -9300,6 +9455,241 @@ export default {
 .upgrade-modal-cancel:hover,
 .upgrade-modal-confirm:hover {
   opacity: 0.9;
+}
+
+/* Custom Confirmation Modal Styles */
+.custom-modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.6);
+  backdrop-filter: blur(8px);
+  z-index: 1002;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  animation: modalOverlayFadeIn 0.25s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+@keyframes modalOverlayFadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+.custom-modal-container {
+  background: linear-gradient(135deg, #ffffff 0%, #fafafa 100%);
+  border-radius: 20px;
+  padding: 32px 28px;
+  box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3), 0 0 0 1px rgba(255, 255, 255, 0.5);
+  width: 90%;
+  max-width: 480px;
+  text-align: center;
+  animation: modalSlideIn 0.35s cubic-bezier(0.34, 1.56, 0.64, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+@keyframes modalSlideIn {
+  from {
+    opacity: 0;
+    transform: translateY(-30px) scale(0.9);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+
+.custom-modal-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 4px;
+  background: linear-gradient(90deg, #e53935 0%, #ff6b6b 50%, #e53935 100%);
+  background-size: 200% 100%;
+  animation: gradientShift 3s ease infinite;
+}
+
+@keyframes gradientShift {
+  0%, 100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+
+.custom-modal-icon {
+  width: 72px;
+  height: 72px;
+  margin: 0 auto 20px;
+  background: linear-gradient(135deg, #fff5f5 0%, #ffebee 100%);
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  box-shadow: 0 8px 24px rgba(229, 57, 53, 0.2);
+  animation: iconBounce 0.6s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+@keyframes iconBounce {
+  0% {
+    transform: scale(0) rotate(-180deg);
+  }
+  50% {
+    transform: scale(1.1) rotate(10deg);
+  }
+  100% {
+    transform: scale(1) rotate(0deg);
+  }
+}
+
+.modal-icon-text {
+  font-size: 36px;
+  line-height: 1;
+}
+
+.modal-icon-image {
+  width: 48px;
+  height: 48px;
+  object-fit: contain;
+}
+
+.custom-modal-header {
+  margin-bottom: 16px;
+}
+
+.custom-modal-title {
+  font-size: 22px;
+  font-weight: 700;
+  color: #1a1a1a;
+  letter-spacing: -0.5px;
+  line-height: 1.3;
+}
+
+.custom-modal-content {
+  margin-bottom: 28px;
+}
+
+.custom-modal-message {
+  font-size: 15px;
+  color: #555;
+  line-height: 1.6;
+  max-width: 400px;
+  margin: 0 auto;
+}
+
+.custom-modal-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: center;
+}
+
+.custom-modal-cancel,
+.custom-modal-confirm {
+  flex: 1;
+  padding: 14px 24px;
+  border: none;
+  border-radius: 12px;
+  font-size: 16px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  position: relative;
+  overflow: hidden;
+}
+
+.custom-modal-cancel {
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  color: #555;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.custom-modal-cancel:hover {
+  background: linear-gradient(135deg, #e8e8e8 0%, #dcdcdc 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.12);
+}
+
+.custom-modal-cancel:active {
+  transform: translateY(0);
+}
+
+.custom-modal-confirm {
+  background: linear-gradient(135deg, #e53935 0%, #d32f2f 100%);
+  color: #ffffff;
+  box-shadow: 0 4px 16px rgba(229, 57, 53, 0.4);
+}
+
+.custom-modal-confirm::before {
+  content: '';
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  width: 0;
+  height: 0;
+  border-radius: 50%;
+  background: rgba(255, 255, 255, 0.3);
+  transform: translate(-50%, -50%);
+  transition: width 0.6s, height 0.6s;
+}
+
+.custom-modal-confirm:hover {
+  background: linear-gradient(135deg, #d32f2f 0%, #c62828 100%);
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(229, 57, 53, 0.5);
+}
+
+.custom-modal-confirm:active {
+  transform: translateY(0);
+}
+
+.custom-modal-confirm:active::before {
+  width: 300px;
+  height: 300px;
+}
+
+/* Responsive adjustments for custom modal */
+@media (max-width: 480px) {
+  .custom-modal-container {
+    padding: 28px 24px;
+    border-radius: 16px;
+  }
+
+  .custom-modal-icon {
+    width: 64px;
+    height: 64px;
+    margin-bottom: 16px;
+  }
+
+  .modal-icon-text {
+    font-size: 32px;
+  }
+
+  .custom-modal-title {
+    font-size: 20px;
+  }
+
+  .custom-modal-message {
+    font-size: 14px;
+  }
+
+  .custom-modal-actions {
+    flex-direction: column;
+  }
+
+  .custom-modal-cancel,
+  .custom-modal-confirm {
+    width: 100%;
+  }
 }
 
 /* Template Selection Mode Styles */
