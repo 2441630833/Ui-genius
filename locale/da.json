@@ -634,6 +634,7 @@
 	"design.export.noData": "Ingen sider fundet i projektet",
 	"dashboard.nav.createProject": "Opret Projekt",
 	"dashboard.nav.dashboard": "Dashboard",
+	"dashboard.nav.publicShare": "Offentlig Deling",
 	"dashboard.nav.account": "Konto",
 	"dashboard.nav.membership": "Medlemskab",
 	"dashboard.nav.inviteCode": "Invitationskode",

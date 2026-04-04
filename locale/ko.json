@@ -418,6 +418,7 @@
   "login.error.authenticationFailed": "인증 실패",
   "dashboard.nav.createProject": "프로젝트 생성",
   "dashboard.nav.dashboard": "대시보드",
+  "dashboard.nav.publicShare": "공개 공유",
   "dashboard.nav.account": "계정",
   "dashboard.nav.membership": "멤버십",
   "dashboard.nav.inviteCode": "초대 코드",

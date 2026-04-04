@@ -616,6 +616,7 @@
 	"design.export.noData": "Nessuna pagina trovata nel progetto",
 	"dashboard.nav.createProject": "Crea Progetto",
 	"dashboard.nav.dashboard": "Dashboard",
+	"dashboard.nav.publicShare": "Condivisione Pubblica",
 	"dashboard.nav.account": "Account",
 	"dashboard.nav.membership": "Iscrizione",
 	"dashboard.nav.inviteCode": "Codice Invito",

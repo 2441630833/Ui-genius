@@ -29,6 +29,14 @@
           <text class="nav-text">{{$t('dashboard.nav.dashboard')}}</text>
         </view>
 
+        <view class="nav-item" :class="{ active: activeNavItem === 'publicShare' }"
+          @click="setActiveNavItem('publicShare')">
+          <image class="sidebar-icon"
+            :src="activeNavItem === 'publicShare' ? '../../static/public_shared_project_white.png' : '../../static/public_shared_project.png'">
+          </image>
+          <text class="nav-text">{{$t('dashboard.nav.publicShare')}}</text>
+        </view>
+
         <view class="nav-item" :class="{ active: activeNavItem === 'account' }" @click="setActiveNavItem('account')">
           <image class="sidebar-icon"
             :src="activeNavItem === 'account' ? '../../static/account_white.png' : '../../static/account.png'"></image>
@@ -308,6 +316,45 @@
               <button class="delete-project-btn" @click.stop="confirmDeleteProject(project)">{{$t('dashboard.delete.deleteBtn')}}</button>
             </view>
           </view>
+        </view>
+      </view>
+
+      <!-- Public Share Content -->
+      <view v-if="activeNavItem === 'publicShare'" class="settings-content">
+        <view class="header">
+          <text class="title">{{$t('dashboard.publicShare.title')}}</text>
+          <view class="user-actions">
+            <image class="refresh-icon" src="../../static/refresh.png" @click="loadSharedProjects"></image>
+          </view>
+        </view>
+
+        <view class="projects-grid">
+          <!-- Loading state -->
+          <view v-if="sharedProjectsLoading" class="loading-container">
+            <text class="loading-text">{{$t('dashboard.publicShare.loading')}}</text>
+          </view>
+
+          <!-- No shared projects state -->
+          <view v-else-if="!sharedProjects || sharedProjects.length === 0" class="no-projects-container">
+            <text class="no-projects-text">{{$t('dashboard.publicShare.noProjects')}}</text>
+          </view>
+
+          <!-- Shared Projects -->
+          <template v-else>
+            <x-skeleton v-for="(project, index) in sharedProjects" :key="'shared-project-' + index" type="banner"
+              :loading="sharedProjectsLoading">
+              <view class="project-card" @click="jumpToDesign(project)">
+                <image class="project-image"
+                  :src="project.projectPreviewImage || 'https://mp-0728a9df-3eac-4bd5-b496-e252db36b648.cdn.bspapp.com/static/Image(3).png'"
+                  mode="aspectFill">
+                </image>
+                <view class="project-content">
+                  <text class="project-title">{{ project.projectTitle }}</text>
+                  <text class="project-description">{{ project.projectDescription }}</text>
+                </view>
+              </view>
+            </x-skeleton>
+          </template>
         </view>
       </view>
 
@@ -702,6 +749,9 @@ export default {
       isMultipleDelete: false, // Flag for multiple delete
       projectsToDelete: [], // Array of projects to delete
       currentUserId: uni.getStorageSync('uid'), // Track current user ID to detect account changes
+      // Public share state
+      sharedProjects: [],
+      sharedProjectsLoading: false,
     }
   },
   computed: {
@@ -890,6 +940,38 @@ export default {
         this.projectLoadingStates.gamma = false;
       }, 1800);
     },
+    async loadSharedProjects() {
+      this.sharedProjectsLoading = true;
+      
+      try {
+        // Call cloud function to get all shared projects
+        const result = await uniCloud.callFunction({
+          name: 'user-project',
+          data: {
+            action: 'readSharedProject'
+          }
+        });
+
+        if (result.result.success) {
+          this.sharedProjects = result.result.data || [];
+          console.log('Shared projects loaded:', this.sharedProjects);
+        } else {
+          console.error('Failed to load shared projects:', result.result.message);
+          uni.showToast({
+            title: this.$t('dashboard.publicShare.loadError'),
+            icon: 'none'
+          });
+        }
+      } catch (error) {
+        console.error('Error loading shared projects:', error);
+        uni.showToast({
+          title: this.$t('dashboard.publicShare.loadError'),
+          icon: 'none'
+        });
+      } finally {
+        this.sharedProjectsLoading = false;
+      }
+    },
     setActiveNavItem(item) {
       this.activeNavItem = item;
 
@@ -907,6 +989,11 @@ export default {
       // This ensures email and other info are up-to-date
       if (item === 'account') {
         this.initializeAccountSettings();
+      }
+
+      // Load shared projects when switching to publicShare tab
+      if (item === 'publicShare') {
+        this.loadSharedProjects();
       }
     },
     jumpToDesign(project) {

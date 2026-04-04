@@ -613,6 +613,7 @@
 	"design.export.noData": "Inga sidor hittades i projektet",
 	"dashboard.nav.createProject": "Skapa Projekt",
 	"dashboard.nav.dashboard": "Instrumentpanel",
+	"dashboard.nav.publicShare": "Offentlig Delning",
 	"dashboard.nav.account": "Konto",
 	"dashboard.nav.membership": "Medlemskap",
 	"dashboard.nav.inviteCode": "Inbjudningskod",

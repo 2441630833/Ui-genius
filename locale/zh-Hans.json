@@ -417,6 +417,7 @@
 	"login.error.authenticationFailed": "身份验证失败",
 	"dashboard.nav.createProject": "创建项目",
 	"dashboard.nav.dashboard": "仪表盘",
+	"dashboard.nav.publicShare": "公开分享",
 	"dashboard.nav.account": "账户",
 	"dashboard.nav.membership": "会员",
 	"dashboard.nav.inviteCode": "邀请码",

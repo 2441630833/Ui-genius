@@ -153,13 +153,16 @@ exports.main = async (event, context) => {
 					}).update(generalPagesUpdateData);
 				}
 
-				// Update project preview image and theme color if provided
+				// Update project preview image, theme color, and share status if provided
 				const projectUpdateData = {};
 				if (data.projectPreviewImage !== undefined) {
 					projectUpdateData.projectPreviewImage = data.projectPreviewImage;
 				}
 				if (data.themeColour !== undefined) {
 					projectUpdateData.themeColour = data.themeColour;
+				}
+				if (data.ifSharedProject !== undefined) {
+					projectUpdateData.ifSharedProject = data.ifSharedProject;
 				}
 				console.log(projectUpdateData)
 
@@ -225,6 +228,18 @@ exports.main = async (event, context) => {
 				response = {
 					success: true,
 					data: sharedProjects.data,
+					message: 'Shared projects retrieved successfully'
+				};
+				break;
+
+			case 'readSharedProject':
+				// Read all projects where ifSharedProject equals true
+				const sharedProjectsQuery = await collection.where({
+					ifSharedProject: true
+				}).get();
+				response = {
+					success: true,
+					data: sharedProjectsQuery.data,
 					message: 'Shared projects retrieved successfully'
 				};
 				break;

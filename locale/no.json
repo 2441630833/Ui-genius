@@ -613,6 +613,7 @@
   "design.export.noData": "Ingen sider funnet i prosjektet",
   "dashboard.nav.createProject": "Opprett Prosjekt",
   "dashboard.nav.dashboard": "Dashbord",
+  "dashboard.nav.publicShare": "Offentlig deling",
   "dashboard.nav.account": "Konto",
   "dashboard.nav.membership": "Medlemskap",
   "dashboard.nav.inviteCode": "Invitasjonskode",

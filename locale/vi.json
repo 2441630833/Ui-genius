@@ -613,6 +613,7 @@
   "design.export.noData": "Không tìm thấy trang nào trong dự án",
   "dashboard.nav.createProject": "Tạo Dự án",
   "dashboard.nav.dashboard": "Bảng điều khiển",
+  "dashboard.nav.publicShare": "Chia sẻ công khai",
   "dashboard.nav.account": "Tài khoản",
   "dashboard.nav.membership": "Tư cách Thành viên",
   "dashboard.nav.inviteCode": "Mã Mời",

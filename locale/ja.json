@@ -417,6 +417,7 @@
 	"login.error.authenticationFailed": "認証に失敗しました",
 	"dashboard.nav.createProject": "プロジェクト作成",
 	"dashboard.nav.dashboard": "ダッシュボード",
+	"dashboard.nav.publicShare": "公開共有",
 	"dashboard.nav.account": "アカウント",
 	"dashboard.nav.membership": "メンバーシップ",
 	"dashboard.nav.inviteCode": "招待コード",

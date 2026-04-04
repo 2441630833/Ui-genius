@@ -634,6 +634,7 @@
   "design.export.noData": "ไม่พบหน้าในโปรเจกต์",
   "dashboard.nav.createProject": "สร้างโปรเจกต์",
   "dashboard.nav.dashboard": "แดชบอร์ด",
+  "dashboard.nav.publicShare": "แชร์สาธารณะ",
   "dashboard.nav.account": "บัญชี",
   "dashboard.nav.membership": "การเป็นสมาชิก",
   "dashboard.nav.inviteCode": "รหัสเชิญ",

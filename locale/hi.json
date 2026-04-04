@@ -634,6 +634,7 @@
   "design.export.noData": "प्रोजेक्ट में कोई पेज नहीं मिला",
   "dashboard.nav.createProject": "प्रोजेक्ट बनाएं",
   "dashboard.nav.dashboard": "डैशबोर्ड",
+  "dashboard.nav.publicShare": "सार्वजनिक साझाकरण",
   "dashboard.nav.account": "खाता",
   "dashboard.nav.membership": "सदस्यता",
   "dashboard.nav.inviteCode": "आमंत्रण कोड",

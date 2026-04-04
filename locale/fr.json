@@ -420,6 +420,7 @@
   "login.error.authenticationFailed": "Échec de l'authentification",
   "dashboard.nav.createProject": "Créer un Projet",
   "dashboard.nav.dashboard": "Tableau de bord",
+  "dashboard.nav.publicShare": "Partage Public",
   "dashboard.nav.account": "Compte",
   "dashboard.nav.membership": "Adhésion",
   "dashboard.nav.inviteCode": "Code d'Invitation",

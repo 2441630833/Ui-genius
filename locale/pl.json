@@ -613,6 +613,7 @@
   "design.export.noData": "W projekcie nie znaleziono żadnych stron",
   "dashboard.nav.createProject": "Utwórz projekt",
   "dashboard.nav.dashboard": "Panel",
+  "dashboard.nav.publicShare": "Udostępnianie publiczne",
   "dashboard.nav.account": "Konto",
   "dashboard.nav.membership": "Członkostwo",
   "dashboard.nav.inviteCode": "Kod zaproszenia",

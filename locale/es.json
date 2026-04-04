@@ -417,6 +417,7 @@
 	"login.error.authenticationFailed": "Error de autenticación",
 	"dashboard.nav.createProject": "Crear Proyecto",
 	"dashboard.nav.dashboard": "Panel",
+	"dashboard.nav.publicShare": "Compartir Público",
 	"dashboard.nav.account": "Cuenta",
 	"dashboard.nav.membership": "Membresía",
 	"dashboard.nav.inviteCode": "Código de Invitación",

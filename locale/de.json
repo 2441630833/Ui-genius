@@ -417,6 +417,7 @@
 	"login.error.authenticationFailed": "Authentifizierung fehlgeschlagen",
 	"dashboard.nav.createProject": "Projekt erstellen",
 	"dashboard.nav.dashboard": "Dashboard",
+	"dashboard.nav.publicShare": "Öffentliches Teilen",
 	"dashboard.nav.account": "Konto",
 	"dashboard.nav.membership": "Mitgliedschaft",
 	"dashboard.nav.inviteCode": "Einladungscode",

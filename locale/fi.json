@@ -613,6 +613,7 @@
   "design.export.noData": "Projektista ei löytynyt sivuja",
   "dashboard.nav.createProject": "Luo Projekti",
   "dashboard.nav.dashboard": "Kojetaulu",
+  "dashboard.nav.publicShare": "Julkinen Jakaminen",
   "dashboard.nav.account": "Tili",
   "dashboard.nav.membership": "Jäsenyys",
   "dashboard.nav.inviteCode": "Kutsukoodi",

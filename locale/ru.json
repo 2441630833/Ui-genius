@@ -417,6 +417,7 @@
 	"login.error.authenticationFailed": "Ошибка аутентификации",
 	"dashboard.nav.createProject": "Создать Проект",
 	"dashboard.nav.dashboard": "Панель",
+	"dashboard.nav.publicShare": "Публичный доступ",
 	"dashboard.nav.account": "Аккаунт",
 	"dashboard.nav.membership": "Членство",
 	"dashboard.nav.inviteCode": "Код Приглашения",

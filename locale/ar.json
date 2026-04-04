@@ -637,6 +637,7 @@
   "design.export.noData": "لم يتم العثور على صفحات في المشروع",
   "dashboard.nav.createProject": "إنشاء مشروع",
   "dashboard.nav.dashboard": "لوحة التحكم",
+  "dashboard.nav.publicShare": "المشاركة العامة",
   "dashboard.nav.account": "الحساب",
   "dashboard.nav.membership": "العضوية",
   "dashboard.nav.inviteCode": "رمز الدعوة",
