@@ -1070,7 +1070,8 @@ export default {
         this.$t('design.export.asHtml'),
         this.$t('design.export.asVue2'),
         this.$t('design.export.asVue3'),
-        this.$t('design.export.asReact')
+        this.$t('design.export.asReact'),
+        this.$t('design.export.asMcpShare')
       ];
     },
     filteredTemplates() {
@@ -1552,6 +1553,118 @@ export default {
         }
       });
     },
+    getShareBaseUrl() {
+      return 'https://uigenius.top/pages/design/design';
+    },
+    async ensureProjectIdForSharing() {
+      let projectId = uni.getStorageSync('currentProjectId');
+      if (projectId) {
+        return projectId;
+      }
+
+      const projectData = uni.getStorageSync('latest_7_overall_page');
+      if (!projectData) {
+        throw new Error(this.$t('design.toast.noProjectData') || 'No project data found');
+      }
+
+      await this.saveProjectToCloud(typeof projectData === 'string' ? JSON.parse(projectData) : projectData);
+      projectId = uni.getStorageSync('currentProjectId');
+      if (!projectId) {
+        throw new Error(this.$t('design.toast.createProjectFailed') || 'Failed to create project');
+      }
+      return projectId;
+    },
+    buildMcpPromptPayload(projectId) {
+      const baseUrl = this.getShareBaseUrl();
+      const sharedProjectUrl = `${baseUrl}?pid=${encodeURIComponent(projectId)}`;
+      const mcpShareUrl = `${baseUrl}?pid=${encodeURIComponent(projectId)}&source=mcp`;
+      const raw = uni.getStorageSync('latest_7_overall_page');
+      const projectData = typeof raw === 'string' ? JSON.parse(raw || '{}') : (raw || {});
+      const pages = Array.isArray(projectData.pages) ? projectData.pages : [];
+      const projectName = projectData.AIProjectName || 'UI Genius Project';
+      const projectDescription = projectData.AIProjectDescription || '';
+
+      const htmlBlocks = pages.map((page, idx) => {
+        const name = page?.name || `Page ${idx + 1}`;
+        const component = page?.component || `<div>${this.$t('design.export.noContent') || 'No content available'}</div>`;
+        return `<!-- ${name} -->\n${component}`;
+      }).join('\n\n');
+
+      const maxHtmlLength = 24000;
+      const safeHtmlBlocks = htmlBlocks.length > maxHtmlLength
+        ? `${htmlBlocks.slice(0, maxHtmlLength)}\n\n<!-- HTML truncated for clipboard size -->`
+        : htmlBlocks;
+
+      const aiPrompt = [
+        'You are helping me implement UI based on an exported UI Genius project.',
+        `Project: ${projectName}`,
+        projectDescription ? `Description: ${projectDescription}` : '',
+        `Open this share link first: ${mcpShareUrl}`,
+        'Then generate production-ready code from the HTML design context below.',
+        'Requirements:',
+        '1) Keep layout and visual hierarchy consistent with the provided HTML.',
+        '2) Split code into reusable components and pages.',
+        '3) Keep responsive behavior and accessibility best practices.',
+        '4) Return final file structure and full code files.',
+        '',
+        '=== UI DESIGN HTML CONTEXT START ===',
+        safeHtmlBlocks,
+        '=== UI DESIGN HTML CONTEXT END ==='
+      ].filter(Boolean).join('\n');
+
+      return {
+        projectName,
+        sharedProjectUrl,
+        mcpShareUrl,
+        aiPrompt
+      };
+    },
+    async shareMcpLink() {
+      uni.showLoading({
+        title: this.$t('design.toast.preparing'),
+        mask: true
+      });
+
+      try {
+        const projectId = await this.ensureProjectIdForSharing();
+        const payload = this.buildMcpPromptPayload(projectId);
+        const mcpPackage = [
+          `MCP Share Link: ${payload.mcpShareUrl}`,
+          `Project Share Link: ${payload.sharedProjectUrl}`,
+          '',
+          'Prompt for Cursor / Windsurf / AI IDE:',
+          payload.aiPrompt
+        ].join('\n');
+
+        uni.setClipboardData({
+          data: mcpPackage,
+          success: () => {
+            uni.hideLoading();
+            uni.showToast({
+              title: this.$t('design.toast.mcpShareCopied'),
+              icon: 'success',
+              duration: 2500
+            });
+          },
+          fail: () => {
+            uni.hideLoading();
+            uni.showToast({
+              title: this.$t('design.toast.copyFailed'),
+              icon: 'none',
+              duration: 2000
+            });
+          }
+        });
+      } catch (error) {
+        uni.hideLoading();
+        console.error('shareMcpLink error:', error);
+        uni.showToast({
+          title: error?.message || (this.$t('design.toast.shareProjectFailed') || 'Failed to prepare MCP share link'),
+          icon: 'none',
+          duration: 2500
+        });
+      }
+    },
     exportProject() {
       // Show custom action sheet instead of uni.showActionSheet
       this.showCustomActionSheet = true;
@@ -1564,7 +1677,7 @@ export default {
     handleActionSheetSelection(index) {
       this.closeCustomActionSheet();
 
-      const exportTypes = ['html', 'vue2', 'vue3', 'react'];
+      const exportTypes = ['html', 'vue2', 'vue3', 'react', 'mcp-share'];
       this.exportType = exportTypes[index];
 
       switch (this.exportType) {
@@ -1579,6 +1692,9 @@ export default {
         case 'vue3':
         case 'react':
           this.exportFrameworkCode(this.exportType);
+          break;
+        case 'mcp-share':
+          this.shareMcpLink();
           break;
       }
     },
