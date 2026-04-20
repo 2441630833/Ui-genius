@@ -474,8 +474,8 @@
           </view>
           <view class="description-container">
             <textarea class="project-description-input" :placeholder="$t('design.createPage.placeholder')"
-              v-model="pageDescription" maxlength="7000"></textarea>
-            <text class="char-count">{{ pageDescription.length }}/7000 </text>
+              v-model="pageDescription" maxlength="50000"></textarea>
+            <text class="char-count">{{ pageDescription.length }}/50000 </text>
           </view>
 
           <button class="continue-btn" @click="createPage">{{ $t('design.createPage.continue') }}</button>
@@ -1584,16 +1584,40 @@ export default {
       const projectName = projectData.AIProjectName || 'UI Genius Project';
       const projectDescription = projectData.AIProjectDescription || '';
 
-      const htmlBlocks = pages.map((page, idx) => {
-        const name = page?.name || `Page ${idx + 1}`;
-        const component = page?.component || `<div>${this.$t('design.export.noContent') || 'No content available'}</div>`;
-        return `<!-- ${name} -->\n${component}`;
-      }).join('\n\n');
+      // Clipboard / paste size: keep a generous cap but never spend the whole budget on early pages.
+      const maxMcpHtmlTotal = 800000;
+      const noContent = `<div>${this.$t('design.export.noContent') || 'No content available'}</div>`;
 
-      const maxHtmlLength = 24000;
-      const safeHtmlBlocks = htmlBlocks.length > maxHtmlLength
-        ? `${htmlBlocks.slice(0, maxHtmlLength)}\n\n<!-- HTML truncated for clipboard size -->`
-        : htmlBlocks;
+      const buildPageBlock = (page, idx, maxComponentChars) => {
+        const name = page?.name || `Page ${idx + 1}`;
+        let component = page?.component || noContent;
+        const fullLen = component.length;
+        if (typeof maxComponentChars === 'number' && fullLen > maxComponentChars) {
+          component =
+            component.slice(0, Math.max(0, maxComponentChars)) +
+            `\n<!-- ${name}: truncated (${fullLen} characters total) -->`;
+        }
+        return `<!-- ${name} -->\n${component}`;
+      };
+
+      let safeHtmlBlocks;
+      if (!pages.length) {
+        safeHtmlBlocks = `<!-- No pages in project -->\n${noContent}`;
+      } else {
+        const fullJoined = pages.map((p, i) => buildPageBlock(p, i, Infinity)).join('\n\n');
+        if (fullJoined.length <= maxMcpHtmlTotal) {
+          safeHtmlBlocks = fullJoined;
+        } else {
+          const overhead = 64;
+          const perPageBudget = Math.max(
+            4000,
+            Math.floor((maxMcpHtmlTotal - overhead) / pages.length) - overhead
+          );
+          safeHtmlBlocks =
+            `<!-- MCP HTML: ${pages.length} pages (each capped so all pages fit the share payload) -->\n\n` +
+            pages.map((p, i) => buildPageBlock(p, i, perPageBudget)).join('\n\n');
+        }
+      }
 
       const aiPrompt = [
         'You are helping me implement UI based on an exported UI Genius project.',

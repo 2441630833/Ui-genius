@@ -510,8 +510,8 @@
           </view>
           <view class="description-container">
             <textarea class="project-description-input" :placeholder="$t('dashboard.createProject.placeholder')"
-              v-model="projectDescription" maxlength="7000"></textarea>
-            <text class="char-count">{{ projectDescription.length }}/7000</text>
+              v-model="projectDescription" maxlength="50000"></textarea>
+            <text class="char-count">{{ projectDescription.length }}/50000</text>
           </view>
           </div>
 
