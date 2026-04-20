@@ -1585,7 +1585,7 @@ export default {
       const projectDescription = projectData.AIProjectDescription || '';
 
       // Clipboard / paste size: keep a generous cap but never spend the whole budget on early pages.
-      const maxMcpHtmlTotal = 800000;
+      const maxMcpHtmlTotal = 2000000;
       const noContent = `<div>${this.$t('design.export.noContent') || 'No content available'}</div>`;
 
       const buildPageBlock = (page, idx, maxComponentChars) => {
