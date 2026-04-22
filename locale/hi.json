@@ -428,6 +428,7 @@
   "design.export.asVue2": "Vue 2 के रूप में निर्यात करें",
   "design.export.asVue3": "Vue 3 के रूप में निर्यात करें",
   "design.export.asReact": "React के रूप में निर्यात करें",
+  "design.export.asPsd": "PSD के रूप में निर्यात करें",
   "design.export.asMcpShare": "MCP साझा लिंक (Cursor / Windsurf)",
   "design.export.cancel": "रद्द करें",
   "design.dialogTitle": "आप किस डिवाइस के लिए डिज़ाइन कर रहे हैं?",

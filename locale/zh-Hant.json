@@ -591,6 +591,7 @@
   "design.export.asVue2": "導出為Vue 2",
   "design.export.asVue3": "導出為Vue 3",
   "design.export.asReact": "導出為React",
+  "design.export.asPsd": "導出為PSD",
   "design.export.asMcpShare": "MCP 分享連結（Cursor / Windsurf）",
   "design.export.cancel": "取消",
   "design.dialogTitle": "您要為哪種設備設計？",

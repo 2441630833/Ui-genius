@@ -428,6 +428,7 @@
   "design.export.asVue2": "ส่งออกเป็น Vue 2",
   "design.export.asVue3": "ส่งออกเป็น Vue 3",
   "design.export.asReact": "ส่งออกเป็น React",
+  "design.export.asPsd": "ส่งออกเป็น PSD",
   "design.export.asMcpShare": "ลิงก์แชร์ MCP (Cursor / Windsurf)",
   "design.export.cancel": "ยกเลิก",
   "design.dialogTitle": "คุณกำลังออกแบบสำหรับอุปกรณ์ใด?",

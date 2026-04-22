@@ -586,6 +586,7 @@
 	"design.export.asVue2": "Als Vue 2 exportieren",
 	"design.export.asVue3": "Als Vue 3 exportieren",
 	"design.export.asReact": "Als React exportieren",
+	"design.export.asPsd": "Als PSD exportieren",
 	"design.export.asMcpShare": "MCP-Freigabelink (Cursor / Windsurf)",
 	"design.export.cancel": "Abbrechen",
 	"design.dialogTitle": "Für welches Gerät entwerfen Sie?",

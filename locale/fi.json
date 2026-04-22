@@ -428,6 +428,7 @@
   "design.export.asVue2": "Vie Vue 2 -muodossa",
   "design.export.asVue3": "Vie Vue 3 -muodossa",
   "design.export.asReact": "Vie React-muodossa",
+  "design.export.asPsd": "Vie PSD-muodossa",
   "design.export.asMcpShare": "MCP-jakolinkki (Cursor / Windsurf)",
   "design.export.cancel": "Peruuta",
   "design.export.alreadyInProgress": "Vienti on jo käynnissä",

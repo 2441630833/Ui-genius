@@ -597,6 +597,7 @@
   "design.export.asVue2": "Export as Vue 2",
   "design.export.asVue3": "Export as Vue 3",
   "design.export.asReact": "Export as React",
+  "design.export.asPsd": "Export as PSD",
   "design.export.asMcpShare": "MCP share link (Cursor / Windsurf)",
   "design.export.cancel": "Cancel",
   "design.export.alreadyInProgress": "Export already in progress",

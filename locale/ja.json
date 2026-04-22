@@ -586,6 +586,7 @@
 	"design.export.asVue2": "Vue 2としてエクスポート",
 	"design.export.asVue3": "Vue 3としてエクスポート",
 	"design.export.asReact": "Reactとしてエクスポート",
+	"design.export.asPsd": "PSDとしてエクスポート",
 	"design.export.asMcpShare": "MCP共有リンク（Cursor / Windsurf）",
 	"design.export.cancel": "キャンセル",
 	"design.dialogTitle": "どのデバイス用にデザインしますか？",

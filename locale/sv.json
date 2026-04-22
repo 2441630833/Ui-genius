@@ -428,6 +428,7 @@
 	"design.export.asVue2": "Exportera som Vue 2",
 	"design.export.asVue3": "Exportera som Vue 3",
 	"design.export.asReact": "Exportera som React",
+	"design.export.asPsd": "Exportera som PSD",
 	"design.export.asMcpShare": "MCP-delningslänk (Cursor / Windsurf)",
 	"design.export.cancel": "Avbryt",
 	"design.export.alreadyInProgress": "Export pågår redan",

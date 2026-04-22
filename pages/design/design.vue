@@ -1071,7 +1071,7 @@ export default {
         this.$t('design.export.asVue2'),
         this.$t('design.export.asVue3'),
         this.$t('design.export.asReact'),
-        'Export as PSD',
+        this.$t('design.export.asPsd'),
         this.$t('design.export.asMcpShare')
       ];
     },
@@ -4476,13 +4476,32 @@ export default {
         return [];
       }
 
-      const cleanContent = (component) => {
-        if (!component || typeof component !== 'string') return '<div></div>';
+      const normalizePageMarkup = (component) => {
+        if (!component || typeof component !== 'string') {
+          return { bodyHtml: '<div></div>', styleCss: '' };
+        }
+
         let content = component.trim();
         if (content.startsWith('```')) {
-          content = content.replace(/^```(?:html|vue)?\s*/, '').replace(/```\s*$/, '');
+          content = content.replace(/^```(?:html|vue)?\s*/i, '').replace(/```\s*$/, '');
         }
-        return content || '<div></div>';
+
+        const styleBlocks = [];
+        content = content.replace(/<style[^>]*>([\s\S]*?)<\/style>/gi, (_, css = '') => {
+          if (css && css.trim()) styleBlocks.push(css.trim());
+          return '';
+        });
+
+        const templateMatch = content.match(/<template[^>]*>([\s\S]*?)<\/template>/i);
+        let bodyHtml = templateMatch ? templateMatch[1].trim() : content;
+
+        bodyHtml = bodyHtml.replace(/<script[\s\S]*?<\/script>/gi, '').trim();
+        if (!bodyHtml) bodyHtml = '<div></div>';
+
+        return {
+          bodyHtml,
+          styleCss: styleBlocks.join('\n\n')
+        };
       };
 
       const waitForImages = async (doc) => {
@@ -4495,6 +4514,17 @@ export default {
           });
         }));
       };
+      const waitForPaint = async (doc) => {
+        if (doc.fonts && doc.fonts.ready) {
+          try {
+            await doc.fonts.ready;
+          } catch (e) {
+            // Ignore font readiness failures and continue rendering.
+          }
+        }
+        await new Promise((resolve) => setTimeout(resolve, 200));
+        await new Promise((resolve) => requestAnimationFrame(() => resolve()));
+      };
 
       const iframe = document.createElement('iframe');
       iframe.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1440px;height:2200px;visibility:hidden;';
@@ -4505,17 +4535,17 @@ export default {
         for (let i = 0; i < projectData.pages.length; i++) {
           const page = projectData.pages[i] || {};
           const pageName = page.name || `Page ${i + 1}`;
-          const htmlContent = cleanContent(page.component);
+          const { bodyHtml, styleCss } = normalizePageMarkup(page.component);
           const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
 
           iframeDoc.open();
           iframeDoc.write(`<!DOCTYPE html><html><head><meta charset="UTF-8" />
 <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-<style>html,body{margin:0;padding:0;background:#fff;}</style></head><body>${htmlContent}</body></html>`);
+<style>html,body{margin:0;padding:0;background:#fff;}${styleCss || ''}</style></head><body>${bodyHtml}</body></html>`);
           iframeDoc.close();
 
-          await new Promise((resolve) => setTimeout(resolve, 250));
           await waitForImages(iframeDoc);
+          await waitForPaint(iframeDoc);
 
           const target = iframeDoc.body;
           const width = Math.max(target.scrollWidth || 0, 1440);

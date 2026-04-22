@@ -587,6 +587,7 @@
   "design.export.asVue2": "Vue 2로 내보내기",
   "design.export.asVue3": "Vue 3로 내보내기",
   "design.export.asReact": "React로 내보내기",
+  "design.export.asPsd": "PSD로 내보내기",
   "design.export.asMcpShare": "MCP 공유 링크 (Cursor / Windsurf)",
   "design.export.cancel": "취소",
   "design.dialogTitle": "어떤 디바이스용으로 디자인하시나요?",

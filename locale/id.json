@@ -428,6 +428,7 @@
   "design.export.asVue2": "Ekspor sebagai Vue 2",
   "design.export.asVue3": "Ekspor sebagai Vue 3",
   "design.export.asReact": "Ekspor sebagai React",
+  "design.export.asPsd": "Ekspor sebagai PSD",
   "design.export.asMcpShare": "Tautan berbagi MCP (Cursor / Windsurf)",
   "design.export.cancel": "Batal",
   "design.export.alreadyInProgress": "Ekspor sedang berlangsung",

@@ -432,6 +432,7 @@
   "design.export.asVue2": "تصدير كـ Vue 2",
   "design.export.asVue3": "تصدير كـ Vue 3",
   "design.export.asReact": "تصدير كـ React",
+  "design.export.asPsd": "تصدير كـ PSD",
   "design.export.asMcpShare": "رابط مشاركة MCP (Cursor / Windsurf)",
   "design.export.cancel": "إلغاء",
   "design.dialogTitle": "لأي جهاز تصمم؟",

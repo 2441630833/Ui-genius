@@ -586,6 +586,7 @@
 	"design.export.asVue2": "导出为Vue 2",
 	"design.export.asVue3": "导出为Vue 3",
 	"design.export.asReact": "导出为React",
+	"design.export.asPsd": "导出为PSD",
 	"design.export.asMcpShare": "MCP 分享链接（Cursor / Windsurf）",
 	"design.export.cancel": "取消",
 	"design.export.alreadyInProgress": "导出已在进行中",

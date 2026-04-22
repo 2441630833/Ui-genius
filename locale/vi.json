@@ -428,6 +428,7 @@
   "design.export.asVue2": "Xuất dưới dạng Vue 2",
   "design.export.asVue3": "Xuất dưới dạng Vue 3",
   "design.export.asReact": "Xuất dưới dạng React",
+  "design.export.asPsd": "Xuất dưới dạng PSD",
   "design.export.asMcpShare": "Liên kết chia sẻ MCP (Cursor / Windsurf)",
   "design.export.cancel": "Hủy",
   "design.export.alreadyInProgress": "Đang tiến hành xuất",
