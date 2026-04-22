@@ -1071,6 +1071,7 @@ export default {
         this.$t('design.export.asVue2'),
         this.$t('design.export.asVue3'),
         this.$t('design.export.asReact'),
+        'Export as PSD',
         this.$t('design.export.asMcpShare')
       ];
     },
@@ -1701,7 +1702,7 @@ export default {
     handleActionSheetSelection(index) {
       this.closeCustomActionSheet();
 
-      const exportTypes = ['html', 'vue2', 'vue3', 'react', 'mcp-share'];
+      const exportTypes = ['html', 'vue2', 'vue3', 'react', 'psd', 'mcp-share'];
       this.exportType = exportTypes[index];
 
       switch (this.exportType) {
@@ -1716,6 +1717,9 @@ export default {
         case 'vue3':
         case 'react':
           this.exportFrameworkCode(this.exportType);
+          break;
+        case 'psd':
+          this.exportPSD();
           break;
         case 'mcp-share':
           this.shareMcpLink();
@@ -4452,6 +4456,192 @@ export default {
           duration: 2000
         });
         console.error(`Error exporting ${framework} code:`, error);
+      }
+    },
+
+    base64ToBlob(base64Data, contentType = 'application/octet-stream') {
+      const raw = window.atob(base64Data);
+      const rawLength = raw.length;
+      const uInt8Array = new Uint8Array(rawLength);
+
+      for (let i = 0; i < rawLength; i++) {
+        uInt8Array[i] = raw.charCodeAt(i);
+      }
+
+      return new Blob([uInt8Array], { type: contentType });
+    },
+
+    async capturePsdPageImages(projectData) {
+      if (typeof document === 'undefined' || !projectData || !Array.isArray(projectData.pages)) {
+        return [];
+      }
+
+      const cleanContent = (component) => {
+        if (!component || typeof component !== 'string') return '<div></div>';
+        let content = component.trim();
+        if (content.startsWith('```')) {
+          content = content.replace(/^```(?:html|vue)?\s*/, '').replace(/```\s*$/, '');
+        }
+        return content || '<div></div>';
+      };
+
+      const waitForImages = async (doc) => {
+        const images = Array.from(doc.images || []);
+        await Promise.all(images.map((img) => {
+          if (img.complete) return Promise.resolve();
+          return new Promise((resolve) => {
+            img.onload = () => resolve();
+            img.onerror = () => resolve();
+          });
+        }));
+      };
+
+      const iframe = document.createElement('iframe');
+      iframe.style.cssText = 'position:absolute;left:-9999px;top:-9999px;width:1440px;height:2200px;visibility:hidden;';
+      document.body.appendChild(iframe);
+
+      const captured = [];
+      try {
+        for (let i = 0; i < projectData.pages.length; i++) {
+          const page = projectData.pages[i] || {};
+          const pageName = page.name || `Page ${i + 1}`;
+          const htmlContent = cleanContent(page.component);
+          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+
+          iframeDoc.open();
+          iframeDoc.write(`<!DOCTYPE html><html><head><meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0" />
+<style>html,body{margin:0;padding:0;background:#fff;}</style></head><body>${htmlContent}</body></html>`);
+          iframeDoc.close();
+
+          await new Promise((resolve) => setTimeout(resolve, 250));
+          await waitForImages(iframeDoc);
+
+          const target = iframeDoc.body;
+          const width = Math.max(target.scrollWidth || 0, 1440);
+          const height = Math.max(target.scrollHeight || 0, 1024);
+
+          const canvas = await html2canvas(target, {
+            useCORS: true,
+            allowTaint: true,
+            backgroundColor: '#FFFFFF',
+            scale: 1,
+            width,
+            height,
+            windowWidth: width,
+            windowHeight: height
+          });
+
+          captured.push({
+            name: pageName,
+            imageBase64: canvas.toDataURL('image/png').split(',')[1],
+            width: canvas.width,
+            height: canvas.height
+          });
+        }
+      } finally {
+        if (iframe && iframe.parentNode) {
+          iframe.parentNode.removeChild(iframe);
+        }
+      }
+
+      return captured;
+    },
+
+    async exportPSD() {
+      uni.showLoading({
+        title: this.$t('design.toast.preparingCode', { framework: 'PSD' }) || 'Preparing PSD...',
+        mask: true
+      });
+
+      try {
+        const jsonData = uni.getStorageSync('latest_7_overall_page');
+        if (!jsonData) {
+          uni.hideLoading();
+          uni.showToast({
+            title: this.$t('design.toast.noProjectData') || 'No project data found',
+            icon: 'none',
+            duration: 2000
+          });
+          return;
+        }
+
+        const projectData = typeof jsonData === 'string' ? JSON.parse(jsonData) : jsonData;
+        const pageImages = await this.capturePsdPageImages(projectData);
+
+        uni.request({
+          url: `${API_BASE_URL}/export-code`,
+          method: 'POST',
+          data: {
+            templateData: JSON.stringify(projectData),
+            framework: 'psd',
+            pageImages
+          },
+          header: {
+            'content-type': 'application/json'
+          },
+          timeout: 900000,
+          success: (res) => {
+            uni.hideLoading();
+
+            if (!res.data) {
+              uni.showToast({
+                title: this.$t('design.toast.codeExportError', { framework: 'PSD' }) || 'PSD export failed',
+                icon: 'none',
+                duration: 2000
+              });
+              return;
+            }
+
+            const saveAs = require('file-saver');
+            const projectName = projectData.AIProjectName || 'ui_genius_project';
+            const fileName = `${projectName.toLowerCase().replace(/\s+/g, '-')}.psd`;
+
+            // Support both base64 and plain text payload shapes from backend.
+            if (res.data.file_base64) {
+              const blob = this.base64ToBlob(res.data.file_base64, 'application/octet-stream');
+              saveAs(blob, fileName);
+            } else if (res.data.base64) {
+              const blob = this.base64ToBlob(res.data.base64, 'application/octet-stream');
+              saveAs(blob, fileName);
+            } else {
+              const psdContent = res.data.file_content || res.data.code;
+              if (!psdContent) {
+                uni.showToast({
+                  title: this.$t('design.toast.codeExportError', { framework: 'PSD' }) || 'PSD export failed',
+                  icon: 'none',
+                  duration: 2000
+                });
+                return;
+              }
+
+              const blob = new Blob([psdContent], { type: 'application/octet-stream' });
+              saveAs(blob, fileName);
+            }
+
+            uni.showToast({
+              title: this.$t('design.toast.codeExportSuccess', { framework: 'PSD' }) || 'PSD exported successfully',
+              icon: 'success',
+              duration: 2000
+            });
+          },
+          fail: (err) => {
+            uni.hideLoading();
+            uni.showToast({
+              title: this.$t('design.toast.exportFailed', { error: err.errMsg }) || 'PSD export failed',
+              icon: 'none',
+              duration: 2000
+            });
+          }
+        });
+      } catch (error) {
+        uni.hideLoading();
+        uni.showToast({
+          title: 'Error exporting PSD',
+          icon: 'none',
+          duration: 2000
+        });
+        console.error('Error exporting PSD:', error);
       }
     },
     tryPageExample() {
